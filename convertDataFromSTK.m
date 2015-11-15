@@ -56,7 +56,25 @@ for i=1:numberOfFolders
         mkdir('matlab');
     end
     
+    % get list of all present MetaMorph (*.stk) files
+    numberOfFiles = 
     
+    % iterate over all files in subfolder
+    for j=1:numberOfFiles
+      
+      % get file number (we assume this is the first part of the file name)
+      currentFileNumber = 
+      
+      % check if related data is already be processed
+      if currentFileNumber == currentExperimentNumber
+        
+      else
+        
+      end
+      
+      % save file as matlab file in respective folder
+      
+    end
     
     % change directory back to parent directory
     cd ..;
