@@ -104,6 +104,9 @@ for i=1:numberOfFolders
         % name separated by the character _ )
         [currentFileNumber, remain] = strtok(stkFiles(j).name, '_');
         
+        % some of the files have a double __ so we separate another time
+        remain = strtok(remain, '_');
+        
         % get dye of experiment (we assume this is the second part of the
         % file name separated by the characters _ and .)
         currentDye = strtok(remain, '.');
@@ -112,7 +115,7 @@ for i=1:numberOfFolders
         currentDye = currentDye(2:end);
         
         % check if related data is already be processed
-        if ~currentFileNumber == currentExperimentNumber
+        if ~strcmp(currentFileNumber, currentExperimentNumber)
    
             % save data belonging to last experiment as matlab file in
             % the current subfolder
