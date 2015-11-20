@@ -218,9 +218,9 @@ while  TIF.img_pos ~= 0
             case 33629       %this tag identify the image as a Metamorph stack!
                 TIF.MM_stack       = entry.val;
                 TIF.MM_stackCnt    = entry.cnt;
-                if  TIF.MM_stackCnt  && numel(indices) > 1
-                    hWaitbar = waitbar(0,'Reading images...','Name','TiffRead');
-                end
+                %if  TIF.MM_stackCnt  && numel(indices) > 1
+                %    hWaitbar = waitbar(0,'Reading images...','Name','TiffRead');
+                %end
             case 33630       %metamorph stack data: wavelength
                 TIF.MM_wavelength  = entry.val;
             case 33631       %metamorph stack data: gain/background?
@@ -297,9 +297,9 @@ while  TIF.img_pos ~= 0
 
             % print a text timer on the main window, or update the waitbar
             % fprintf('img_read %i img_skip %i\n', img_read, img_skip);
-            if ~isempty( hWaitbar )
-                waitbar( img_read/numel(indices), hWaitbar);
-            end
+            % if ~isempty( hWaitbar )
+            %     waitbar( img_read/numel(indices), hWaitbar);
+            % end
             
             [ IMG.MM_stack, IMG.MM_wavelength, IMG.MM_private2 ] = splitMetamorph(ii);
             

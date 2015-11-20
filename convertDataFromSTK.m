@@ -105,14 +105,16 @@ for i=1:numberOfFolders
         [currentFileNumber, remain] = strtok(stkFiles(j).name, '_');
         
         % some of the files have a double __ so we separate another time
-        remain = strtok(remain, '_');
+	if remain(1) == '_'
+          remain = strtok(remain, '_');
+	end
         
         % get dye of experiment (we assume this is the second part of the
         % file name separated by the characters _ and .)
         currentDye = strtok(remain, '.');
         
         % cut away the character _ at the beginning
-        currentDye = currentDye(2:end);
+        currentDye = currentDye(1:end);
         
         % check if related data is already be processed
         if ~strcmp(currentFileNumber, currentExperimentNumber)
@@ -146,6 +148,10 @@ for i=1:numberOfFolders
         for k=1:nz
             data.(currentDye)(:,:,k) = tmpData(k).data;
         end
+
+	% add additional fields for the x-/y-resolution
+	data.x_resolution = tmpData(1).x_resolution(1);	
+	data.y_resolution = tmpData(1).y_resolution(1);	
         
     end
     
