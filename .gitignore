@@ -1,2 +1,5 @@
 # ignore data folder
 data/
+
+# ignore temporary vim files
+*~
