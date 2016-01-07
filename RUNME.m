@@ -14,24 +14,25 @@ clear; close all; clc;
 addpath(genpath(pwd));
 
 % load the data
-load('1.mat');
+load('19.mat');
 dapi = data.Dapi;           % embryo membrane
 gfp = data.GFP;             % fluorescent landmark on membrane
 mCherry = data.mCherry;     % fluorescent cells within embryo
 
 % rescale image size using trilinear interpolation for higher speed
-scale = 0.25;
+scale = 0.1;
 for i=1:size(dapi,3)
   dapi_resized(:,:,i) = double(imresize(dapi(:,:,i), scale));
   gfp_resized(:,:,i) = double(imresize(gfp(:,:,i), scale));
   mCherry_resized(:,:,i) = double(imresize(mCherry(:,:,i), scale));
 end
  
-% segment embryo membrane
-dapi_segmented = segmentData(dapi_resized,1100);
-
 % segment fluorescent landmark
-gfp_segmented = segmentData(gfp_resized, 1150);
+[embryo, landmark] = segmentGFP(gfp_resized);
 
-% segment cells
-mCherry_segmented = segmentData(mCherry_resized,600);
+% compose segmentation results
+ensemble = embryo;
+ensemble(landmark == 1) = 2;
+
+% visualize results
+slideShow(gfp_resized, ensemble, 2);
