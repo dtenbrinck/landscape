@@ -14,7 +14,7 @@ clear; close all; clc;
 addpath(genpath(pwd));
 
 % load the data
-load('19.mat');
+load('11.mat');
 dapi = data.Dapi;           % embryo membrane
 gfp = data.GFP;             % fluorescent landmark on membrane
 mCherry = data.mCherry;     % fluorescent cells within embryo
