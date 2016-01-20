@@ -1,3 +1,3 @@
 [submodule "segmentation"]
 	path = segmentation
-	url = ssh://git@wwwmath.uni-muenster.de:16199/daniel.tenbrinck/minimal_surfaces.git
+	url = ssh://git@wwwmath.uni-muenster.de:16199/segmentation/minimal_surfaces.git
