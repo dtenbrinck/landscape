@@ -21,13 +21,13 @@ dapi = data.Dapi;           % embryo membrane
 l = fspecial('laplacian');
 
 % set rescaling factor
-scale = 0.7;
+scale = 0.5;
 
 % set threshold for sharp objects
 threshold = 100;
 
 % set threshold for indicator functions
-threshold_indicator = 0.2;
+threshold_indicator = 0.005;
 
 % treat slices separately
 for i=1:size(dapi,3)
@@ -48,29 +48,46 @@ for i=1:size(dapi,3)
   dapi_filtered(3:end-3, 3:end-3, i) = tmp;
   
   % compute indicator function using threshold of absolute value
-  indicator(:,:,i) = double(abs(dapi_filtered(:,:,i)) > threshold);
+  indicator(:,:,i) = double(abs(dapi_filtered(:,:,i)) > threshold); % TODO: determine threshold automatically
   
   % smooth indicator function
-  g = fspecial('gaussian', [21 21], 5);
+  g = fspecial('gaussian', [29 29], 3.2);
   indicator_smoothed(:,:,i) = convn( indicator(:,:,i),g,'same');
   
-  % compute center-of-mass for each slice
-  CoM(i,:) = computeCoM(indicator_smoothed(:,:,i)>threshold_indicator); % TODO determine threshold automatically
+  % compute region-of-interest according to sharpness
+  ROI = indicator_smoothed(:,:,i) > threshold_indicator; % TODO determine threshold automatically
+  
+  % try regionprops function
+  %stats = regionprops('table',ROI,'Centroid','MajorAxisLength','MinorAxisLength')
+
+  % compute center by searching for a bounding box
+  bBox = computeBoundingBox(ROI);
+  center(i,:) = [mean(bBox(1:2)), mean(bBox(3:4))];
+  
+  % compute center-of-mass for each slice -> DOESNT WORK!
+  %center(i,:) = computeCoM(ROI); 
+  
+  % visualize centers of mass inside indicator
+  %figure(1); imagesc(indicator_smoothed(:,:,i)>threshold_indicator);
+  %viscircles(center(i,2:-1:1), 1);
+  %pause;
   
 end
 
 % determine center axes
-valid_entries = CoM(~isnan(CoM(:,1)),:);
-valid_entries = valid_entries(2:end-1,:);
-center_axes = mean(valid_entries);
+%valid_entries = center(~isnan(center(:,1)),:);
+%valid_entries = valid_entries(2:end-1,:);
+%center_axes = mean(center);
 
 % determine radii of outer circles
-radii = computeRadii(indicator_smoothed>threshold_indicator,center_axes);
-
-%figure; imagesc(abs(dapi_resized(3:end-3,3:end-3,8))) 
+radii = computeRadii(indicator_smoothed>threshold_indicator,center);
 
 % visualize results
-figure; imagesc(indicator_smoothed(:,:,7));
-viscircles(cat(1,center_axes(2:-1:1),center_axes(2:-1:1)), radii(7,:)');
+for i=1:size(dapi,3)
+    figure(1); imagesc(dapi_resized(:,:,i));
+    viscircles(cat(1,center(i,2:-1:1),center(i,2:-1:1)), radii(i,:)');
+    print(['results/result_' num2str(i) ],'-dpng'); 
+    pause(1)
+end
 
-slideShow(indicator_smoothed, indicator_smoothed>0.08, 2);
+%slideShow(dapi_resized, indicator_smoothed>threshold_indicator, 2);
