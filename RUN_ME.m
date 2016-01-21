@@ -14,7 +14,7 @@ clear; close all; clc;
 addpath(genpath(pwd));
 
 % load the data
-load('2.mat');
+load('1.mat');
 dapi = data.Dapi;           % embryo membrane
 
 % generate a two-dimensional laplacian filter
@@ -36,7 +36,8 @@ for i=1:size(dapi,3)
   dapi_resized(:,:,i) = double(imresize(dapi(:,:,i), scale));
   
   % smooth image slices
-  dapi_filtered(:,:,i) = imgaussfilt(dapi_resized(:,:,i),1);
+  g = fspecial('gaussian', [9 9], 1);
+  dapi_filtered(:,:,i) = convn(dapi_resized(:,:,i),g,'same');
   
   % use Laplacian filter to find sharp objects
   dapi_filtered(:,:,i) = convn(dapi_filtered(:,:,i),l,'same');
@@ -50,7 +51,8 @@ for i=1:size(dapi,3)
   indicator(:,:,i) = double(abs(dapi_filtered(:,:,i)) > threshold);
   
   % smooth indicator function
-  indicator_smoothed(:,:,i) = imgaussfilt( indicator(:,:,i),5);
+  g = fspecial('gaussian', [21 21], 5);
+  indicator_smoothed(:,:,i) = convn( indicator(:,:,i),g,'same');
   
   % compute center-of-mass for each slice
   CoM(i,:) = computeCoM(indicator_smoothed(:,:,i)>threshold_indicator); % TODO determine threshold automatically
@@ -63,9 +65,12 @@ valid_entries = valid_entries(2:end-1,:);
 center_axes = mean(valid_entries);
 
 % determine radii of outer circles
-radiigit st = computeRadii(indicator_smoothed>threshold_indicator,center_axes);
+radii = computeRadii(indicator_smoothed>threshold_indicator,center_axes);
 
 %figure; imagesc(abs(dapi_resized(3:end-3,3:end-3,8))) 
 
 % visualize results
+figure; imagesc(indicator_smoothed(:,:,7));
+viscircles(cat(1,center_axes(2:-1:1),center_axes(2:-1:1)), radii(7,:)');
+
 slideShow(indicator_smoothed, indicator_smoothed>0.08, 2);

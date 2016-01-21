@@ -32,7 +32,12 @@ for z = 1:N(3)
             end
         end
     end
+    
+    % get indices that are interesting
+    indices = intersect(find(integral(z,:) > 500), find(integral(z,:) < integral(z,end)));
+    if isempty(indices)
+      radii(z,:) = [0 0];
+    else
+      radii(z,:) = [min(indices(:)), max(indices(:))];
+    end
 end
-
-
-radii = 0;
