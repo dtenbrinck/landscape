@@ -1,7 +1,7 @@
 function [radii surface3D] = estimateSurface(mask3D, center)
 
 % determine size of data
-N = size(mask3D);
+[N(1), N(2), N(3)] = size(mask3D);
 
 % initialize mask for 3D surface of embryo
 surface3D = zeros(N);
@@ -17,7 +17,7 @@ for z = 1:N(3)
     maxRadius = floor(max(distances));
     
     % initialize empty integral
-    integral = zeros(1,maxRadius);
+    integral = zeros(1,2*maxRadius);
     
     for y = 1:N(1)
         for x = 1:N(2)
@@ -47,7 +47,7 @@ for z = 1:N(3)
     end
     circumference = 2 * pi * innerRadius;
     
-    threshold = 5*circumference; % TODO check for robustness
+    threshold = 5* circumference; % TODO check for robustness
     
     
     % get indices that are interesting

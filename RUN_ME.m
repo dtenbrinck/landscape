@@ -29,11 +29,30 @@ threshold = 100;
 % set threshold for indicator functions
 threshold_indicator = 0.005;
 
-% treat slices separately
+% rescale data
 for i=1:size(dapi,3)
     
   % rescale image size using trilinear interpolation for higher speed  
   dapi_resized(:,:,i) = double(imresize(dapi(:,:,i), scale));
+  
+end
+
+% segment embryo area from maximum intensity projection
+MIP = computeMIP(dapi_resized);
+embryo_area = segmentEmbryo(MIP);
+
+% compute center-of-mass
+CoM = computeCoM(embryo_area);
+
+% estimate circumference of embryo
+radius_embryo = estimateSurface(embryo_area,CoM);
+
+% visualize result
+figure(1); imagesc(embryo_area);
+viscircles(CoM(2:-1:1), radius_embryo(2));
+
+% treat slices separately
+for i = size(dapi,3)
   
   % smooth image slices
   g = fspecial('gaussian', [9 9], 1);
@@ -86,8 +105,8 @@ end
 for i=1:size(dapi,3)
     figure(1); imagesc(dapi_resized(:,:,i));
     viscircles(cat(1,center(i,2:-1:1),center(i,2:-1:1)), radii(i,:)');
-    print(['results/result_' num2str(i) ],'-dpng'); 
-    pause(1)
+    %print(['results/result_' num2str(i) ],'-dpng'); 
+    pause(0.3)
 end
 
 %slideShow(dapi_resized, indicator_smoothed>threshold_indicator, 2);
