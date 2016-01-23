@@ -1,11 +1,13 @@
-function radii = computeRadii(mask3D, center)
+function [radii surface3D] = estimateSurface(mask3D, center)
 
 % determine size of data
 N = size(mask3D);
 
+% initialize mask for 3D surface of embryo
+surface3D = zeros(N);
+
 % initialize vector to collect radii (min and max)
 radii = zeros(N(3), 2);
-
 
 % compute radial integrals by checking every pixel (linear time)
 for z = 1:N(3)
@@ -29,11 +31,13 @@ for z = 1:N(3)
                     
                     % add value to all circles with radius bigger than d
                     integral(ceil(d):end) = integral(ceil(d):end) + 1;
+                    
                 end
             end
         end
     end
     
+    % TODO: comments
     innerRadius = find(integral(:) > 0);
     
     if(isempty(innerRadius))
@@ -43,7 +47,7 @@ for z = 1:N(3)
     end
     circumference = 2 * pi * innerRadius;
     
-    threshold = 5*circumference;
+    threshold = 5*circumference; % TODO check for robustness
     
     
     % get indices that are interesting
@@ -52,5 +56,18 @@ for z = 1:N(3)
         radii(z,:) = [0 0];
     else
         radii(z,:) = [min(indices(:))-1, max(indices(:))-1];
+    end
+    
+    for y = 1:N(1)
+        for x = 1:N(2)
+        
+            d = norm([y,x] - center(z,:));
+             
+            if radii(z,1) <= d & radii(z,2) >= d
+                % set current position as part of surface
+                surface3D(y,x,z) = 1;
+            end
+                    
+        end
     end
 end

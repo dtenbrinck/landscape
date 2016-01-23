@@ -80,7 +80,7 @@ end
 %center_axes = mean(center);
 
 % determine radii of outer circles
-radii = computeRadii(indicator_smoothed>threshold_indicator,center);
+[radii surface3D] = estimateSurface(indicator_smoothed>threshold_indicator,center);
 
 % visualize results
 for i=1:size(dapi,3)
