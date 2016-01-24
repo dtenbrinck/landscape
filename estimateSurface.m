@@ -1,10 +1,10 @@
-function [radii surface3D] = estimateSurface(mask3D, center)
+function [radii surface] = estimateSurface(mask, center,radius_embryo)
 
 % determine size of data
-[N(1), N(2), N(3)] = size(mask3D);
+[N(1), N(2), N(3)] = size(mask);
 
-% initialize mask for 3D surface of embryo
-surface3D = zeros(N);
+% initialize mask for surface of embryo
+surface = zeros(N);
 
 % initialize vector to collect radii (min and max)
 radii = zeros(N(3), 2);
@@ -14,16 +14,22 @@ for z = 1:N(3)
     
     % determine largest radius possible
     distances = N(1:2) - center(z,:);
-    maxRadius = floor(max(distances));
     
+    % set maximum radius to search for
+    if nargin == 3
+        maxRadius = radius_embryo;
+    else
+        maxRadius = 2*floor(max(distances));
+    end
+        
     % initialize empty integral
-    integral = zeros(1,2*maxRadius);
+    integral = zeros(1,maxRadius);
     
     for y = 1:N(1)
         for x = 1:N(2)
             
             % check if mask has 1
-            if mask3D(y,x,z) == 1
+            if mask(y,x,z) == 1
                 d = norm([y,x] - center(z,:));
                 
                 % make sure pixel is not outside of maximal radius
@@ -65,7 +71,7 @@ for z = 1:N(3)
              
             if radii(z,1) <= d & radii(z,2) >= d
                 % set current position as part of surface
-                surface3D(y,x,z) = 1;
+                surface(y,x,z) = 1;
             end
                     
         end
