@@ -1,4 +1,4 @@
-function landmark = segmentGFP( data, mask )
+function landmark = segmentGFP( data )
 %SEGMENTDATA Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -11,8 +11,8 @@ dataP.dim = ndims(dataP.f);
 dataP.hx = 1; dataP.hy = 1; dataP.hz = 1;
 
 % initialize algorithm parameters
-algP.maxIts = 2000;%5000;
-algP.alpha = 200;
+algP.maxIts = 1000;%5000;
+algP.alpha = 0.05;
 algP.regAccur = 1e-7;
 algP.mu_grad_u = 1;
 algP.TV = 'iso';
@@ -34,7 +34,7 @@ u = dataP.f;
 
 % determine segmentation contour by thresholding
 Xi = zeros(size(dataP.f));
-Xi(u >= dataP.t+1) = 1;
+Xi(u >= dataP.t) = 1;
 
 % set output variable
 embryo = Xi;
@@ -46,11 +46,11 @@ dataP.t = kittler_thresholding(dataP.f, embryo);
 fprintf('Optimal threshold for GFP landmark computed as t2=%i.\n', dataP.t);
 
 % segment landmark region using modified Arrow-Hurrowitz algorithm
-[u, rel_change] = wL2_TV_AHMOD(dataP, algP, dataP.f .* mask, ones(size(dataP.f)), false);
+[u, rel_change] = wL2_TV_AHMOD(dataP, algP, dataP.f, ones(size(dataP.f)), false);
     
 % determine segmentation contour by thresholding
 Xi = zeros(size(dataP.f));
-Xi(u >= dataP.t+1) = 1;
+Xi(u >= dataP.t) = 1;
 
 % set output variable
 landmark = Xi;

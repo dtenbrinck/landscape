@@ -13,7 +13,7 @@
 %   Sawatzky A, Tenbrinck D, Jiang X, Burger M, "A Variational Framework for 
 %   Region-Based Segmentation Incorporating Physical Noise Models", Journal 
 %   of Mathematical Imaging and Vision 47(3), p. 179-209 (2013)
-function render_surface(surface3D, landmark, resolution)
+function renderGFPsurface(surface3D, landmark, resolution)
 
 % flip dimensions to get a more intuitive view
 v=flipdim(double(surface3D>0),3);
@@ -41,7 +41,7 @@ set(p, 'FaceColor','r', 'EdgeColor','none','FaceAlpha',1);
 set(p2, 'FaceColor','g', 'EdgeColor','none','FaceAlpha',1);
 
 % set aspect ratio
-daspect(1./resolution)  
+daspect(resolution(3)./resolution)  
 
 % adjust a view angle for perspective
 view(-122,46), axis off, box off, grid off; camproj perspective

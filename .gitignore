@@ -1,8 +1,5 @@
-# ignore data folder
-data/
-
-# ignore results folder
-results/
+# ignore reference folde
+refs/
 
 # ignore temporary vim files
 *~
