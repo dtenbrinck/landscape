@@ -11,7 +11,7 @@ dataP.dim = ndims(dataP.f);
 dataP.hx = 1; dataP.hy = 1; dataP.hz = 1;
 
 % initialize algorithm parameters
-algP.maxIts = 1000;%5000;
+algP.maxIts = 600;%5000;
 algP.alpha = 0.05;
 algP.regAccur = 1e-7;
 algP.mu_grad_u = 1;

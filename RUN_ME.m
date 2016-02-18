@@ -87,3 +87,5 @@ for i=1:size(dapi,3)
   print(['results/gfp_' num2str(i) ],'-dpng');
   pause(0.2)
 end
+
+close all;
