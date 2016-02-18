@@ -84,7 +84,7 @@ print('results/rendering','-dpng');
 % visualize segmentation contour of gfp landmark and save results
 for i=1:size(dapi,3)
   drawSegmentation(gfp_resized(:,:,i),landmark(:,:,i));
-  print(['results/gfp_' num2str(i) ],'-dpng');
+  print(['results/gfp_' sprintf('%02d',i) ],'-dpng');
   pause(0.2)
 end
 
