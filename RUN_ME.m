@@ -77,8 +77,30 @@ landmark = landmark .* surface3D;
 % segment cells -> TODO: Threshold not good!
 %cells = segmentCells( mCherry_resized );
 
+firstSlice = size(surface3D,3);
+lastSlice = 1;
+
+for i=1:size(surface3D,3)
+  slice = surface3D(:,:,i);
+  if sum(slice(:)) > 0
+    if firstSlice > lastSlice
+      firstSlice = i;      
+    end
+    lastSlice = i;
+  end
+end
+
+cutSurface = surface3D(:,:,firstSlice:lastSlice);
+cutLandmark = landmark(:,:,firstSlice:lastSlice);
+
+flippedSurface = flipdim(cutSurface,3);
+fullSurface = cat(3,cutSurface,flippedSurface); 
+
+embeddedLandmark = zeros(size(cutLandmark,1), size(cutLandmark,2), 2*size(cutLandmark,3));
+embeddedLandmark(:,:,1:end/2) = cutLandmark;
+
 % visualize and save result in 3D
-renderGFPsurface(surface3D, landmark, resolution)
+renderGFPsurface(fullSurface, embeddedLandmark, resolution)
 print('results/rendering','-dpng');
 
 % visualize segmentation contour of gfp landmark and save results
