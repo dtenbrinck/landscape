@@ -45,15 +45,16 @@ kernelLaplace = generate3dLaplacian(resolution);
 sharp_areas = normalizeData(imfilter(blurred, kernelLaplace, 'same', 'replicate'));
 
 % estimate focus of images by fitting circles
-[center_points, radii, radii_disc, surface3D] = fitCircles(sharp_areas);
+%[center_points, radii, radii_disc, surface3D] = fitCircles(sharp_areas);
+fitEllipsoid(sharp_areas);
 
 % visualize estimation of sharp areas and save results
 for i = 1:size(dapi_resized,3)
   
   figure(1); imagesc(dapi_resized(:,:,i)); colormap gray;
-  %viscircles(center_points(i,2:-1:1), radii(i),'EdgeColor','b');
-  viscircles(center_points(i,2:-1:1), radii_disc(i,1));
-  viscircles(center_points(i,2:-1:1), radii_disc(i,2));
+  viscircles(center_points(i,2:-1:1), radii(i),'EdgeColor','b');
+  %viscircles(center_points(i,2:-1:1), radii_disc(i,1));
+  %viscircles(center_points(i,2:-1:1), radii_disc(i,2));
   print(['results/dapi_' sprintf('%02d',i) ],'-dpng');
   pause(0.1);
   

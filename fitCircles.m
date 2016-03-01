@@ -25,7 +25,7 @@ for slice = 1:number_of_slices
   [Y, X] = ind2sub(size(sharp_areas),sharp_points);
   
   % fit best circle using Gauss-Newton approach
-  [center_x, center_y, radius] = gaussNewton(cat(2,Y,X));
+  [center_x, center_y, radius] = gaussNewtonCircles(cat(2,Y,X));
   
   % set output variables
   center_points(slice,:) = [center_y, center_x];
