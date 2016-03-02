@@ -14,7 +14,7 @@ clear; close all; clc;
 addpath(genpath(pwd));
 
 % load the data
-load('17.mat');
+load('12.mat');
 dapi = normalizeData(data.Dapi);           % embryo membrane
 gfp = normalizeData(data.GFP);             % landmark
 mCherry = normalizeData(data.mCherry);     % labeled cells
@@ -42,11 +42,11 @@ blurred = imfilter(dapi_resized, g, 'same','replicate');
 kernelLaplace = generate3dLaplacian(resolution);
 
 % determine sharp areas by Laplacian filtering
-sharp_areas = normalizeData(imfilter(blurred, kernelLaplace, 'same', 'replicate'));
+sharp_areas = normalizeData (imfilter(blurred, kernelLaplace, 'same', 'replicate'));
 
 % estimate focus of images by fitting circles
 %[center_points, radii, radii_disc, surface3D] = fitCircles(sharp_areas);
-fitEllipsoid(sharp_areas);
+fitEllipsoid(sharp_areas, resolution);
 
 % visualize estimation of sharp areas and save results
 for i = 1:size(dapi_resized,3)

@@ -1,4 +1,4 @@
-function [center A] = gaussNewtonEllipsoid( sharp_points, initialCenter )
+function [center A] = gaussNewtonEllipsoid( sharp_points, initialCenter, initialA )
 %GAUSSNEWTON Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -9,16 +9,16 @@ m = size(sharp_points,2);
 center_old = initialCenter;
 
 % initialize matrix as identity
-A_old = eye(3);
+A_old = initialA;
 
 % initialize container for Jacobi matrix
-J = zeros(m,12);
+J = zeros(m,9);
 
 % initialize termination criterion
 rel_error = 1;
 
 % iterate Gauss-Newton algorithm until convergence
-while rel_error > 1e-05
+while rel_error > 1e-06
   
   %compute f
   translated_points = sharp_points - repmat(center_old,1,m);
@@ -28,23 +28,27 @@ while rel_error > 1e-05
   for i=1:m
     
     % compute y_1
-    J(i,1:3) = (center_old'-sharp_points(:,i)')*(A_old + A_old');
+    J(i,1:3) = 2*(center_old'-sharp_points(:,i)')*A_old;
     
     % compute y_0
     %J(i,4:12) = reshape( sharp_points(:,i)*(sharp_points(:,i)' - center_old') + center_old*(center_old' - sharp_points(:,i)'), 1, 9);
-    J(i,4:12) = reshape( sharp_points(:,i)*sharp_points(:,i)' - 2*(center_old*sharp_points(:,i)') + center_old*center_old', 1, 9);
+    delA = sharp_points(:,i)*sharp_points(:,i)' - 2*(center_old*sharp_points(:,i)') + center_old*center_old';
+    J(i,4:9) = delA([1:3 5 6 9]);
     
   end
   
   h = J \ -f;
   
   center_new = center_old + h(1:3);
-  A_new = reshape(A_old(:) + h(4:12),3,3);
+  
+  upA = [h(4) h(5) h(6); h(5) h(7) h(8); h(6) h(8) h(9)]; 
+  
+  A_new = reshape(A_old(:) + upA(:),3,3);
   
   rel_error = norm(cat(1,center_old(:), A_old(:)) - cat(1,center_new(:),A_new(:))) / norm(cat(1,center_old(:), A_old(:)))
   
   A_old = A_new;
-  center_old = center_new;
+  center_old = center_new
 end
 
 
