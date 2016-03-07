@@ -13,45 +13,39 @@
 %   Sawatzky A, Tenbrinck D, Jiang X, Burger M, "A Variational Framework for 
 %   Region-Based Segmentation Incorporating Physical Noise Models", Journal 
 %   of Mathematical Imaging and Vision 47(3), p. 179-209 (2013)
-function renderGFPsurface(surface3D, landmark, resolution)
+function renderGFPsurface(surface3D, landmark, resolution, x, y, z)
 
-% flip dimensions to get a more intuitive view
-v=flipdim(double(surface3D>0),3);
-v2=flipdim(double(landmark>0),3);
+  surface3D = flipdim(double(surface3D),3);
+  landmark = flipdim(double(landmark),3);
 
-% always render to the same figure
-h = figure(1);
-close(h);
-h = figure(1);
-set(h,'Position', [0, 0, 1024, 768]);
-set(gcf, 'Color', 'w');
-
-hold on; 
-
-% create isosurface patches at zero level set
-p = patch( isosurface(v,0) );
-p2 = patch( isosurface(v2,0) );
-
-% compute and set normals for the patches
-isonormals(v, p)
-isonormals(v2, p2)
-
-% render with red color and without edges
-set(p, 'FaceColor','r', 'EdgeColor','none','FaceAlpha',1);
-set(p2, 'FaceColor','g', 'EdgeColor','none','FaceAlpha',1);
-
-% set aspect ratio
-daspect(resolution(3)./resolution)  
-
-% adjust a view angle for perspective
-view(-122,46), axis off, box off, grid off; camproj perspective
-
-% enable phong lightning model
-camlight, lighting phong
-
-% force thread to draw
-drawnow;
-
-hold off
+  %test = (surface3D) .* landmark;
+  %slideShow(test);
+  
+  figure;
+  p = patch( isosurface( x, y, z, surface3D, 0 ) );
+  hold on
+  %p2 = patch( isosurface( x, y, z, landmark .* (surface3D + 1) .* (surface3D <= 0.05), 1)); 
+  p2 = patch( isosurface( x, y, z, landmark .* (surface3D + 1), 1)); 
+  set( p, 'FaceColor', 'g', 'EdgeColor', 'none' );
+  set( p2, 'FaceColor', 'r', 'EdgeColor', 'none' );
+  %view( -70, 40 );
+  hold off
+  axis vis3d equal;
+  daspect(resolution(3)./resolution)
+  camlight;
+  
+  figure; 
+   p = patch( isosurface( x, y, z, surface3D, 0 ) );
+  hold on
+  %p2 = patch( isosurface( x, y, z, landmark .* (surface3D + 1) .* (surface3D <= 0.05), 1)); 
+  p2 = patch( isosurface( x, y, z, landmark, 0.5)); 
+  set( p, 'FaceColor', 'g', 'EdgeColor', 'none' );
+  set( p2, 'FaceColor', 'r', 'EdgeColor', 'none' );
+  %view( -70, 40 );
+  hold off
+  axis vis3d equal;
+  daspect(resolution(3)./resolution)
+  camlight;
+  %lighting phong;
 
 end

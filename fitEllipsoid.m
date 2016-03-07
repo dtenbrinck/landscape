@@ -1,4 +1,4 @@
-function fitEllipsoid( sharp_areas, resolution )
+function [center radii axes v] = fitEllipsoid( sharp_areas, resolution )
 %FITELLIPSOID Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -9,9 +9,10 @@ visualize = true;
 threshold = kittler_thresholding(sharp_areas);
 
 % embed data points in bigger domain
-sharp_areas = padarray(sharp_areas, [150 150 5], 0);
-large_domain = zeros(size(sharp_areas) .* [1 1 2]);
-large_domain(:,:,1:end/2) = sharp_areas;
+%sharp_areas = padarray(sharp_areas, [150 150 5], 0);
+%large_domain = zeros(size(sharp_areas) .* [1 1 2]);
+%large_domain(:,:,1:end/2) = sharp_areas;
+large_domain = sharp_areas;
 %sharp_areas = tmp;
 
 % determine sharp points
@@ -30,7 +31,8 @@ Y = Y * resolution(1);
 X = X * resolution(2);
 Z = Z * resolution(3);
 
-[ center, radii, evecs, v, chi2 ] = ellipsoid_fit( [ X Y Z ], '' );
+% fit ellipsoid to sharp points in areas in focus
+[ center, radii, axes, v, chi2 ] = ellipsoid_fit( [ X Y Z ], '' );
 
 %v = v*2;
 
@@ -62,7 +64,7 @@ if visualize
   hold on
   plot3( X, Y, Z, '.r' );
   hold off
-  pause;
+  %pause;
   
   % visualize slice by slice
   mind = [1 1 1]; maxd = size(sharp_areas) .* resolution;
@@ -74,18 +76,19 @@ if visualize
     2*v(7) *x    + 2*v(8)*y    + 2*v(9) * z;
   
   for i=1:size(sharp_areas,3)
-    figure(2); imagesc(sharp_areas(:,:,i));
+    figure(2); imagesc(sharp_areas(:,:,i), [min(sharp_areas(:)) max(sharp_areas(:))]); colormap gray;
     hold on
     [contourMatrix, handle] = contour(Ellipsoid(:,:,i), [0.98 0.98], 'r');
     set(handle, 'LineWidth', 2);
     set(gca,'YDir','reverse');
     drawnow;
     hold off
-    pause;
+    print(['results/dapi_' sprintf('%02d',i) ],'-dpng');
+    %pause;
   end
 end
 
- test = 1;
+test =1 ;
 %%% DOESN'T WORK YET
 % % guess initial center
 % initialCenter = center;
