@@ -1,6 +1,32 @@
-function cells = segmentCells( data )
+function cells = segmentCells( data, resolution )
 %SEGMENTDATA Summary of this function goes here
 %   Detailed explanation goes here
+
+% normalize data
+data = normalizeData(data);
+
+% get histogram
+[h, bins] = imhist(data(:));
+
+% get integral over histogram
+p = cumsum(h);
+
+% normalize integral
+p = p / p(end);
+
+% get only brightest signals
+threshold = 0.995; % WARNING: THIS IS HEURISTIC!
+
+% get relevant indices
+indices = find(p > threshold);
+
+% take first index
+index = indices(1);
+
+% get corresponding bin as global threshold
+dataP.t = bins(index);
+fprintf('Optimal threshold for embryo data in mCherry channel computed as t1=%i.\n', dataP.t);
+
 
 % set data in struct
 dataP.f = data;
@@ -8,52 +34,69 @@ dataP.f = data;
 % initialize image parameters
 [dataP.nx, dataP.ny, dataP.nz] = size(dataP.f);
 dataP.dim = ndims(dataP.f);
-dataP.hx = 1; dataP.hy = 1; dataP.hz = 1;
+dataP.hx = resolution(1); dataP.hy = resolution(2); dataP.hz = resolution(3);
+%dataP.hx = 1; dataP.hy = 1; dataP.hz = 1;
 
 % initialize algorithm parameters
-algP.maxIts = 1500;%5000;
-algP.alpha = 100;
+algP.maxIts = 200;%5000;
+algP.alpha = 10;
 algP.regAccur = 1e-7;
 algP.mu_grad_u = 1;
 algP.TV = 'iso';
 
 % decide if plotting is enabled
 algP.showSegmentation = false;
-algP.showInterval = 200;
+algP.showInterval = 400;
 algP.plotError = false;
 
-% obtain global threshold
-dataP.t = otsu_thresholding(dataP.f);
-fprintf('Optimal threshold for embryo data in mCherry channel computed as t1=%i.\n', dataP.t);
 
-%%% segment embryo
-
-% segment embryo region using modified Arrow-Hurrowitz algorithm
-%[u, rel_change] = wL2_TV_AHMOD(dataP, algP, dataP.f, ones(size(dataP.f)), false);
-u = dataP.f; 
-
-% determine segmentation contour by thresholding
-Xi = zeros(size(dataP.f));
-Xi(u >= dataP.t+1) = 1;
-
-% set output variable
-embryo = Xi;
-
-%%% segment cells
-
-% compute new threshold only for volume of embryo
-dataP.t = otsu_thresholding(dataP.f, embryo);
-fprintf('Optimal threshold for mCherry labeled cells computed as t2=%i.', dataP.t);
-
-% segment landmark region using modified Arrow-Hurrowitz algorithm
+% segment mCherry cells using modified Arrow-Hurrowitz algorithm
 [u, rel_change] = wL2_TV_AHMOD(dataP, algP, dataP.f, ones(size(dataP.f)), false);
     
 % determine segmentation contour by thresholding
+u = dataP.f;
 Xi = zeros(size(dataP.f));
-Xi(u >= dataP.t+1) = 1;
+Xi(u >= dataP.t) = 1;
+
+% look for connected components
+cc = bwconncomp(Xi);
+
+cells = zeros(size(data));
+
+% remove too small items
+j = 1;
+for i = 1:cc.NumObjects
+  
+  pixelList = cc.PixelIdxList{i};
+  if length(pixelList) > 50
+    cellObjects{j} = pixelList;
+    j = j+1;
+  end
+end
+
+for j=1:length(cellObjects)
+  currentCell = zeros(size(data)); 
+  currentCell(cellObjects{j}) = 1;
+  currentCell = currentCell .* data;
+  
+  maxSlice = 2;
+  maxValue = -1;
+  for slice = 2:size(data,3)-1
+    if max(max(currentCell(:,:,slice))) > maxValue
+      maxSlice = slice;
+      maxValue = max(max(currentCell(:,:,slice)));
+    end
+  end
+  
+  sliceMask = zeros(size(data));
+  sliceMask(:,:,maxSlice-1:maxSlice+1) = 1;
+  
+  currentCell = currentCell .* sliceMask;
+  cells(currentCell > 0) = 1;
+end
 
 % set output variable
-cells = Xi;
+%cells = Xi;
 
 
 end
