@@ -30,7 +30,7 @@ addpath(genpath(pwd));
 %% load and preprocess data
 
 % load the data
-load('1a3.mat');
+load('1.mat');
 
 % set rescaling factor
 scale = 0.5;
@@ -70,7 +70,7 @@ sharp_areas = normalizeData (imfilter(blurred, kernelLaplace, 'same', 'replicate
 %% segment GFP landmark
 
 % segment gfp landmark
-landmark_resized = segmentGFP(gfp_resized, resolution);
+landmark = segmentGFP(gfp_resized, resolution);
 
 %% experimental code for rescaling data with different sizes 
 % (some channel work with even less resolution)
@@ -129,10 +129,10 @@ transform = scale_matrix * rotation_matrix;
 
 % sample surface of unit sphere by parametrization
 samples = 64;
-[alpha, beta] = meshgrid(linspace(0,2*pi,samples), linspace(0,2*pi,samples)); % TODO: only one time 2*pi!
-x_s=  cos(alpha) .* cos(beta);
-y_s = sin(alpha) .* cos(beta);
-z_s = sin(beta);
+[alpha, beta] = meshgrid(linspace(pi,2*pi,samples/2), linspace(0,2*pi,samples)); % TODO: only one time 2*pi!
+x_s = cos(alpha) .* sin(beta);
+y_s = sin(alpha) .* sin(beta);
+z_s = cos(beta);
 
 % determine position of spherical points in original space
 xs_t = x_s;
@@ -168,6 +168,8 @@ end
 CellsInSphere = interp3(x, y, z, cells, xu_t, yu_t, zu_t,'nearest');
 
 %% visualize results
+
+
 figure;
 renderCellsInSphere(CellsInSphere,xu,yu,zu);
 hold on;
