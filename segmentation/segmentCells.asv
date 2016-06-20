@@ -67,10 +67,13 @@ cells = zeros(size(data));
 j = 1;
 % Centroid for all cells
 
+centCoords = zeros(3,cc.NumObjects);
 for i = 1:cc.NumObjects
+  
   pixelList = cc.PixelIdxList{i};
   if length(pixelList) > 50
     cellObjects{j} = pixelList;
+    centCoords(:,j) = S(i).Centroid;
     j = j+1;
   end
 end
@@ -98,10 +101,12 @@ end
 
 
 % Centroids of the cells
-
-cc = bwconncomp(cells);
 S = regionprops(cc,'centroid');
-centCoords = round(reshape([S.Centroid],[3,numel([S.Centroid])/3]));
+centCoords = round(centCoords);
+centCoords = centCoords(:,1:size(cellObjects,2));
+cache = centCoords(1,:);
+centCoords(1,:) = centCoords(2,:);
+centCoords(2,:) = cache;
 
 % set output variable
 %cells = Xi;

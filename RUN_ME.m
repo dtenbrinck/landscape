@@ -63,13 +63,27 @@ kernelLaplace = generate3dLaplacian(resolution);
 
 % determine sharp areas in DAPI channel by Laplacian filtering
 sharp_areas = normalizeData (imfilter(blurred, kernelLaplace, 'same', 'replicate'));
+%% Little excurse to the dimensions
+% The image is always set in [row, column, z] dimensionsen. When we are
+% working with axis [x,y,z] x = column, y = row and z = z. fitEllipsoid is
+% working on the axis. So we get a center and a radii that depends on the
+% axis and not on the image itself. So if we compute a sphere in the axis
+% we can just use center and radii as it is. but if we want to visualize it
+% in the image we need to permute the dimensions. So we can just work with
+% the the output of fitEllipsoid on our sphere etc. But we need to be
+% carefull when we use interp3 with landmark. landmark is the segmentation
+% of the gfp channel. So it is in the same dimensions as the other images.
+% We dont need to care about the resolution now because it is the same for
+% x and y. 
+% centCoords gives us the centroids of the cells in the image. It is
+% computed with regionprops. This gives us the right centroids with the
+% right order. So we can just use it for our axial representation.
+%% Estimate embryo shape by fitting ellipsoid to sharp areas
 
-% estimate embryo shape by fitting ellipsoid to sharp areas
 [center radii axes v] = fitEllipsoid(sharp_areas, resolution);
 
-%% segment GFP landmark
+%% Segment GFP landmark
 
-% segment gfp landmark
 landmark = segmentGFP(gfp_resized, resolution);
 
 %% experimental code for rescaling data with different sizes 
@@ -93,27 +107,27 @@ landmark = segmentGFP(gfp_resized, resolution);
 % sample original space
 mind = [0 0 0]; maxd = size(landmark) .* resolution;
 
-% experimental code for meshgrid with different resolution
+%% experimental code for meshgrid with different resolution
 %nsteps = maxd*0.2;
 %step = ( maxd - mind ) ./ nsteps;
-%[ x, y, z ] = meshgrid( linspace( mind(2) - step(2), maxd(2) + step(2), nsteps(2) ), linspace( mind(1) - step(1), maxd(1) + step(1), nsteps(1) ), linspace( mind(3) - step(3), maxd(3) + step(3), nsteps(3) ) );
+%[ X, Y, Z ] = meshgrid( linspace( mind(2) - step(2), maxd(2) + step(2), nsteps(2) ), linspace( mind(1) - step(1), maxd(1) + step(1), nsteps(1) ), linspace( mind(3) - step(3), maxd(3) + step(3), nsteps(3) ) );
 
-% create a meshgrid with same resolution as data
-[ x, y, z ] = meshgrid( linspace( mind(2), maxd(2), size(landmark,2) ), linspace( mind(1), maxd(1), size(landmark,1) ), linspace( mind(3), maxd(3), size(landmark,3) ) );
+%% create a meshgrid with same resolution as data
+[ X, Y, Z ] = meshgrid( linspace( mind(2), maxd(2), size(landmark,2) ), linspace( mind(1), maxd(1), size(landmark,1) ), linspace( mind(3), maxd(3), size(landmark,3) ) );
 
-% experimental code to transform data using ellipsoid equation
+%% experimental code to transform data using ellipsoid equation
 % [ x_coarse, y_coarse, z_coarse] = meshgrid( linspace( mind(2) - step(2), maxd(2) + step(2), size(landmark,2) ), linspace( mind(1) - step(1), maxd(1) + step(1), size(landmark,1) ), linspace( mind(3) - step(3), maxd(3) + step(3), size(landmark,3) ) );
-% Ellipsoid = v(1) *x.*x +   v(2) * y.*y + v(3) * z.*z + ...
-%     2*v(4) *x.*y + 2*v(5)*x.*z + 2*v(6) * y.*z + ...
-%     2*v(7) *x    + 2*v(8)*y    + 2*v(9) * z -1;
+% Ellipsoid = v(1) *X.*X +   v(2) * Y.*Y + v(3) * Z.*Z + ...
+%     2*v(4) *X.*Y + 2*v(5)*X.*Z + 2*v(6) * Y.*Z + ...
+%     2*v(7) *X    + 2*v(8)*Y    + 2*v(9) * Z -1;
 % % interpolate data
-% landmark_fine = interp3(x_coarse, y_coarse, z_coarse, landmark, x, y, z, 'nearest');  
+% landmark_fine = interp3(x_coarse, y_coarse, z_coarse, landmark, X, Y, Z, 'nearest');  
 %validGFP = landmark_fine .* (abs(Ellipsoid) < 0.01);
 % visualize and save result in 3D
-%renderGFPsurface(Ellipsoid, landmark_fine, [1 1 1],x,y,z)
+%renderGFPsurface(Ellipsoid, landmark_fine, [1 1 1],X,Y,Z)
 
-% specify transformation matrix based on orientation and length of axis
-% TODO: Verify that this is correct!
+%% specify transformation matrix based on orientation and length of axis
+
 scale_matrix = eye(3);
 scale_matrix(1) = 1/radii(1);
 scale_matrix(5) = 1/radii(2);
@@ -121,13 +135,13 @@ scale_matrix(9) = 1/radii(3);
 rotation_matrix = axes';
 transform = scale_matrix * rotation_matrix;
 
-% experimental code for sampling unit cube as 3D voxel grid
+%% experimental code for sampling unit cube as 3D voxel grid
 %mind = [-1 -1 -1]; maxd = [1 1 1];
 %nsteps = [64 64 64];
 %step = ( maxd - mind ) ./ nsteps;
 %[Xc Yc Zc] = meshgrid( linspace( mind(2) - step(2), maxd(2) + step(2), nsteps(2) ), linspace( mind(1) - step(1), maxd(1) + step(1), nsteps(1) ), linspace( mind(3) - step(3), maxd(3) + step(3), nsteps(3) ));
 
-% sample surface of unit sphere by parametrization
+%% sample surface of unit sphere by parametrization
 samples = 64;
 [alpha, beta] = meshgrid(linspace(pi,2*pi,samples/2), linspace(0,2*pi,samples)); % TODO: only one time 2*pi!
 Zs = cos(alpha) .* sin(beta);
@@ -139,7 +153,7 @@ Ys = cos(beta);
 [Xs_t,Ys_t,Zs_t] = transformUnitSphere3D(Xs,Ys,Zs,scale_matrix,rotation_matrix,center);
 
 % interpolate signal on unit sphere transformed to original space
-GFPOnSphere = interp3(x, y, z, landmark, Xs_t, Ys_t, Zs_t,'nearest');
+GFPOnSphere = interp3(X, Y, Z, landmark, Xs_t, Ys_t, Zs_t,'nearest');
 
 %% transform segmented cells on new positions within unit sphere
 
@@ -148,11 +162,11 @@ GFPOnSphere = interp3(x, y, z, landmark, Xs_t, Ys_t, Zs_t,'nearest');
 
 % determine position of points in unit cube in original space
 
-[Xs_t,Ys_t,Zs_t] = transformUnitSphere3D(Xs,Ys,Zs,scale_matrix,rotation_matrix,center);
+[Xc_t,Yc_t,Zc_t] = transformUnitCube3D(Xc,Yc,Zc,scale_matrix,rotation_matrix,center);
 
 % interpolate signal in unit cube transformed to original space
 
-CellsInSphere = interp3(x, y, z, cells, Xc_t, Yc_t, Zc_t,'nearest');
+CellsInSphere = interp3(X, Y, Z, cells, Xc_t, Yc_t, Zc_t,'nearest');
 CellsInSphere(isnan(CellsInSphere)) = 0;
 
 %% Registration
@@ -160,16 +174,23 @@ CellsInSphere(isnan(CellsInSphere)) = 0;
 % Get coordinates of the cells
 
 % Fit Coordinates to real resolution
+
 centCoords = diag(resolution)*centCoords;
 
-% Transform the Coords into the sphere. With scaling and rotating.
-centCoords(1,:) = centCoords(1,:)-center(2);
-centCoords(2,:) = centCoords(2,:)-center(1);
+% Transform the coordinates into the sphere. With scaling and rotating.
+centCoords(1,:) = centCoords(1,:)-center(1);
+centCoords(2,:) = centCoords(2,:)-center(2);
 centCoords(3,:) = centCoords(3,:)-center(3);
 centCoords = transform*centCoords;
 
 
 % Regression
+
+data = [(round(Xs(GFPOnSphere == 1 & Zs <= 0)*10^10)/10^10)';...
+    (round(Ys(GFPOnSphere == 1 & Zs <= 0)*10^10)/10^10)';...
+    (round(Zs(GFPOnSphere == 1 & Zs <= 0)*10^10)/10^10)'];
+data = unique(data','rows')';
+[pstar,vstar] = sphericalRegression3D(data,[11;0;0],[0;0;-1]);
 
 % Registration and transformation
 
@@ -181,10 +202,25 @@ centCoords = transform*centCoords;
 figure;
 renderCellsInSphere(CellsInSphere,Xc,Yc,Zc);
 hold on;
+T = 0:0.01:1;
+    G = geodesicFun(pstar,vstar);
+    regressionLine = G(T);
+    scatter3(pstar(1),pstar(2),pstar(3));
+   
+    quiver3(pstar(1),pstar(2),pstar(3),vstar(1)/norm(vstar),vstar(2)/norm(vstar),vstar(3)/norm(vstar));
+    plot3(regressionLine(1,:),regressionLine(2,:),regressionLine(3,:),'r');
+    plot3(data(1,1),data(2,1),data(3,1),'o')
+    plot3(data(1,end),data(2,end),data(3,end),'o')
+    xlim([-1,1]);
+    ylim([-1,1]);
+    zlim([-1,1]);
+    %plot3(x,y,z);
+    scatter3(data(1,:),data(2,:),data(3,:),'*')
+
 grid on;
 scatter3(centCoords(1,:),centCoords(2,:),centCoords(3,:));
 scatter3(Xs(:), Ys(:), Zs(:),10,[0 1 0]);
-scatter3(Xs(GFPOnSphere == 1 & Ys <= 0), Ys(GFPOnSphere == 1 & Ys <= 0), Zs(GFPOnSphere == 1 & Ys <= 0),50,[1 0 0]); 
+scatter3(Xs(GFPOnSphere == 1 & Zs <= 0), Ys(GFPOnSphere == 1 & Zs <= 0), Zs(GFPOnSphere == 1 & Zs <= 0),50,[1 0 0]); 
 hold off;
 axis vis3d equal;
 view([-37.5, -75])
