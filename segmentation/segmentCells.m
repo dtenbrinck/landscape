@@ -1,4 +1,4 @@
-function cells = segmentCells( data, resolution )
+function [cells, centCoords] = segmentCells( data, resolution )
 %SEGMENTDATA Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -45,13 +45,13 @@ algP.mu_grad_u = 1;
 algP.TV = 'iso';
 
 % decide if plotting is enabled
-algP.showSegmentation = false;
+algP.showSegmentation = true;
 algP.showInterval = 400;
 algP.plotError = false;
 
 
 % segment mCherry cells using modified Arrow-Hurrowitz algorithm
-[u, rel_change] = wL2_TV_AHMOD(dataP, algP, dataP.f, ones(size(dataP.f)), false);
+% [u, rel_change] = wL2_TV_AHMOD(dataP, algP, dataP.f, ones(size(dataP.f)), false);
     
 % determine segmentation contour by thresholding
 u = dataP.f;
@@ -65,11 +65,15 @@ cells = zeros(size(data));
 
 % remove too small items
 j = 1;
+% Centroid for all cells
+S = regionprops(cc,'centroid');
+centCoords = zeros(3,cc.NumObjects);
 for i = 1:cc.NumObjects
   
   pixelList = cc.PixelIdxList{i};
   if length(pixelList) > 50
     cellObjects{j} = pixelList;
+    centCoords(:,j) = S(i).Centroid;
     j = j+1;
   end
 end
@@ -89,11 +93,20 @@ for j=1:length(cellObjects)
   end
   
   sliceMask = zeros(size(data));
-  sliceMask(:,:,maxSlice-1:maxSlice+1) = 1;
+  sliceMask(:,:,maxSlice) = 1;
   
   currentCell = currentCell .* sliceMask;
   cells(currentCell > 0) = 1;
 end
+
+
+% Centroids of the cells
+
+centCoords = round(centCoords);
+centCoords = centCoords(:,1:size(cellObjects,2));
+cache = centCoords(1,:);
+centCoords(1,:) = centCoords(2,:);
+centCoords(2,:) = cache;
 
 % set output variable
 %cells = Xi;

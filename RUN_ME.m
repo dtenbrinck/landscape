@@ -86,7 +86,7 @@ landmark = segmentGFP(gfp_resized, resolution);
 %% segment stem cells in mCherry channel
 
 % segment cells
-cells = segmentCells( mCherry_resized, resolution );
+[cells,centCoords] = segmentCells( mCherry_resized, resolution );
 
 %% transform GFP on embryo shape onto unit sphere
 
@@ -125,56 +125,66 @@ transform = scale_matrix * rotation_matrix;
 %mind = [-1 -1 -1]; maxd = [1 1 1];
 %nsteps = [64 64 64];
 %step = ( maxd - mind ) ./ nsteps;
-%[xu yu zu] = meshgrid( linspace( mind(2) - step(2), maxd(2) + step(2), nsteps(2) ), linspace( mind(1) - step(1), maxd(1) + step(1), nsteps(1) ), linspace( mind(3) - step(3), maxd(3) + step(3), nsteps(3) ));
+%[Xc Yc Zc] = meshgrid( linspace( mind(2) - step(2), maxd(2) + step(2), nsteps(2) ), linspace( mind(1) - step(1), maxd(1) + step(1), nsteps(1) ), linspace( mind(3) - step(3), maxd(3) + step(3), nsteps(3) ));
 
 % sample surface of unit sphere by parametrization
 samples = 64;
 [alpha, beta] = meshgrid(linspace(pi,2*pi,samples/2), linspace(0,2*pi,samples)); % TODO: only one time 2*pi!
-x_s = cos(alpha) .* sin(beta);
-y_s = sin(alpha) .* sin(beta);
-z_s = cos(beta);
+Zs = cos(alpha) .* sin(beta);
+Xs = sin(alpha) .* sin(beta);
+Ys = cos(beta);
 
 % determine position of spherical points in original space
-xs_t = x_s;
-ys_t = y_s;
-zs_t = z_s;
-for i = 1:numel(xs_t)  
-  new_coordinate = transform^-1 * [xs_t(i), ys_t(i), zs_t(i)]';
-  xs_t(i) = new_coordinate(1) + center(1);
-  ys_t(i) = new_coordinate(2) + center(2);
-  zs_t(i) = new_coordinate(3) + center(3);
-end
+
+[Xs_t,Ys_t,Zs_t] = transformUnitSphere3D(Xs,Ys,Zs,scale_matrix,rotation_matrix,center);
 
 % interpolate signal on unit sphere transformed to original space
-GFPOnSphere = interp3(x, y, z, landmark, xs_t, ys_t, zs_t,'nearest');
+GFPOnSphere = interp3(x, y, z, landmark, Xs_t, Ys_t, Zs_t,'nearest');
 
 %% transform segmented cells on new positions within unit sphere
 
 % sample unit cube as 3D voxel grid 
-[xu, yu, zu] = meshgrid(linspace(-1,1,samples), linspace(-1,1,samples), linspace(-1,1,samples));
+[Xc, Yc, Zc] = meshgrid(linspace(-1,1,samples), linspace(-1,1,samples), linspace(-1,1,samples));
 
 % determine position of points in unit cube in original space
-xu_t = xu;
-yu_t = yu;
-zu_t = zu;
-for i = 1:numel(xu_t)  
-  new_coordinate = transform^-1 * [xu_t(i), yu_t(i), zu_t(i)]';
-  xu_t(i) = new_coordinate(1) + center(1);
-  yu_t(i) = new_coordinate(2) + center(2);
-  zu_t(i) = new_coordinate(3) + center(3);
-end
+
+[Xs_t,Ys_t,Zs_t] = transformUnitSphere3D(Xs,Ys,Zs,scale_matrix,rotation_matrix,center);
 
 % interpolate signal in unit cube transformed to original space
-CellsInSphere = interp3(x, y, z, cells, xu_t, yu_t, zu_t,'nearest');
+
+CellsInSphere = interp3(x, y, z, cells, Xc_t, Yc_t, Zc_t,'nearest');
+CellsInSphere(isnan(CellsInSphere)) = 0;
+
+%% Registration
+
+% Get coordinates of the cells
+
+% Fit Coordinates to real resolution
+centCoords = diag(resolution)*centCoords;
+
+% Transform the Coords into the sphere. With scaling and rotating.
+centCoords(1,:) = centCoords(1,:)-center(2);
+centCoords(2,:) = centCoords(2,:)-center(1);
+centCoords(3,:) = centCoords(3,:)-center(3);
+centCoords = transform*centCoords;
+
+
+% Regression
+
+% Registration and transformation
+
+
 
 %% visualize results
 
 
 figure;
-renderCellsInSphere(CellsInSphere,xu,yu,zu);
+renderCellsInSphere(CellsInSphere,Xc,Yc,Zc);
 hold on;
-scatter3(x_s(:), y_s(:), z_s(:),10,[0 1 0]);
-scatter3(x_s(GFPOnSphere == 1 & z_s <= 0), y_s(GFPOnSphere == 1 & z_s <= 0), z_s(GFPOnSphere == 1 & z_s <= 0),50,[1 0 0]); 
+grid on;
+scatter3(centCoords(1,:),centCoords(2,:),centCoords(3,:));
+scatter3(Xs(:), Ys(:), Zs(:),10,[0 1 0]);
+scatter3(Xs(GFPOnSphere == 1 & Ys <= 0), Ys(GFPOnSphere == 1 & Ys <= 0), Zs(GFPOnSphere == 1 & Ys <= 0),50,[1 0 0]); 
 hold off;
 axis vis3d equal;
 view([-37.5, -75])

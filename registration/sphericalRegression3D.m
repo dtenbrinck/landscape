@@ -53,9 +53,7 @@ vstar = pvstar(4:6);
 if strcmp(visualize,'true')
     T = 0:0.01:1;
     G = geodesicFun(pstar,vstar);
-%     G = specialGeodesicFun(pstar,vstar);
     regressionLine = G(T);
-    %[x,y,z] = sphere;
     figure, title('Regression line through the data set.');
     scatter3(pstar(1),pstar(2),pstar(3));
     hold on

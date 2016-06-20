@@ -46,14 +46,21 @@ y_d = y/radii(1);
 z_d = z/radii(3);
 
 %% Projection on sphere
+
+%% INTERP3
+
+
+
+%% OLD TRY
+
 a = sqrt(1-(x_d-uCenter(2)).^2-(y_d-uCenter(1)).^2)-(z_d-uCenter(3));
 z_d2 = z_d+a;
 % sample the points onto the samplepoints of the sphere. Get there angles
 % and then compute the nearest ankle of a samplepoint.
 alpha2 = atan((y_d-uCenter(1))./(x_d-uCenter(2)));
 beta2 = acos(z_d2-uCenter(3));
-x_s2 = cos(alpha2) .* sin(beta2);
-y_s2 = sin(alpha2) .* sin(beta2);
+x_s2 = sin(beta2) .* cos(alpha2);
+y_s2 = sin(beta2) .* sin(alpha2);
 z_s2 = cos(beta2);
 %data = [y_d';x_d';z_d2'];
 
