@@ -20,7 +20,7 @@ function [pstar, vstar] = sphericalRegression3D(data, p0, v0, options, visualize
 % vstar:        Optimal tangential direction vector at pstar.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% INITIALISATION %%
+%% INITIALIZATION %%
 
 % Check input
 if nargin < 2
@@ -30,7 +30,7 @@ if nargin < 3
     v0 = [0;1;0];
 end
 if nargin < 4
-    options = optimoptions('fmincon','Display','iter','Algorithm','sqp');
+    options = optimoptions('fmincon','Display','off','Algorithm','sqp');
 end
 if nargin < 5
     visualize = 'true';
@@ -59,8 +59,8 @@ if strcmp(visualize,'true')
     hold on
     quiver3(pstar(1),pstar(2),pstar(3),vstar(1)/norm(vstar),vstar(2)/norm(vstar),vstar(3)/norm(vstar));
     plot3(regressionLine(1,:),regressionLine(2,:),regressionLine(3,:),'r');
-    plot3(data(1,1),data(2,1),data(3,1),'o')
-    plot3(data(1,end),data(2,end),data(3,end),'o')
+    %plot3(data(1,1),data(2,1),data(3,1),'o')
+    %plot3(data(1,end),data(2,end),data(3,end),'o')
     xlim([-1,1]);
     ylim([-1,1]);
     zlim([-1,1]);
