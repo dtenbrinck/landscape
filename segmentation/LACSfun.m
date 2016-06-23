@@ -54,9 +54,19 @@ landmark = segmentGFP(gfp_resized, resolution);
 % Segment stem cells in mCherry channel and get the centroids of the cells
 [cells,centCoords] = segmentCells( mCherry_resized, resolution );
 
+% Get coordinates of the cells %
+% Fit Coordinates to real resolution
+centCoords = diag(resolution)*centCoords;
+
+% Transform the coordinates into the sphere. With scaling and rotating.
+centCoords(1,:) = centCoords(1,:)-center(1);
+centCoords(2,:) = centCoords(2,:)-center(2);
+centCoords(3,:) = centCoords(3,:)-center(3);
+centCoords = diag([1/radii(1),1/radii(2),1/radii(3)])*axes'*centCoords;
+
 %% Generate Output
 
-output = [];
+output = struct;
 output.landmark = landmark;
 output.cells = cells;
 output.centCoords = centCoords;

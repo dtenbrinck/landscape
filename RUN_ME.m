@@ -36,6 +36,11 @@ addpath(genpath(pwd));
 
 % Value and variable init: %
 
+% Visualize 
+vis_regist = true;
+vis_regr = 'true';
+
+
 % Set rescaling factor
 scale = 0.5;
 
@@ -69,49 +74,75 @@ fprintf('\n\nUser interaction: \n');
 fprintf('Choose which dataset should be the reference dataset?\n');
 refDataset = char(datanames(1));
 refDataset = refDataset(1:end-4);
+datanames(1) = [];
 fprintf('Default selected. Starting with the first dataset.\n');
 %% 3. Registration
 
 fprintf('Starting registration: \n');
-fprintf('Computing regressions...\n');
+fprintf(['Initializing the reference data set ',refDataset,'.mat... \n']);
 
-% Compute the spherical regression for the rest of the datasets
+% Initialize the reference data set.
+[refpstar, refvstar,regData] ...
+    = computeRegression(SegmentationData.(['Data_',refDataset]).GFPOnSphere, Xs, Ys, Zs, 'true');
+
+fprintf('Setting the reference p* and v*.\n');
+
+% Update SegmentationData
+SegmentationData.(['Data_',refDataset]).pstar = refpstar;
+SegmentationData.(['Data_',refDataset]).vstar = refvstar;
+SegmentationData.(['Data_',refDataset]).regData = regData;
+
+fprintf('Initialization done!\n');
+% Compute the spherical regression for the rest of the datasets and
+% register them.
+
+fprintf(['Starting registration of the data sets to the reference dataset: ',refDataset,'... \n'])
 
 for i=1:size(datanames,1)
-    fprintf(['Computing regression for dataset ',num2str(i),' of ',num2str(size(datanames,1)),'.\n']);
+    fprintf(['Computing regression for dataset ',num2str(i),' of ',num2str(size(datanames,1)),'...']);
     
     % Get the data that is projected onto the sphere
     dataName = char(datanames(i));
     dataName = dataName(1:end-4);
     fieldname = ['Data_',dataName];
-    regData = [(round(Xs(SegmentationData.(fieldname).GFPOnSphere == 1 & Zs <= 0)*10^10)/10^10)';...
-        (round(Ys(SegmentationData.(fieldname).GFPOnSphere == 1 & Zs <= 0)*10^10)/10^10)';...
-        (round(Zs(SegmentationData.(fieldname).GFPOnSphere == 1 & Zs <= 0)*10^10)/10^10)'];
-    regData = unique(regData','rows')';
+    
+    % Compute regression
+    [pstar,vstar, regData] ...
+        = computeRegression(SegmentationData.(fieldname).GFPOnSphere, Xs,Ys,Zs,vis_regr);
+    fprintf('Done!\n');
+    
+    % Registration of the data set
+    fprintf('Register data set onto reference dataset.\n');
+    
+    % Rotationmatrix: Rotate the great circle s.t. pstar is on refpstar
+    [Rp,Rv,pstar_r,vstar_r,vAngle]...
+        = rotateGreatCircle(pstar,vstar,refpstar,refvstar);
+    
+    % Rotationmatrix: Rotates the regression line onto the reference line
+    Ra = rotAboutAxis(vAngle,refpstar);
+    
+    % Rotate data set and cell coordinates
+    regData_r = Ra*Rp*regData;
+    SegmentationData.(fieldname).centCoords ...
+        = Ra*Rp*SegmentationData.(fieldname).centCoords;
+    
+    % Update field
+    SegmentationData.(fieldname).Rp = Rp;
+    SegmentationData.(fieldname).Rv = Rv;
+    SegmentationData.(fieldname).Ra = Ra;
+    SegmentationData.(fieldname).pstar = pstar;
+    SegmentationData.(fieldname).vstar = vstar;
+    SegmentationData.(fieldname).pstar_r = pstar_r;
+    SegmentationData.(fieldname).vstar_r = vstar_r;
+    SegmentationData.(fieldname).vAngle = vAngle;
     SegmentationData.(fieldname).regData = regData;
-    % Set options
-    options = optimoptions('fmincon','Display','off','Algorithm','sqp');
+    SegmentationData.(fieldname).regData_r = regData_r;
     
-    % Compute spherical regression
-    [SegmentationData.(fieldname).pstar,SegmentationData.(fieldname).vstar] ...
-        = sphericalRegression3D(regData,[1;0;0],[0;0;-1],options,'true');
-    
-    % Registration part %
-    if i > 1
-        % Rotate great circle
-        fprintf('Rotate great circle onto the reference circle.\n');
-        [SegmentationData.(fieldname).Rp,SegmentationData.(fieldname).Rv, ...
-            SegmentationData.(fieldname).pstar_r,SegmentationData.(fieldname).vstar_r,...
-            SegmentationData.(fieldname).vAngle]...
-            = rotateGreatCircle(SegmentationData.(fieldname).pstar,...
-            SegmentationData.(fieldname).vstar,refpstar,refvstar);
-        
-    elseif i == 1
-        % Set as reference values
-        refpstar = SegmentationData.(['Data_',refDataset]).pstar;
-        refvstar = SegmentationData.(['Data_',refDataset]).vstar;
+    % Visualize Registration
+    if vis_regist == true;
+        showRegist(SegmentationData.(['Data_',refDataset]),...
+            SegmentationData.(fieldname),['Data_',refDataset],fieldname);
     end
-    
 end
 
 fprintf('Registration Done!\n');
