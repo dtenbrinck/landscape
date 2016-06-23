@@ -53,7 +53,7 @@ vAngle = acos(c/(norm(vstar)*norm(refvstar)));
 
 % Rotate refvstar 90 about refpstar(!!!).
 Ra = rotAboutAxis(pi/2,refpstar);
-vAngle = vAngle*(vstar'*Ra*refvstar)/norm(vstar'*Ra*refvstar);
+vAngle = (-1)*vAngle*(vstar'*Ra*refvstar)/norm(vstar'*Ra*refvstar);
 
 
 % Compute the rotated vstar

@@ -119,7 +119,7 @@ for i=1:size(datanames,1)
         = rotateGreatCircle(pstar,vstar,refpstar,refvstar);
     
     % Rotationmatrix: Rotates the regression line onto the reference line
-    Ra = rotAboutAxis(-vAngle,refpstar);
+    Ra = rotAboutAxis(vAngle,refpstar);
     
     % Rotate data set and cell coordinates
     regData_r = Ra*Rp*regData;
