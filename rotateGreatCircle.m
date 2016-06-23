@@ -33,7 +33,7 @@ c = pstar'*refpstar;
 V = [0,-v(3),v(2);v(3),0,-v(1);-v(2),v(1),0];
 % 
 Rp = eye(3)+V+V*V*(1-c)/s^2;
-Rp = rotAboutAxis(-acos(c),v);
+%Rp = rotAboutAxis(acos(c),v);
 
 % Rotate pstar and vstar
 pstar = Rp*pstar;
@@ -51,9 +51,9 @@ vAngle = acos(c/(norm(vstar)*norm(refvstar)));
 
 % Dertermine the sign of vAngle
 
-% Rotate refvstar 90° about v
-Ra = rotAboutAxis(pi/2,cross(refvstar,vstar));
-vAngle = vAngle*(vstar'*Ra*v)/norm(vstar'*Ra*v);
+% Rotate refvstar 90 about refpstar(!!!).
+Ra = rotAboutAxis(pi/2,refpstar);
+vAngle = vAngle*(vstar'*Ra*refvstar)/norm(vstar'*Ra*refvstar);
 
 
 % Compute the rotated vstar

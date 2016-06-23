@@ -63,7 +63,7 @@ Ys = cos(beta);
 [Xc, Yc, Zc] = meshgrid(linspace(-1,1,samples), linspace(-1,1,samples), linspace(-1,1,samples));
 
 %% 1. Segmentation and projection of all data sets
-
+fprintf('Starting segmentation...\n');
 % Generate segmentation data.
 SegmentationData = genSegData(Xs,Ys,Zs,Xc,Yc,Zc,datanames,resolution,scale);
 
@@ -72,9 +72,9 @@ SegmentationData = genSegData(Xs,Ys,Zs,Xc,Yc,Zc,datanames,resolution,scale);
 % Maybe wont need this later if the biologists find good characteristics.
 fprintf('\n\nUser interaction: \n');
 fprintf('Choose which dataset should be the reference dataset?\n');
-refDataset = char(datanames(1));
+refDataset = char(datanames(3));
 refDataset = refDataset(1:end-4);
-datanames(1) = [];
+datanames(3) = [];
 fprintf('Default selected. Starting with the first dataset.\n');
 %% 3. Registration
 
@@ -119,7 +119,7 @@ for i=1:size(datanames,1)
         = rotateGreatCircle(pstar,vstar,refpstar,refvstar);
     
     % Rotationmatrix: Rotates the regression line onto the reference line
-    Ra = rotAboutAxis(vAngle,refpstar);
+    Ra = rotAboutAxis(-vAngle,refpstar);
     
     % Rotate data set and cell coordinates
     regData_r = Ra*Rp*regData;

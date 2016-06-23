@@ -23,12 +23,12 @@ function [R] = rotAboutAxis(theta,u)
 ux = [0,-u(3),u(2);u(3), 0, -u(1); -u(2),u(1),0];
 
 % Compute tensor product
-crossproductmatrix = [u(1)^2,u(1)*u(2),u(1)*u(3);...
+tensorproduct = [u(1)^2,u(1)*u(2),u(1)*u(3);...
     u(1)*u(2),u(2)^2,u(2)*u(3);...
     u(1)*u(3),u(2)*u(3),u(3)^2];
 
 % Compute R
-R = cos(-theta)*eye(3) + sin(-theta)*ux +(1-cos(-theta))*crossproductmatrix;
+R = cos(-theta)*eye(3) + sin(-theta)*ux +(1-cos(-theta))*tensorproduct;
 
 end
 
