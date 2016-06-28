@@ -1,4 +1,4 @@
-function [Rp, Rv, pstar, vstar, vAngle] = rotAboutAbiAxis(pstar,vstar,refpstar,refvstar)
+function [Rp, Rv, pstar, vstar, vAngle] = rotateGreatCircle(pstar,vstar,refpstar,refvstar)
 %ROTATEGREATCIRCLE: This function rotates a great circle onto another on
 % with a given characteristic. Parametrized with a point and a vector.
 % Trs characteristic can be the pstar of the regression line or a
@@ -33,7 +33,6 @@ c = pstar'*refpstar;
 V = [0,-v(3),v(2);v(3),0,-v(1);-v(2),v(1),0];
 % 
 Rp = eye(3)+V+V*V*(1-c)/s^2;
-%Rp = rotAboutAxis(acos(c),v);
 
 % Rotate pstar and vstar
 pstar = Rp*pstar;

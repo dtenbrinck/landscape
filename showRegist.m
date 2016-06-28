@@ -14,7 +14,7 @@ G = geodesicFun(rS.pstar,rS.vstar);
 regressionLine = G(T);
 options = optimoptions('fmincon','Display','off','Algorithm','sqp');
 [pstar,vstar] ...
-        = sphericalRegression3D(S.regData_r,[1;0;0],[0;0;-1],options,'true');
+        = sphericalRegression3D(S.regData_r,[1;0;0],[0;0;-1],options,'false');
 
 % Visualize
 figure, 
@@ -22,6 +22,7 @@ plot3(regressionLine(1,:),regressionLine(2,:),regressionLine(3,:),'r');
 hold on;
 scatter3(rS.regData(1,:),rS.regData(2,:),rS.regData(3,:), 'o');
 scatter3(S.regData_r(1,:),S.regData_r(2,:),S.regData_r(3,:), 'x');
+scatter3(S.centCoords(1,:),S.centCoords(2,:),S.centCoords(3,:), '*');
 xlim([-1,1]);
 ylim([-1,1]);
 zlim([-1,1]);

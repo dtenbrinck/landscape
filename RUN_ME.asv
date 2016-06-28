@@ -152,7 +152,6 @@ fprintf('Registration Done!\n');
 
 %% 4. Compute the heatmap
 
-% PUT INTO FUNCTIONS!
 % We will give 3 different heatmaps.
 % 1. slice by slice
 % 2. 3D
@@ -229,11 +228,9 @@ colormap('jet')
 slicesMat = permute(sum(sum(SbSMat)),[3,1,2]);
 figure, bar(slicesMat), title('Density distribution in the slices');
 % 3.1.2 Histogram x direction
-slicesMat = sum(sum(SbSMat,1),3)';
+slicesMat = sum(sum(SbSMat,1),3);
 figure, bar(slicesMat), title('Density distribution in the slices');
-% 3.1.3 Histogramm in y direction
 slicesMat = sum(sum(SbSMat,2),3);
-figure, bar(slicesMat), title('Density distribution in the slices');
 % 3.2 As a 3d map 
 % 3.2.1 As Bars in 3d
 figure, b=bar3(prMat);
