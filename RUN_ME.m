@@ -78,7 +78,7 @@ fprintf('Default selected. Starting with the first dataset.\n');
 %% 3. Registration
 
 fprintf('Starting registration: \n');
-fprintf(['Initializing the reference data set ',refDatasettext1,'.mat... \n']);
+fprintf(['Initializing the reference data set ',refDataset,'.mat... \n']);
 
 % Initialize the reference data set.
 [refpstar, refvstar,regData] ...

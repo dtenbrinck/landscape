@@ -80,7 +80,7 @@ end
 % Close waitbar
 close(wb1);
 
-fprintf(['\n','Finished segmentation!']);
+fprintf(['\n','Finished segmentation!\n']);
 
 end
 

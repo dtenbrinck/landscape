@@ -22,7 +22,7 @@ function varargout = Embryo_Registration(varargin)
 
 % Edit the above text to modify the response to help Embryo_Registration
 
-% Last Modified by GUIDE v2.5 29-Jun-2016 15:28:35
+% Last Modified by GUIDE v2.5 30-Jun-2016 22:44:40
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -71,8 +71,16 @@ handles.resolution = [1.29/handles.scale, 1.29/handles.scale, 20];
 handles.samples = 64;
 
 % Set Buttons
+set(handles.textField,'String','Welcome! Please load your data.');
 set(handles.start_seg,'Enable','off');
 set(handles.btnOrientation,'Enable','off');
+set(handles.btnReg,'Enable','off');
+
+% Set default reference data
+handles.nRefData = 1;
+
+% Set default visualization
+handles.vis_regist = 0;
 
 % Update handles structure
 guidata(hObject, handles);
@@ -123,6 +131,8 @@ end
 
 if numOfData==0
     errordlg('No data selected.');
+    set(handles.textField,'String','Failed to load data. Please try again.');
+    return;
 end
 
 disp('Loading data...');
@@ -146,6 +156,7 @@ close(wb1);
 
 % Update handles
 handles.filenames = fileName;
+handles.nRefData = 1;
 handles.data = datastruct;
 set(handles.textField,'String','Data loaded.');
 set(handles.start_seg,'Enable','on');
@@ -183,6 +194,7 @@ handles.SegData = genSegDataGUI(Xs,Ys,Zs,Xc,Yc,Zc,handles.data,handles.resolutio
 set(handles.textField,'String','Segmentation Done!');
 set(handles.start_seg,'Enable','off');
 set(handles.btnOrientation,'Enable','on');
+set(handles.btnReg,'Enable','on');
 
 guidata(hObject,handles);
 
@@ -222,5 +234,41 @@ function btnOrientation_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 Embryo_Orientation(handles);
+
+guidata(hObject,handles);
+
+
+% --- Executes on button press in btnReg.
+function btnReg_Callback(hObject, eventdata, handles)
+% hObject    handle to btnReg (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+handles = compRegistrationGUI(handles);
+
+guidata(hObject,handles);
+
+% --- Executes on button press in cbShowReg.
+function cbShowReg_Callback(hObject, eventdata, handles)
+% hObject    handle to cbShowReg (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of cbShowReg
+if get(hObject,'Value')
+    handles.vis_regist = 1;
+else
+    handles.vis_regist = 0;
+end
+guidata(hObject,handles);
+
+
+% --- Executes on button press in btnHeat.
+function btnHeat_Callback(hObject, eventdata, handles)
+% hObject    handle to btnHeat (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+Embryo_Heatmap(handles);
 
 guidata(hObject,handles);

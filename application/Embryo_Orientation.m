@@ -22,7 +22,7 @@ function varargout = Embryo_Orientation(varargin)
 
 % Edit the above text to modify the response to help Embryo_Orientation
 
-% Last Modified by GUIDE v2.5 29-Jun-2016 16:23:53
+% Last Modified by GUIDE v2.5 30-Jun-2016 00:17:46
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -79,7 +79,16 @@ set(handles.sliderData,...
     'Max',numOfData,...
     'Value',1,...
     'SliderStep', [1 ,1]/(numOfData-1));
-    
+
+% Check if there is already a reference data set
+if isfield(handles.MGH,'nRefData')
+    handles.nRefData = handles.MGH.nRefData;
+else
+    handles.nRefData = 1;
+end
+
+fieldNames = fieldnames(handles.MGH.data); 
+set(handles.textRef,'String',char(fieldNames(handles.nRefData)));
     
 
 % Update handles structure
@@ -161,20 +170,29 @@ if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColo
 end
 
 
+% --- Executes when selected object is changed in bgImageType.
+function bgImageType_SelectionChangedFcn(hObject, eventdata, handles)
+% hObject    handle to the selected object in bgImageType 
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+datanum = get(handles.sliderData,'Value');
+slice = get(handles.sliderSlice,'Value');
+
+if get(handles.rbSeg,'Value')
+    axes(handles.axes1),imagesc(handles.MGH.SegData.(char(handles.datanames(datanum))).landmark(:,:,slice));
+elseif get(handles.rbGFP,'Value')
+    axes(handles.axes1),imagesc(handles.MGH.data.(char(handles.datanames(datanum))).GFP(:,:,slice));
+end
+
+
 % --- Executes on button press in rbGFP.
 function rbGFP_Callback(hObject, eventdata, handles)
 % hObject    handle to rbGFP (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-datanum = get(handles.sliderData,'Value');
-slice = get(handles.sliderSlice,'Value');
-value = get(handles.rbGFP,'Value');
-if value == 1
-    axes(handles.axes1),imagesc(handles.MGH.data.(char(handles.datanames(datanum))).GFP(:,:,slice));
-end
-
-guidata(hObject,handles);
+% Hint: get(hObject,'Value') returns toggle state of rbGFP
 
 
 % --- Executes on button press in rbSeg.
@@ -185,25 +203,91 @@ function rbSeg_Callback(hObject, eventdata, handles)
 
 % Hint: get(hObject,'Value') returns toggle state of rbSeg
 
-datanum = get(handles.sliderData,'Value');
-slice = get(handles.sliderSlice,'Value');
-value = get(handles.rbSeg,'Value');
-if value == 1
-    axes(handles.axes1),imagesc(handles.MGH.SegData.(char(handles.datanames(datanum))).landmark(:,:,slice));
-end
 
-guidata(hObject,handles);
-
-
-% --- Executes when selected object is changed in bgImageType.
-function bgImageType_SelectionChangedFcn(hObject, eventdata, handles)
-% hObject    handle to the selected object in bgImageType 
+% --- Executes on button press in btnFlip.
+function btnFlip_Callback(hObject, eventdata, handles)
+% hObject    handle to btnFlip (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 datanum = get(handles.sliderData,'Value');
 slice = get(handles.sliderSlice,'Value');
-value = get(handles.rbSeg,'Value');
-if value == 1
+
+% Flip from left to right
+handles.MGH.data.(char(handles.datanames(datanum))).GFP ...
+    = fliplr(handles.MGH.data.(char(handles.datanames(datanum))).GFP);
+handles.MGH.data.(char(handles.datanames(datanum))).Dapi ...
+    = fliplr(handles.MGH.data.(char(handles.datanames(datanum))).Dapi);
+handles.MGH.data.(char(handles.datanames(datanum))).mCherry ...
+    = fliplr(handles.MGH.data.(char(handles.datanames(datanum))).mCherry);
+handles.MGH.SegData.(char(handles.datanames(datanum))).landmark ...
+    = fliplr(handles.MGH.SegData.(char(handles.datanames(datanum))).landmark);
+
+% Update axes
+if get(handles.rbSeg,'Value')
     axes(handles.axes1),imagesc(handles.MGH.SegData.(char(handles.datanames(datanum))).landmark(:,:,slice));
+elseif get(handles.rbGFP,'Value')
+    axes(handles.axes1),imagesc(handles.MGH.data.(char(handles.datanames(datanum))).GFP(:,:,slice));
 end
+
+guidata(hObject,handles);
+
+
+% --- Executes on button press in btnNext.
+function btnNext_Callback(hObject, eventdata, handles)
+% hObject    handle to btnNext (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+slice = get(handles.sliderSlice,'Value');
+datanum = get(handles.sliderData,'Value');
+plusone = datanum+1;
+if plusone <= size(handles.datanames,1)
+    set(handles.sliderData,'Value',get(handles.sliderData,'Value')+1);
+    % Update axes
+    if get(handles.rbSeg,'Value')
+        axes(handles.axes1),imagesc(handles.MGH.SegData.(char(handles.datanames(plusone))).landmark(:,:,slice));
+    elseif get(handles.rbGFP,'Value')
+        axes(handles.axes1),imagesc(handles.MGH.data.(char(handles.datanames(plusone))).GFP(:,:,slice));
+    end
+end
+
+guidata(hObject,handles);
+
+
+% --- Executes on button press in btnSave.
+function btnSave_Callback(hObject, eventdata, handles)
+% hObject    handle to btnSave (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+h = findobj('Name','Embryo Registration');
+handles.MGH.nRefData = handles.nRefData;
+guidata(h,handles.MGH)
+close
+
+% --- Executes on button press in btnDiscard.
+function btnDiscard_Callback(hObject, eventdata, handles)
+% hObject    handle to btnDiscard (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+close;
+
+
+% --- Executes on button press in btnRef.
+function btnRef_Callback(hObject, eventdata, handles)
+% hObject    handle to btnRef (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+handles.nRefData = get(handles.sliderData,'Value');
+fieldNames = fieldnames(handles.MGH.data);
+set(handles.textRef,'String',char(fieldNames(handles.nRefData)));
+
+guidata(hObject,handles);
+
+% --- If Enable == 'on', executes on mouse press in 5 pixel border.
+% --- Otherwise, executes on mouse press in 5 pixel border or over btnRef.
+function btnRef_ButtonDownFcn(hObject, eventdata, handles)
+% hObject    handle to btnRef (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)

@@ -9,7 +9,7 @@ function [samCoordsG, samCoordsU] = fitOnSamSphere(coords, numOfGridPoints)
 %
 %% Output: 
 % samCoordsG:      sampled coordinates in the grid
-% samCoordsU:     sampled coordinates in the unit sphere
+% samCoordsU:       sampled coordinates in the unit sphere
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
