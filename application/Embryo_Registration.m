@@ -120,7 +120,7 @@ end
 
 % Load data
 pathName=uigetdir('','Please select a folder with the data!');
-searchFiles=strcat(pathName,'/*.mat');
+searchFiles=strcat(pathName,'/*.stk');
 handles.PathName = pathName;
 listFiles=dir(searchFiles);
 numOfData=numel(listFiles);
@@ -142,14 +142,92 @@ wb1=waitbar(0, 'Loading selected data... Please wait...');
 set(findobj(wb1,'type','patch'),'edgecolor','k','facecolor','b');
 
 % Create data structure
-datastruct = struct;
+% data = struct;
+% for i=1:numOfData
+%     waitbar(i/numOfData);
+%     drawnow;
+%     fName = fileName{i};
+%     load(fName);
+%     fieldname = ['Data_',fName(1:end-4)];
+%     data.(fieldname) = data;
+% end
+
+% Create data structure
+% Sort the names of the stk files
+
+
+data = struct;
+indices = strfind(fileName,'_');
+experimentNumber = zeros(size(fileName));
+for i=1:size(fileName,1)
+experimentNumber(i) ...
+    = str2double(strtok(...
+    fileName{i}(indices{i,1}((size(indices{i,1},2)-1))+1:indices{i,1}((size(indices{i,1},2)-1))+2),'_'));
+end
+stkFiles = cell(max(experimentNumber),3);
+for i=1:size(stkFiles,1)
+    indices = find(experimentNumber==i);
+    if size(indices,1)<3
+        continue;
+        warning(['Dataset #',num2str(i),' is not completly! Will be ignored!'])
+    end
+    % Find Dapi
+    index = strfind(fileName(indices),'Dapi');
+    rightind = find(~cellfun(@isempty,index));
+    stkFiles{i,1} = fileName(indices(rightind));
+    % Find GFP
+    index = strfind(fileName(indices),'GFP');
+    rightind = find(~cellfun(@isempty,index));
+    stkFiles{i,2} = fileName(indices(rightind));
+    % Find mCherry
+    index = strfind(fileName(indices),'mCherry');
+    rightind = find(~cellfun(@isempty,index));
+    stkFiles{i,3} = fileName(indices(rightind));
+end
+
+% Delete the empty cells
+stkFiles = reshape(stkFiles(~cellfun('isempty',stkFiles)),[],3);
+
+numOfData = size(stkFiles,1);
 for i=1:numOfData
+    if i == 20
+        l = 3;
+    end
     waitbar(i/numOfData);
     drawnow;
-    fName = fileName{i};
-    load(fName);
-    fieldname = ['Data_',fName(1:end-4)];
-    datastruct.(fieldname) = data;
+    
+    try
+        dataName = ['Data_',num2str(i)];
+        % Load Dapi
+        data.(dataName) = [];
+        pathFile = [handles.PathName,'\',char(stkFiles{i,1})];
+        TIFF = tiffread(pathFile);
+        % Set x_resolution
+        xres = TIFF.('x_resolution');
+        yres = TIFF.('y_resolution');
+        height = TIFF.('height');
+        width = TIFF.('width');
+        data.(dataName).x_resolution = xres(1);
+        data.(dataName).y_resolution = yres(1);
+        data.(dataName).Dapi ...
+            = double(reshape(cell2mat({TIFF(:).('data')}),height,width,size(TIFF,2)));
+        % Load GFP
+        pathFile = [handles.PathName,'\',char(stkFiles{i,2})];
+        TIFF = tiffread(pathFile);
+        data.(dataName).GFP ...
+            = double(reshape(cell2mat({TIFF(:).('data')}),height,width,size(TIFF,2)));
+        % Load mCherry
+        pathFile = [handles.PathName,'\',char(stkFiles{i,3})];
+        TIFF = tiffread(pathFile);
+        data.(dataName).mCherry ...
+            = double(reshape(cell2mat({TIFF(:).('data')}),height,width,size(TIFF,2)));
+    catch ME
+        
+        warning('Some error occured while reading the TIFF file! The error',...
+            ' message was: ',ME.message,'\n this file will be skipped!');
+        rmfield(data,dataName);
+        continue;
+    end
 end
 
 close(wb1);
@@ -157,7 +235,7 @@ close(wb1);
 % Update handles
 handles.filenames = fileName;
 handles.nRefData = 1;
-handles.data = datastruct;
+handles.data = data;
 set(handles.textField,'String','Data loaded.');
 set(handles.start_seg,'Enable','on');
 guidata(hObject,handles);

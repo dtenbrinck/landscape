@@ -25,39 +25,37 @@ Ys = cos(beta);
 %% Main Code
 
 % Set the sRefData
-sRefData = char(handles.filenames(handles.nRefData));
-sRefData = sRefData(1:end-4);
+handles.fieldnames = fieldnames(handles.data);
+sRefData = char(handles.fieldnames(handles.nRefData));
 
 fprintf('Starting registration: \n');
-fprintf(['Initializing the reference data set Data_',sRefData,'... \n']);
+fprintf(['Initializing the reference data set ',sRefData,'... \n']);
 
 % Initialize the reference data set.
 [refpstar, refvstar,regData] ...
-    = computeRegression(handles.SegData.(['Data_',sRefData]).GFPOnSphere, Xs, Ys, Zs, 'false');
+    = computeRegression(handles.SegData.([sRefData]).GFPOnSphere, Xs, Ys, Zs, 'false');
 
 fprintf('Setting the reference p* and v*.\n');
 
 % Update handles.SegData
-handles.SegData.(['Data_',sRefData]).pstar = refpstar;
-handles.SegData.(['Data_',sRefData]).vstar = refvstar;
-handles.SegData.(['Data_',sRefData]).regData = regData;
+handles.SegData.([sRefData]).pstar = refpstar;
+handles.SegData.([sRefData]).vstar = refvstar;
+handles.SegData.([sRefData]).regData = regData;
 
 fprintf('Initialization done!\n');
 % Compute the spherical regression for the rest of the datasets and
 % register them.
 
-fprintf(['Starting registration of the data sets to the reference dataset: Data_',sRefData,'... \n'])
+fprintf(['Starting registration of the data sets to the reference dataset: ',sRefData,'... \n'])
 
 % Delete the reference data from the filenames.
-filenames = handles.filenames;
-filenames(handles.nRefData) = [];
-for i=1:size(filenames,1)
-    fprintf(['Computing regression for dataset ',num2str(i),' of ',num2str(size(filenames,1)),'...']);
+fieldNames = handles.fieldnames;
+fieldNames(handles.nRefData) = [];
+for i=1:size(fieldNames,1)
+    fprintf(['Computing regression for dataset ',num2str(i),' of ',num2str(size(fieldNames,1)),'...']);
     
     % Get the data that is projected onto the sphere
-    dataName = char(filenames(i));
-    dataName = dataName(1:end-4);
-    fieldname = ['Data_',dataName];
+    fieldname = char(fieldNames(i));
     
     % Compute regression
     [pstar,vstar, regData] ...
@@ -93,8 +91,8 @@ for i=1:size(filenames,1)
     
     % Visualize Registration
     if handles.vis_regist
-        showRegist(handles.SegData.(['Data_',sRefData]),...
-            handles.SegData.(fieldname),['Data_',sRefData],fieldname);
+        showRegist(handles.SegData.(sRefData),...
+            handles.SegData.(fieldname),sRefData,fieldname);
     end
 end
 set(handles.textField,'String','Registration Done!');
