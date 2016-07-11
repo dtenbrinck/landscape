@@ -129,7 +129,6 @@ if get(handles.rbGFP,'Value')== 1
 elseif get(handles.rbSeg,'Value')==1
     axes(handles.axes1),imagesc(handles.MGH.SegData.(char(handles.datanames(datanum))).landmark(:,:,slice));
 end
-set(handles.axes1,'XTick','','YTick','');
 guidata(hObject,handles);
 
 % --- Executes during object creation, after setting all properties.
@@ -160,7 +159,6 @@ if get(handles.rbGFP,'Value')== 1
 elseif get(handles.rbSeg,'Value')==1
     axes(handles.axes1),imagesc(handles.MGH.SegData.(char(handles.datanames(datanum))).landmark(:,:,slice));
 end
-set(handles.axes1,'XTick','','YTick','');
 guidata(hObject,handles);
 
 
@@ -190,8 +188,6 @@ if get(handles.rbSeg,'Value')
 elseif get(handles.rbGFP,'Value')
     axes(handles.axes1),imagesc(handles.MGH.data.(char(handles.datanames(datanum))).GFP(:,:,slice));
 end
-set(handles.axes1,'XTick','','YTick','');
-drawnow
 
 
 % --- Executes on button press in rbGFP.
@@ -237,7 +233,7 @@ if get(handles.rbSeg,'Value')
 elseif get(handles.rbGFP,'Value')
     axes(handles.axes1),imagesc(handles.MGH.data.(char(handles.datanames(datanum))).GFP(:,:,slice));
 end
-set(handles.axes1,'XTick','','YTick','');
+
 guidata(hObject,handles);
 
 
@@ -259,7 +255,7 @@ if plusone <= size(handles.datanames,1)
         axes(handles.axes1),imagesc(handles.MGH.data.(char(handles.datanames(plusone))).GFP(:,:,slice));
     end
 end
-set(handles.axes1,'XTick','','YTick','');
+
 guidata(hObject,handles);
 
 
@@ -440,5 +436,4 @@ set(handles.textRef,'String','Data_Ref');
 close(wb1);
 handles.masterRef = 1;
 
-% UPDATE THE SLIDER!!!
 guidata(hObject,handles);

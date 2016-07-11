@@ -38,9 +38,9 @@ fprintf(['Initializing the reference data set ',sRefData,'... \n']);
 fprintf('Setting the reference p* and v*.\n');
 
 % Update handles.SegData
-handles.SegData.([sRefData]).pstar = refpstar;
-handles.SegData.([sRefData]).vstar = refvstar;
-handles.SegData.([sRefData]).regData = regData;
+handles.SegData.(sRefData).pstar = refpstar;
+handles.SegData.(sRefData).vstar = refvstar;
+handles.SegData.(sRefData).regData = regData;
 
 fprintf('Initialization done!\n');
 % Compute the spherical regression for the rest of the datasets and

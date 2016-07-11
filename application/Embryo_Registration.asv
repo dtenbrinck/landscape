@@ -141,15 +141,29 @@ set(handles.textField,'String','Loading data...');
 wb1=waitbar(0, 'Loading selected data... Please wait...');
 set(findobj(wb1,'type','patch'),'edgecolor','k','facecolor','b');
 
+% Create data structure
+% data = struct;
+% for i=1:numOfData
+%     waitbar(i/numOfData);
+%     drawnow;
+%     fName = fileName{i};
+%     load(fName);
+%     fieldname = ['Data_',fName(1:end-4)];
+%     data.(fieldname) = data;
+% end
+
+% Create data structure
+% Sort the names of the stk files
+
+
 data = struct;
 indices = strfind(fileName,'_');
 experimentNumber = zeros(size(fileName));
-for i=1:size(fileName,1) 
-    experimentNumber(i) ... 
-        = str2double(strtok(... 
-        fileName{i}(indices{i,1}((size(indices{i,1},2)-1))+1:indices{i,1}((size(indices{i,1},2)))-1),'_')); 
+for i=1:size(fileName,1)
+experimentNumber(i) ...
+    = str2double(strtok(...
+    fileName{i}(indices{i,1}((size(indices{i,1},2)-1))+1:indices{i,1}((size(indices{i,1},2)-1))+2),'_'));
 end
-
 stkFiles = cell(max(experimentNumber),3);
 for i=1:size(stkFiles,1)
     indices = find(experimentNumber==i);
@@ -186,7 +200,7 @@ for i=1:numOfData
         dataName = ['Data_',num2str(i)];
         % Load Dapi
         data.(dataName) = [];
-        pathFile = [handles.PathName,'/',char(stkFiles{i,1})];
+        pathFile = [handles.PathName,'\',char(stkFiles{i,1})];
         TIFF = tiffread(pathFile);
         % Set x_resolution
         xres = TIFF.('x_resolution');
@@ -198,12 +212,12 @@ for i=1:numOfData
         data.(dataName).Dapi ...
             = double(reshape(cell2mat({TIFF(:).('data')}),height,width,size(TIFF,2)));
         % Load GFP
-        pathFile = [handles.PathName,'/',char(stkFiles{i,2})];
+        pathFile = [handles.PathName,'\',char(stkFiles{i,2})];
         TIFF = tiffread(pathFile);
         data.(dataName).GFP ...
             = double(reshape(cell2mat({TIFF(:).('data')}),height,width,size(TIFF,2)));
         % Load mCherry
-        pathFile = [handles.PathName,'/',char(stkFiles{i,3})];
+        pathFile = [handles.PathName,'\',char(stkFiles{i,3})];
         TIFF = tiffread(pathFile);
         data.(dataName).mCherry ...
             = double(reshape(cell2mat({TIFF(:).('data')}),height,width,size(TIFF,2)));
