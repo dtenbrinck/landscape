@@ -335,7 +335,7 @@ if nargin<4
 end
 if strcmp(cT,'Pro')||strcmp(cT,'Slice')
     text(h.axMain,2, datasize(2)/2,max(h.proMat(:))*2/3,'Tail','FontSize',12,'Color',color,'Rotation',90);
-    text(h.axMain,datasize(1)-1, datasize(2)/2,max(h.proMat(:))*2/3,'Head','FontSize',12,'Color',color,'Rotation',90);
+    text(h.axMain,datasize(1), datasize(2)/2,max(h.proMat(:))*2/3,'Head','FontSize',12,'Color',color,'Rotation',90);
     text(h.axMain,datasize(1)/2,2,max(h.proMat(:))*2/3,'Rightside','FontSize',12,'Color',color);
     text(h.axMain,datasize(1)/2,datasize(2),max(h.proMat(:))*2/3,'Leftside','FontSize',12,'Color',color);
 elseif strcmp(cT,'3D')||strcmp(cT,'Bars')
@@ -727,14 +727,8 @@ colors(1,:) = colorArray(1,:);
 % Find the density in the data in a linear way
 minD = min(data(:));
 maxD = max(data(:));
-
-% We want that the upper 10% should be red.
-maxD = maxD*0.9;
-
 % normalize onto [0,5]
-data = (data)/maxD;
-data(data>1) = 1;
-data = data*5;
+data = (data)/maxD*5;
 
 if strcmp(layerType,'linear')
     layerValues = 0:5;
@@ -747,8 +741,8 @@ if strcmp(layerType,'linear')
 end
 layerValues = fliplr(layerValues);
 layerValues = layerValues(1:numOfLayers);
-if layerValues(end) == 0
-    layerValues(end) = 0.1;
+if layerValues(end) == 1
+    layerValues(end) = 0
 end
 
 ax = gca;
@@ -1412,7 +1406,7 @@ if get(hObject,'Value')
     set(h.tbRot_Bars,'Enable','off');
     rotate3d off;
     
-    set(h.cbLabelAxis_Bars,'Enable','off');
+    set(h.cbLabelAxis,'Enable','off');
 
 else
     set(hObject,'Value',1);
