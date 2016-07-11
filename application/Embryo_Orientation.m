@@ -22,7 +22,7 @@ function varargout = Embryo_Orientation(varargin)
 
 % Edit the above text to modify the response to help Embryo_Orientation
 
-% Last Modified by GUIDE v2.5 30-Jun-2016 00:17:46
+% Last Modified by GUIDE v2.5 11-Jul-2016 16:54:36
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -289,5 +289,12 @@ guidata(hObject,handles);
 % --- Otherwise, executes on mouse press in 5 pixel border or over btnRef.
 function btnRef_ButtonDownFcn(hObject, eventdata, handles)
 % hObject    handle to btnRef (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in btnMasterRef.
+function btnMasterRef_Callback(hObject, eventdata, handles)
+% hObject    handle to btnMasterRef (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
