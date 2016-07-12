@@ -288,44 +288,12 @@ function btnRef_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 handles.nRefData = get(handles.sliderData,'Value');
-
-if handles.masterRef == 1 && handles.nRefData == get(handles.sliderData,'Max')
-    return;
-end
-
 fieldNames = fieldnames(handles.MGH.data);
 set(handles.textRef,'String',char(fieldNames(handles.nRefData)));
 if handles.masterRef == 1
     handles.masterRef = 0;
-    handles.MGH.data = rmfield(handles.MGH.data,'Master_Ref');
-    handles.MGH.SegData = rmfield(handles.MGH.SegData,'Master_Ref');
-    handles.datanames = fieldnames(handles.MGH.data);
-    
-    % Update slider
-    datanum = size(handles.datanames,1);
-    set(handles.sliderData,...
-        'Min',1,...
-        'Max',datanum,...
-        'Value',handles.nRefData,...
-        'SliderStep', [1 ,1]/(datanum-1));
-    
-    numOfSlices = size(handles.MGH.data.(char(handles.datanames(1))).GFP,3);
-    set(handles.sliderSlice,...
-        'Min',1,...
-        'Max',numOfSlices,...
-        'Value',1,...
-        'SliderStep', [1 ,1]/(numOfSlices-1));
-    
-    
-    slice = 1;
-    if get(handles.rbGFP,'Value')== 1
-        axes(handles.axes1),imagesc(handles.MGH.data.Data_1.GFP(:,:,slice));
-    elseif get(handles.rbSeg,'Value')==1
-        axes(handles.axes1),imagesc(handles.MGH.SegData.Data_1.landmark(:,:,slice));
-    end
-    set(handles.axes1,'XTick','','YTick','');
+    handles.MGH.data = rmfield(handles.MGH.data,'Data_Ref');
 end
-
 guidata(hObject,handles);
 
 % --- If Enable == 'on', executes on mouse press in 5 pixel border.
@@ -428,7 +396,7 @@ set(findobj(wb1,'type','patch'),'edgecolor','k','facecolor','b');
 
 data = struct;
 try
-    dataName = 'Master_Ref';
+    dataName = 'Data_Ref';
     
     % Load Dapi
     data.(dataName) = [];
@@ -470,7 +438,7 @@ close(wb1);
 % Check if the master reference has the same amount of slices as the
 % Dataset.
 
-if size(data.Master_Ref.Dapi,3) > size(handles.MGH.data.Data_1.Dapi,3)
+if size(handles.MGH.data.Data_Ref.Dapi,3) > size(handles.MGH.data.Data_1.Dapi,3)
     choice = questdlg(['The master reference data has more slices than the corresponding data set.'...
         ,'Do you want to pick another master reference or just ignore it?'],'Too many slices',...
         'Repick','Ignore','Cancel','Cancel');
@@ -479,16 +447,16 @@ if size(data.Master_Ref.Dapi,3) > size(handles.MGH.data.Data_1.Dapi,3)
             btnMasterRef_Callback(hObject,eventdata,handles);
         case 'Ignore'
             warning('Will delete the leftover slices of the master reference...');
-            data.Master_Ref.Dapi ...
-                = data.Master_Ref.Dapi(:,:,size(handles.MGH.data.Data_1.Dapi,3));
-            data.Master_Ref.GFP ...
-                = data.Master_Ref.GFP(:,:,size(handles.MGH.data.Data_1.Dapi,3));
-            data.Master_Ref.mCherry ...
-                = data.Master_Ref.mCherry(:,:,size(handles.MGH.data.Data_1.Dapi,3));
+            data.Data_Ref.Dapi ...
+                = data.Data_Ref.Dapi(:,:,size(handles.MGH.data.Data_1.Dapi,3));
+            data.Data_Ref.GFP ...
+                = data.Data_Ref.GFP(:,:,size(handles.MGH.data.Data_1.Dapi,3));
+            data.Data_Ref.mCherry ...
+                = data.Data_Ref.mCherry(:,:,size(handles.MGH.data.Data_1.Dapi,3));
         case 'Cancel'
             return;
     end
-elseif size(data.Master_Ref.Dapi,3) < size(handles.MGH.data.Data_1.Dapi,3)
+elseif size(handles.MGH.data.Data_Ref.Dapi,3) < size(handles.MGH.data.Data_1.Dapi,3)
     choice = questdlg(['The master reference data has less slices than the corresponding data set.'...
         ,'Do you want to pick another master reference or just ignore it?'],'Insufficient slices',...
         'Repick','Ignore','Cancel','Cancel');
@@ -496,14 +464,13 @@ elseif size(data.Master_Ref.Dapi,3) < size(handles.MGH.data.Data_1.Dapi,3)
         case 'Repick'
             btnMasterRef_Callback(hObject,eventdata,handles);
         case 'Ignore'
-            diff = size(handles.MGH.data.Data_1.Dapi,3)-size(data.Master_Ref.Dapi,3);
             warning('Will add zero-slices at the end of the master reference data set...');
-            data.Master_Ref.Dapi ...
-                = padarray(data.Master_Ref.Dapi,[0,0,diff],'post');
-            data.Master_Ref.GFP ...
-                = padarray(data.Master_Ref.GFP,[0,0,diff],'post');
-            data.Master_Ref.mCherry ...
-                = padarray(data.Master_Ref.mCherry,[0,0,diff],'post');
+            data.Data_Ref.Dapi ...
+                = data.Data_Ref.Dapi(:,:,size(handles.MGH.data.Data_1.Dapi,3));
+            data.Data_Ref.GFP ...
+                = data.Data_Ref.GFP(:,:,size(handles.MGH.data.Data_1.Dapi,3));
+            data.Data_Ref.mCherry ...
+                = data.Data_Ref.mCherry(:,:,size(handles.MGH.data.Data_1.Dapi,3));
         case 'Cancel'
             return;
     end
@@ -528,9 +495,9 @@ segDataRef = genSegDataGUI(Xs,Ys,Zs,Xc,Yc,Zc,data,handles.MGH.resolution,handles
 
 
 % Work it into the handles structure
-handles.MGH.SegData.Master_Ref = segDataRef.Master_Ref;
-handles.MGH.data.Master_Ref = data.Master_Ref;
-set(handles.textRef,'String','Master_Ref');
+handles.MGH.SegData.Data_Ref = segDataRef.Data_Ref;
+handles.MGH.data.Data_Ref = data.Data_Ref;
+set(handles.textRef,'String','Data_Ref');
 
 handles.masterRef = 1;
 
@@ -552,12 +519,12 @@ set(handles.sliderSlice,...
 
 slice = 1;
 if get(handles.rbGFP,'Value')== 1
-    axes(handles.axes1),imagesc(handles.MGH.data.Master_Ref.GFP(:,:,slice));
+    axes(handles.axes1),imagesc(handles.MGH.data.Data_Ref.GFP(:,:,slice));
 elseif get(handles.rbSeg,'Value')==1
-    axes(handles.axes1),imagesc(handles.MGH.SegData.Master_Ref.landmark(:,:,slice));
+    axes(handles.axes1),imagesc(handles.MGH.SegData.Data_Ref.landmark(:,:,slice));
 end
 set(handles.axes1,'XTick','','YTick','');
-handles.datanames = fieldnames(handles.MGH.data);
+guidata(hObject,handles);
 
 guidata(hObject,handles);
 
