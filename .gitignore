@@ -1,5 +1,5 @@
 # ignore reference folde
 refs/
-/deploy_embryo.bat
+/deploy_embryo_now.bat
 # ignore temporary vim files
 *~
