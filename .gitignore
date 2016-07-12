@@ -3,6 +3,5 @@ refs/
 /deploy_new_version.bat
 /deploy_hotfix.bat
 /deploy_embryo.bat
-
 # ignore temporary vim files
 *~
