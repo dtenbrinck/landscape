@@ -25,7 +25,6 @@ for i=1:size(datanames,1)
     
     % Load dataset
     fileName = char(datanames(i));
-    fileName = [fileName(6:end),'.mat'];
     fprintf(['File name: ', fileName,'\n']);
     data = bigdata.(char(datanames(i)));
     
@@ -47,7 +46,6 @@ for i=1:size(datanames,1)
     % ... and cube
     [output.tCube.Xc_t,output.tCube.Yc_t,output.tCube.Zc_t] ...
         = transformUnitCube3D(Xc,Yc,Zc,scale_matrix,rotation_matrix,output.ellipsoid.center);
-    fieldName = ['Data_',fileName(1:end-4)];
     
     % Projection: %
     fprintf('Starting projection onto the unit sphere and unit cube...');
@@ -70,7 +68,7 @@ for i=1:size(datanames,1)
     fprintf('Done!');
     
     % Save in structure
-    SegmentedData.(fieldName) = output;
+    SegmentedData.(fileName) = output;
     
     % Update waitbar
     waitbar(i/size(datanames,1));
