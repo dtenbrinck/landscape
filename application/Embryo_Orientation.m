@@ -266,7 +266,6 @@ if plusone <= size(handles.datanames,1)
 end
 
 txSliceChange(handles.txSliceOf,slice,handles.numOfSlices);
-
 set(handles.axes1,'XTick','','YTick','');
 guidata(hObject,handles);
 
@@ -586,7 +585,8 @@ uicontrol('Parent',d,...
     'Style','text',...
     'Position',[0 0 01 0.6],...
     'String','Computing the segmentation...');
-drawnow
+
+drawnow  
 
 function txDataChange(txObj,dataName)
 set(txObj,'String',dataName)
