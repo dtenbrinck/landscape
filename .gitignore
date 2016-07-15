@@ -5,5 +5,6 @@ refs/
 /.csync_journal.db
 /deploy_embryo.bat
 /deploy_embryo_now.bat
+
 # ignore temporary vim files
 *~

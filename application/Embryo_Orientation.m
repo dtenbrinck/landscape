@@ -336,6 +336,7 @@ if handles.masterRef == 1
     txSliceChange(handles.txSliceOf,1,handles.numOfSlices);
     
 end
+
 guidata(hObject,handles);
 
 % --- If Enable == 'on', executes on mouse press in 5 pixel border.
@@ -355,6 +356,7 @@ function btnMasterRef_Callback(hObject, eventdata, handles)
 % Open up file browser
 
 if handles.masterRef == 1
+
     choice = questdlg('You have already added a Master Reference. Do you pick another?','Repick','Yes','No','Yes');
     switch choice
         case 'Yes'
@@ -362,7 +364,6 @@ if handles.masterRef == 1
         case 'No'
             return
     end
-end
 
 [fileNames,pathName] = uigetfile('*.stk','Please select the master reference files!','MultiSelect','on');
 fileNames = fileNames';
@@ -474,6 +475,7 @@ catch ME
     rmfield(data,dataName);
     return;
 end
+
 close(wb1);
 
 % Check if the master reference has the same amount of slices as the
@@ -594,3 +596,5 @@ drawnow
 
 function txSliceChange(txObj,slice,total)
 set(txObj,'String',['Slice ',num2str(slice),' of ',num2str(total)]);
+
+>>>>>>> origin/feature/master_reference_embryo
