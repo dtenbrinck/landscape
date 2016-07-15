@@ -151,7 +151,9 @@ for i=1:size(fileName,1)
 end
 
 stkFiles = cell(max(experimentNumber),3);
-for i=1:size(stkFiles,1)
+
+expeNums = unique(experimentNumber)';
+for i=expeNums
     indices = find(experimentNumber==i);
     if size(indices,1)<3
         warning(['Dataset #',num2str(i),' is not completly! Will be ignored!'])
@@ -176,10 +178,6 @@ stkFiles = reshape(stkFiles(~cellfun('isempty',stkFiles)),[],3);
 
 numOfData = size(stkFiles,1);
 for i=1:numOfData
-    if i == 20
-        l = 3;
-    end
-    waitbar(i/numOfData);
     drawnow;
     
     try
@@ -207,6 +205,8 @@ for i=1:numOfData
         TIFF = tiffread(pathFile);
         data.(dataName).mCherry ...
             = double(reshape(cell2mat({TIFF(:).('data')}),height,width,size(TIFF,2)));
+        % Save name of the file
+        data.(dataName).filename = stkFiles{i,1}(1:end-10);
     catch ME
         
         warning(['Some error occured while reading the TIFF file!', ...
@@ -215,6 +215,7 @@ for i=1:numOfData
         rmfield(data,dataName);
         continue;
     end
+    waitbar(i/numOfData);
 end
 
 close(wb1);

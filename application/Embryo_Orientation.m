@@ -72,6 +72,7 @@ axes(handles.axes1), imagesc(handles.MGH.data.(char(handles.datanames(1))).GFP(:
 set(handles.axes1,'XTick','','YTick','');
 % Set sliders
 numOfSlices = size(handles.MGH.data.(char(handles.datanames(1))).GFP,3);
+handles.numOfSlices = numOfSlices;
 numOfData = size(handles.datanames,1);
 set(handles.sliderSlice,...
     'Min',1,...
@@ -93,7 +94,8 @@ end
 
 fieldNames = fieldnames(handles.MGH.data); 
 set(handles.textRef,'String',char(fieldNames(handles.nRefData)));
-    
+txDataChange(handles.txDataOf,'Data_1');
+txSliceChange(handles.txSliceOf,1,numOfSlices);
 
 % Update handles structure
 guidata(hObject, handles);
@@ -129,6 +131,7 @@ if get(handles.rbGFP,'Value')== 1
 elseif get(handles.rbSeg,'Value')==1
     axes(handles.axes1),imagesc(handles.MGH.SegData.(char(handles.datanames(datanum))).landmark(:,:,slice));
 end
+txDataChange(handles.txDataOf,handles.datanames(datanum));
 set(handles.axes1,'XTick','','YTick','');
 guidata(hObject,handles);
 
@@ -160,6 +163,7 @@ if get(handles.rbGFP,'Value')== 1
 elseif get(handles.rbSeg,'Value')==1
     axes(handles.axes1),imagesc(handles.MGH.SegData.(char(handles.datanames(datanum))).landmark(:,:,slice));
 end
+txSliceChange(handles.txSliceOf,slice,handles.numOfSlices);
 set(handles.axes1,'XTick','','YTick','');
 guidata(hObject,handles);
 
@@ -258,7 +262,11 @@ if plusone <= size(handles.datanames,1)
     elseif get(handles.rbGFP,'Value')
         axes(handles.axes1),imagesc(handles.MGH.data.(char(handles.datanames(plusone))).GFP(:,:,slice));
     end
+    txDataChange(handles.txDataOf,char(handles.datanames(plusone)));
 end
+
+
+txSliceChange(handles.txSliceOf,slice,handles.numOfSlices);
 set(handles.axes1,'XTick','','YTick','');
 guidata(hObject,handles);
 
@@ -318,12 +326,16 @@ if handles.masterRef == 1
     
     
     slice = 1;
+    cla(handles.axes1);
     if get(handles.rbGFP,'Value')== 1
-        axes(handles.axes1),imagesc(handles.MGH.data.Data_1.GFP(:,:,slice));
+        axes(handles.axes1),imagesc(handles.MGH.data.(char(fieldNames(handles.nRefData))).GFP(:,:,slice));
     elseif get(handles.rbSeg,'Value')==1
-        axes(handles.axes1),imagesc(handles.MGH.SegData.Data_1.landmark(:,:,slice));
+        axes(handles.axes1),imagesc(handles.MGH.SegData.(char(fieldNames(handles.nRefData))).landmark(:,:,slice));
     end
     set(handles.axes1,'XTick','','YTick','');
+    txDataChange(handles.txDataOf,char(fieldNames(handles.nRefData)));
+    txSliceChange(handles.txSliceOf,1,handles.numOfSlices);
+    
 end
 
 guidata(hObject,handles);
@@ -558,6 +570,8 @@ elseif get(handles.rbSeg,'Value')==1
 end
 set(handles.axes1,'XTick','','YTick','');
 handles.datanames = fieldnames(handles.MGH.data);
+txDataChange(handles.txDataOf,'Master_Ref');
+txSliceChange(handles.txSliceOf,slice,handles.numOfSlices);
 
 guidata(hObject,handles);
 
@@ -575,3 +589,11 @@ uicontrol('Parent',d,...
     'Position',[0 0 01 0.6],...
     'String','Computing the segmentation...');
 drawnow  
+
+function txDataChange(txObj,dataName)
+set(txObj,'String',dataName)
+drawnow
+
+function txSliceChange(txObj,slice,total)
+set(txObj,'String',['Slice ',num2str(slice),' of ',num2str(total)]);
+
