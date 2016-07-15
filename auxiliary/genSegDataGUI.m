@@ -50,7 +50,7 @@ for i=1:size(datanames,1)
     if strcmp(fileName,'Master_Ref')
         fieldName = 'Master_Ref';
     else
-        fieldName = ['Data_',fileName(1:end-4)];
+        fieldName = fileName;
     end
     
     % Projection: %
