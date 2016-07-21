@@ -277,8 +277,8 @@ function btnSave_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 h = findobj('Name','Embryo Registration');
 handles.MGH.nRefData = handles.nRefData;
-guidata(h,handles.MGH)
-close
+guidata(h,handles.MGH);
+close;
 
 % --- Executes on button press in btnDiscard.
 function btnDiscard_Callback(hObject, eventdata, handles)
@@ -356,7 +356,7 @@ function btnMasterRef_Callback(hObject, eventdata, handles)
 % Open up file browser
 
 if handles.masterRef == 1
-
+    
     choice = questdlg('You have already added a Master Reference. Do you pick another?','Repick','Yes','No','Yes');
     switch choice
         case 'Yes'
@@ -364,6 +364,7 @@ if handles.masterRef == 1
         case 'No'
             return
     end
+end
 
 [fileNames,pathName] = uigetfile('*.stk','Please select the master reference files!','MultiSelect','on');
 fileNames = fileNames';
@@ -588,7 +589,7 @@ uicontrol('Parent',d,...
     'Position',[0 0 01 0.6],...
     'String','Computing the segmentation...');
 
-drawnow  
+drawnow
 
 function txDataChange(txObj,dataName)
 set(txObj,'String',dataName)
@@ -596,5 +597,3 @@ drawnow
 
 function txSliceChange(txObj,slice,total)
 set(txObj,'String',['Slice ',num2str(slice),' of ',num2str(total)]);
-
->>>>>>> origin/feature/master_reference_embryo
