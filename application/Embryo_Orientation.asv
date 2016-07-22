@@ -511,11 +511,11 @@ elseif size(data.Master_Ref.Dapi,3) < size(handles.MGH.data.Data_1.Dapi,3)
             diff = size(handles.MGH.data.Data_1.Dapi,3)-size(data.Master_Ref.Dapi,3);
             warning('Will add zero-slices at the end of the master reference data set...');
             data.Master_Ref.Dapi ...
-                = padarray(data.Master_Ref.Dapi,[0,0,diff],'replicate''post');
+                = padarray(data.Master_Ref.Dapi,[0,0,diff],'post');
             data.Master_Ref.GFP ...
-                = padarray(data.Master_Ref.GFP,[0,0,diff],'replicate','post');
+                = padarray(data.Master_Ref.GFP,[0,0,diff],'post');
             data.Master_Ref.mCherry ...
-                = padarray(data.Master_Ref.mCherry,[0,0,diff],'replicate','post');
+                = padarray(data.Master_Ref.mCherry,[0,0,diff],'post');
         case 'Cancel'
             return;
     end
@@ -545,17 +545,14 @@ handles.MGH.data.Master_Ref = data.Master_Ref;
 set(handles.textRef,'String','Master_Ref');
 
 handles.masterRef = 1;
-if isempty(find(~cellfun(@isempty,strfind((handles.datanames),'Master_Ref')),1))
-    handles.nRefData = size(handles.datanames,1)+1;
-end
-
-
+if isempty(find(~cellfun(@isempty,strfind((handles.datanames),'Master_Ref'))))
 % Update slider
+datanum = size(handles.datanames,1);
 set(handles.sliderData,...
     'Min',1,...
-    'Max',handles.nRefData,...
-    'Value',handles.nRefData,...
-    'SliderStep', [1 ,1]/(handles.nRefData-1));
+    'Max',datanum+1,...
+    'Value',datanum+1,...
+    'SliderStep', [1 ,1]/(datanum+1-1));
 
 numOfSlices = size(handles.MGH.data.(char(handles.datanames(1))).GFP,3);
 set(handles.sliderSlice,...

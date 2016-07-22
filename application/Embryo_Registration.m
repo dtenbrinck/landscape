@@ -75,6 +75,7 @@ set(handles.textField,'String','Welcome! Please load your data.');
 set(handles.start_seg,'Enable','off');
 set(handles.btnOrientation,'Enable','off');
 set(handles.btnReg,'Enable','off');
+set(handles.btnHeat,'Enable','off');
 
 % Set default reference data
 handles.nRefData = 1;
@@ -311,6 +312,7 @@ function btnReg_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 handles = compRegistrationGUI(handles);
+set(handles.btnOrientation,'Enable','on');
 
 guidata(hObject,handles);
 
