@@ -312,7 +312,7 @@ function btnReg_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 handles = compRegistrationGUI(handles);
-set(handles.btnOrientation,'Enable','on');
+set(handles.btnHeat,'Enable','on');
 
 guidata(hObject,handles);
 
