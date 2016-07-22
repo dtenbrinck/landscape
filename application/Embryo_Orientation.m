@@ -545,7 +545,7 @@ handles.MGH.data.Master_Ref = data.Master_Ref;
 set(handles.textRef,'String','Master_Ref');
 
 handles.masterRef = 1;
-
+handles.nRefData = size(handles.datanames,1)+1;
 % Update slider
 datanum = size(handles.datanames,1);
 set(handles.sliderData,...
