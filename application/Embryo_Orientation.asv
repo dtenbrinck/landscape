@@ -226,14 +226,20 @@ datanum = get(handles.sliderData,'Value');
 slice = get(handles.sliderSlice,'Value');
 
 % Flip from left to right
-handles.MGH.data.(char(handles.datanames(datanum))).GFP ...
+output = handles.MGH.SegData.(char(handles.datanames(datanum)));
+output.GFP ...
     = fliplr(handles.MGH.data.(char(handles.datanames(datanum))).GFP);
 handles.MGH.data.(char(handles.datanames(datanum))).Dapi ...
     = fliplr(handles.MGH.data.(char(handles.datanames(datanum))).Dapi);
 handles.MGH.data.(char(handles.datanames(datanum))).mCherry ...
     = fliplr(handles.MGH.data.(char(handles.datanames(datanum))).mCherry);
-handles.MGH.SegData.(char(handles.datanames(datanum))).landmark ...
-    = fliplr(handles.MGH.SegData.(char(handles.datanames(datanum))).landmark);
+.landmark ...
+    = fliplr(output.landmark);
+
+% Generate the flipped GPFOnSphere
+
+output.GFPOnSphere ...
+        = interp3(X, Y, Z, output.landmark, output.tSphere.Xs_t, output.tSphere.Ys_t, output.tSphere.Zs_t,'nearest');
 
 % Update axes
 if get(handles.rbSeg,'Value')
@@ -511,11 +517,11 @@ elseif size(data.Master_Ref.Dapi,3) < size(handles.MGH.data.Data_1.Dapi,3)
             diff = size(handles.MGH.data.Data_1.Dapi,3)-size(data.Master_Ref.Dapi,3);
             warning('Will add zero-slices at the end of the master reference data set...');
             data.Master_Ref.Dapi ...
-                = padarray(data.Master_Ref.Dapi,[0,0,diff],'post');
+                = padarray(data.Master_Ref.Dapi,[0,0,diff],'replicate','post');
             data.Master_Ref.GFP ...
-                = padarray(data.Master_Ref.GFP,[0,0,diff],'post');
+                = padarray(data.Master_Ref.GFP,[0,0,diff],'replicate','post');
             data.Master_Ref.mCherry ...
-                = padarray(data.Master_Ref.mCherry,[0,0,diff],'post');
+                = padarray(data.Master_Ref.mCherry,[0,0,diff],'replicate','post');
         case 'Cancel'
             return;
     end
@@ -545,14 +551,17 @@ handles.MGH.data.Master_Ref = data.Master_Ref;
 set(handles.textRef,'String','Master_Ref');
 
 handles.masterRef = 1;
-if isempty(find(~cellfun(@isempty,strfind((handles.datanames),'Master_Ref'))))
+if isempty(find(~cellfun(@isempty,strfind((handles.datanames),'Master_Ref')),1))
+    handles.nRefData = size(handles.datanames,1)+1;
+end
+
+
 % Update slider
-datanum = size(handles.datanames,1);
 set(handles.sliderData,...
     'Min',1,...
-    'Max',datanum+1,...
-    'Value',datanum+1,...
-    'SliderStep', [1 ,1]/(datanum+1-1));
+    'Max',handles.nRefData,...
+    'Value',handles.nRefData,...
+    'SliderStep', [1 ,1]/(handles.nRefData-1));
 
 numOfSlices = size(handles.MGH.data.(char(handles.datanames(1))).GFP,3);
 set(handles.sliderSlice,...

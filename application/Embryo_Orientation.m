@@ -226,14 +226,33 @@ datanum = get(handles.sliderData,'Value');
 slice = get(handles.sliderSlice,'Value');
 
 % Flip from left to right
+output = handles.MGH.SegData.(char(handles.datanames(datanum)));
 handles.MGH.data.(char(handles.datanames(datanum))).GFP ...
     = fliplr(handles.MGH.data.(char(handles.datanames(datanum))).GFP);
 handles.MGH.data.(char(handles.datanames(datanum))).Dapi ...
     = fliplr(handles.MGH.data.(char(handles.datanames(datanum))).Dapi);
 handles.MGH.data.(char(handles.datanames(datanum))).mCherry ...
     = fliplr(handles.MGH.data.(char(handles.datanames(datanum))).mCherry);
-handles.MGH.SegData.(char(handles.datanames(datanum))).landmark ...
-    = fliplr(handles.MGH.SegData.(char(handles.datanames(datanum))).landmark);
+output.landmark ...
+    = fliplr(output.landmark);
+
+% Generate the flipped GPFOnSphere
+
+% First flip the ellipsoid in the x-direction!
+
+storeMat = (output.tSphere.Xs_t-min(output.tSphere.Xs_t(:)));
+output.tSphere.Xs_t ...
+    = (-1)*(storeMat/max(storeMat(:))-1)*max(storeMat(:))+min(output.tSphere.Xs_t(:));
+
+% Now generate the GRPOnSphere map
+mind = [0 0 0]; maxd = size(output.landmark).*handles.MGH.resolution;
+[ X, Y, Z ] = meshgrid( linspace( mind(2), maxd(2), size(output.landmark,2) ),...
+        linspace( mind(1), maxd(1), size(output.landmark,1) ),...
+        linspace( mind(3), maxd(3), size(output.landmark,3) ) );
+    
+output.GFPOnSphere ...
+        = interp3(X, Y, Z, output.landmark, output.tSphere.Xs_t, output.tSphere.Ys_t, output.tSphere.Zs_t,'nearest');
+handles.MGH.SegData.(char(handles.datanames(datanum))) = output;
 
 % Update axes
 if get(handles.rbSeg,'Value')
