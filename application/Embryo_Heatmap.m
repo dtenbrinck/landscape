@@ -73,6 +73,10 @@ allCentCoords = [];
 for i = 1:size(fieldNames,1)
    allCentCoords = horzcat(allCentCoords,h.MGH.SegData.(char(fieldNames(i))).centCoords);
 end
+% Throw coordinates away that don't fit into unit sphere.
+counts = 1:size(allCentCoords,2);
+allCentCoords(:,counts(sqrt(sum(allCentCoords.^2,1))>1)) = [];
+
 h.allCentCoords = allCentCoords;
 h.numOfCells = size(allCentCoords,2);
 h.sizeLandmark = size(h.MGH.SegData.(fieldNames{1}).landmark);
