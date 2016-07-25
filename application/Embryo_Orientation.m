@@ -385,7 +385,14 @@ if handles.masterRef == 1
     end
 end
 
-[fileNames,pathName] = uigetfile('*.stk','Please select the master reference files!','MultiSelect','on');
+% Set default path
+if exist('/4TB/data/SargonYigit/Image Registration/10hpf_data/ody data_10hpf_heatmap/potential master references_10hpf/','dir') == 7
+    dataPath = '/4TB/data/SargonYigit/Image Registration/10hpf_data/ody data_10hpf_heatmap/potential master references_10hpf/*.stk';
+elseif exist('E:/Embryo_Registration/data/SargonYigit/Image Registration/10hpf_data/ody data_10hpf_heatmap/potential master references_10hpf/','dir') == 7
+    dataPath = 'E:/Embryo_Registration/data/SargonYigit/Image Registration/10hpf_data/ody data_10hpf_heatmap/potential master references_10hpf/*.stk';
+end
+
+[fileNames,pathName] = uigetfile(dataPath,'Please select the master reference files!','MultiSelect','on');
 fileNames = fileNames';
 % Check if there is the correct size of data and all types of channels
 % selected
