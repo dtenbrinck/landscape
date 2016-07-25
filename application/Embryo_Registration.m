@@ -120,7 +120,13 @@ if isfield(handles,'data');
 end
 
 % Load data
-pathName=uigetdir('','Please select a folder with the data!');
+
+if exist('/4TB/data/SargonYigit/','dir') == 7
+    dataPath = '/4TB/data/SargonYigit/';
+elseif exist('E:/Embryo_Registration/data/SargonYigit/','dir') == 7
+    dataPath = 'E:/Embryo_Registration/data/SargonYigit/';
+end
+pathName=uigetdir(dataPath,'Please select a folder with the data!');
 searchFiles=strcat(pathName,'/*.stk');
 handles.PathName = pathName;
 listFiles=dir(searchFiles);
