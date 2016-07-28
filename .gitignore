@@ -1,9 +1,7 @@
 # ignore reference folde
 refs/
-/deploy_new_version.bat
-/deploy_hotfix.bat
-/.csync_journal.db
-/deploy_embryo.bat
 /deploy_embryo_now.bat
+/deploy_hotfix.bat
+/deploy_new_version.bat
 # ignore temporary vim files
 *~
