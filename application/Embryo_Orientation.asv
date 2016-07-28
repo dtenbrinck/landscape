@@ -239,7 +239,7 @@ output.centCoords(1,:) = output.centCoords(1,:)*-1;
 
 % Generate the flipped GPFOnSphere
 
-samples = handles.MGH.samples;
+samples = handles.samples;
 [alpha, beta] = meshgrid(linspace(pi,pi*2,samples/2), linspace(0,2*pi,samples));
 Zs = cos(alpha) .* sin(beta);
 Xs = sin(alpha) .* sin(beta);
@@ -247,22 +247,13 @@ Ys = cos(beta);
 
 % First change the rotationmatrix so that it fits the flipping
 
-rotMat = output.ellipsoid.axes';
+rotMat = output.axes';
 rotMat(2,1) = -rotMat(2,1);
 rotMat(2,3) = -rotMat(2,3);
 rotMat(1,2) = -rotMat(1,2);
 rotMat(3,2) = -rotMat(3,2);
 
-% Compute the new meshgrids
-scaleMat = diag(1./output.ellipsoid.radii);
-transform = scaleMat*rotMat;
-% Transform all coordinates of the unit sphere
-X = transform^-1*[Xs(:),Ys(:),Zs(:)]';
 
-% Set the output and reshape it.
-output.tSphere.Xs_t = reshape(X(1,:)+output.ellipsoid.center(1),size(Xs));
-output.tSphere.Ys_t = reshape(X(2,:)+output.ellipsoid.center(2),size(Ys));
-output.tSphere.Zs_t = reshape(X(3,:)+output.ellipsoid.center(3),size(Zs));
 
 % Now generate the GRPOnSphere map
 

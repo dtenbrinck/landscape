@@ -26,6 +26,7 @@ Ys = cos(beta);
 
 % Set the sRefData
 handles.fieldnames = fieldnames(handles.data);
+
 sRefData = char(handles.fieldnames(handles.nRefData));
 
 fprintf('Starting registration: \n');
@@ -33,14 +34,14 @@ fprintf(['Initializing the reference data set ',sRefData,'... \n']);
 
 % Initialize the reference data set.
 [refpstar, refvstar,regData] ...
-    = computeRegression(handles.SegData.([sRefData]).GFPOnSphere, Xs, Ys, Zs, 'false');
+    = computeRegression(handles.SegData.(sRefData).GFPOnSphere, Xs, Ys, Zs, 'false');
 
 fprintf('Setting the reference p* and v*.\n');
 
 % Update handles.SegData
-handles.SegData.([sRefData]).pstar = refpstar;
-handles.SegData.([sRefData]).vstar = refvstar;
-handles.SegData.([sRefData]).regData = regData;
+handles.SegData.(sRefData).pstar = refpstar;
+handles.SegData.(sRefData).vstar = refvstar;
+handles.SegData.(sRefData).regData = regData;
 
 fprintf('Initialization done!\n');
 % Compute the spherical regression for the rest of the datasets and

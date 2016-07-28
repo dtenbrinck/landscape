@@ -1,0 +1,5 @@
+# ignore reference folde
+refs/
+/changelog.md
+# ignore temporary vim files
+*~

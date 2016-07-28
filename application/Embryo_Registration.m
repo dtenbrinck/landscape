@@ -75,6 +75,7 @@ set(handles.textField,'String','Welcome! Please load your data.');
 set(handles.start_seg,'Enable','off');
 set(handles.btnOrientation,'Enable','off');
 set(handles.btnReg,'Enable','off');
+set(handles.btnHeat,'Enable','off');
 
 % Set default reference data
 handles.nRefData = 1;
@@ -119,7 +120,13 @@ if isfield(handles,'data');
 end
 
 % Load data
-pathName=uigetdir('','Please select a folder with the data!');
+
+if exist('/4TB/data/SargonYigit/','dir') == 7
+    dataPath = '/4TB/data/SargonYigit/';
+elseif exist('E:/Embryo_Registration/data/SargonYigit/','dir') == 7
+    dataPath = 'E:/Embryo_Registration/data/SargonYigit/';
+end
+pathName=uigetdir(dataPath,'Please select a folder with the data!');
 searchFiles=strcat(pathName,'/*.stk');
 handles.PathName = pathName;
 listFiles=dir(searchFiles);
@@ -151,11 +158,13 @@ for i=1:size(fileName,1)
 end
 
 stkFiles = cell(max(experimentNumber),3);
-for i=1:size(stkFiles,1)
+
+expeNums = unique(experimentNumber)';
+for i=expeNums
     indices = find(experimentNumber==i);
     if size(indices,1)<3
-        continue;
         warning(['Dataset #',num2str(i),' is not completly! Will be ignored!'])
+        continue;
     end
     % Find Dapi
     index = strfind(fileName(indices),'Dapi');
@@ -176,10 +185,6 @@ stkFiles = reshape(stkFiles(~cellfun('isempty',stkFiles)),[],3);
 
 numOfData = size(stkFiles,1);
 for i=1:numOfData
-    if i == 20
-        l = 3;
-    end
-    waitbar(i/numOfData);
     drawnow;
     
     try
@@ -207,13 +212,17 @@ for i=1:numOfData
         TIFF = tiffread(pathFile);
         data.(dataName).mCherry ...
             = double(reshape(cell2mat({TIFF(:).('data')}),height,width,size(TIFF,2)));
+        % Save name of the file
+        data.(dataName).filename = stkFiles{i,1}(1:end-10);
     catch ME
         
-        warning('Some error occured while reading the TIFF file! The error',...
-            ' message was: ',ME.message,'\n this file will be skipped!');
+        warning(['Some error occured while reading the TIFF file!', ...
+            '\n this file will be skipped!\n The error',...
+            ' message was: ',ME.message]);
         rmfield(data,dataName);
         continue;
     end
+    waitbar(i/numOfData);
 end
 
 close(wb1);
@@ -309,6 +318,7 @@ function btnReg_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 handles = compRegistrationGUI(handles);
+set(handles.btnHeat,'Enable','on');
 
 guidata(hObject,handles);
 

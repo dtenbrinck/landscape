@@ -25,6 +25,7 @@ for i=1:size(datanames,1)
     
     % Load dataset
     fileName = char(datanames(i));
+
     fprintf(['File name: ', fileName,'\n']);
     data = bigdata.(char(datanames(i)));
     
@@ -40,12 +41,18 @@ for i=1:size(datanames,1)
     % Transform unit sphere...
     scale_matrix = diag(1./output.ellipsoid.radii);
     rotation_matrix = output.ellipsoid.axes';
-    [output.tSphere.Xs_t,output.tSphere.Ys_t,output.tSphere.Zs_t] ...
+    [output.tSphere.Xs_t,output.tSphere.Ys_t,output.tSphere.Zs_t,output.ellipsoid.axes] ...
         = transformUnitSphere3D(Xs,Ys,Zs,scale_matrix,rotation_matrix,output.ellipsoid.center);
     
     % ... and cube
     [output.tCube.Xc_t,output.tCube.Yc_t,output.tCube.Zc_t] ...
         = transformUnitCube3D(Xc,Yc,Zc,scale_matrix,rotation_matrix,output.ellipsoid.center);
+
+    if strcmp(fileName,'Master_Ref')
+        fieldName = 'Master_Ref';
+    else
+        fieldName = fileName;
+    end
     
     % Projection: %
     fprintf('Starting projection onto the unit sphere and unit cube...');
