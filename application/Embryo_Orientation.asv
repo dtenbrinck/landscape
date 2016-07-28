@@ -186,8 +186,8 @@ function bgImageType_SelectionChangedFcn(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-datanum = get(handles.sliderData,'Value');
-slice = get(handles.sliderSlice,'Value');
+datanum = round(get(handles.sliderData,'Value'));
+slice = round(get(handles.sliderSlice,'Value'));
 
 if get(handles.rbSeg,'Value')
     axes(handles.axes1),imagesc(handles.MGH.SegData.(char(handles.datanames(datanum))).landmark(:,:,slice));
@@ -222,24 +222,49 @@ function btnFlip_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-datanum = get(handles.sliderData,'Value');
-slice = get(handles.sliderSlice,'Value');
+datanum = round(get(handles.sliderData,'Value'));
+slice = round(get(handles.sliderSlice,'Value'));
 
 % Flip from left to right
 output = handles.MGH.SegData.(char(handles.datanames(datanum)));
-output.GFP ...
+handles.MGH.data.(char(handles.datanames(datanum))).GFP ...
     = fliplr(handles.MGH.data.(char(handles.datanames(datanum))).GFP);
 handles.MGH.data.(char(handles.datanames(datanum))).Dapi ...
     = fliplr(handles.MGH.data.(char(handles.datanames(datanum))).Dapi);
 handles.MGH.data.(char(handles.datanames(datanum))).mCherry ...
     = fliplr(handles.MGH.data.(char(handles.datanames(datanum))).mCherry);
-.landmark ...
+output.landmark ...
     = fliplr(output.landmark);
+output.centCoords(1,:) = output.centCoords(1,:)*-1;
 
 % Generate the flipped GPFOnSphere
 
+samples = handles.samples;
+[alpha, beta] = meshgrid(linspace(pi,pi*2,samples/2), linspace(0,2*pi,samples));
+Zs = cos(alpha) .* sin(beta);
+Xs = sin(alpha) .* sin(beta);
+Ys = cos(beta);
+
+% First change the rotationmatrix so that it fits the flipping
+
+rotMat = output.axes';
+rotMat(2,1) = -rotMat(2,1);
+rotMat(2,3) = -rotMat(2,3);
+rotMat(1,2) = -rotMat(1,2);
+rotMat(3,2) = -rotMat(3,2);
+
+
+
+% Now generate the GRPOnSphere map
+
+mind = [0 0 0]; maxd = size(output.landmark).*handles.MGH.resolution;
+[ X, Y, Z ] = meshgrid( linspace( mind(2), maxd(2), size(output.landmark,2) ),...
+        linspace( mind(1), maxd(1), size(output.landmark,1) ),...
+        linspace( mind(3), maxd(3), size(output.landmark,3) ) );
+    
 output.GFPOnSphere ...
         = interp3(X, Y, Z, output.landmark, output.tSphere.Xs_t, output.tSphere.Ys_t, output.tSphere.Zs_t,'nearest');
+handles.MGH.SegData.(char(handles.datanames(datanum))) = output;
 
 % Update axes
 if get(handles.rbSeg,'Value')
@@ -257,8 +282,8 @@ function btnNext_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-slice = get(handles.sliderSlice,'Value');
-datanum = get(handles.sliderData,'Value');
+slice = round(get(handles.sliderSlice,'Value'));
+datanum = round(get(handles.sliderData,'Value'));
 plusone = datanum+1;
 if plusone <= size(handles.datanames,1)
     set(handles.sliderData,'Value',get(handles.sliderData,'Value')+1);
@@ -300,7 +325,7 @@ function btnRef_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-handles.nRefData = get(handles.sliderData,'Value');
+handles.nRefData = round(get(handles.sliderData,'Value'));
 
 if handles.masterRef == 1 && handles.nRefData == get(handles.sliderData,'Max')
     return;
@@ -372,7 +397,14 @@ if handles.masterRef == 1
     end
 end
 
-[fileNames,pathName] = uigetfile('*.stk','Please select the master reference files!','MultiSelect','on');
+% Set default path
+if exist('/4TB/data/SargonYigit/Image Registration/10hpf_data/ody data_10hpf_heatmap/potential master references_10hpf/','dir') == 7
+    dataPath = '/4TB/data/SargonYigit/Image Registration/10hpf_data/ody data_10hpf_heatmap/potential master references_10hpf/*.stk';
+elseif exist('E:/Embryo_Registration/data/SargonYigit/Image Registration/10hpf_data/ody data_10hpf_heatmap/potential master references_10hpf/','dir') == 7
+    dataPath = 'E:/Embryo_Registration/data/SargonYigit/Image Registration/10hpf_data/ody data_10hpf_heatmap/potential master references_10hpf/*.stk';
+end
+
+[fileNames,pathName] = uigetfile(dataPath,'Please select the master reference files!','MultiSelect','on');
 fileNames = fileNames';
 % Check if there is the correct size of data and all types of channels
 % selected
@@ -555,22 +587,6 @@ if isempty(find(~cellfun(@isempty,strfind((handles.datanames),'Master_Ref')),1))
     handles.nRefData = size(handles.datanames,1)+1;
 end
 
-
-% Update slider
-set(handles.sliderData,...
-    'Min',1,...
-    'Max',handles.nRefData,...
-    'Value',handles.nRefData,...
-    'SliderStep', [1 ,1]/(handles.nRefData-1));
-
-numOfSlices = size(handles.MGH.data.(char(handles.datanames(1))).GFP,3);
-set(handles.sliderSlice,...
-    'Min',1,...
-    'Max',numOfSlices,...
-    'Value',1,...
-    'SliderStep', [1 ,1]/(numOfSlices-1));
-
-
 slice = 1;
 if get(handles.rbGFP,'Value')== 1
     axes(handles.axes1),imagesc(handles.MGH.data.Master_Ref.GFP(:,:,slice));
@@ -581,6 +597,20 @@ set(handles.axes1,'XTick','','YTick','');
 handles.datanames = fieldnames(handles.MGH.data);
 txDataChange(handles.txDataOf,'Master_Ref');
 txSliceChange(handles.txSliceOf,slice,handles.numOfSlices);
+
+% Update slider
+set(handles.sliderData,...
+    'Min',1,...
+    'Max',handles.nRefData,...
+    'Value',handles.nRefData,...
+    'SliderStep', [1 ,1]/(size(handles.datanames,1)));
+
+numOfSlices = size(handles.MGH.data.(char(handles.datanames(1))).GFP,3);
+set(handles.sliderSlice,...
+    'Min',1,...
+    'Max',numOfSlices,...
+    'Value',1,...
+    'SliderStep', [1 ,1]/(numOfSlices-1));
 
 guidata(hObject,handles);
 

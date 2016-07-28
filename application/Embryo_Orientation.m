@@ -186,8 +186,8 @@ function bgImageType_SelectionChangedFcn(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-datanum = get(handles.sliderData,'Value');
-slice = get(handles.sliderSlice,'Value');
+datanum = round(get(handles.sliderData,'Value'));
+slice = round(get(handles.sliderSlice,'Value'));
 
 if get(handles.rbSeg,'Value')
     axes(handles.axes1),imagesc(handles.MGH.SegData.(char(handles.datanames(datanum))).landmark(:,:,slice));
@@ -222,8 +222,8 @@ function btnFlip_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-datanum = get(handles.sliderData,'Value');
-slice = get(handles.sliderSlice,'Value');
+datanum = round(get(handles.sliderData,'Value'));
+slice = round(get(handles.sliderSlice,'Value'));
 
 % Flip from left to right
 output = handles.MGH.SegData.(char(handles.datanames(datanum)));
@@ -235,16 +235,37 @@ handles.MGH.data.(char(handles.datanames(datanum))).mCherry ...
     = fliplr(handles.MGH.data.(char(handles.datanames(datanum))).mCherry);
 output.landmark ...
     = fliplr(output.landmark);
+output.centCoords(1,:) = output.centCoords(1,:)*-1;
 
 % Generate the flipped GPFOnSphere
 
-% First flip the ellipsoid in the x-direction!
+samples = handles.MGH.samples;
+[alpha, beta] = meshgrid(linspace(pi,pi*2,samples/2), linspace(0,2*pi,samples));
+Zs = cos(alpha) .* sin(beta);
+Xs = sin(alpha) .* sin(beta);
+Ys = cos(beta);
 
-storeMat = (output.tSphere.Xs_t-min(output.tSphere.Xs_t(:)));
-output.tSphere.Xs_t ...
-    = (-1)*(storeMat/max(storeMat(:))-1)*max(storeMat(:))+min(output.tSphere.Xs_t(:));
+% First change the rotationmatrix so that it fits the flipping
+
+rotMat = output.ellipsoid.axes';
+rotMat(2,1) = -rotMat(2,1);
+rotMat(2,3) = -rotMat(2,3);
+rotMat(1,2) = -rotMat(1,2);
+rotMat(3,2) = -rotMat(3,2);
+
+% Compute the new meshgrids
+scaleMat = diag(1./output.ellipsoid.radii);
+transform = scaleMat*rotMat;
+% Transform all coordinates of the unit sphere
+X = transform^-1*[Xs(:),Ys(:),Zs(:)]';
+
+% Set the output and reshape it.
+output.tSphere.Xs_t = reshape(X(1,:)+output.ellipsoid.center(1),size(Xs));
+output.tSphere.Ys_t = reshape(X(2,:)+output.ellipsoid.center(2),size(Ys));
+output.tSphere.Zs_t = reshape(X(3,:)+output.ellipsoid.center(3),size(Zs));
 
 % Now generate the GRPOnSphere map
+
 mind = [0 0 0]; maxd = size(output.landmark).*handles.MGH.resolution;
 [ X, Y, Z ] = meshgrid( linspace( mind(2), maxd(2), size(output.landmark,2) ),...
         linspace( mind(1), maxd(1), size(output.landmark,1) ),...
@@ -270,8 +291,8 @@ function btnNext_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-slice = get(handles.sliderSlice,'Value');
-datanum = get(handles.sliderData,'Value');
+slice = round(get(handles.sliderSlice,'Value'));
+datanum = round(get(handles.sliderData,'Value'));
 plusone = datanum+1;
 if plusone <= size(handles.datanames,1)
     set(handles.sliderData,'Value',get(handles.sliderData,'Value')+1);
@@ -313,7 +334,7 @@ function btnRef_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-handles.nRefData = get(handles.sliderData,'Value');
+handles.nRefData = round(get(handles.sliderData,'Value'));
 
 if handles.masterRef == 1 && handles.nRefData == get(handles.sliderData,'Max')
     return;
@@ -575,22 +596,6 @@ if isempty(find(~cellfun(@isempty,strfind((handles.datanames),'Master_Ref')),1))
     handles.nRefData = size(handles.datanames,1)+1;
 end
 
-
-% Update slider
-set(handles.sliderData,...
-    'Min',1,...
-    'Max',handles.nRefData,...
-    'Value',handles.nRefData,...
-    'SliderStep', [1 ,1]/(handles.nRefData-1));
-
-numOfSlices = size(handles.MGH.data.(char(handles.datanames(1))).GFP,3);
-set(handles.sliderSlice,...
-    'Min',1,...
-    'Max',numOfSlices,...
-    'Value',1,...
-    'SliderStep', [1 ,1]/(numOfSlices-1));
-
-
 slice = 1;
 if get(handles.rbGFP,'Value')== 1
     axes(handles.axes1),imagesc(handles.MGH.data.Master_Ref.GFP(:,:,slice));
@@ -601,6 +606,20 @@ set(handles.axes1,'XTick','','YTick','');
 handles.datanames = fieldnames(handles.MGH.data);
 txDataChange(handles.txDataOf,'Master_Ref');
 txSliceChange(handles.txSliceOf,slice,handles.numOfSlices);
+
+% Update slider
+set(handles.sliderData,...
+    'Min',1,...
+    'Max',handles.nRefData,...
+    'Value',handles.nRefData,...
+    'SliderStep', [1 ,1]/(size(handles.datanames,1)));
+
+numOfSlices = size(handles.MGH.data.(char(handles.datanames(1))).GFP,3);
+set(handles.sliderSlice,...
+    'Min',1,...
+    'Max',numOfSlices,...
+    'Value',1,...
+    'SliderStep', [1 ,1]/(numOfSlices-1));
 
 guidata(hObject,handles);
 
