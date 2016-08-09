@@ -125,59 +125,73 @@ if exist('/4TB/data/SargonYigit/','dir') == 7
     dataPath = '/4TB/data/SargonYigit/';
 elseif exist('E:/Embryo_Registration/data/SargonYigit/','dir') == 7
     dataPath = 'E:/Embryo_Registration/data/SargonYigit/';
-end
-pathName=uigetdir(dataPath,'Please select a folder with the data!');
-searchFiles=strcat(pathName,'/*.stk');
-handles.PathName = pathName;
-listFiles=dir(searchFiles);
-numOfData=numel(listFiles);
-fileName=cell(numOfData,1);
-for i=1:numOfData
-    fileName{i}=listFiles(i).name;
+else % in case the above folders don't exist take the current directory
+    dataPath = pwd();
 end
 
-if numOfData==0
+% get path to selected folder
+pathName = uigetdir(dataPath,'Please select a folder with the data!');
+handles.PathName = pathName;
+
+% get all stk files in selected folder
+stkFiles = strcat(pathName,'/*.stk');
+listFiles=dir(stkFiles);
+
+% get number of stkFiles
+numOfData = numel(listFiles);
+
+% check if any stk files have been found in selected folder
+if numOfData == 0
     errordlg('No data selected.');
     set(handles.textField,'String','Failed to load data. Please try again.');
     return;
 end
 
+% put all stk filenames in a list
+fileNames = cell(numOfData,1);
+for i=1:numOfData
+    fileNames{i}=listFiles(i).name;
+end
+
+% Give output and create waitbar for loading files
 disp('Loading data...');
 set(handles.textField,'String','Loading data...');
-% Create waitbar
 wb1=waitbar(0, 'Loading selected data... Please wait...');
 set(findobj(wb1,'type','patch'),'edgecolor','k','facecolor','b');
 
+% initialize empty struct
 data = struct;
-indices = strfind(fileName,'_');
-experimentNumber = zeros(size(fileName));
-for i=1:size(fileName,1) 
-    experimentNumber(i) ... 
+
+% search for underscores in filenames
+indices = strfind(fileNames,'_');
+experimentNumbers = zeros(size(fileNames));
+for i=1:size(fileNames,1) 
+    experimentNumbers(i) ... 
         = str2double(strtok(... 
-        fileName{i}(indices{i,1}((size(indices{i,1},2)-1))+1:indices{i,1}((size(indices{i,1},2)))-1),'_')); 
+        fileNames{i}(indices{i,1}((size(indices{i,1},2)-1))+1:indices{i,1}((size(indices{i,1},2)))-1),'_')); 
 end
 
-stkFiles = cell(max(experimentNumber),3);
+stkFiles = cell(max(experimentNumbers),3);
 
-expeNums = unique(experimentNumber)';
+expeNums = unique(experimentNumbers)';
 for i=expeNums
-    indices = find(experimentNumber==i);
+    indices = find(experimentNumbers==i);
     if size(indices,1)<3
         warning(['Dataset #',num2str(i),' is not completly! Will be ignored!'])
         continue;
     end
     % Find Dapi
-    index = strfind(fileName(indices),'Dapi');
+    index = strfind(fileNames(indices),'Dapi');
     rightind = find(~cellfun(@isempty,index));
-    stkFiles{i,1} = fileName(indices(rightind));
+    stkFiles{i,1} = fileNames(indices(rightind));
     % Find GFP
-    index = strfind(fileName(indices),'GFP');
+    index = strfind(fileNames(indices),'GFP');
     rightind = find(~cellfun(@isempty,index));
-    stkFiles{i,2} = fileName(indices(rightind));
+    stkFiles{i,2} = fileNames(indices(rightind));
     % Find mCherry
-    index = strfind(fileName(indices),'mCherry');
+    index = strfind(fileNames(indices),'mCherry');
     rightind = find(~cellfun(@isempty,index));
-    stkFiles{i,3} = fileName(indices(rightind));
+    stkFiles{i,3} = fileNames(indices(rightind));
 end
 
 % Delete the empty cells
@@ -228,7 +242,7 @@ end
 close(wb1);
 
 % Update handles
-handles.filenames = fileName;
+handles.filenames = fileNames;
 handles.nRefData = 1;
 handles.data = data;
 set(handles.textField,'String','Data loaded.');
