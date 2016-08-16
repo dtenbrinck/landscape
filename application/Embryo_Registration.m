@@ -27,11 +27,11 @@ function varargout = Embryo_Registration(varargin)
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
-                   'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @Embryo_Registration_OpeningFcn, ...
-                   'gui_OutputFcn',  @Embryo_Registration_OutputFcn, ...
-                   'gui_LayoutFcn',  [] , ...
-                   'gui_Callback',   []);
+    'gui_Singleton',  gui_Singleton, ...
+    'gui_OpeningFcn', @Embryo_Registration_OpeningFcn, ...
+    'gui_OutputFcn',  @Embryo_Registration_OutputFcn, ...
+    'gui_LayoutFcn',  [] , ...
+    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
     gui_State.gui_Callback = str2func(varargin{1});
 end
@@ -56,7 +56,7 @@ handles.output = hObject;
 
 % Initialization %
 
-% Visualize 
+% Visualize
 handles.vis_regist = true;
 handles.vis_regr = 'true';
 
@@ -109,13 +109,13 @@ handles = guidata(hObject);
 
 % Check if there is already data loaded
 if isfield(handles,'data');
-   choice = questdlg('You have already loaded data. Do you want to load again?','Reload','Yes','No','Yes');
-   switch choice
-       case 'Yes'
-           handles.data = [];
-       case 'No'
-           return
-   end   
+    choice = questdlg('You have already loaded data. Do you want to load again?','Reload','Yes','No','Yes');
+    switch choice
+        case 'Yes'
+            handles.data = [];
+        case 'No'
+            return
+    end
 end
 
 % Load data
@@ -167,14 +167,14 @@ indices = strfind(fileNames,'_');
 % get the experiment numbers from file names
 experimentNumbers = zeros(size(fileNames));
 for i=1:size(fileNames,1)
-  
-  % get number of underscores in current file name
-  nb_underscores = size(indices{i,1},2);
-  
-  % get the integer number between second-last and last underscore
-  experimentNumbers(i) ... 
-       = str2double(... 
-       fileNames{i}(indices{i,1}(nb_underscores-1)+1:indices{i,1}(nb_underscores)-1)); 
+    
+    % get number of underscores in current file name
+    nb_underscores = size(indices{i,1},2);
+    
+    % get the integer number between second-last and last underscore
+    experimentNumbers(i) ...
+        = str2double(...
+        fileNames{i}(indices{i,1}(nb_underscores-1)+1:indices{i,1}(nb_underscores)-1));
 end
 
 % initialize cell array assuming each experiment has three data sets
@@ -185,7 +185,7 @@ expeNums = unique(experimentNumbers)';
 
 % iterate over all experiments and check for validity
 for i = expeNums
-  
+    
     % get indices of data sets of current experiment
     indices = find(experimentNumbers==i);
     
@@ -196,7 +196,7 @@ for i = expeNums
     end
     
     % TODO: There is no exception handling for the following lines!
-    % ATTENTION: Having an experiment called "DAPI" will cause a bug
+    % ATTENTION: Having an experiment called "DAPI" will cause a bug  
     
     % get Dapi data set for current experiment
     index = strfind(fileNames(indices),'Dapi');
@@ -222,6 +222,12 @@ stkFiles = reshape(stkFiles(~cellfun('isempty',stkFiles)),[],3);
 % get amount of data to be processed
 numOfData = size(stkFiles,1);
 
+% TODO: Test best size of structuring element experimentally!
+
+% Generate structural elements for preprocessing
+struct_element_small = strel('disk',11); 
+struct_element_big = strel('disk',53); 
+
 % iterate over all data sets
 for i=1:numOfData
     
@@ -237,15 +243,21 @@ for i=1:numOfData
         
         % read Dapi data set from tiff file into struct
         pathFile = [handles.PathName,'/',char(stkFiles{i,1})];
-        TIFF = tiffread(pathFile);       
+        TIFF = tiffread(pathFile);
         data.(dataName).Dapi ...
             = double(reshape(cell2mat({TIFF(:).('data')}),TIFF(1).('height'),TIFF(1).('width'),size(TIFF,2)));
-          
+        
+        % preprocess Dapi data
+        data.(dataName).Dapi = imtophat(data.(dataName).Dapi, struct_element_small);
+        
         % read GFP data set from tiff file into struct
         pathFile = [handles.PathName,'/',char(stkFiles{i,2})];
         TIFF = tiffread(pathFile);
         data.(dataName).GFP ...
             = double(reshape(cell2mat({TIFF(:).('data')}),TIFF(1).('height'),TIFF(1).('width'),size(TIFF,2)));
+        
+        % preprocess GFP data
+        data.(dataName).GFP = imtophat(data.(dataName).GFP, struct_element_big);
         
         % read mCherry data set from tiff file into struct
         pathFile = [handles.PathName,'/',char(stkFiles{i,3})];
@@ -253,19 +265,23 @@ for i=1:numOfData
         data.(dataName).mCherry ...
             = double(reshape(cell2mat({TIFF(:).('data')}),TIFF(1).('height'),TIFF(1).('width'),size(TIFF,2)));
         
-        % TODO: Check if all data sets have same size!  
-          
+        % preprocess mCherry data
+        data.(dataName).mCherry = imtophat(data.(dataName).mCherry, struct_element_small);
+        
+        
+        % TODO: Check if all data sets have same size!
+        
         % save filename
         % ATTENTION: This assumes a fixed naming convention!
         data.(dataName).filename = stkFiles{i,1}(1:end-10);
-
+        
         % set resolution and size of 2D slices
         xres = TIFF.('x_resolution');
         yres = TIFF.('y_resolution');
         data.(dataName).x_resolution = xres(1);
         data.(dataName).y_resolution = yres(1);
-    
-    catch ME    
+        
+    catch ME
         warning(['Some error occured while reading the TIFF file!', ...
             '\n this file will be skipped!\n The error',...
             ' message was: ',ME.message]);
