@@ -19,6 +19,8 @@ function [ output ] = LACSfun(data, resolution, scale)
 
 %% Initialization:
 
+% TODO: Preallocate containers for resized data!
+
 % Rescale data for higher processing speed using trilinear interpolation
 for i=1:size(data.Dapi,3)
   dapi_resized(:,:,i) = imresize(data.Dapi(:,:,i), scale);
