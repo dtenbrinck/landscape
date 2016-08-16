@@ -60,7 +60,6 @@ handles.output = hObject;
 handles.vis_regist = true;
 handles.vis_regr = 'true';
 
-
 % Set rescaling factor
 handles.scale = 0.5;
 
@@ -164,81 +163,120 @@ data = struct;
 
 % search for underscores in filenames
 indices = strfind(fileNames,'_');
+
+% get the experiment numbers from file names
 experimentNumbers = zeros(size(fileNames));
-for i=1:size(fileNames,1) 
-    experimentNumbers(i) ... 
-        = str2double(strtok(... 
-        fileNames{i}(indices{i,1}((size(indices{i,1},2)-1))+1:indices{i,1}((size(indices{i,1},2)))-1),'_')); 
+for i=1:size(fileNames,1)
+  
+  % get number of underscores in current file name
+  nb_underscores = size(indices{i,1},2);
+  
+  % get the integer number between second-last and last underscore
+  experimentNumbers(i) ... 
+       = str2double(... 
+       fileNames{i}(indices{i,1}(nb_underscores-1)+1:indices{i,1}(nb_underscores)-1)); 
 end
 
+% initialize cell array assuming each experiment has three data sets
 stkFiles = cell(max(experimentNumbers),3);
 
+% extract number of experiments
 expeNums = unique(experimentNumbers)';
-for i=expeNums
+
+% iterate over all experiments and check for validity
+for i = expeNums
+  
+    % get indices of data sets of current experiment
     indices = find(experimentNumbers==i);
-    if size(indices,1)<3
-        warning(['Dataset #',num2str(i),' is not completly! Will be ignored!'])
+    
+    % validity check if current experiment has exactly 3 data sets
+    if size(indices,1) ~= 3
+        warning(['Experiment #',num2str(i),' does not have three data sets! Will be ignored!'])
         continue;
     end
-    % Find Dapi
+    
+    % TODO: There is no exception handling for the following lines!
+    % ATTENTION: Having an experiment called "DAPI" will cause a bug
+    
+    % get Dapi data set for current experiment
     index = strfind(fileNames(indices),'Dapi');
     rightind = find(~cellfun(@isempty,index));
     stkFiles{i,1} = fileNames(indices(rightind));
-    % Find GFP
+    
+    % get GFP data set for current experiment
     index = strfind(fileNames(indices),'GFP');
     rightind = find(~cellfun(@isempty,index));
     stkFiles{i,2} = fileNames(indices(rightind));
-    % Find mCherry
+    
+    % get mCherry data set for current experiment
     index = strfind(fileNames(indices),'mCherry');
     rightind = find(~cellfun(@isempty,index));
     stkFiles{i,3} = fileNames(indices(rightind));
 end
 
-% Delete the empty cells
+% TODO: The whole experiment row would have to be deleted instead!
+
+% delete empty cells
 stkFiles = reshape(stkFiles(~cellfun('isempty',stkFiles)),[],3);
 
+% get amount of data to be processed
 numOfData = size(stkFiles,1);
+
+% iterate over all data sets
 for i=1:numOfData
-    drawnow;
     
+    % try to read TIFF file and generate a substruct
     try
+        % generate successive data identifier
         dataName = ['Data_',num2str(i)];
-        % Load Dapi
+        
+        % initialize substruct
         data.(dataName) = [];
+        
+        % read Dapi data set from tiff file into struct
         pathFile = [handles.PathName,'/',char(stkFiles{i,1})];
-        TIFF = tiffread(pathFile);
-        % Set x_resolution
-        xres = TIFF.('x_resolution');
-        yres = TIFF.('y_resolution');
-        height = TIFF.('height');
-        width = TIFF.('width');
-        data.(dataName).x_resolution = xres(1);
-        data.(dataName).y_resolution = yres(1);
+        TIFF = tiffread(pathFile);       
         data.(dataName).Dapi ...
-            = double(reshape(cell2mat({TIFF(:).('data')}),height,width,size(TIFF,2)));
-        % Load GFP
+            = double(reshape(cell2mat({TIFF(:).('data')}),TIFF.('height'),TIFF.('width'),size(TIFF,2)));
+          
+        % read GFP data set from tiff file into struct
         pathFile = [handles.PathName,'/',char(stkFiles{i,2})];
         TIFF = tiffread(pathFile);
         data.(dataName).GFP ...
-            = double(reshape(cell2mat({TIFF(:).('data')}),height,width,size(TIFF,2)));
-        % Load mCherry
+            = double(reshape(cell2mat({TIFF(:).('data')}),TIFF.('height'),TIFF.('width'),size(TIFF,2)));
+        
+        % read mCherry data set from tiff file into struct
         pathFile = [handles.PathName,'/',char(stkFiles{i,3})];
         TIFF = tiffread(pathFile);
         data.(dataName).mCherry ...
-            = double(reshape(cell2mat({TIFF(:).('data')}),height,width,size(TIFF,2)));
-        % Save name of the file
-        data.(dataName).filename = stkFiles{i,1}(1:end-10);
-    catch ME
+            = double(reshape(cell2mat({TIFF(:).('data')}),TIFF.('height'),TIFF.('width'),size(TIFF,2)));
         
+        % TODO: Check if all data sets have same size!  
+          
+        % save filename
+        % ATTENTION: This assumes a fixed naming convention!
+        data.(dataName).filename = stkFiles{i,1}(1:end-10);
+
+        % set resolution and size of 2D slices
+        xres = TIFF.('x_resolution');
+        yres = TIFF.('y_resolution');
+        data.(dataName).x_resolution = xres(1);
+        data.(dataName).y_resolution = yres(1);
+    
+    catch ME    
         warning(['Some error occured while reading the TIFF file!', ...
             '\n this file will be skipped!\n The error',...
             ' message was: ',ME.message]);
         rmfield(data,dataName);
         continue;
     end
+    
+    % update waitbar
     waitbar(i/numOfData);
+    drawnow;
 end
 
+% close waitbar when finished
 close(wb1);
 
 % Update handles
