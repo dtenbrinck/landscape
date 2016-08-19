@@ -105,6 +105,8 @@ function Load_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% TODO: Encapsulate loading functions to separate io and GUI
+
 handles = guidata(hObject);
 
 % Check if there is already data loaded
@@ -118,38 +120,27 @@ if isfield(handles,'data');
     end
 end
 
-% Load data
-
+% set default search path for data
 if exist('/4TB/data/SargonYigit/','dir') == 7
     dataPath = '/4TB/data/SargonYigit/';
 elseif exist('E:/Embryo_Registration/data/SargonYigit/','dir') == 7
     dataPath = 'E:/Embryo_Registration/data/SargonYigit/';
 else % in case the above folders don't exist take the current directory
-    dataPath = pwd();
+    dataPath = './data';
 end
 
 % get path to selected folder
 pathName = uigetdir(dataPath,'Please select a folder with the data!');
 handles.PathName = pathName;
 
-% get all stk files in selected folder
-stkFiles = strcat(pathName,'/*.stk');
-listFiles=dir(stkFiles);
-
-% get number of stkFiles
-numOfData = numel(listFiles);
+% get filenames of STK files in selected folder
+fileNames = getSTKfilenames( pathName );
 
 % check if any stk files have been found in selected folder
-if numOfData == 0
+if size(fileNames,1) == 0
     errordlg('No data selected.');
     set(handles.textField,'String','Failed to load data. Please try again.');
     return;
-end
-
-% put all stk filenames in a list
-fileNames = cell(numOfData,1);
-for i=1:numOfData
-    fileNames{i}=listFiles(i).name;
 end
 
 % Give output and create waitbar for loading files
@@ -158,141 +149,11 @@ set(handles.textField,'String','Loading data...');
 wb1=waitbar(0, 'Loading selected data... Please wait...');
 set(findobj(wb1,'type','patch'),'edgecolor','k','facecolor','b');
 
-% initialize empty struct
-data = struct;
+% extract only valid experiments with three data sets
+experimentSets = checkExperimentChannels(fileNames);
 
-% search for underscores in filenames
-indices = strfind(fileNames,'_');
-
-% get the experiment numbers from file names
-experimentNumbers = zeros(size(fileNames));
-for i=1:size(fileNames,1)
-    
-    % get number of underscores in current file name
-    nb_underscores = size(indices{i,1},2);
-    
-    % get the integer number between second-last and last underscore
-    experimentNumbers(i) ...
-        = str2double(...
-        fileNames{i}(indices{i,1}(nb_underscores-1)+1:indices{i,1}(nb_underscores)-1));
-end
-
-% initialize cell array assuming each experiment has three data sets
-stkFiles = cell(max(experimentNumbers),3);
-
-% extract number of experiments
-expeNums = unique(experimentNumbers)';
-
-% iterate over all experiments and check for validity
-for i = expeNums
-    
-    % get indices of data sets of current experiment
-    indices = find(experimentNumbers==i);
-    
-    % validity check if current experiment has exactly 3 data sets
-    if size(indices,1) ~= 3
-        warning(['Experiment #',num2str(i),' does not have three data sets! Will be ignored!'])
-        continue;
-    end
-    
-    % TODO: There is no exception handling for the following lines!
-    % ATTENTION: Having an experiment called "DAPI" will cause a bug  
-    
-    % get Dapi data set for current experiment
-    index = strfind(fileNames(indices),'Dapi');
-    rightind = find(~cellfun(@isempty,index));
-    stkFiles{i,1} = fileNames(indices(rightind));
-    
-    % get GFP data set for current experiment
-    index = strfind(fileNames(indices),'GFP');
-    rightind = find(~cellfun(@isempty,index));
-    stkFiles{i,2} = fileNames(indices(rightind));
-    
-    % get mCherry data set for current experiment
-    index = strfind(fileNames(indices),'mCherry');
-    rightind = find(~cellfun(@isempty,index));
-    stkFiles{i,3} = fileNames(indices(rightind));
-end
-
-% TODO: The whole experiment row would have to be deleted instead!
-
-% delete empty cells
-stkFiles = reshape(stkFiles(~cellfun('isempty',stkFiles)),[],3);
-
-% get amount of data to be processed
-numOfData = size(stkFiles,1);
-
-% TODO: Test best size of structuring element experimentally!
-
-% Generate structural elements for preprocessing
-struct_element_small = strel('disk',11); 
-struct_element_big = strel('disk',53); 
-
-% iterate over all data sets
-for i=1:numOfData
-    
-    % try to read TIFF file and generate a substruct
-    try
-        % generate successive data identifier
-        dataName = ['Data_',num2str(i)];
-        
-        % initialize substruct
-        data.(dataName) = [];
-        
-        % ATTENTION: We assume that each TIFF file has only 2D slices of same size!
-        
-        % read Dapi data set from tiff file into struct
-        pathFile = [handles.PathName,'/',char(stkFiles{i,1})];
-        TIFF = tiffread(pathFile);
-        data.(dataName).Dapi ...
-            = double(reshape(cell2mat({TIFF(:).('data')}),TIFF(1).('height'),TIFF(1).('width'),size(TIFF,2)));
-        
-        % preprocess Dapi data
-        data.(dataName).Dapi = imtophat(data.(dataName).Dapi, struct_element_small);
-        
-        % read GFP data set from tiff file into struct
-        pathFile = [handles.PathName,'/',char(stkFiles{i,2})];
-        TIFF = tiffread(pathFile);
-        data.(dataName).GFP ...
-            = double(reshape(cell2mat({TIFF(:).('data')}),TIFF(1).('height'),TIFF(1).('width'),size(TIFF,2)));
-        
-        % preprocess GFP data
-        data.(dataName).GFP = imtophat(data.(dataName).GFP, struct_element_big);
-        
-        % read mCherry data set from tiff file into struct
-        pathFile = [handles.PathName,'/',char(stkFiles{i,3})];
-        TIFF = tiffread(pathFile);
-        data.(dataName).mCherry ...
-            = double(reshape(cell2mat({TIFF(:).('data')}),TIFF(1).('height'),TIFF(1).('width'),size(TIFF,2)));
-        
-        % preprocess mCherry data
-        data.(dataName).mCherry = imtophat(data.(dataName).mCherry, struct_element_small);
-        
-        
-        % TODO: Check if all data sets have same size!
-        
-        % save filename
-        % ATTENTION: This assumes a fixed naming convention!
-        data.(dataName).filename = stkFiles{i,1}(1:end-10);
-        
-        % set resolution and size of 2D slices
-        xres = TIFF.('x_resolution');
-        yres = TIFF.('y_resolution');
-        data.(dataName).x_resolution = xres(1);
-        data.(dataName).y_resolution = yres(1);
-        
-    catch ME
-        warning(['Some error occured while reading the TIFF file!', ...
-            '\n this file will be skipped!\n The error',...
-            ' message was: ',ME.message]);
-        rmfield(data,dataName);
-        continue;
-    end
-    
-    % update waitbar
-    waitbar(i/numOfData);
-    drawnow;
-end
+% load data for each experiment
+data = loadExperimentData(experimentSets, pathName, wb1);
 
 % close waitbar when finished
 close(wb1);
