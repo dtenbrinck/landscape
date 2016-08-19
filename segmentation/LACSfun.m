@@ -17,48 +17,32 @@ function [ output ] = LACSfun(data, resolution, scale)
 %           .radii:     radii of the ellipsoid [x,y,z]
 %           .axes:      rotation matrix of the ellipsoid.
 
-%% Initialization:
+%% Preprocessing:
 
-% TODO: Preallocate containers for resized data!
+% Perform background removal using morphological filters
+data = removeBackground(data);
 
-% Rescale data for higher processing speed using trilinear interpolation
-for i=1:size(data.Dapi,3)
-  dapi_resized(:,:,i) = imresize(data.Dapi(:,:,i), scale);
-  gfp_resized(:,:,i) = imresize(data.GFP(:,:,i), scale); % coarse data for segmentation sufficient
-  mCherry_resized(:,:,i) = imresize(data.mCherry(:,:,i), scale);
-end
+% Resize data
+resized_data = rescaleSlices(data, scale);
 
 % Normalize data
-dapi_resized = normalizeData(dapi_resized);           % nuclei in embryo membrane
-gfp_resized = normalizeData(gfp_resized);             % landmark
-mCherry_resized = normalizeData(mCherry_resized);     % labeled cells
+resized_data = normalizeData(resized_data);
 
-% Generate three-dimensional Gaussian filter
-g = generate3dGaussian(9, 1.5);
 
-% Denoise DAPI channel by blurring
-blurred = imfilter(dapi_resized, g, 'same','replicate');
+%% Segmentation:
 
-% Generate a three-dimensional Laplacian filter
-kernelLaplace = generate3dLaplacian(resolution);
-
-%% Main Code:
-
-% Determine sharp areas in DAPI channel by Laplacian filtering
-sharp_areas = normalizeData (imfilter(blurred, kernelLaplace, 'same', 'replicate'));
-
-% Estimate embryo shape by fitting ellipsoid to sharp areas
-[center radii axes v] = fitEllipsoid(sharp_areas, resolution);
+% Estimate surface of embryo by fitting an ellipsoid
+[center, radii, axes] = estimateEmbryoSurface(resized_data.Dapi, round(resolution/scale));
 
 % Segment landmark in GFP channel
-landmark = segmentGFP(gfp_resized, resolution);
+landmark = segmentGFP(resized_data.GFP, round(resolution/scale));
 
 % Segment stem cells in mCherry channel and get the centroids of the cells
-[cells,origCentCoords] = segmentCells( mCherry_resized, resolution );
+[cells,origCentCoords] = segmentCells(resized_data.mCherry, round(resolution/scale) );
 
 % Get coordinates of the cells %
 % Fit Coordinates to real resolution
-centCoords = diag(resolution)*origCentCoords;
+centCoords = diag(round(resolution/scale))*origCentCoords;
 
 % Transform the coordinates into the sphere. With scaling and rotating.
 
