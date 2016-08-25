@@ -5,28 +5,34 @@ function cells = segmentCells2D( data, resolution )
 % normalize data
 data = normalizeData(data);
 
+%% OLD IDEA
+
 % get histogram
-[h, bins] = imhist(data(:));
+%[h, bins] = imhist(data(:));
 
 % get integral over histogram
-p = cumsum(h);
+%p = cumsum(h);
 
 % normalize integral
-p = p / p(end);
+%p = p / p(end);
 
 % get only brightest signals
-threshold = 0.96; % WARNING: THIS IS HEURISTIC!
+%threshold = 0.96; % WARNING: THIS IS HEURISTIC!
 
 % get relevant indices
-indices = find(p > threshold);
+%indices = find(data > threshold);
 
 % take first index
-index = indices(1);
+%index = indices(1);
 
 % get corresponding bin as global threshold
-dataP.t = bins(index);
-fprintf('Optimal threshold for embryo data in mCherry channel computed as t1=%i.\n', dataP.t);
+%dataP.t = bins(index);
+%fprintf('Optimal threshold for embryo data in mCherry channel computed as t1=%i.\n', dataP.t);
 
+%% NEW APPROACH
+
+% compute optimal threshold
+dataP.t = kittler_thresholding(data);
 
 % set data in struct
 dataP.f = data;
@@ -37,8 +43,8 @@ dataP.dim = ndims(dataP.f);
 dataP.hx = 1; dataP.hy = 1; dataP.hz = 1;
 
 % initialize algorithm parameters
-algP.maxIts = 1000;%5000;
-algP.alpha = 20;
+algP.maxIts = 200;%5000;
+algP.alpha = 2000;
 algP.regAccur = 1e-7;
 algP.mu_grad_u = 1;
 algP.TV = 'iso';

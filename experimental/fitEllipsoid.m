@@ -3,7 +3,7 @@ function [center radii axes v] = fitEllipsoid( sharp_areas, resolution )
 %   Detailed explanation goes here
 
 % use visualization for debugging
-visualize = false;
+visualize = true;
 
 % determine global threshold to detect sharp areas
 threshold = kittler_thresholding(sharp_areas);
@@ -38,7 +38,7 @@ Z = Z * resolution(3);
 
 % visualize fitted ellipsoid if needed
 if visualize
-  figure,
+  figure;
   
   %draw fit
   %mind = min( [ x y z ] );
@@ -88,7 +88,6 @@ if visualize
   end
 end
 
-test =1 ;
 %%% DOESN'T WORK YET
 % % guess initial center
 % initialCenter = center;

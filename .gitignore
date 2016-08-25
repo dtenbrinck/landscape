@@ -6,3 +6,5 @@ refs/
 # ignore temporary vim files
 *~
 commands.txt
+
+*.mat
