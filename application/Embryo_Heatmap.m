@@ -62,7 +62,10 @@ h.MGH = varargin{1,1};
 
 % Set defaults
 
-h.typeNH = 'gaussian';
+h.sizeCells = 20; %um
+h.sizeOfPixel = 0.29; %um
+h.sizeCellsPixel = round(h.sizeCells/h.sizeOfPixel);
+h.typeNH = 'cube';
 h.sizeNH = 1;
 h.numOfLayers = 6;
 h.layerType = 'linear';
@@ -82,6 +85,7 @@ h.numOfCells = size(allCentCoords,2);
 h.sizeLandmark = size(h.MGH.SegData.(fieldNames{1}).landmark);
 
 % Compute the standard density matrix
+h.samples = h.MGH.samples;
 h = updateSampAndDens(h);
 
 % Update uicontrols
@@ -269,6 +273,15 @@ guidata(hObject, h);
 
 %% OTHER FUNCTIONS 
 
+function sizeNH = computeRadius(h)
+
+sizeNH = floor(h.samples/h.sizeCellsPixel);
+if sizeNH == 0
+    sizeNH = 1;
+end
+sizeNH = sizeNH*h.sizeNH;
+drawnow
+
 function d = showProcessing(h)
 % Positioning it into the middle of the figure
 posFig = get(h.figEmbrHeat,'Position');
@@ -302,14 +315,20 @@ if nargin < 2
     sampleType = 'samples';
 end 
 if nargin < 3
-    typeNH = 'gaussian';
+    typeNH = 'cube';
 end
 if nargin < 4
-    sizeNH = 3;
+    sizeNH = 1;
 end
 if nargin < 5
     samples = h.MGH.samples;
 end
+
+% If the cube is selected we want to compute it via the size of the cells
+if strcmp(typeNH,'cube')
+    sizeNH = computeRadius(h);
+end
+
 if strcmp(sampleType,'datasize')
     [h.samCoordsG,h.samCoordsU] ...
         = fitOnSamSphere(h.allCentCoords,h.sizeLandmark);
