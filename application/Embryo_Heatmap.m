@@ -820,7 +820,7 @@ if get(h.tb2DOnePlot,'Value')
     % Subplot 1
     set(h.subax1,'Visible','on');
     set(h.subax1,'Units',units);
-    set(h.subax1,'Position',[posAx(1) posAx(2)+8+2*(posAx(4)-8)/3 posAx(3) (posAx(4)-8)/3]);
+    set(h.subax1,'Position',[posAx(1) posAx(2)+0.12+2*(posAx(4)-0.12)/3 posAx(3) (posAx(4)-0.12)/3]);
     barMat1 = permute(sum(sum(h.densMat)),[3,2,1]);
     b1 = bar(h.subax1,barMat1);
     xlabel(h.subax1,'Slices','FontSize',10);
@@ -829,7 +829,7 @@ if get(h.tb2DOnePlot,'Value')
     % Subplot 2
     set(h.subax2,'Visible','on');
     set(h.subax2,'Units',units);
-    set(h.subax2,'Position',[posAx(1) posAx(2)+4+(posAx(4)-8)/3 posAx(3) (posAx(4)-8)/3]);
+    set(h.subax2,'Position',[posAx(1) posAx(2)+0.06+(posAx(4)-0.12)/3 posAx(3) (posAx(4)-0.12)/3]);
     barMat2 = sum(sum(h.densMat,3),2);
     b2 = bar(h.subax2,barMat2);
     xlabel(h.subax2,'Tail \leftarrow \rightarrow Head','FontSize',10);
@@ -838,7 +838,7 @@ if get(h.tb2DOnePlot,'Value')
     % Subplot 3
     set(h.subax3,'Visible','on');
     set(h.subax3,'Units',units);
-    set(h.subax3,'Position',[posAx(1) posAx(2) posAx(3) (posAx(4)-8)/3]);
+    set(h.subax3,'Position',[posAx(1) posAx(2) posAx(3) (posAx(4)-0.12)/3]);
     barMat3 = sum(sum(h.densMat,3),1)';
     b3 = bar(h.subax3,barMat3);
     xlabel(h.subax3,'Leftside \leftarrow \rightarrow Rightside','FontSize',10)
