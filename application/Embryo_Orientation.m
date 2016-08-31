@@ -228,13 +228,13 @@ slice = round(get(handles.sliderSlice,'Value'));
 % Flip from left to right
 output = handles.MGH.SegData.(char(handles.datanames(datanum)));
 handles.MGH.data.(char(handles.datanames(datanum))).GFP ...
-    = fliplr(handles.MGH.data.(char(handles.datanames(datanum))).GFP);
+    = rot90(handles.MGH.data.(char(handles.datanames(datanum))).GFP,2);
 handles.MGH.data.(char(handles.datanames(datanum))).Dapi ...
-    = fliplr(handles.MGH.data.(char(handles.datanames(datanum))).Dapi);
+    = rot90(handles.MGH.data.(char(handles.datanames(datanum))).Dapi,2);
 handles.MGH.data.(char(handles.datanames(datanum))).mCherry ...
-    = fliplr(handles.MGH.data.(char(handles.datanames(datanum))).mCherry);
+    = rot90(handles.MGH.data.(char(handles.datanames(datanum))).mCherry,2);
 output.landmark ...
-    = fliplr(output.landmark);
+    = rot90(output.landmark,2);
 output.centCoords(1,:) = output.centCoords(1,:)*-1;
 
 % Generate the flipped GPFOnSphere

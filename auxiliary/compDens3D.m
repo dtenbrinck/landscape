@@ -1,4 +1,4 @@
-function [ densMat ] = compDens3D(sizeGrid, points, sizeNH, typeNH)
+function [ densMat, coordMat ] = compDens3D(sizeGrid, points, sizeNH, typeNH)
 %COMPDENS3D: Computes the 3D denisity of the points. Therefore we use a
 % neighbourhood of size sizeNH around the points. It also can be done with a
 % cube or a spherical neighbourhood.
