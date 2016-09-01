@@ -65,8 +65,8 @@ h.MGH = varargin{1,1};
 h.sizeCells = 20; %um
 h.sizeOfPixel = 0.29; %um
 h.sizeCellsPixel = round(h.sizeCells/h.sizeOfPixel);
-h.typeNH = 'cube';
-h.sizeNH = 1;
+h.typeNH = 'sphere';
+h.coeffNH = 1;
 h.numOfLayers = 6;
 h.layerType = 'linear';
 h.pmSelection = 1;
@@ -89,6 +89,12 @@ h.samples = h.MGH.samples;
 h = updateSampAndDens(h);
 
 % Update uicontrols
+
+set(h.edSizeNH, 'Tooltipstring', sprintf(...
+    ['Coefficient to handle the size of the ball around the cell position.',...
+    '\n 1 represents the approcimated size of a cell.',...
+    '\n Changing this value will blow up the ball around the cell coordinate by the coefficient.',...
+    '\n 0 will give the real number of cells on one (x,y) coordinate.']));
 
 % Invisible subplots
 h.subax1 = axes('Visible','off');
@@ -123,8 +129,8 @@ set(h.slAutoSpeed,...
     'Value',6,...
     'SliderStep', [1 ,1]/(10-1));
 
-set(h.edSizeNH,'Value',h.sizeNH);
-set(h.edSizeNH,'String',num2str(h.sizeNH));
+set(h.edSizeNH,'Value',h.coeffNH);
+set(h.edSizeNH,'String',num2str(h.coeffNH));
 h.currentTab = 'Pro';
 
 initTab(hObject,h.proMat);
@@ -275,11 +281,15 @@ guidata(hObject, h);
 
 function sizeNH = computeRadius(h)
 
-sizeNH = floor(h.samples/h.sizeCellsPixel);
+% Formular: SizeOfObject/sizeOfAxis = scaledSizeOfObject/samples
+%           SizeOfObject/sizeOfAxis*samples = scaledSizeOfObject
+% In this case we will use the higher dimension 680
+sizeOfAxis = size(h.MGH.data.Data_1.Dapi,2);
+sizeNH = round(h.samples*h.sizeCellsPixel/sizeOfAxis);
 if sizeNH == 0
     sizeNH = 1;
 end
-sizeNH = sizeNH*h.sizeNH;
+sizeNH = round(sizeNH*h.coeffNH);
 drawnow
 
 function d = showProcessing(h)
@@ -315,7 +325,7 @@ if nargin < 2
     sampleType = 'samples';
 end 
 if nargin < 3
-    typeNH = 'cube';
+    typeNH = 'sphere';
 end
 if nargin < 4
     sizeNH = 1;
@@ -324,8 +334,8 @@ if nargin < 5
     samples = h.MGH.samples;
 end
 
-% If the cube is selected we want to compute it via the size of the cells
-if strcmp(typeNH,'cube')
+% If the sphere is selected we want to compute it via the size of the cells
+if strcmp(typeNH,'sphere')
     sizeNH = computeRadius(h);
 end
 
@@ -1072,6 +1082,7 @@ function edSamples_Callback(hObject, eventdata, h)
 %        str2double(get(hObject,'String')) returns contents of edSamples as a double
 
 h.samples = str2double(get(hObject,'String'));
+h.sizeNH = computeRadius(h);
 set(hObject,'Value',h.samples);
 h ...
     = updateSampAndDens(h,'samples',h.typeNH,h.sizeNH,h.samples);
@@ -1190,14 +1201,20 @@ function edSizeNH_Callback(hObject, eventdata, h)
 % Hints: get(hObject,'String') returns contents of edSizeNH as text
 %        str2double(get(hObject,'String')) returns contents of edSizeNH as a double
 
-h.sizeNH = str2double(get(hObject,'String'));
+h.coeffNH = str2double(get(hObject,'String'));
 
 % If its the same value as before
-if h.sizeNH == get(hObject,'Value')
+if h.coeffNH == get(hObject,'Value')
     return
 end
 
-set(hObject,'Value',h.sizeNH);
+if h.coeffNH < 0 || isnan(h.coeffNH)
+    set(hObject,'String',num2str(get(hObject,'Value')));
+    return;
+end
+
+set(hObject,'Value',h.coeffNH);
+h.sizeNH = computeRadius(h);
 if get(h.rbSamples,'Value')
     h ...
         = updateSampAndDens(h,'samples',h.typeNH,h.sizeNH,h.samples);
