@@ -3,23 +3,17 @@ function [center radii axes v] = fitEllipsoid( sharp_areas, resolution )
 %   Detailed explanation goes here
 
 % use visualization for debugging
-visualize = false;
+visualize = true;
 
 % determine global threshold to detect sharp areas
 threshold = kittler_thresholding(sharp_areas);
 
-% embed data points in bigger domain
-%sharp_areas = padarray(sharp_areas, [150 150 5], 0);
-%large_domain = zeros(size(sharp_areas) .* [1 1 2]);
-%large_domain(:,:,1:end/2) = sharp_areas;
-large_domain = sharp_areas;
-%sharp_areas = tmp;
-
 % determine sharp points
-sharp_points = find(large_domain > threshold);
+sharp_points = find(sharp_areas > threshold);
+nucleii = sharp_areas > threshold;
 
 % convert indices to coordinates
-[Y, X, Z] = ind2sub(size(large_domain),sharp_points);
+ [Y, X, Z] = ind2sub(size(sharp_areas),sharp_points);
 
 % Q = [X.^2 Y.^2 Z.^2 X.*Y Y.* X.*Z X Y Z];
 % R= [ones(size(sharp_points))];
@@ -43,10 +37,10 @@ if visualize
   %draw fit
   %mind = min( [ x y z ] );
   %maxd = max( [ x y z ] );
-  mind = [1 1 1]; maxd = size(large_domain) .* resolution;
+  mind = [1 1 1]; maxd = size(sharp_areas) .* resolution;
   nsteps = maxd * 0.15;
   step = ( maxd - mind ) ./ nsteps;
-  [ x, y, z ] = meshgrid( linspace( mind(1) - step(1), maxd(1) + step(1), nsteps(1) ), linspace( mind(2) - step(2), maxd(2) + step(2), nsteps(2) ), linspace( mind(3) - step(3), maxd(3) + step(3), nsteps(3) ) );
+  [ x, y, z ] = meshgrid( linspace( mind(2) - step(2), maxd(2) + step(2), nsteps(2) ), linspace( mind(1) - step(1), maxd(1) + step(1), nsteps(1) ), linspace( mind(3) - step(3), maxd(3) + step(3), nsteps(3) ) );
   %[x, y, z] = meshgrid(1:maxd(1), 1:maxd(2), 1:maxd(3));
   
   Ellipsoid = v(1) *x.*x +   v(2) * y.*y + v(3) * z.*z + ...
@@ -67,7 +61,7 @@ if visualize
   %pause;
   
   % visualize slice by slice
-  mind = [1 1 1]; maxd = size(sharp_areas) .* resolution;
+  mind = [1 1 1] .* resolution; maxd = size(sharp_areas) .* resolution;
   nsteps = size(sharp_areas);
   step = ( maxd - mind ) ./ nsteps;
   [ x, y, z ] = meshgrid( linspace( mind(2) - step(2), maxd(2) + step(2), nsteps(2) ), linspace( mind(1) - step(1), maxd(1) + step(1), nsteps(1) ), linspace( mind(3) - step(3), maxd(3) + step(3), nsteps(3) ) );
@@ -76,14 +70,16 @@ if visualize
     2*v(7) *x    + 2*v(8)*y    + 2*v(9) * z;
   
   for i=1:size(sharp_areas,3)
-    figure(2); imagesc(sharp_areas(:,:,i), [min(sharp_areas(:)) max(sharp_areas(:))]); colormap gray;
+    %figure(2); imagesc(sharp_areas(:,:,i), [min(sharp_areas(:)) max(sharp_areas(:))]); colormap gray;
+    figure(2); imagesc(nucleii(:,:,i), [0, 1]); colormap gray;
     hold on
-    [contourMatrix, handle] = contour(Ellipsoid(:,:,i), [0.98 0.98], 'r');
+    [contourMatrix, handle] = contour(Ellipsoid(:,:,i), [1 1], 'r');
     set(handle, 'LineWidth', 2);
     set(gca,'YDir','reverse');
     drawnow;
+    pause(0.1);
     hold off
-    print(['results/dapi_' sprintf('%02d',i) ],'-dpng');
+    %print(['results/dapi_' sprintf('%02d',i) ],'-dpng');
     %pause;
   end
 end

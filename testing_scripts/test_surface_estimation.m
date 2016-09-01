@@ -42,6 +42,6 @@ resized_data = rescaleSlices(data, scale);
 resized_data = normalizeData(resized_data);
 
 % estimate surface of embryo
-resolution = [2.58 2.58 20];
+resolution = [1.29 1.29 20];
 resolution(1:2) = resolution(1:2) / scale;
 [center, radii, axes] = estimateEmbryoSurface(resized_data.Dapi, resolution);
