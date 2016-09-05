@@ -35,7 +35,7 @@ end
 data = removeBackground(all_data.Data_1);
 
 % resize data
-scale = 0.25;
+scale = 0.5;
 resized_data = rescaleSlices(data, scale);
 
 % normalize data
@@ -45,8 +45,16 @@ resized_data = normalizeData(resized_data);
 resolution = [1.29 1.29 20];
 resolution(1:2) = resolution(1:2) / scale;
 
-% segment landmark in GFP channel
-resized_landmark = segmentGFP(resized_data.GFP, resolution);
+
+%%%  segment landmark in GFP channel
+
+% segment GFP using Chambolle-Pock algorithm with ghresholding
+%resized_landmark = segmentGFP(resized_data.GFP, resolution);
+
+% segment GFP using k-means clustering
+resized_landmark = k_means_clustering(resized_data.GFP, 3, 'real');
+resized_landmark = resized_landmark - 2;
+
 
 % rescale result to full resolution
 landmark = rescaleSlices(resized_landmark, 1/scale, 'nearest');
@@ -56,3 +64,6 @@ figure; imagesc(computeMIP(data.GFP)); hold on; contour(computeMIP(landmark), [0
 
 % determine direction of head and tail
 orientation = determineHeadOrientation(computeMIP(landmark));
+
+% Give output about orientation
+disp(['The head of the GFP landmark is on the ' orientation '.']);
