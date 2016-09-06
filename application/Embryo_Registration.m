@@ -61,7 +61,7 @@ handles.vis_regist = true;
 handles.vis_regr = 'true';
 
 % Set rescaling factor
-handles.scale = 0.5;
+handles.scale = 0.75;
 
 % Set resolution for data in micrometers (given by biologists)
 handles.resolution = [1.29/handles.scale, 1.29/handles.scale, 20];

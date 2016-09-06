@@ -49,7 +49,8 @@ f = reshape(f, [nb_elements, channels]);
 cluster_centers = zeros(channels,k);
 
 % initialize random labels in {1,...,k} for each pixel
-labels = ceil(rand(nb_elements,1) * k);
+%labels = ceil(rand(nb_elements,1) * k);
+labels = ones(nb_elements,1);
 
 % set parameters for terminating condition of iterative loop
 threshold = 1e-12;  % threshold for relative changes per iteration

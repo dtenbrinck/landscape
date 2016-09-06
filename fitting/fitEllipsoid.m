@@ -3,7 +3,7 @@ function [center radii axes v] = fitEllipsoid( sharp_areas, resolution )
 %   Detailed explanation goes here
 
 % use visualization for debugging
-visualize = true;
+visualize = false;
 
 % determine global threshold to detect sharp areas
 threshold = kittler_thresholding(sharp_areas);

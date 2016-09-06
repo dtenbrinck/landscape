@@ -1,7 +1,7 @@
 function [center, radii, axes] = estimateEmbryoSurface( Dapi_data, resolution )
 
 % Generate three-dimensional Gaussian filter
-g = generate3dGaussian(9, 1.5);
+%g = generate3dGaussian(9, 1.5);
 
 % Denoise DAPI channel by blurring
 %blurred = imfilter(Dapi_data, g, 'same','replicate');

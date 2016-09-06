@@ -40,6 +40,9 @@ landmark = segmentGFP(resized_data.GFP, round(resolution/scale));
 % Segment stem cells in mCherry channel and get the centroids of the cells
 [cells,origCentCoords] = segmentCells(resized_data.mCherry, round(resolution/scale) );
 
+% get orientation of embryo
+headOrientation = determineHeadOrientation(computeMIP(landmark));
+
 % Get coordinates of the cells %
 % Fit Coordinates to real resolution
 centCoords = diag(round(resolution/scale))*origCentCoords;

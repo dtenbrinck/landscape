@@ -35,7 +35,7 @@ end
 data = removeBackground(all_data.Data_1);
 
 % resize data
-scale = 0.5;
+scale = 0.75;
 resized_data = rescaleSlices(data, scale);
 
 % normalize data
@@ -53,7 +53,7 @@ resolution(1:2) = resolution(1:2) / scale;
 
 % segment GFP using k-means clustering
 resized_landmark = k_means_clustering(resized_data.mCherry, 3, 'real');
-resized_landmark = resized_landmark - 2;
+resized_landmark = floor(resized_landmark/3);
 
 
 % rescale result to full resolution
