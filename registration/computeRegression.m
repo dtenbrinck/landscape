@@ -34,5 +34,7 @@ options = optimoptions('fmincon','Display','off','Algorithm','sqp');
 % Compute the spherical regression
 [pstar,vstar] ...
         = sphericalRegression3D(regData,[1;0;0],[0;0;-1],options,visualize);
+% Normalize vstar
+vstar = vstar/norm(vstar);
 end
 

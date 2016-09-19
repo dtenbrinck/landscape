@@ -67,7 +67,7 @@ for i=1:size(fieldNames,1)
     fprintf('Done!\n');
     
     % Tilt refpstar onto the head position
-    [pstar,vstar] = getHeadPos(pstar,vstar,regData);
+    [refpstar,refvstar] = getHeadPos(refpstar,refvstar,regData);
     
     % Registration of the data set
     fprintf('Register data set onto reference dataset.\n');
