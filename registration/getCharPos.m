@@ -1,4 +1,4 @@
-function [ pnew,vnew,regLine ] = getCharPos( p,v,regData, type )
+function [pnew,vnew,regLine] = getCharPos(p,v,regData,type)
 %GETCHARPOS: This function will give you the position of the characteristic
 %depanding on the input type. It can give you the head, tail, weight and
 %middle (between head and tail) position. It will also compute the new

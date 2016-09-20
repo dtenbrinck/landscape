@@ -12,6 +12,7 @@ function [handles] = compRegistrationGUI(handles)
 
 %% Initialization
 
+charType = 'head';
 % Sample the unit sphere
 samples = handles.samples;
 [alpha, beta] = meshgrid(linspace(pi,2*pi,samples/2), linspace(0,2*pi,samples));
@@ -37,7 +38,7 @@ fprintf(['Initializing the reference data set ',sRefData,'... \n']);
     = computeRegression(handles.SegData.(sRefData).GFPOnSphere, Xs, Ys, Zs, 'false');
 
 % Tilt refpstar onto the head position
-[refpstar,refvstar] = getHeadPos(refpstar,refvstar,regData);
+[refpstar,refvstar] = getCharPos(refpstar,refvstar,regData,charType);
 
 fprintf('Setting the reference p* and v*.\n');
 
@@ -67,7 +68,7 @@ for i=1:size(fieldNames,1)
     fprintf('Done!\n');
     
     % Tilt refpstar onto the head position
-    [pstar,vstar] = getHeadPos(pstar,vstar,regData);
+    [pstar,vstar] = getCharPos(pstar,vstar,regData,charType);
     
     % Registration of the data set
     fprintf('Register data set onto reference dataset.\n');
