@@ -63,6 +63,7 @@ normCoords = sqrt(centCoords(1,:).^2+centCoords(2,:).^2+centCoords(3,:).^2);
 
 % Delete each point that is > 1+tol
 centCoords(:,normCoords>1+tol) = [];
+normCoords = sqrt(centCoords(1,:).^2+centCoords(2,:).^2+centCoords(3,:).^2);
 
 % Normalize each point that is > 1 but <= 1+tol
 centCoords(:,normCoords>1&normCoords<1+tol) = ...

@@ -235,7 +235,14 @@ handles.MGH.data.(char(handles.datanames(datanum))).mCherry ...
     = rot90(handles.MGH.data.(char(handles.datanames(datanum))).mCherry,2);
 output.landmark ...
     = rot90(output.landmark,2);
-output.centCoords(1,:) = output.centCoords(1,:)*-1;
+
+% Flip cell coordinates
+output.centCoords(1,:) = -output.centCoords(1,:);
+output.centCoords(2,:) = -output.centCoords(2,:);
+
+% Flip regression data
+output.regData(1,:) = -output.regData(1,:);
+output.regData(2,:) = -output.regData(2,:);
 
 % Generate the flipped GPFOnSphere
 
@@ -273,6 +280,8 @@ mind = [0 0 0]; maxd = size(output.landmark).*handles.MGH.resolution;
     
 output.GFPOnSphere ...
         = interp3(X, Y, Z, output.landmark, output.tSphere.Xs_t, output.tSphere.Ys_t, output.tSphere.Zs_t,'nearest');
+
+    
 handles.MGH.SegData.(char(handles.datanames(datanum))) = output;
 
 % Update axes
