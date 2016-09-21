@@ -62,6 +62,11 @@ landmark = rescaleSlices(resized_landmark, 1/scale, 'nearest');
 % plot result
 figure; imagesc(computeMIP(data.GFP)); hold on; contour(computeMIP(landmark), [0.5 0.5], 'r', 'LineWidth',2); hold off;
 
+% Second approach
+output = LACSfun(all_data.Data_1,resolution,scale);
+figure; imagesc(computeMIP(data.GFP)); hold on; contour(computeMIP(output.landmark), [0.5 0.5], 'r', 'LineWidth',2); hold off;
+
+
 % determine direction of head and tail
 orientation = determineHeadOrientation(computeMIP(landmark));
 

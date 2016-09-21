@@ -63,18 +63,22 @@ end
 charInd = charInd+indweight;
 charInd(charInd<0) = charInd(charInd<0)+629;
 charInd = round(charInd);
+
 % -- Compute the coordinates of the new p -- %
 pnew = rL(:,charInd);
 
-% -- Compute the corresponding v to the new p -- %
-V = cross(p,pnew);
-s = norm(V);
-c = p'*pnew;
-V = [0,-V(3),V(2);V(3),0,-V(1);-V(2),V(1),0];
-
-% Compute the rotation matrix of p
-Rp = eye(3)+V+V*V*(1-c)/s^2;
-
+if sum(pnew==p)/3
+    Rp = eye(3);
+else
+    % -- Compute the corresponding v to the new p -- %
+    V = cross(p,pnew);
+    s = norm(V);
+    c = p'*pnew;
+    V = [0,-V(3),V(2);V(3),0,-V(1);-V(2),V(1),0];
+    
+    % Compute the rotation matrix of p
+    Rp = eye(3)+V+V*V*(1-c)/s^2;
+end
 % Rotate v
 vnew = Rp*v;
 

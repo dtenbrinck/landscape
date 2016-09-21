@@ -35,9 +35,11 @@ resized_data = normalizeData(resized_data);
 [center, radii, axes] = estimateEmbryoSurface(resized_data.Dapi, round(resolution/scale));
 
 % Segment landmark in GFP channel
+disp('Segmenting GFP...');
 landmark = segmentGFP(resized_data.GFP, round(resolution/scale));
 
-% Segment stem cells in mCherry channel and get the centroids of the cells
+ % Segment stem cells in mCherry channel and get the centroids of the cells
+ disp('Segmenting mCherry...');
 [cells,origCentCoords] = segmentCells(resized_data.mCherry, round(resolution/scale) );
 
 % get orientation of embryo
@@ -54,6 +56,20 @@ centCoords(2,:) = centCoords(2,:)-center(2);
 centCoords(3,:) = centCoords(3,:)-center(3);
 centCoords = diag([1/radii(1),1/radii(2),1/radii(3)])*axes'*centCoords;
 
+% Only take the centers that are really inside the ball with a toleranz
+tol = 0.1;
+normCoords = sqrt(centCoords(1,:).^2+centCoords(2,:).^2+centCoords(3,:).^2);
+
+
+% Delete each point that is > 1+tol
+centCoords(:,normCoords>1+tol) = [];
+
+% Normalize each point that is > 1 but <= 1+tol
+centCoords(:,normCoords>1&normCoords<1+tol) = ...
+centCoords(:,(normCoords>1&normCoords<1+tol))...
+    .*1./repmat(normCoords(:,(normCoords>1&normCoords<1+tol)),[3,1]);
+
+
 %% Generate Output
 
 output = struct;
@@ -65,7 +81,7 @@ output.ellipsoid.center = center;
 output.ellipsoid.radii = radii;
 output.ellipsoid.axes = axes;
 %% Information for the data dimensions
-% The image is always set in [row, column, z] dimensionsen. When we are
+% The image is always set in [row, column, z] dimensions. When we are
 % working with axis [x,y,z] x = column, y = row and z = z. fitEllipsoid is
 % working on the axis. So we get a center and a radii that depends on the
 % axis and not on the image itself. So if we compute a sphere in the axis

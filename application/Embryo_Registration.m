@@ -67,7 +67,7 @@ handles.scale = 0.75;
 handles.resolution = [1.29/handles.scale, 1.29/handles.scale, 20];
 
 % Set the sample rate (will be changeable for user later)
-handles.samples = 64;
+handles.samples = 128;
 
 % Set Buttons
 set(handles.textField,'String','Welcome! Please load your data.');
