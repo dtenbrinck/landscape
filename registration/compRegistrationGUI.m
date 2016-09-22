@@ -12,7 +12,7 @@ function [handles] = compRegistrationGUI(handles)
 
 %% Initialization
 
-charType = 'tail';
+charType = 'head';
 % Sample the unit sphere
 samples = handles.samples;
 [alpha, beta] = meshgrid(linspace(pi,2*pi,samples/2), linspace(0,2*pi,samples));

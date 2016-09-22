@@ -51,9 +51,9 @@ ind = ind-indweight;
 
 % -- Get the characteristic point depending on the selected type -- %
 charInd = 0;    %This is a trick so we don't need the if for type 'weight'.
-if strcmp(type,'head')
+if strcmp(type,'tail')
     charInd = max(ind);
-elseif strcmp(type,'tail')
+elseif strcmp(type,'head')
     charInd = min(ind);
 elseif strcmp(type,'middle')
     charInd = (min(ind)+(max(ind)-min(ind))/2);
