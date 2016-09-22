@@ -15,8 +15,10 @@ function [Xs_t,Ys_t,Zs_t,axes] = transformUnitSphere3D(Xs, Ys, Zs, scale_matrix,
 %% Main Code
 
 % Get transformmatrix and take care of direction of axes.
+sign = (-0.5+ (acos([1,0,0]*rotation_matrix(:,1)) < acos([-1,0,0]*rotation_matrix(:,1))))*2;
+rotation_matrix(:,1) = sign*rotation_matrix(:,1);
 sign = (-0.5+ (acos([0,1,0]*rotation_matrix(:,2)) < acos([0,-1,0]*rotation_matrix(:,2))))*2;
-rotation_matrix(:,1:2) = sign*rotation_matrix(:,1:2);
+rotation_matrix(:,2) = sign*rotation_matrix(:,2);
 transform = scale_matrix*rotation_matrix;
 % Transform all coordinates of the unit sphere
 X = transform^-1*[Xs(:),Ys(:),Zs(:)]';
