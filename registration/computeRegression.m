@@ -1,4 +1,4 @@
-function [ pstar, vstar, regData ] = computeRegression(regData, visualize)
+function [ pstar, vstar ] = computeRegression(regData, visualize)
 % INITREFDATA: This function initializes the reference data set. It will
 % compute the regression and will output the new structure S and the pstar
 % and vstar of the reference data regression.

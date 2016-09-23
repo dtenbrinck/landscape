@@ -64,7 +64,7 @@ for i=1:size(fieldNames,1)
     
     regData = handles.SegData.(fieldname).regData;
     % Compute regression
-    [pstar,vstar, regData] ...
+    [pstar,vstar] ...
         = computeRegression(regData,'false');
     fprintf('Done!\n');
     
