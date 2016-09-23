@@ -1,4 +1,4 @@
-function [center, radii, axes] = estimateEmbryoSurface( Dapi_data, resolution )
+function [center, radii, axes,v] = estimateEmbryoSurface( Dapi_data, resolution )
 
 % Generate three-dimensional Gaussian filter
 %g = generate3dGaussian(9, 1.5);
@@ -14,7 +14,7 @@ kernelLaplace = generate3dLaplacian(resolution);
 sharp_areas = normalizeData (imfilter(blurred, kernelLaplace, 'same', 'replicate'));
 
 % Estimate embryo shape by fitting ellipsoid to sharp areas
-[center, radii, axes] = fitEllipsoid(sharp_areas, resolution);
+[center, radii, axes,v] = fitEllipsoid(sharp_areas, resolution);
 
 end
 

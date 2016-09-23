@@ -1,0 +1,62 @@
+function [ p,v,regLine ] = getCharPos( p,v,regData, type )
+%GETCHARPOS: This function will give you the position of the characteristic
+%depanding on the input type. It can give you the head, tail, weight and
+%middle (between head and tail) position. It will also compute the new
+%vector on this point and the new regression line
+%% INPUT: %%
+% p:        pstar of the regression line.
+% v:        vstar of the regression line.
+% regData:  The points of the segmentation of the embryo projected onto the
+%           sphere.
+% type:     String with the values:
+%           'head':     set characteristic to head
+%           'tail':     set characteristic to tail
+%           'weight':   set characteristic to  the weight of nearest points
+%           'middle':     set characteristic to middle between head and tail
+%% OUTPUT: %%
+% charPos:  The position of the characteric point on the regression line
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% MAIN CODE %%
+
+% -- Compute original regression line -- %
+T = 0:0.01:2*pi;
+G = geodesicFun(p,v);
+rL = G(T);
+
+%-- Compute the nearest points on the regression line -- %
+ind = ones(1,size(regData,2));
+
+% Compute the smallest difference of each regData point to the
+% regressionLine. ind is the position on the regression line.
+for i=1:size(regData,2)
+    diffSum = ...
+      abs(rL(1,:)-ones(1,size(rL,2))*regData(1,i))...
+    + abs(rL(2,:)-ones(1,size(rL,2))*regData(2,i))...
+    + abs(rL(3,:)-ones(1,size(rL,2))*regData(3,i));
+    [~,ind(i)] = min(diffSum);
+    
+end
+
+% -- Rearrange the indices into the interval -314:314 -- %
+ind(ind>629/2) = ind(ind>629/2)-629;
+
+% -- Find the weight of the indices -- %
+indweight = sum(ind)/size(ind,2);
+
+% -- Rearrange the indices -- %
+ind = ind-indweight;
+
+% -- Get the characteristic point depending on the selected type -- %
+
+if strcmp(type,'head')
+    charInd = max(ind);
+elseif strcmp(type,'tail')
+    charInd = min(ind);
+elseif strcmp(type,'weight')
+    charInd = indweight;
+elseif strcmp(type,'middle')
+    charInd = min(ind)+(max(ind)-min(ind))/2;
+end
+end
+
