@@ -78,7 +78,7 @@ for i = 1:size(fieldNames,1)
 end
 % Throw coordinates away that don't fit into unit sphere.
 counts = 1:size(allCentCoords,2);
-allCentCoords(:,counts(sqrt(sum(allCentCoords.^2,1))>1)) = [];
+allCentCoords(:,counts(sqrt(sum(allCentCoords.^2,1))>1+1e-10)) = [];
 
 h.allCentCoords = allCentCoords;
 h.numOfCells = size(allCentCoords,2);
