@@ -3,6 +3,7 @@ function landmark = segmentGFP( data, resolution )
 % specify segmentation algorithm
 % TODO: Set via GUI!
 method = 'k-means';
+type = 'morph';
 
 if strcmp(method, 'CP') % Chambolle-Pock and thresholding
     
@@ -22,7 +23,7 @@ if strcmp(method, 'CP') % Chambolle-Pock and thresholding
     algP.TV = 'iso';
     
     % decide if plotting is enabled
-    algP.showSegmentation = true;
+    algP.showSegmentation = false;
     algP.showInterval = 200;
     algP.plotError = false;
     
@@ -45,13 +46,20 @@ if strcmp(method, 'CP') % Chambolle-Pock and thresholding
 elseif strcmp(method, 'k-means')  % k-means clustering
     
     % segment GFP using k-means clustering
-    Xi = k_means_clustering(data, 3, 'real');
-    Xi = floor(Xi / 3);
+    k = 4;
+    Xi = k_means_clustering(data, k, 'real');
+    
+    if strcmp(type,'k-channel')
+        Xi = floor(Xi / k);
+    elseif strcmp(type,'morph')
+        Xi = Xi-2>0;
+        Xi = imopen(Xi,strel('disk',5));
+    end
     
 end
 
 % set output variable
-landmark = Xi;
+landmark = double(Xi);
 
 end
 
