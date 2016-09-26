@@ -6,7 +6,7 @@ function data = removeBackground( data )
 
 % Generate structural elements for preprocessing
 struct_element_dapi = strel('disk',5);
-struct_element_gfp = strel('disk',27);
+struct_element_gfp = strel('disk',50);
 struct_element_mCherry = strel('disk',11);
 
 % preprocess Dapi data

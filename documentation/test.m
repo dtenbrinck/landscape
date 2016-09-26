@@ -222,3 +222,18 @@ for i=1:20
     figure(1),cla,imagesc(cells2(:,:,i))
     pause(1)
 end
+
+%% CONVEX HULL SEGMENTATION TEST
+A = max(Xi,[],3)-2>0;
+B = A;
+figure,imagesc(B)
+CC = bwconncomp(A);
+areaCC = regionprops(CC,'Area');
+for i=1:size(areaCC,1)
+   if areaCC(i).Area<50
+        A(CC.PixelIdxList{i}) = 0;
+   end
+end
+
+se = strel('disk',5);
+figure,imagesc(imopen(B,se))
