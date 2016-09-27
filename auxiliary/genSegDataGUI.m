@@ -1,4 +1,4 @@
-function [SegmentedData] = genSegDataGUI(Xs,Ys,Zs,Xc,Yc,Zc,bigdata,resolution,scale)
+function [SegmentedData] = genSegDataGUI(Xs,Ys,Zs,Xc,Yc,Zc,bigdata,samples,resolution,scale)
 %%GENSEGDATA: Generate Segmentation Data in the GUI framework.
 %% Input:
 %   Xs,Ys,Zs:   Meshgrid for the samples unit sphere
@@ -31,7 +31,7 @@ for i=1:size(datanames,1)
     
     % Compute the segmentaion of landmark and cells
     fprintf('Starting segmentation ...\n');
-    output = LACSfun(data,resolution,scale);
+    output = LACSfun(data,samples,resolution,scale);
     fprintf('Segmentation Done!\n');
     
     % Compute the transformed sphere and cube

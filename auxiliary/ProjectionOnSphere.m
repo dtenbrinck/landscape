@@ -76,6 +76,21 @@ CC = bwconncomp(CellsInSphere);
 rp = regionprops(CC,'Centroid');
 centCoords = reshape([rp(:).Centroid],3,[]);
 output.centCoords = centCoords;
+
+% Only take the centers that are really inside the ball with a toleranz
+tol = 0.1;
+normCoords = sqrt(centCoords(1,:).^2+centCoords(2,:).^2+centCoords(3,:).^2);
+
+
+% Delete each point that is > 1+tol
+centCoords(:,normCoords>1+tol) = [];
+normCoords = sqrt(centCoords(1,:).^2+centCoords(2,:).^2+centCoords(3,:).^2);
+
+% Normalize each point that is > 1 but <= 1+tol
+centCoords(:,normCoords>1&normCoords<1+tol) = ...
+centCoords(:,(normCoords>1&normCoords<1+tol))...
+    .*1./repmat(normCoords(:,(normCoords>1&normCoords<1+tol)),[3,1]);
+
 fprintf('Done!\n');
 
 end

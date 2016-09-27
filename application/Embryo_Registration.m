@@ -193,7 +193,7 @@ Ys = cos(beta);
 
 % Sample the unit cube
 [Xc, Yc, Zc] = meshgrid(linspace(-1,1,samples), linspace(-1,1,samples), linspace(-1,1,samples));
-handles.SegData = genSegDataGUI(Xs,Ys,Zs,Xc,Yc,Zc,handles.data,handles.resolution,handles.scale);
+handles.SegData = genSegDataGUI(Xs,Ys,Zs,Xc,Yc,Zc,handles.data,samples,handles.resolution,handles.scale);
 
 set(handles.textField,'String','Segmentation Done!');
 set(handles.start_seg,'Enable','off');
