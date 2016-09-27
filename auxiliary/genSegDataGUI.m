@@ -74,6 +74,9 @@ for i=1:size(datanames,1)
     output.CellsInSphere = CellsInSphere;
     fprintf('Done!');
     
+    % Compute the regression data for later use
+    output.regData = getRegData(output.GFPOnSphere,size(Xs,1));
+    
     % Save in structure
     SegmentedData.(fileName) = output;
     

@@ -1,14 +1,14 @@
 % clean up
-clc; clear; close all;
+%clc; clear; close all;
 
 % add needed subfolders
-addpath(genpath('../'));
+%addpath(genpath('../'));
 
 % check if data has been loaded already
 if ~exist('all_data.mat','file')
   
   % define data path
-  dataPathName = '../data/tilting_adjustments_first_priority';
+  dataPathName = 'E:\Embryo_Registration\data\SargonYigit\Image Registration\10hpf_data\tilting_experiments';
   
   % get filenames of STK files in selected folder
   fileNames = getSTKfilenames(dataPathName);

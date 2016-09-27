@@ -27,9 +27,6 @@ points(1:2) = fliplr(points(1:2));
 % coordinate.
 coordMat = zeros(sizeGrid);
 
-% Fucking workaround
-points(points<=0) = 1;
-points(points>64) = 64;
 indPoints = sub2ind(sizeGrid,points(1,:),points(2,:),points(3,:));
 
 % Find out how many points are on the same gridpoint
