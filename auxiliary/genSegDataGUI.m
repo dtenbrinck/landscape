@@ -1,4 +1,4 @@
-function [SegmentedData] = genSegDataGUI(Xs,Ys,Zs,Xc,Yc,Zc,bigdata,samples,resolution,scale)
+function [SegmentedData] = genSegDataGUI(bigdata,samples,resolution)
 %%GENSEGDATA: Generate Segmentation Data in the GUI framework.
 %% Input:
 %   Xs,Ys,Zs:   Meshgrid for the samples unit sphere
@@ -23,68 +23,33 @@ set(findobj(wb1,'type','patch'),'edgecolor','k','facecolor','b');
 for i=1:size(datanames,1)
     fprintf(['Dataset ',num2str(i),' of ',num2str(size(datanames,1)),':\n']);
     
-    % Load dataset
+    % --- Load dataset --- %
     fileName = char(datanames(i));
 
     fprintf(['File name: ', fileName,'\n']);
     data = bigdata.(char(datanames(i)));
-    % Preprocess the data
-    fprintf('Preprocess the data...\n');
+    
+    % --- Preprocess the data --- %
+    fprintf('Preprocess the data...');
     data = preprocessData(data);
-    fprintf('Preprocessing done!\n');
-    % Compute the segmentaion of landmark and cells
-    fprintf('Starting segmentation ...\n');
-    output = LACSfun(data,samples,resolution,scale);
-    fprintf('Segmentation Done!\n');
+    fprintf('Done!\n');
     
-    % Compute the transformed sphere and cube
-    output.tSphere = struct;
-    output.tCube = struct;
+    % --- Segmentaion of landmark and cells --- %
+    fprintf('Starting segmentation ...');
+    output = LACSfun(data,resolution);
+    fprintf('Done!\n');
     
-    % Transform unit sphere...
-    scale_matrix = diag(1./output.ellipsoid.radii);
-    rotation_matrix = output.ellipsoid.axes';
-    [output.tSphere.Xs_t,output.tSphere.Ys_t,output.tSphere.Zs_t,output.ellipsoid.axes] ...
-        = transformUnitSphere3D(Xs,Ys,Zs,scale_matrix,rotation_matrix,output.ellipsoid.center);
-    
-    % ... and cube
-    [output.tCube.Xc_t,output.tCube.Yc_t,output.tCube.Zc_t] ...
-        = transformUnitCube3D(Xc,Yc,Zc,scale_matrix,rotation_matrix,output.ellipsoid.center);
-
-    if strcmp(fileName,'Master_Ref')
-        fieldName = 'Master_Ref';
-    else
-        fieldName = fileName;
-    end
-    
-    % Projection: %
-    fprintf('Starting projection onto the unit sphere and unit cube...');
-    % Sample original space
-    mind = [0 0 0]; maxd = size(output.landmark) .* resolution;
-    %Create meshgrid with same resolution as data
-    [ X, Y, Z ] = meshgrid( linspace( mind(2), maxd(2), size(output.landmark,2) ),...
-        linspace( mind(1), maxd(1), size(output.landmark,1) ),...
-        linspace( mind(3), maxd(3), size(output.landmark,3) ) );
-    
-    % Project segmented landmark onto unit sphere...
-    output.GFPOnSphere ...
-        = interp3(X, Y, Z, output.landmark, output.tSphere.Xs_t, output.tSphere.Ys_t, output.tSphere.Zs_t,'nearest');
-    
-    % ... and cells into unit cube
-    CellsInSphere ...
-        = interp3(X, Y, Z, output.cells, output.tCube.Xc_t, output.tCube.Yc_t, output.tCube.Zc_t,'nearest');
-    CellsInSphere(isnan(CellsInSphere)) = 0;
-    output.CellsInSphere = CellsInSphere;
-    fprintf('Done!');
-    
-    % Compute the regression data for later use
-    output.regData = getRegData(output.GFPOnSphere,size(Xs,1));
+    % --- Projection --- %
+    fprintf('Starting projection...\n');
+    output = ProjectionOnSphere(output,samples,resolution);
+    fprintf('Projection done!\n');
     
     % Save in structure
     SegmentedData.(fileName) = output;
     
     % Update waitbar
     waitbar(i/size(datanames,1));
+    fprintf('--------------------------------------------------');
     drawnow;
 end
 

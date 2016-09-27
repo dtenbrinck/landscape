@@ -27,7 +27,7 @@ output.tSphere = struct;
 output.tCube = struct;
 
 % Projection: %
-fprintf('Starting projection onto the unit sphere and unit cube...');
+fprintf('Projection onto the unit sphere...');
 % Sample original space
 mind = [0 0 0]; maxd = size(output.landmark) .* resolution;
 %Create meshgrid with same resolution as data
@@ -61,8 +61,10 @@ output.regData = [(round(Xs(GFPOnSphere == 1 & Zs <= 0)*10^10)/10^10)';...
         (round(Zs(GFPOnSphere == 1 & Zs <= 0)*10^10)/10^10)'];
 % Delete all multiple points
 output.regData = unique(output.regData','rows')';
+fprintf('Done!\n');
 
 % ... and cube
+fprintf('Projection of the cells...');
 [output.tCube.Xc_t,output.tCube.Yc_t,output.tCube.Zc_t] ...
     = transformUnitCube3D(Xc,Yc,Zc,scale_matrix,rotation_matrix,output.ellipsoid.center);
 

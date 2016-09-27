@@ -183,17 +183,8 @@ handles = guidata(hObject);
 
 set(handles.textField,'String','Starting segmentation...');
 
-samples = handles.samples;
-
 % Sample the unit sphere
-[alpha, beta] = meshgrid(linspace(pi,2*pi,samples/2), linspace(0,2*pi,samples));
-Zs = cos(alpha) .* sin(beta);
-Xs = sin(alpha) .* sin(beta);
-Ys = cos(beta);
-
-% Sample the unit cube
-[Xc, Yc, Zc] = meshgrid(linspace(-1,1,samples), linspace(-1,1,samples), linspace(-1,1,samples));
-handles.SegData = genSegDataGUI(Xs,Ys,Zs,Xc,Yc,Zc,handles.data,samples,handles.resolution,handles.scale);
+handles.SegData = genSegDataGUI(handles.data,handles.samples,handles.resolution);
 
 set(handles.textField,'String','Segmentation Done!');
 set(handles.start_seg,'Enable','off');

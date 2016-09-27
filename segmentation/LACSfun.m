@@ -1,4 +1,4 @@
-function [ output ] = LACSfun(data, samples, resolution, scale)
+function [ output ] = LACSfun(data,resolution)
 %LACSfun: Short for Landmark And Cells Segmentation Function. This function
 %segments the landmark in the GFP channel and the cells in the mCherry 
 %channel.
@@ -35,10 +35,6 @@ output.landmark = segmentGFP(data.GFP, resolution);
 
 % Get orientation of embryo
 headOrientation = determineHeadOrientation(computeMIP(output.landmark));
-
-%% Projection
-
-output = ProjectionOnSphere(output,samples,resolution);
 
 %% Generate Output
 
