@@ -32,27 +32,28 @@ resized_data = normalizeData(resized_data);
 %% Segmentation:
 
 % Estimate surface of embryo by fitting an ellipsoid
-[center, radii, axes] = estimateEmbryoSurface(resized_data.Dapi, round(resolution/scale));
+[center, radii, axes] = estimateEmbryoSurface(resized_data.Dapi, resolution);
 
 % Segment landmark in GFP channel
-landmark = segmentGFP(resized_data.GFP, round(resolution/scale));
+landmark = segmentGFP(resized_data.GFP, resolution);
 
 % Segment stem cells in mCherry channel and get the centroids of the cells
-[cells,origCentCoords] = segmentCells(resized_data.mCherry, round(resolution/scale) );
+[cells,origCentCoords] = segmentCells(resized_data.mCherry, resolution);
 
 % get orientation of embryo
 headOrientation = determineHeadOrientation(computeMIP(landmark));
 
 % Get coordinates of the cells %
 % Fit Coordinates to real resolution
-centCoords = diag(round(resolution/scale))*origCentCoords;
+%%centCoords = diag(resolution)*origCentCoords;
 
 % Transform the coordinates into the sphere. With scaling and rotating.
 
-centCoords(1,:) = centCoords(1,:)-center(1);
-centCoords(2,:) = centCoords(2,:)-center(2);
-centCoords(3,:) = centCoords(3,:)-center(3);
-centCoords = diag([1/radii(1),1/radii(2),1/radii(3)])*axes'*centCoords;
+%%centCoords(1,:) = centCoords(1,:)-center(1);
+%%centCoords(2,:) = centCoords(2,:)-center(2);
+%%centCoords(3,:) = centCoords(3,:)-center(3);
+%centCoords = diag([1/radii(1),1/radii(2),1/radii(3)])*axes'*centCoords;
+%%centCoords = diag([1/radii(1),1/radii(2),1/radii(3)])*centCoords;
 
 %% Generate Output
 
@@ -60,7 +61,7 @@ output = struct;
 output.landmark = landmark;
 output.cells = cells;
 output.origCentCoords = origCentCoords;
-output.centCoords = centCoords;
+%%output.centCoords = centCoords;
 output.ellipsoid.center = center;
 output.ellipsoid.radii = radii;
 output.ellipsoid.axes = axes;

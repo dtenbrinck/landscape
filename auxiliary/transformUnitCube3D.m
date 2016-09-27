@@ -15,7 +15,8 @@ function [Xc_t,Yc_t,Zc_t] = transformUnitSphere3D(Xc, Yc, Zc, scale_matrix, rota
 %% Main Code
 
 % Get transformmatrix
-transform = scale_matrix*rotation_matrix;
+%transform = scale_matrix*rotation_matrix;
+transform = scale_matrix;
 % Transform all coordinates of the unit cube
 X = transform^-1*[Xc(:),Yc(:),Zc(:)]';
 

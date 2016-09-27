@@ -54,7 +54,7 @@ labels = ones(nb_elements,1);
 
 % set parameters for terminating condition of iterative loop
 threshold = 1e-12;  % threshold for relative changes per iteration
-max_iteration = 50;  % maximum number of iterations
+max_iteration = 100;  % maximum number of iterations
 
 % initialize termination variables of iterative loop
 iteration = 0;
