@@ -28,7 +28,10 @@ for i=1:size(datanames,1)
 
     fprintf(['File name: ', fileName,'\n']);
     data = bigdata.(char(datanames(i)));
-    
+    % Preprocess the data
+    fprintf('Preprocess the data...\n');
+    data = preprocessData(data);
+    fprintf('Preprocessing done!\n');
     % Compute the segmentaion of landmark and cells
     fprintf('Starting segmentation ...\n');
     output = LACSfun(data,samples,resolution,scale);

@@ -20,30 +20,18 @@ function [ output ] = LACSfun(data, samples, resolution, scale)
 %% Initialization
 output = struct;
 
-%% Preprocessing:
-
-% Perform background removal using morphological filters
-data = removeBackground(data);
-
-% Resize data
-resized_data = rescaleSlices(data, scale);
-
-% Normalize data
-resized_data = normalizeData(resized_data);
-
-
 %% Segmentation:
 
 % Estimate surface of embryo by fitting an ellipsoid
-[center, radii, axes] = estimateEmbryoSurface(resized_data.Dapi, resolution);
+[center, radii, axes] = estimateEmbryoSurface(data.Dapi, resolution);
 
 % Segment landmark in GFP channel
 disp('Segmenting GFP...');
-output.landmark = segmentGFP(resized_data.GFP, resolution);
+output.landmark = segmentGFP(data.GFP, resolution);
 
 % Segment stem cells in mCherry channel and get the centroids of the cells
  disp('Segmenting mCherry...');
-[output.cells,origCentCoords] = segmentCells(resized_data.mCherry, resolution);
+[output.cells,origCentCoords] = segmentCells(data.mCherry, resolution);
 
 % Get orientation of embryo
 headOrientation = determineHeadOrientation(computeMIP(output.landmark));
