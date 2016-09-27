@@ -16,7 +16,7 @@ if ~exist('segmented_data.mat','file')
   if ~exist('all_data.mat','file')
     
     % define data path
-    dataPathName = '../data/bad_data';
+    dataPathName = 'E:\Embryo_Registration\data\tilting_experiments';
     
     % get filenames of STK files in selected folder
     fileNames = getSTKfilenames(dataPathName);
@@ -94,7 +94,6 @@ for boundary = 0.80:0.01:1.2
 % Project segmented landmark onto unit sphere...
 tmp ...
   = interp3(X, Y, Z, output.landmark, output.tSphere.Xs_t, output.tSphere.Ys_t, output.tSphere.Zs_t,'nearest');
-figure; imagesc(tmp); pause;
 
 output.GFPOnSphere = max(output.GFPOnSphere, tmp);
 end
@@ -108,10 +107,17 @@ CellsInSphere ...
   = interp3(X, Y, Z, output.cells, output.tCube.Xc_t, output.tCube.Yc_t, output.tCube.Zc_t,'nearest');
 CellsInSphere(isnan(CellsInSphere)) = 0;
 output.CellsInSphere = CellsInSphere;
+CC = bwconncomp(CellsInSphere);
+rp = regionprops(CC,'Centroid');
+centCoords = reshape([rp(:).Centroid],3,[]);
+centCoords = centCoords;
+CellsInSphere(sub2ind(size(CellsInSphere),round(centCoords(2,:)),round(centCoords(1,:)),round(centCoords(3,:))))=2;
+figure,imagesc(max(CellsInSphere,[],3))
 fprintf('Done!\n');
 
 size_markers = ones(numel(Xs),1);
 size_markers(output.GFPOnSphere == 1) = 100;
 size_markers(output.GFPOnSphere == 0) = 5;
 
-figure; scatter3(Xs(:),Ys(:),Zs(:), size_markers, -1*output.GFPOnSphere(:)); colormap gray;
+output2 = ProjectionOnSphere(output,samples,resolution);
+figure; scatter3(Xs(:),Ys(:),Zs(:), size_markers, -1*output.GFPOnSphere(:),'*');
