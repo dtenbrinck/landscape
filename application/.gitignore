@@ -1,0 +1,11 @@
+# ignore reference folde
+refs/
+/deploy_new_version.bat
+/deploy_hotfix.bat
+/.csync_journal.db
+# ignore temporary vim files
+*~
+commands.txt
+Untitled.m
+*.asv
+*.mat

@@ -12,6 +12,7 @@ function [handles] = compRegistrationGUI(handles)
 
 %% Initialization
 
+charType = 'head';
 % Sample the unit sphere
 samples = handles.samples;
 [alpha, beta] = meshgrid(linspace(pi,2*pi,samples/2), linspace(0,2*pi,samples));
@@ -32,16 +33,19 @@ sRefData = char(handles.fieldnames(handles.nRefData));
 fprintf('Starting registration: \n');
 fprintf(['Initializing the reference data set ',sRefData,'... \n']);
 
+regData = handles.SegData.(sRefData).regData;
 % Initialize the reference data set.
-[refpstar, refvstar,regData] ...
-    = computeRegression(handles.SegData.(sRefData).GFPOnSphere, Xs, Ys, Zs, 'false');
+[refpstar, refvstar] ...
+    = computeRegression(regData,'false');
+
+% Tilt refpstar onto the head position
+[refpstar,refvstar] = getCharPos(refpstar,refvstar,regData,charType);
 
 fprintf('Setting the reference p* and v*.\n');
 
 % Update handles.SegData
 handles.SegData.(sRefData).pstar = refpstar;
 handles.SegData.(sRefData).vstar = refvstar;
-handles.SegData.(sRefData).regData = regData;
 
 fprintf('Initialization done!\n');
 % Compute the spherical regression for the rest of the datasets and
@@ -58,10 +62,14 @@ for i=1:size(fieldNames,1)
     % Get the data that is projected onto the sphere
     fieldname = char(fieldNames(i));
     
+    regData = handles.SegData.(fieldname).regData;
     % Compute regression
-    [pstar,vstar, regData] ...
-        = computeRegression(handles.SegData.(fieldname).GFPOnSphere, Xs,Ys,Zs,'false');
+    [pstar,vstar] ...
+        = computeRegression(regData,'false');
     fprintf('Done!\n');
+    
+    % Tilt refpstar onto the head position
+    [pstar,vstar] = getCharPos(pstar,vstar,regData,charType);
     
     % Registration of the data set
     fprintf('Register data set onto reference dataset.\n');
