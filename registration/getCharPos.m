@@ -48,6 +48,7 @@ indweight = sum(ind)/size(ind,2);
 
 % -- Rearrange the indices -- %
 ind = ind-indweight;
+ind(ind<-629/2) = ind(ind<-629/2)+629;
 
 % -- Get the characteristic point depending on the selected type -- %
 charInd = 0;    %This is a trick so we don't need the if for type 'weight'.

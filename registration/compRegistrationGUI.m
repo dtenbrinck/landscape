@@ -96,7 +96,6 @@ for i=1:size(fieldNames,1)
     end
     fprintf('--------------------------------------------------\n');
 end
-set(handles.textField,'String','Registration Done!');
 fprintf('Registration Done!\n');
 
 

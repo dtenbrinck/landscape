@@ -76,12 +76,11 @@ CellsInSphere(isnan(CellsInSphere)) = 0;
 % Compute the coordinates of the centroids of the cells
 
 % Should have been
-% CC = bwconncomp(CellsInSphere);
-% rp = regionprops(CC,'Centroid');
-% centCoords = reshape([rp(:).Centroid],3,[]);
-% And now?!
-
-% --- Current workaround -- % % DOESNOT WORK...
+CC = bwconncomp(CellsInSphere);
+rp = regionprops(CC,'Centroid');
+centCoords = reshape([rp(:).Centroid],3,[]);
+centCoords = centCoords/250
+% --- Current workaround -- % 
 CC = bwconncomp(output.cells);
 rp = regionprops(CC,'Centroid');
 centCoords = reshape([rp(:).Centroid],3,[]);
