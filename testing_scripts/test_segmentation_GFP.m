@@ -8,6 +8,7 @@
 if ~exist('all_data.mat','file')
   
   % define data path
+
   dataPathName = 'E:\Embryo_Registration\data\SargonYigit\Image Registration\10hpf_data\tilting_experiments';
   
   % get filenames of STK files in selected folder
@@ -35,7 +36,7 @@ end
 data = removeBackground(all_data.Data_1);
 
 % resize data
-scale = 0.75;
+scale = 0.25;
 resized_data = rescaleSlices(data, scale);
 
 % normalize data
@@ -49,12 +50,11 @@ resolution(1:2) = resolution(1:2) / scale;
 %%%  segment landmark in GFP channel
 
 % segment GFP using Chambolle-Pock algorithm with ghresholding
-%resized_landmark = segmentGFP(resized_data.GFP, resolution);
+resized_landmark = segmentGFP(resized_data.GFP, resolution);
 
 % segment GFP using k-means clustering
-resized_landmark = k_means_clustering(resized_data.GFP, 3, 'real');
-resized_landmark = floor(resized_landmark / 3);
-
+%resized_landmark = k_means_clustering(resized_data.GFP, 3, 'real');
+%resized_landmark = floor(resized_landmark / 3);
 
 % rescale result to full resolution
 landmark = rescaleSlices(resized_landmark, 1/scale, 'nearest');

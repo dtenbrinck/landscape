@@ -144,7 +144,7 @@ if size(fileNames,1) == 0
 end
 
 % Give output and create waitbar for loading files
-disp('Loading data...');
+fprintf('Loading data...');
 set(handles.textField,'String','Loading data...');
 wb1=waitbar(0, 'Loading selected data... Please wait...');
 set(findobj(wb1,'type','patch'),'edgecolor','k','facecolor','b');
@@ -157,6 +157,7 @@ data = loadExperimentData(experimentSets, pathName, wb1);
 
 % close waitbar when finished
 close(wb1);
+fprintf('Done!\n');
 
 % Update handles
 handles.filenames = fileNames;
@@ -183,17 +184,9 @@ handles = guidata(hObject);
 
 set(handles.textField,'String','Starting segmentation...');
 
-samples = handles.samples;
-
 % Sample the unit sphere
-[alpha, beta] = meshgrid(linspace(pi,2*pi,samples/2), linspace(0,2*pi,samples));
-Zs = cos(alpha) .* sin(beta);
-Xs = sin(alpha) .* sin(beta);
-Ys = cos(beta);
-
-% Sample the unit cube
-[Xc, Yc, Zc] = meshgrid(linspace(-1,1,samples), linspace(-1,1,samples), linspace(-1,1,samples));
-handles.SegData = genSegDataGUI(Xs,Ys,Zs,Xc,Yc,Zc,handles.data,handles.resolution,handles.scale);
+handles.SegData = ...
+    genSegDataGUI(handles.data,handles.samples,handles.resolution,handles.scale);
 
 set(handles.textField,'String','Segmentation Done!');
 set(handles.start_seg,'Enable','off');
