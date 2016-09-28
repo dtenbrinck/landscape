@@ -11,17 +11,7 @@ function [handles] = compRegistrationGUI(handles)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Initialization
-
 charType = 'head';
-% Sample the unit sphere
-samples = handles.samples;
-[alpha, beta] = meshgrid(linspace(pi,2*pi,samples/2), linspace(0,2*pi,samples));
-Zs = cos(alpha) .* sin(beta);
-Xs = sin(alpha) .* sin(beta);
-Ys = cos(beta);
-
-% Sample the unit cube
-[Xc, Yc, Zc] = meshgrid(linspace(-1,1,samples), linspace(-1,1,samples), linspace(-1,1,samples));
 
 %% Main Code
 
@@ -30,6 +20,7 @@ handles.fieldnames = fieldnames(handles.data);
 
 sRefData = char(handles.fieldnames(handles.nRefData));
 
+fprintf('_____________________________________________________\n');
 fprintf('Starting registration: \n');
 fprintf(['Initializing the reference data set ',sRefData,'... \n']);
 
@@ -51,7 +42,7 @@ fprintf('Initialization done!\n');
 % Compute the spherical regression for the rest of the datasets and
 % register them.
 
-fprintf(['Starting registration of the data sets to the reference dataset: ',sRefData,'... \n'])
+fprintf(['Starting registration of the data sets to the reference dataset:\n',sRefData,'... \n'])
 
 % Delete the reference data from the filenames.
 fieldNames = handles.fieldnames;
@@ -103,6 +94,7 @@ for i=1:size(fieldNames,1)
         showRegist(handles.SegData.(sRefData),...
             handles.SegData.(fieldname),sRefData,fieldname);
     end
+    fprintf('--------------------------------------------------\n');
 end
 set(handles.textField,'String','Registration Done!');
 fprintf('Registration Done!\n');

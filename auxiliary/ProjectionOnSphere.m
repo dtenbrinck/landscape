@@ -45,14 +45,14 @@ for boundary = 0.80:0.01:1.2
     
     scale_matrix = diag(1./output.ellipsoid.radii) * boundary;
     
-    [output.tSphere.Xs_t,output.tSphere.Ys_t,output.tSphere.Zs_t,output.ellipsoid.axes] ...
-        = transformUnitSphere3D(Xs,Ys,Zs,scale_matrix,rotation_matrix,output.ellipsoid.center);
+    [output.tSphere.Xs_t,output.tSphere.Ys_t,output.tSphere.Zs_t] ...
+        = transformUnitSphere3D(Xs,Ys,Zs,scale_matrix,output.ellipsoid.center);
     
     % Project segmented landmark onto unit sphere...
     tmp ...
         = interp3(X, Y, Z, output.landmark, output.tSphere.Xs_t, output.tSphere.Ys_t, output.tSphere.Zs_t,'nearest');
     
-    GFPOnSphere = max(output.GFPOnSphere, tmp);
+    GFPOnSphere = max(GFPOnSphere, tmp);
 end
 
 % Computing the coordinates of the segmentation
@@ -66,7 +66,7 @@ fprintf('Done!\n');
 % ... and cube
 fprintf('Projection of the cells...');
 [output.tCube.Xc_t,output.tCube.Yc_t,output.tCube.Zc_t] ...
-    = transformUnitCube3D(Xc,Yc,Zc,scale_matrix,rotation_matrix,output.ellipsoid.center);
+    = transformUnitCube3D(Xc,Yc,Zc,scale_matrix,output.ellipsoid.center);
 
 % ... and cells into unit cube
 CellsInSphere ...

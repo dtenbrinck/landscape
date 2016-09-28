@@ -53,7 +53,7 @@ elseif strcmp(method, 'k-means')  % k-means clustering
         Xi = floor(Xi / k);
     elseif strcmp(type,'morph')
         Xi = Xi-2>0;
-        Xi = imopen(Xi,strel('disk',5));
+        Xi = imopen(Xi,strel('disk',5));        
     end
     
 end

@@ -1,4 +1,4 @@
-function [Xs_t,Ys_t,Zs_t,axes] = transformUnitSphere3D(Xs, Ys, Zs, scale_matrix, center)
+function [Xs_t,Ys_t,Zs_t] = transformUnitSphere3D(Xs, Ys, Zs, scale_matrix, center)
 %TRANSFORMUNITSPHERE This function transforms the unit sphere. Therefore it
 %will be scaled with a scale_matrix, rotated with a rotation_matrix and
 %will be set to the center center
@@ -24,6 +24,5 @@ Xs_t = reshape(X(1,:)+center(1),size(Xs));
 Ys_t = reshape(X(2,:)+center(2),size(Ys));
 Zs_t = reshape(X(3,:)+center(3),size(Zs));
 
-axes = rotation_matrix';
 end
 

@@ -144,7 +144,7 @@ if size(fileNames,1) == 0
 end
 
 % Give output and create waitbar for loading files
-disp('Loading data...');
+fprintf('Loading data...');
 set(handles.textField,'String','Loading data...');
 wb1=waitbar(0, 'Loading selected data... Please wait...');
 set(findobj(wb1,'type','patch'),'edgecolor','k','facecolor','b');
@@ -157,6 +157,7 @@ data = loadExperimentData(experimentSets, pathName, wb1);
 
 % close waitbar when finished
 close(wb1);
+fprintf('Done!\n');
 
 % Update handles
 handles.filenames = fileNames;
@@ -184,7 +185,8 @@ handles = guidata(hObject);
 set(handles.textField,'String','Starting segmentation...');
 
 % Sample the unit sphere
-handles.SegData = genSegDataGUI(handles.data,handles.samples,handles.resolution);
+handles.SegData = ...
+    genSegDataGUI(handles.data,handles.samples,handles.resolution,handles.scale);
 
 set(handles.textField,'String','Segmentation Done!');
 set(handles.start_seg,'Enable','off');

@@ -1,4 +1,4 @@
-function [Xc_t,Yc_t,Zc_t] = transformUnitSphere3D(Xc, Yc, Zc, scale_matrix, center)
+function [Xc_t,Yc_t,Zc_t] = transformUnitCube3D(Xc, Yc, Zc, scale_matrix, center)
 %TRANSFORMUNITcube This function transforms the unit cube. Therefore it
 %will be scaled with 'scale_matrix' and
 %will be set to the center 'center'.
