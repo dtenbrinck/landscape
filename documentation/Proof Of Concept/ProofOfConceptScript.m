@@ -68,9 +68,6 @@ predata = preprocessData(h.data.(char(h.fieldnames(h.nData))),scale);
 h.vis_regist = 1;
 h = compRegistrationGUI(h);
 
-%% HEATMAP
-
-
 %% VISUALIZATION %%
 close all;
 % -- Data -- %

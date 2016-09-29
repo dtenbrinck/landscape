@@ -85,6 +85,7 @@ CellsInSphere(isnan(CellsInSphere)) = 0;
 CC = bwconncomp(output.cells);
 rp = regionprops(CC,'Centroid');
 centCoords = reshape([rp(:).Centroid],3,[]);
+centCoords = diag(resolution)*centCoords;
 centCoords(1,:) = centCoords(1,:)-output.ellipsoid.center(1);
 centCoords(2,:) = centCoords(2,:)-output.ellipsoid.center(2);
 centCoords(3,:) = centCoords(3,:)-output.ellipsoid.center(3);
