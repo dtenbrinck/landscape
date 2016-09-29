@@ -12,9 +12,6 @@ function [] = showRegist(rS, S, rFieldName, FieldName)
 T = 0:0.01:100;
 G = geodesicFun(rS.pstar,rS.vstar);
 regressionLine = G(T);
-options = optimoptions('fmincon','Display','off','Algorithm','sqp');
-[pstar,vstar] ...
-        = sphericalRegression3D(S.regData_r,[1;0;0],[0;0;-1],options,'false');
 
 % Visualize
 figure, 

@@ -74,11 +74,26 @@ CellsInSphere ...
 CellsInSphere(isnan(CellsInSphere)) = 0;
 
 % Compute the coordinates of the centroids of the cells
-CC = bwconncomp(CellsInSphere);
+
+% Should have been
+% CC = bwconncomp(CellsInSphere);
+% rp = regionprops(CC,'Centroid');
+% centCoords = reshape([rp(:).Centroid],3,[]);
+% And now?!
+
+% --- Current workaround -- % % DOESNOT WORK...
+CC = bwconncomp(output.cells);
 rp = regionprops(CC,'Centroid');
 centCoords = reshape([rp(:).Centroid],3,[]);
-output.centCoords = centCoords;
+centCoords = diag(resolution)*centCoords;
+centCoords(1,:) = centCoords(1,:)-output.ellipsoid.center(1);
+centCoords(2,:) = centCoords(2,:)-output.ellipsoid.center(2);
+centCoords(3,:) = centCoords(3,:)-output.ellipsoid.center(3);
+centCoords = ...
+    (output.ellipsoid.axes')^-1*diag([1/output.ellipsoid.radii(1),1/output.ellipsoid.radii(2),1/output.ellipsoid.radii(3)])...
+    *output.ellipsoid.axes'*centCoords;
 
+% --- --- %
 % Only take the centers that are really inside the ball with a toleranz
 tol = 0.1;
 normCoords = sqrt(centCoords(1,:).^2+centCoords(2,:).^2+centCoords(3,:).^2);
@@ -92,7 +107,7 @@ normCoords = sqrt(centCoords(1,:).^2+centCoords(2,:).^2+centCoords(3,:).^2);
 centCoords(:,normCoords>1&normCoords<1+tol) = ...
 centCoords(:,(normCoords>1&normCoords<1+tol))...
     .*1./repmat(normCoords(:,(normCoords>1&normCoords<1+tol)),[3,1]);
-
+output.centCoords = centCoords;
 fprintf('Done!\n');
 
 end
