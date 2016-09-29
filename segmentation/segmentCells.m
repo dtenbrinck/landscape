@@ -117,7 +117,7 @@ normCoords = sqrt(centCoords(1,:).^2+centCoords(2,:).^2+centCoords(3,:).^2);
 centCoords(:,normCoords>1&normCoords<1+tol) = ...
 centCoords(:,(normCoords>1&normCoords<1+tol))...
     .*1./repmat(normCoords(:,(normCoords>1&normCoords<1+tol)),[3,1]);
-output.centCoords = centCoords;
+centCoords = centCoords;
 
 end
 
