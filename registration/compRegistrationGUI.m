@@ -11,7 +11,7 @@ function [handles] = compRegistrationGUI(handles)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Initialization
-charType = 'head';
+charType = 'middle';
 
 %% Main Code
 
