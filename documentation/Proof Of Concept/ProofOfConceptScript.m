@@ -1,9 +1,12 @@
+% add current folder and subfolders to path variable
+addpath(genpath('./../..'));
+
 %% LOAD DATA
 
 % Load the data 
 h = struct;
 if ~exist('dataset.mat','file')
-    h.data = load_data('E:\Embryo_Registration\data\tilting_experiments');
+    h.data = load_data('../../data/tilting_adjustments_first_priority');
     save('dataset.mat','-struct','h','data');
 else
     load('dataset.mat','data');
@@ -84,10 +87,10 @@ drawnow,pause();
 % -- Segmentation -- %
 
 figure(1),clf,imagesc(max(predata.GFP,[],3)),hold on,
-contour(max(h.SegData.(char(h.fieldnames(h.nData))).landmark,[],3)),
+contour(max(h.SegData.(char(h.fieldnames(h.nData))).landmark,[],3), 'r', 'LineWidth', 2),
 title('Segmentation of the embryo shape');
 figure(2),clf,imagesc(max(predata.mCherry,[],3)),hold on,
-contour(max(h.SegData.(char(h.fieldnames(h.nData))).cells,[],3)),
+contour(max(h.SegData.(char(h.fieldnames(h.nData))).cells,[],3),  'r', 'LineWidth', 2),
 title('Segmentation of the cells');
 drawnow,pause();
 
