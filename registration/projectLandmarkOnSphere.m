@@ -14,11 +14,12 @@ function [ sphereCoordinates, landmarkCoordinates, landmarkOnSphere ] = projectL
 %% Main Code:
 
 % % Sampling sphere
-[alpha, beta] = meshgrid(linspace(pi,2*pi,samples), linspace(0,2*pi,samples));
+[alpha, beta] = meshgrid(linspace(pi,2*pi,samples/2), linspace(0,2*pi,samples));
 Xs = sin(alpha) .* sin(beta);
 Ys = cos(beta);
 Zs = cos(alpha) .* sin(beta);
 
+% save sphere coordinates as N x 3 matrix
 sphereCoordinates = [Xs(:), Ys(:), Zs(:)];
 
 % Sample original space by creating meshgrid with same resolution as data
@@ -41,8 +42,8 @@ for tolerance = 0.90:0.01:1.1
     scale_matrix = diag(1./ellipsoid.radii) * tolerance;
     
     transformation_matrix = rotation_matrix * scale_matrix;
-    [Xs_t,Ys_t,Zs_t] ...
-       = transformUnitSphere3D(Xs,Ys,Zs,transformation_matrix,ellipsoid.center);
+    %[Xs_t,Ys_t,Zs_t] ...
+       %= transformUnitSphere3D(Xs,Ys,Zs,transformation_matrix,ellipsoid.center);
     transformedCoordinates = ...
         transformCoordinates(sphereCoordinates, [0; 0; 0], transformation_matrix^-1, ellipsoid.center);
     
@@ -59,11 +60,11 @@ for tolerance = 0.90:0.01:1.1
 end
 
 % visualize projection on unit sphere
-visualizeProjectedLandmark(sphereCoordinates, landmarkOnSphere);
+%visualizeProjectedLandmark(sphereCoordinates, landmarkOnSphere);
 
 % compute coordinates of landmark on sphere
 landmark_indices = find(landmarkOnSphere == 1);
-landmarkCoordinates = [sphereCoordinates(landmark_indices,1), sphereCoordinates(landmark_indices,1), sphereCoordinates(landmark_indices,1)];
+landmarkCoordinates = [sphereCoordinates(landmark_indices,1), sphereCoordinates(landmark_indices,2), sphereCoordinates(landmark_indices,3)];
 
 % Computing the coordinates of the segmentation
 %regData = [(round(Xs(landmarkOnSphere == 1 & Zs <= 0)*10^10)/10^10)';...
