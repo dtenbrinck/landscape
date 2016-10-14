@@ -1,12 +1,12 @@
 % add current folder and subfolders to path variable
-addpath(genpath('./../..'));
+% addpath(genpath('./../..'));
 
 %% LOAD DATA
 
 % Load the data 
 h = struct;
 if ~exist('dataset.mat','file')
-    h.data = load_data('../../data/tilting_adjustments_first_priority');
+    h.data = load_data('E:\Embryo_Registration\data\SargonYigit\Image Registration\10hpf_data\tilting_adjustments_first_priority');
     save('dataset.mat','-struct','h','data');
 else
     load('dataset.mat','data');

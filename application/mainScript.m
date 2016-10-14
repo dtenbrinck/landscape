@@ -1,11 +1,11 @@
 %% INITIALIZATION
 
 % add current folder and subfolders to path variable
-addpath(genpath('./..'));
+% addpath(genpath('./..'));
 
 %% SET PARAMETERS
 
-dataPath = '../data/tilting_adjustments_first_priority';
+dataPath = 'E:\Embryo_Registration\data\SargonYigit\Image Registration\10hpf_data\tilting_adjustments_first_priority';
 resolution = [1.29, 1.29, 20];
 scale = 0.5;
 samples_sphere = 64;
@@ -91,11 +91,11 @@ for experiment=1:numberOfExperiments
         registerLandmark(landmarkCoordinates, reference_point, reference_vector, landmarkCharacteristic);
     
     registered_sphere = ...
-        transformCoordinates(sphereCoordinates, [0 0 0]', transformaton_registration^-1, [0 0 0]');
+        transformCoordinates(sphereCoordinates, [0 0 0]', transformation_registration^-1, [0 0 0]');
     
     % visualize projection on unit sphere
-    visualizeProjectedLandmark(sphereCoordinates, landmarkOnSphere);
-    visualizeProjectedLandmark(registered_sphere, landmarkOnSphere);
+    %visualizeProjectedLandmark(sphereCoordinates, landmarkOnSphere);
+    %visualizeProjectedLandmark(registered_sphere, landmarkOnSphere);
     
     % klappt noch nicht
     [registeredData.GFP, ~] = ...

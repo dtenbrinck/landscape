@@ -23,7 +23,10 @@ output = struct;
 %% Segmentation:
 
 % Estimate surface of embryo by fitting an ellipsoid
-[center, radii, axes] = estimateEmbryoSurface(data.Dapi, resolution);
+ellipsoid = estimateEmbryoSurface(data.Dapi, resolution);
+center = ellipsoid.center;
+radii = ellipsoid.radii;
+axes = ellipsoid.axes;
 
 % Segment landmark in GFP channel
 disp('Segmenting GFP...');

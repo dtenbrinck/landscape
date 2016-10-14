@@ -3,9 +3,10 @@ function transformation = registerLandmark( landmarkCoordinates, reference_point
 %   Detailed explanation goes here
 
 % Compute regression
-[pstar,vstar] = computeRegression(landmarkCoordinates','false');
+[pstar,vstar] = computeRegression_new(landmarkCoordinates','false');
 
 %%%%% DEBUG TUT NOCH NICHT!
+figure,
 scatter3(landmarkCoordinates(:,1),...
     landmarkCoordinates(:,2),...
     landmarkCoordinates(:,3))
@@ -16,22 +17,20 @@ T = 0:0.01:2*pi;
 G = geodesicFun(pstar,vstar);
 rL = G(T);
 plot3(rL(1,:),rL(2,:),rL(3,:),'r')
+xlim([-1,1]);
+ylim([-1,1]);
+zlim([-1,1]);
 %%%%%
 
 % Tilt refpstar onto the specified position
-[refpstar,refvstar] = getCharPos(reference_point,reference_vector,landmarkCoordinates',landmarkCharacteristic);
+[pstar,vstar] = getCharPos(pstar,vstar,landmarkCoordinates',landmarkCharacteristic);
 
 % Rotationmatrix: Rotate the great circle s.t. pstar is on refpstar
 [Rp,Rv,pstar_r,vstar_r,vAngle]...
-    = rotateGreatCircle(pstar,vstar,refpstar,refvstar);
+    = rotateGreatCircle(pstar,vstar,reference_point,reference_vector);
 
 % Rotationmatrix: Rotates the regression line onto the reference line
-Ra = rotAboutAxis(vAngle,refpstar);
-
-% Rotate data set and cell coordinates
-%regData_r = Ra*Rp*regData;
-%handles.SegData.(fieldname).centCoords ...
-%    = Ra*Rp*handles.SegData.(fieldname).centCoords;
+Ra = rotAboutAxis(vAngle,reference_point);
 
 transformation = Ra * Rp;
 

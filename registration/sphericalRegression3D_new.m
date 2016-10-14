@@ -1,4 +1,4 @@
-function [pstar, vstar] = sphericalRegression3D(data, p0, v0, options, visualize)
+function [pstar, vstar, Tstar] = sphericalRegression3D_new(data, p0, v0, options, visualize)
 %SPHERICALREGRESSION3D   This function computes a spherical regression on
 %the 3D unit sphere.
 %% INPUT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -18,6 +18,7 @@ function [pstar, vstar] = sphericalRegression3D(data, p0, v0, options, visualize
 %
 % pstar:        3D optimal startin point of the regression.
 % vstar:        Optimal tangential direction vector at pstar.
+% Tstar:        Optimal function values for the great circle.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% INITIALIZATION %%
@@ -37,17 +38,21 @@ if nargin < 5
 end
 
 %% MAIN CODE %%
-pv0 = [p0;v0];
-F = geoRegObjFun(data);
+T = 0:1/(size(data,2)-1):1;
+G = geodesicFun(p0,v0);
+rL = G(T);
+F = geoRegObjFun_new2(data);
 %F = specialGeoRegObjFun(data);
-nonlcon = @nonlconSR;
-
+nonlcon = @nonlconSR_new2;
+pvT = [p0;v0;T'];
 % Compute pvstar with fmincon
-pvstar = fmincon(F,pv0,[],[],[],[],[],[],nonlcon,options);
+pvT2 = fmincon(F,pvT,[],[],[],[],[],[],nonlcon,options);
+pstar = pvT2(1:3);
+vstar = pvT2(4:6);
+Tstar = pvT2(7:end)';
+G2 = geodesicFun(pstar,vstar);
+rL2 = G2(Tstar);
 
-pstar = pvstar(1:3);
-vstar = pvstar(4:6);
-vstar = vstar/norm(vstar);
 % Visualize
 
 if strcmp(visualize,'true')
