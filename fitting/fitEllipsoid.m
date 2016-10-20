@@ -1,4 +1,4 @@
-function [center radii axes v] = fitEllipsoid( sharp_areas, resolution )
+function [center, radii, axes, v] = fitEllipsoid( sharp_areas, resolution )
 %FITELLIPSOID Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -10,23 +10,15 @@ threshold = kittler_thresholding(sharp_areas);
 
 % determine sharp points
 sharp_points = find(sharp_areas > threshold);
-nucleii = sharp_areas > threshold;
 
 % convert indices to coordinates
- [Y, X, Z] = ind2sub(size(sharp_areas),sharp_points);
-
-% Q = [X.^2 Y.^2 Z.^2 X.*Y Y.* X.*Z X Y Z];
-% R= [ones(size(sharp_points))];
-% %b=[A;B;C;D;E;F;G;H;I];
-%
-% b = Q \ R;
-
+[Y, X, Z] = ind2sub(size(sharp_areas),sharp_points);
 Y = Y * resolution(1);
 X = X * resolution(2);
 Z = Z * resolution(3);
 
 % fit ellipsoid to sharp points in areas in focus
-[ center, radii, axes, v, chi2 ] = ellipsoid_fit( [ X Y Z ], '' );
+[ center, radii, axes, v, ~] = ellipsoid_fit( [ X Y Z ], '' );
 
 %v = v*2;
 
@@ -83,17 +75,6 @@ if visualize
     %pause;
   end
 end
-
-%%% DOESN'T WORK YET
-% % guess initial center
-% initialCenter = center;
-% initialA = eye(3);
-% initialA(1) = initialCenter(1);
-% initialA(5) = initialCenter(2);
-% initialA(9) = initialCenter(3);
-%
-% % fit best ellipsoid using Gauss-Newton approach
-% [center A] = gaussNewtonEllipsoid(cat(1,y',x',z'), initialCenter, initialA);
 
 end
 

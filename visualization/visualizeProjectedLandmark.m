@@ -7,6 +7,8 @@ size_markers(landmarkOnSphere == 1) = 100;
 size_markers(landmarkOnSphere == 0) = 5;
 
 figure; scatter3(sphereCoordinates(:,1),sphereCoordinates(:,2),sphereCoordinates(:,3), size_markers, -1*landmarkOnSphere(:),'*');
+%view(2);
+view(0,-90);
 drawnow;
 
 end

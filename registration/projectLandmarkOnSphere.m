@@ -33,24 +33,25 @@ mind = [0 0 0]; maxd = size(landmark) .* resolution;
 fprintf('Projection onto the unit sphere...');
 
 landmarkOnSphere = zeros(size(alpha));
+ellipsoid_tmp = ellipsoid;
 
 % Transform unit sphere...
-rotation_matrix = ellipsoid.axes';
 
-for tolerance = 0.90:0.01:1.1
+for tolerance = 0.9:0.01:1.1
     
-    scale_matrix = diag(1./ellipsoid.radii) * tolerance;
+    ellipsoid_tmp.radii = ellipsoid.radii * tolerance;
     
-    transformation_matrix = rotation_matrix * scale_matrix;
+    transformationMatrix = computeTransformationMatrix(ellipsoid_tmp);
+    
     %[Xs_t,Ys_t,Zs_t] ...
        %= transformUnitSphere3D(Xs,Ys,Zs,transformation_matrix,ellipsoid.center);
     transformedCoordinates = ...
-        transformCoordinates(sphereCoordinates, [0; 0; 0], transformation_matrix^-1, ellipsoid.center);
+        transformCoordinates(sphereCoordinates, [0; 0; 0], transformationMatrix, ellipsoid.center);
     
     % reshape coordinates to parameter space size
-    X_sphere_transformed = reshape(transformedCoordinates(:,1), size(alpha));
-    Y_sphere_transformed = reshape(transformedCoordinates(:,2), size(alpha));
-    Z_sphere_transformed = reshape(transformedCoordinates(:,3), size(alpha));
+    X_sphere_transformed = reshape(transformedCoordinates(1,:), size(alpha));
+    Y_sphere_transformed = reshape(transformedCoordinates(2,:), size(alpha));
+    Z_sphere_transformed = reshape(transformedCoordinates(3,:), size(alpha));
     
     % Project segmented landmark onto unit sphere...
     tmp ...

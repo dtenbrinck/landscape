@@ -3,7 +3,7 @@ function [ transformation ] = computeTransformationMatrix( ellipsoid )
 %   Detailed explanation goes here
 
 % compute transformation to transform ellisoid to unit sphere
-transformation = diag(1 ./ ellipsoid.radii(:)) * ellipsoid.axes;
+transformation = diag(ellipsoid.radii(:)) * ellipsoid.axes;
 
 end
 

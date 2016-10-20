@@ -1,4 +1,4 @@
-function [transformedData, transformedResolution] = transformVoxelData(processedData, resolution, transformationMatrix, ellipsoid_center, samples)
+function [transformedData, transformedResolution] = transformVoxelData(processedData, resolution, transformationMatrix, ellipsoid_center, samples, interpolationMethod)
 %TRANSFORMVOXELDATA Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -21,16 +21,16 @@ tolerance = 0.2;
  warpedCoordinates = [X_cube(:), Y_cube(:), Z_cube(:)];
   
  % apply inverse of transformation matrix to unit cube coordinates
- warpedCoordinates = warpedCoordinates * transformationMatrix^-1;
+ warpedCoordinates = transformationMatrix * warpedCoordinates';
  
  % translate transformed unit cube coordinates to center of ellipsoid
- warpedCoordinates = warpedCoordinates + repmat(ellipsoid_center', numel(X_cube(:)), 1);
+ warpedCoordinates = warpedCoordinates + repmat(ellipsoid_center, 1, numel(X_cube(:)));
  
  % transform data
  transformedData = interp3(X, Y, Z, processedData, ...
-     reshape(warpedCoordinates(:,1), size(X_cube)), ...
-     reshape(warpedCoordinates(:,2), size(Y_cube)), ...
-     reshape(warpedCoordinates(:,3), size(Z_cube)), 'nearest');
+     reshape(warpedCoordinates(1,:), size(X_cube)), ...
+     reshape(warpedCoordinates(2,:), size(Y_cube)), ...
+     reshape(warpedCoordinates(3,:), size(Z_cube)), interpolationMethod);
  transformedData(isnan(transformedData)) = 0;
            
  % calculate new resolution

@@ -2,9 +2,14 @@ function transformedCoordinates = transformCoordinates(originalCoordinates, orig
 %TRANSFORMCOORDINATES Summary of this function goes here
 %   Detailed explanation goes here
 
-transformedCoordinates =  (originalCoordinates - repmat(originalCenter',size(originalCoordinates,1),1)) ...
-                         * transformationMatrix ...
-                         + repmat(newCenter',size(originalCoordinates,1),1);
+% translate coordinates to center
+transformedCoordinates =  (originalCoordinates - repmat(originalCenter',size(originalCoordinates,1),1))';
+
+% scale coordinates
+transformedCoordinates = transformationMatrix * transformedCoordinates;
+                
+% translate to target center point
+transformedCoordinates = transformedCoordinates + repmat(newCenter,1,size(originalCoordinates,1));
 
 end
 

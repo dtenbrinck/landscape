@@ -57,7 +57,7 @@ if strcmp(type,'tail')
 elseif strcmp(type,'head')
     charInd = min(ind);
 elseif strcmp(type,'middle')
-    charInd = (min(ind)+(max(ind)-min(ind))/2);
+    charInd = (min(ind)+(max(ind)-min(ind))*0.40);  % CHANGED! 0.45 is good!
 end
 
 % -- Rearrange back to the original interval
