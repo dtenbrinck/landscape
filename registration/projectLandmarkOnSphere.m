@@ -30,7 +30,7 @@ mind = [0 0 0]; maxd = size(landmark) .* resolution;
 
 
 % Projection: %
-fprintf('Projection onto the unit sphere...');
+%fprintf('Projection onto the unit sphere...');
 
 landmarkOnSphere = zeros(size(alpha));
 ellipsoid_tmp = ellipsoid;
@@ -75,7 +75,7 @@ landmarkCoordinates = [sphereCoordinates(landmark_indices,1), sphereCoordinates(
 % Delete all multiple points
 %regData = unique(output.regData','rows')';
 
-fprintf('Done!\n');
+%fprintf('Done!\n');
 
 
 end

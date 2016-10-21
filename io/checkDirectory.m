@@ -16,6 +16,11 @@ if ~exist([path '/rejected'],'dir')
     mkdir(path, 'rejected');
 end
 
+% create subdir for buggy data
+if ~exist([path '/bug'],'dir')
+    mkdir(path, 'bug');
+end
+
 
 end
 
