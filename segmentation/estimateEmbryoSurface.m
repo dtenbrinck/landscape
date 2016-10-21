@@ -28,6 +28,15 @@ Z = Z * resolution(3);
 % fit ellipsoid to sharp points in areas in focus
 [ ellipsoid.center, ellipsoid.radii, ellipsoid.axes, ellipsoid.v, ~] = ellipsoid_fit( [ X Y Z ], '' );
 
+
+% check axes orientation and flip if necessary
+orientation = diag(ellipsoid.axes);
+for i=1:3
+    if orientation(i) < 0
+        ellipsoid.axes(:,i) = -ellipsoid.axes(:,i);
+    end
+end
+
 % % show nuclei
 % figure; scatter3(nucleiCoordinates(:,1), nucleiCoordinates(:,2), nucleiCoordinates(:,3));
 % 

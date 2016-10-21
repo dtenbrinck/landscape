@@ -16,7 +16,7 @@ landmarkCharacteristic = 'middle';
 reference_point = [0; 0; -1];
 reference_vector = [1; 0; 0];
 
-debug = 0;
+debug = 1;
 visualization = 1;
 
 %% LOAD DATA
@@ -36,7 +36,7 @@ resolution(1:2) = resolution(1:2) / scale;
 %% MAIN LOOP
 
 % process all existing data sequentially
-for experiment=3%1:numberOfExperiments
+for experiment=2%1:numberOfExperiments
     
     % get data of current experiment
     experimentData = loadExperimentData(allValidExperiments(experiment,:), dataPath);

@@ -37,7 +37,7 @@ ellipsoid_tmp = ellipsoid;
 
 % Transform unit sphere...
 
-for tolerance = 0.9:0.01:1.1
+for tolerance = 0.8:0.01:1.2
     
     ellipsoid_tmp.radii = ellipsoid.radii * tolerance;
     
