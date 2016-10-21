@@ -9,5 +9,7 @@ function [ registeredData ] = registerData( processedData, resolution, registrat
 [registeredData.landmark, ~] = transformVoxelData(processedData.landmark, resolution, registrationMatrix, ellipsoid.center, samples_cube, 'nearest');
 [registeredData.cells, ~] = transformVoxelData(processedData.cells, resolution, registrationMatrix, ellipsoid.center, samples_cube, 'nearest');
 
+% register cell coordinates accordingly
+registeredData.cellCoordinates = transformCoordinates(processedData.cellCoordinates', ellipsoid.center, registrationMatrix^-1, [0; 0; 0]);
 end
 

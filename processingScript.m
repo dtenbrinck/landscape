@@ -10,7 +10,7 @@ addpath(genpath(pwd));
 dataPath = './data/tilting_adjustments_first_priority';
 resultsPath = './results/tilting_adjustments_first_priority'; % DONT APPEND '/' TO DIRECTORY NAME!!!
 resolution = [1.29, 1.29, 20];
-scale = 0.55;
+scale = 0.5;
 samples_sphere = 128;
 samples_cube = 256;
 landmarkCharacteristic = 'middle';
@@ -18,7 +18,7 @@ reference_point = [0; 0; -1];
 reference_vector = [1; 0; 0];
 
 % some output variables
-debug_level = 0;
+debug_level = 1;
 visualization = 0;
 
 %% PREPARE RESULTS DIRECTORY
@@ -69,7 +69,7 @@ for experiment=1:numberOfExperiments
         headOrientation = determineHeadOrientation(computeMIP(processedData.landmark));
         if strcmp(headOrientation, 'right')
             if debug_level >= 1; disp('Rotating data...'); end
-            processedData = flipOrientation(processedData); %TODO: Rotate cell coordinates
+            processedData = flipOrientation(processedData);
         end
         
         % estimate embryo surface by fitting an ellipsoid
@@ -111,6 +111,7 @@ for experiment=1:numberOfExperiments
         transformation_registration = transformationMatrix * rotationMatrix';
         
         % register data
+        if debug_level >= 1; disp('Registering data...'); end
         registeredData = registerData( processedData, resolution, transformation_registration, ellipsoid, samples_cube);
         
         % visualize results if needed

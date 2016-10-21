@@ -12,10 +12,10 @@ flippedData.mCherry = rot90(data.mCherry,2);
 flippedData.landmark = rot90(data.landmark,2);
 flippedData.cells = rot90(data.cells,2);
 
-% Flip cell coordinates % TODO!!!
+% Flip cell coordinates
 flippedData.cellCoordinates = data.cellCoordinates;
-%output.centCoords(1,:) = -output.centCoords(1,:);
-%output.centCoords(2,:) = -output.centCoords(2,:);
+flippedData.cellCoordinates(:,1) = -data.cellCoordinates(:,1);
+flippedData.cellCoordinates(:,2) = -data.cellCoordinates(:,2);
 
 end
 
