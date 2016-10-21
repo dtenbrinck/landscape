@@ -2,12 +2,13 @@
 clear; clc; close all;
 
 % add current folder and subfolders to path variable
-addpath(genpath('./..'));
+addpath(genpath(pwd));
 
 %% SET PARAMETERS
 
 %dataPath = 'E:\Embryo_Registration\data\SargonYigit\Image Registration\10hpf_data\tilting_adjustments_first_priority';
-dataPath = './../data/tilting_adjustments_first_priority';
+dataPath = './data/tilting_adjustments_first_priority';
+resultsPath = './results/tilting_adjustments_first_priority'; % DONT APPEND '/' TO DIRECTORY NAME!!!
 resolution = [1.29, 1.29, 20];
 scale = 0.5;
 samples_sphere = 96;
@@ -18,6 +19,9 @@ reference_vector = [1; 0; 0];
 
 debug = 1;
 visualization = 1;
+
+%% PREPARE RESULTS DIRECTORY
+checkDirectory(resultsPath);
 
 %% LOAD DATA
 
@@ -36,7 +40,7 @@ resolution(1:2) = resolution(1:2) / scale;
 %% MAIN LOOP
 
 % process all existing data sequentially
-for experiment=2%1:numberOfExperiments
+for experiment=1%1:numberOfExperiments
     
     % get data of current experiment
     experimentData = loadExperimentData(allValidExperiments(experiment,:), dataPath);
@@ -104,4 +108,10 @@ for experiment=2%1:numberOfExperiments
     if visualization == 1
         visualizeResults(experimentData, processedData, registeredData);
     end
+    
+    % create filename to save results
+    results_filename = [resultsPath '/' experimentData.filename '_results.mat'];
+    
+    % save results
+    save(results_filename, 'experimentData', 'processedData', 'registeredData');
 end
