@@ -50,11 +50,22 @@ pvT2 = fmincon(F,pvT,[],[],[],[],[],[],nonlcon,options);
 pstar = pvT2(1:3);
 vstar = pvT2(4:6);
 Tstar = pvT2(7:end)';
-G2 = geodesicFun(pstar,vstar);
-rL2 = G2(Tstar);
+
+% vstar must look in the same direction as v0!
+[vstar,Tstar] = evaluateDirection(pstar,vstar,Tstar,v0);
+
+% Tstar should be in the interval from [0,2*pi]
+factor = ceil(max(Tstar(:))/(2*pi));
+for i=1:factor
+    Tstar(Tstar>2*pi) = Tstar(Tstar>2*pi)-2*pi;
+end
+factor = abs(floor(min(Tstar(:))/(2*pi)));
+for i=1:factor
+    Tstar(Tstar<0) = Tstar(Tstar<0)+2*pi;
+end
+Tstar = sort(Tstar);
 
 % Visualize
-
 if strcmp(visualize,'true')
     T = 0:0.01:2*pi;
     G = geodesicFun(pstar,vstar);
