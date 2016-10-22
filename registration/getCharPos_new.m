@@ -1,4 +1,4 @@
-function [pnew,vnew,regLine] = getCharPos(p,v,regData,type)
+function [pnew,vnew] = getCharPos_new(p,v,Tstar,type)
 %GETCHARPOS: This function will give you the position of the characteristic
 %depanding on the input type. It can give you the head, tail, weight and
 %middle (between head and tail) position. It will also compute the new
@@ -19,54 +19,49 @@ function [pnew,vnew,regLine] = getCharPos(p,v,regData,type)
 % regLine:  The new regression line corresponding to the new p and v.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%% PARAMETER
+weightingRatio = 0.45; % For 0.5 it will pick the midpoint on the line, 
+                        % For <0.5 it will pick a point nearer to the tail
+                        % For >0.5 it will pick a point nearer to the head
+                        % 0.45 is a good ratio
+
 %% MAIN CODE %%
 
-% -- Compute original regression line -- %
-T = 0:0.01:2*pi;
+% -- Compute points on regressionline for Tstar -- %
 G = geodesicFun(p,v);
+rL = G(Tstar);
+
+% -- Compute the angles between the neighbours -- %
+angles = acos(dot(rL,circshift(rL,1,2)));
+
+% Get the neighbours with the greatest angle between them
+[~,indi] = max(angles(:));
+
+% Compute new G for the point p=rL(:,indi);
+% Map pstar onto refpstar
+b = cross(p,rL(:,indi));
+s = norm(b);
+c = p'*rL(:,indi);
+V = [0,-b(3),b(2);b(3),0,-b(1);-b(2),b(1),0];
+% 
+Rp_indi = eye(3)+V+V*V*(1-c)/s^2;
+v_indi = Rp_indi*v;
+
+% New regressionline from rL(:,indi) with equidistant points
+G = geodesicFun(rL(:,indi),v_indi);
+ending = 2*pi-Tstar(indi)+Tstar(indi-1);
+T = 0:ending/(size(Tstar,2)-1):ending;
 rL = G(T);
 
-%-- Compute the nearest points on the regression line -- %
-ind = ones(1,size(regData,2));
-
-% Compute the smallest difference of each regData point to the
-% regressionLine. ind is the position on the regression line.
-for i=1:size(regData,2)
-    diffSum = ...
-      abs(rL(1,:)-ones(1,size(rL,2))*regData(1,i))...
-    + abs(rL(2,:)-ones(1,size(rL,2))*regData(2,i))...
-    + abs(rL(3,:)-ones(1,size(rL,2))*regData(3,i));
-    [~,ind(i)] = min(diffSum);
-    
-end
-
-% -- Rearrange the indices into the interval -314:314 -- %
-ind(ind>629/2) = ind(ind>629/2)-629;
-
-% -- Find the weight of the indices -- %
-indweight = sum(ind)/size(ind,2);
-
-% -- Rearrange the indices -- %
-ind = ind-indweight;
-ind(ind<-629/2) = ind(ind<-629/2)+629;
-
-% -- Get the characteristic point depending on the selected type -- %
-charInd = 0;    %This is a trick so we don't need the if for type 'weight'.
+% -- Compute coordinates of the new p -- %
 if strcmp(type,'tail')
-    charInd = max(ind);
+    pnew = rL(:,1);
 elseif strcmp(type,'head')
-    charInd = min(ind);
+    pnew = rL(:,size(Tstar,2));
 elseif strcmp(type,'middle')
-    charInd = (min(ind)+(max(ind)-min(ind))*0.5);  % CHANGED! 0.45 is good!
+    t = T(round(size(Tstar,2)*weightingRatio));
+    pnew = G(t);
 end
-
-% -- Rearrange back to the original interval
-charInd = charInd+indweight;
-charInd(charInd<0) = charInd(charInd<0)+629;
-charInd = round(charInd);
-
-% -- Compute the coordinates of the new p -- %
-pnew = rL(:,charInd);
 
 if sum(pnew==p)/3
     Rp = eye(3);
@@ -82,9 +77,5 @@ else
 end
 % Rotate v
 vnew = Rp*v;
-
-% -- Compute the new regression line for pnew and vnew - %
-G = geodesicFun(pnew,vnew);
-regLine = G(T);
 end
 
