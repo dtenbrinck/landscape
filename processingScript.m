@@ -10,7 +10,7 @@ addpath(genpath(pwd));
 dataPath = './data/tilting_adjustments_first_priority';
 resultsPath = './results/tilting_adjustments_first_priority'; % DONT APPEND '/' TO DIRECTORY NAME!!!
 resolution = [1.29, 1.29, 20];
-scale = 0.5;
+scale = 0.75;
 samples_sphere = 128;
 samples_cube = 256;
 landmarkCharacteristic = 'middle';
@@ -18,8 +18,8 @@ reference_point = [0; 0; -1];
 reference_vector = [1; 0; 0];
 
 % some output variables
-debug_level = 1;
-visualization = 0;
+debug_level = 0;
+visualization = 1;
 
 %% PREPARE RESULTS DIRECTORY
 checkDirectory(resultsPath);
@@ -92,7 +92,7 @@ for experiment=1:numberOfExperiments
             projectLandmarkOnSphere(processedData.landmark, resolution, ellipsoid, samples_sphere);
         
         % estimate optimal rotation to register data to reference point with reference orientation
-        if debug_level >= 1; disp('Estimating transformation from projected landmark...'); end
+        if debug_level >= 1; disp('Estimating transformation from projected landmark...'); end        
         rotationMatrix = ...
             registerLandmark(landmarkCoordinates, reference_point, reference_vector, landmarkCharacteristic);
         

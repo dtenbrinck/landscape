@@ -6,7 +6,6 @@ function [G] = geodesicFun(p,v)
 %% OUTPUT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   F:      The geodesic regression objective function
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-G = @(t) p*cos(t.*norm(v))+v/norm(v)*sin(t.*norm(v));
+G = @(t) p*cos(t.*norm(v))+v./norm(v)*sin(t.*norm(v));
 
 end
-

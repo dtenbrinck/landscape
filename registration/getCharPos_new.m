@@ -20,7 +20,7 @@ function [pnew,vnew] = getCharPos_new(p,v,Tstar,type)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% PARAMETER
-weightingRatio = 0.45; % For 0.5 it will pick the midpoint on the line, 
+weightingRatio = 0.5; % For 0.5 it will pick the midpoint on the line, 
                         % For <0.5 it will pick a point nearer to the tail
                         % For >0.5 it will pick a point nearer to the head
                         % 0.45 is a good ratio
@@ -32,7 +32,7 @@ G = geodesicFun(p,v);
 rL = G(Tstar);
 
 % -- Compute the angles between the neighbours -- %
-angles = acos(dot(rL,circshift(rL,1,2)));
+angles = real(acos(dot(rL,circshift(rL,1,2))));
 
 % Get the neighbours with the greatest angle between them
 [~,indi] = max(angles(:));
