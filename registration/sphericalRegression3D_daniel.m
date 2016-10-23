@@ -57,7 +57,7 @@ vstar = pvT2(4:6);
 %Tstar = pvT2(7:end)';
 
 % visualization for debugging
-visualizeRegression(data', pstar, vstar, p0, v0);
+%visualizeRegression(data', pstar, vstar, p0, v0);
 
 % vstar must look in the same direction as v0!
 %[vstar,Tstar] = evaluateDirection(pstar,vstar,Tstar,v0);

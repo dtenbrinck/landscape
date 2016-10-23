@@ -12,7 +12,7 @@ pstar = pstar/norm(pstar);
 vstar = vstar/norm(vstar);
 
 % visualization for debugging
-visualizeRegression( landmarkCoordinates, pstar, vstar, reference_point, reference_vector ) 
+%visualizeRegression( landmarkCoordinates, pstar, vstar, reference_point, reference_vector ) 
 
 % Rotationmatrix: Rotate the great circle s.t. pstar is on refpstar
 [Rp,~,~,~,vAngle]...
@@ -23,9 +23,9 @@ Ra = rotAboutAxis(vAngle,reference_point);
 
 transformation = Ra * Rp;
 
-pstar = Rp*pstar;
-vstar = Ra*Rp*vstar;
-transformedCoordinates = transformation * landmarkCoordinates';
+%pstar = Rp*pstar;
+%vstar = Ra*Rp*vstar;
+%transformedCoordinates = transformation * landmarkCoordinates';
 
 % Compute regression
 % [pstar2,vstar2,Tstar2] = computeRegression_new(transformed_Coordinates,'false');
@@ -34,7 +34,7 @@ transformedCoordinates = transformation * landmarkCoordinates';
 % [pstar2,vstar2] = getCharPos_new(pstar2,vstar2,Tstar2,transformed_Coordinates',landmarkCharacteristic);
 
 % visualization for debugging
-visualizeRegression( transformedCoordinates, pstar, vstar, reference_point, reference_vector )
+%visualizeRegression( transformedCoordinates, pstar, vstar, reference_point, reference_vector )
 
 end
 
