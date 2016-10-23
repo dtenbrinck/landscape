@@ -6,10 +6,10 @@ addpath(genpath('./..'));
 
 %% SET PARAMETERS
 
-% dataPath = 'E:\Embryo_Registration\data\SargonYigit\Image Registration\10hpf_data\tilting_adjustments_first_priority';
-dataPath = './../data/tilting_adjustments_first_priority';
+dataPath = 'E:\Embryo_Registration\data\SargonYigit\Image Registration\10hpf_data\tilting_adjustments_first_priority';
+% dataPath = './../data/tilting_adjustments_first_priority';
 resolution = [1.29, 1.29, 20];
-scale = 0.5;
+scale = 0.35;
 samples_sphere = 96;
 samples_cube = 256;
 landmarkCharacteristic = 'middle';
@@ -36,7 +36,7 @@ resolution(1:2) = resolution(1:2) / scale;
 %% MAIN LOOP
 
 % process all existing data sequentially
-for experiment=1:numberOfExperiments
+for experiment=1%1:numberOfExperiments
     
     % get data of current experiment
     experimentData = loadExperimentData(allValidExperiments(experiment,:), dataPath);

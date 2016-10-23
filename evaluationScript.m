@@ -1,5 +1,5 @@
 %% INITIALIZATION
-clear; clc; close all;
+clear all; clc; close all;
 
 %% SET PATH
 resultsPath = './results/tilting_adjustments_first_priority'; % DONT APPEND '/' TO DIRECTORY NAME!!!
@@ -59,3 +59,4 @@ end
 %% USER OUTPUT
 disp('All results in folder processed!');
 close all;
+clear all;

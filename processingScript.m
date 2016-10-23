@@ -6,8 +6,8 @@ addpath(genpath(pwd));
 
 %% SET PARAMETERS
 
-%dataPath = 'E:\Embryo_Registration\data\SargonYigit\Image Registration\10hpf_data\tilting_adjustments_first_priority';
-dataPath = './data/tilting_adjustments_first_priority';
+dataPath = 'E:\Embryo_Registration\data\SargonYigit\Image Registration\10hpf_data\tilting_adjustments_first_priority';
+% dataPath = './data/tilting_adjustments_first_priority';
 resultsPath = './results/tilting_adjustments_first_priority'; % DONT APPEND '/' TO DIRECTORY NAME!!!
 resolution = [1.29, 1.29, 20];
 scale = 0.75;
@@ -144,3 +144,4 @@ end
 fprintf('\n');
 disp('All data sets in folder processed!');
 close all;
+clear all;

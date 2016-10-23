@@ -10,6 +10,12 @@ function [ registeredData ] = registerData( processedData, resolution, registrat
 [registeredData.cells, ~] = transformVoxelData(processedData.cells, resolution, registrationMatrix, ellipsoid.center, samples_cube, 'nearest');
 
 % register cell coordinates accordingly
+processedData.cellCoordinates(1,:) = processedData.cellCoordinates(1,:)*resolution(2);
+processedData.cellCoordinates(2,:) = processedData.cellCoordinates(2,:)*resolution(1);
+processedData.cellCoordinates(3,:) = processedData.cellCoordinates(3,:)*resolution(3);
 registeredData.cellCoordinates = transformCoordinates(processedData.cellCoordinates', ellipsoid.center, registrationMatrix^-1, [0; 0; 0]);
+registeredData.cellCoordinates(1,:) = registeredData.cellCoordinates(1,:)/resolution(2);
+registeredData.cellCoordinates(2,:) = registeredData.cellCoordinates(2,:)/resolution(1);
+registeredData.cellCoordinates(3,:) = registeredData.cellCoordinates(3,:)/resolution(3);
 end
 
