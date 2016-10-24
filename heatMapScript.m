@@ -3,6 +3,11 @@ clear; clc; close all;
 
 %% PARAMETER 
 tole = 0.1;
+% Size of the cells
+sizeCells = 20; %um
+% Size of the Pixel
+sizeOfPixel = 0.29; %um
+sizeCellsPixel = round(sizeCells/sizeOfPixel);
 %% SET PATH
 resultsPath = './results/tilting_adjustments_first_priority/accepted'; % DONT APPEND '/' TO DIRECTORY NAME!!!
 
@@ -31,6 +36,19 @@ load(fileNames{1,1});
 % initialize accumulator
 accumulator = zeros(size(registeredData.GFP));
 
+% original data size (in mu)
+origSize = size(processedData.Dapi);
+% accumulator size
+accSize = size(registeredData.GFP);
+% compute the cell size in sampled space 
+cellFilter = fspecial('disk',floor(sizeCellsPixel/2))>0;
+sizeCellFilter = size(cellFilter);
+% transform into the correct space. From original to sampled.
+cellFilter = imresize(...
+    cellFilter,[size(cellFilter,1)*accSize(1)/origSize(1),...
+    size(cellFilter,2)*accSize(2)/origSize(2)]);
+cellFilter = padarray(cellFilter,[floor((sizeCellFilter(1)-size(cellFilter,1))/2),...
+    floor((sizeCellFilter(2)-size(cellFilter,2))/2)]);
 %% MAIN ACCUMULATOR LOOP
 for result = 1:numberOfResults
     
@@ -57,6 +75,9 @@ for result = 1:numberOfResults
     
     accumulator = accumulator + indicator;
 end
+
+% -- Convolve over the points -- %
+
 
 %% VISUALIZATION
 f1 = figure('Name','Heatmaps','units','normalized','outerposition',[0.25 0.25 0.5 0.5]);
@@ -85,4 +106,4 @@ results_filename = [resultsPath '/HeatmapAcculmulator.mat'];
 save(results_filename, 'accumulator');
 
 %% USER OUTPUT
-disp('All results in folder processed!');´
+disp('All results in folder processed!');ï¿½

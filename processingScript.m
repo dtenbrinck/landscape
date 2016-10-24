@@ -6,7 +6,7 @@ addpath(genpath(pwd));
 
 %% SET PARAMETERS
 
-dataPath = 'E:\Embryo_Registration\data\SargonYigit\Image Registration\10hpf_data\tilting_adjustments_first_priority';
+dataPath = '/home/f_gaed01/Projects/EmbryoProject/data/tilting_adjustments_first_priority';
 % dataPath = './data/tilting_adjustments_first_priority';
 resultsPath = './results/tilting_adjustments_first_priority'; % DONT APPEND '/' TO DIRECTORY NAME!!!
 resolution = [1.29, 1.29, 20];
@@ -45,7 +45,7 @@ fprintf(['Processing dataset: (0,' num2str(numberOfExperiments) ')']);
 % process all existing data sequentially
 for experiment=1:numberOfExperiments
     
-    % show current experiment number
+    % show remotecurrent experiment number
     dispCounter(experiment, numberOfExperiments);
     
     try
