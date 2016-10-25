@@ -6,9 +6,10 @@ addpath(genpath(pwd));
 
 %% SET PARAMETERS
 
-dataPath = '/home/f_gaed01/Projects/EmbryoProject/data/tilting_adjustments_first_priority';
+% dataPath = '/home/f_gaed01/Projects/EmbryoProject/data/tilting_adjustments_first_priority';
+dataPath = 'E:\Embryo_Registration\data\Small';
 % dataPath = './data/tilting_adjustments_first_priority';
-resultsPath = './results/tilting_adjustments_first_priority'; % DONT APPEND '/' TO DIRECTORY NAME!!!
+resultsPath = './results/Small'; % DONT APPEND '/' TO DIRECTORY NAME!!!
 resolution = [1.29, 1.29, 20];
 scale = 0.75;
 samples_sphere = 128;

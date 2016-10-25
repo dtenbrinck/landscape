@@ -40,15 +40,7 @@ accumulator = zeros(size(registeredData.GFP));
 origSize = size(processedData.Dapi);
 % accumulator size
 accSize = size(registeredData.GFP);
-% compute the cell size in sampled space 
-cellFilter = fspecial('disk',floor(sizeCellsPixel/2))>0;
-sizeCellFilter = size(cellFilter);
-% transform into the correct space. From original to sampled.
-cellFilter = imresize(...
-    cellFilter,[size(cellFilter,1)*accSize(1)/origSize(1),...
-    size(cellFilter,2)*accSize(2)/origSize(2)]);
-cellFilter = padarray(cellFilter,[floor((sizeCellFilter(1)-size(cellFilter,1))/2),...
-    floor((sizeCellFilter(2)-size(cellFilter,2))/2)]);
+
 %% MAIN ACCUMULATOR LOOP
 for result = 1:numberOfResults
     
@@ -106,4 +98,4 @@ results_filename = [resultsPath '/HeatmapAcculmulator.mat'];
 save(results_filename, 'accumulator');
 
 %% USER OUTPUT
-disp('All results in folder processed!');�
+disp('All results in folder processed!');
