@@ -9,7 +9,7 @@ sizeCells = 20; %um
 sizeOfPixel = 0.29; %um
 sizeCellsPixel = round(sizeCells/sizeOfPixel);
 %% SET PATH
-resultsPath = './results/tilting_adjustments_first_priority/accepted'; % DONT APPEND '/' TO DIRECTORY NAME!!!
+resultsPath = './results/Small/accepted'; % DONT APPEND '/' TO DIRECTORY NAME!!!
 
 %% GET FILES TO PROCESS
 
@@ -34,12 +34,12 @@ end
 load(fileNames{1,1});
 
 % initialize accumulator
-accumulator = zeros(size(registeredData.GFP));
+accumulator = zeros(gatheredData.registered.registeredSize);
 
 % original data size (in mu)
-origSize = size(processedData.Dapi);
+origSize = gatheredData.processed.originalSize;
 % accumulator size
-accSize = size(registeredData.GFP);
+accSize = size(accumulator);
 
 %% MAIN ACCUMULATOR LOOP
 for result = 1:numberOfResults
@@ -47,18 +47,20 @@ for result = 1:numberOfResults
     % load result data
     load(fileNames{result,1})
     
+    cellCoordinates = gatheredData.registered.cellCoordinates;
+    
     % Ignore all that are out of the domain
-    registeredData.cellCoordinates(:,sum(abs(registeredData.cellCoordinates)>1)>=1) = [];
+    cellCoordinates(:,sum(abs(cellCoordinates)>1)>=1) = [];
     
     % Compute norm of each column 
-    normOfCoordinates = sqrt(sum(registeredData.cellCoordinates.^2,1));
+    normOfCoordinates = sqrt(sum(cellCoordinates.^2,1));
     
     % Ignore all coordinates outside the sphere with a tolerance tole
-    registeredData.cellCoordinates(:,normOfCoordinates > 1+tole) = [];
+    cellCoordinates(:,normOfCoordinates > 1+tole) = [];
     
     % get rounded cell centroid coordinates 
     cellCoordinates = round(...
-        (registeredData.cellCoordinates + repmat([1;1;1], 1, size(registeredData.cellCoordinates,2)))...
+        (cellCoordinates + repmat([1;1;1], 1, size(cellCoordinates,2)))...
         * size(accumulator,1) / 2 );
     
     % indicator matrix

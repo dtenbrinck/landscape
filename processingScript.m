@@ -114,17 +114,43 @@ for experiment=1:numberOfExperiments
         % register data
         if debug_level >= 1; disp('Registering data...'); end
         registeredData = registerData( processedData, resolution, transformation_registration, ellipsoid, samples_cube);
-        
-        % visualize results if needed
-        if visualization == 1
-            visualizeResults(experimentData, processedData, registeredData);
-        end
-        
+                
         % create filename to save results
         results_filename = [resultsPath '/' experimentData.filename '_results.mat'];
         
         % save results
-        save(results_filename, 'experimentData', 'processedData', 'registeredData');
+        % only save needed results
+        gatheredData = struct;
+        gatheredData.filename = experimentData.filename;
+        % important experiment data
+        gatheredData.experiment.DapiMIP = computeMIP(experimentData.Dapi);
+        gatheredData.experiment.GFPMIP = computeMIP(experimentData.GFP);
+        gatheredData.experiment.mCherryMIP = computeMIP(experimentData.mCherry);
+        
+        % important processed data
+        gatheredData.processed.DapiMIP = computeMIP(processedData.Dapi);
+        gatheredData.processed.GFPMIP = computeMIP(processedData.GFP);
+        gatheredData.processed.mCherryMIP = computeMIP(processedData.mCherry);
+        gatheredData.processed.landmarkMIP = computeMIP(processedData.landmark);
+        gatheredData.processed.cellsMIP = computeMIP(processedData.cells);
+        gatheredData.processed.cellCoordinates = processedData.cellCoordinates;
+        gatheredData.processed.originalSize = size(processedData.GFP);
+        
+        % important registered data
+        gatheredData.registered.DapiMIP = computeMIP(registeredData.Dapi);
+        gatheredData.registered.GFPMIP = computeMIP(registeredData.GFP);
+        gatheredData.registered.mCherryMIP = computeMIP(registeredData.mCherry);
+        gatheredData.registered.landmarkMIP = computeMIP(registeredData.landmark);
+        gatheredData.registered.cellsMIP = computeMIP(registeredData.cells);
+        gatheredData.registered.cellCoordinates = registeredData.cellCoordinates;
+        gatheredData.registered.registeredSize = size(registeredData.GFP);
+        % visualize results if needed
+        if visualization == 1
+            visualizeResults_new(gatheredData);
+        end
+        
+        save(results_filename,'gatheredData');
+        %save(results_filename, 'experimentData', 'processedData', 'registeredData');
         
         if debug_level >= 1; disp('Saved results successfully!'); end
         
@@ -144,5 +170,4 @@ end
 %% USER OUTPUT
 fprintf('\n');
 disp('All data sets in folder processed!');
-close all;
 clear all;

@@ -2,7 +2,7 @@
 clear all; clc; close all;
 
 %% SET PATH
-resultsPath = './results/tilting_adjustments_first_priority'; % DONT APPEND '/' TO DIRECTORY NAME!!!
+resultsPath = './results/Small'; % DONT APPEND '/' TO DIRECTORY NAME!!!
 
 %% GET FILES TO PROCESS
 
@@ -31,13 +31,14 @@ for result = 1:numberOfResults
     load(fileNames{result,1})
     
     % visualize results
-    visualizeResults(experimentData, processedData, registeredData);
+%     visualizeResults(experimentData, processedData, registeredData);
+    visualizeResults_new(gatheredData);
     
     % display user output
-    fprintf(experimentData.filename);
+    fprintf(gatheredData.filename);
     
     % ask user to decide what to do with the results
-    choice = questdlg(['What do you want to do with the results of dataset ' experimentData.filename '?'], ...
+    choice = questdlg(['What do you want to do with the results of dataset ' gatheredData.filename '?'], ...
         'Decision on results', ...
         'Accept','Reject','Accept');
     
