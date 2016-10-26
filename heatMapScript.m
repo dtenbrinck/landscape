@@ -9,20 +9,21 @@ sizeCells = 20; %um
 sizeOfPixel = 0.29; %um
 sizeCellsPixel = round(sizeCells/sizeOfPixel);
 %% SET PATH
-resultsPath = './results/Small/accepted'; % DONT APPEND '/' TO DIRECTORY NAME!!!
+resultsPath = './results/Small/'; % DONT APPEND '/' TO DIRECTORY NAME!!!
+resultsPathAccepted = [resultsPath,'/accepted'];
 
 %% GET FILES TO PROCESS
 
-% get filenames of MAT files in selected folder
-fileNames = getMATfilenames(resultsPath);
+% Get filenames of MAT files in selected folder
+fileNames = getMATfilenames(resultsPathAccepted);
 
-% get number of experiments
+% Get number of experiments
 numberOfResults = size(fileNames,1);
 
-% check if any results have been found
+% Check if any results have been found
 if numberOfResults == 0
     disp('All results already processed or path to results folder wrong?');
-    disp(resultsPath);
+    disp(resultsPathAccepted);
     return;
 else
     disp([ num2str(numberOfResults) ' results found in folder for generating heat map.']);
@@ -30,74 +31,138 @@ end
 
 %% GET DATA SIZE FOR ACCUMULATOR
 
-% load first data set
-load(fileNames{1,1});
+% Load first data set
+load([resultsPathAccepted,'/',fileNames{1,1}]);
 
-% initialize accumulator
+% Initialize accumulator
 accumulator = zeros(gatheredData.registered.registeredSize);
 
-% original data size (in mu)
+% Original data size (in mu)
 origSize = gatheredData.processed.originalSize;
-% accumulator size
+% Accumulator size
 accSize = size(accumulator);
+
+% All coordinates of cell centers
+allCellCoords = double.empty(3,0);
 
 %% MAIN ACCUMULATOR LOOP
 for result = 1:numberOfResults
     
-    % load result data
-    load(fileNames{result,1})
+    % Load result data
+    load([resultsPathAccepted,'/',fileNames{result,1}])
     
-    cellCoordinates = gatheredData.registered.cellCoordinates;
-    
-    % Ignore all that are out of the domain
-    cellCoordinates(:,sum(abs(cellCoordinates)>1)>=1) = [];
-    
-    % Compute norm of each column 
-    normOfCoordinates = sqrt(sum(cellCoordinates.^2,1));
-    
-    % Ignore all coordinates outside the sphere with a tolerance tole
-    cellCoordinates(:,normOfCoordinates > 1+tole) = [];
-    
-    % get rounded cell centroid coordinates 
-    cellCoordinates = round(...
-        (cellCoordinates + repmat([1;1;1], 1, size(cellCoordinates,2)))...
-        * size(accumulator,1) / 2 );
-    
-    % indicator matrix
-    indicator = zeros(size(accumulator));
-    indicator(sub2ind(size(accumulator),cellCoordinates(1,:),cellCoordinates(2,:),cellCoordinates(3,:))) = 1;
-    
-    accumulator = accumulator + indicator;
+    % Get all cell center coordinates
+    allCellCoords = horzcat(allCellCoords, gatheredData.registered.cellCoordinates);
+end
+
+% Ignore all that are out of the domain
+allCellCoords(:,sum(abs(allCellCoords)>1)>=1) = [];
+
+% Compute norm of each column
+normOfCoordinates = sqrt(sum(allCellCoords.^2,1));
+
+% Ignore all coordinates outside the sphere with a tolerance tole
+allCellCoords(:,normOfCoordinates > 1+tole) = [];
+normOfCoordinates(:,normOfCoordinates > 1+tole) = [];
+
+% Normalize the coordinates that are too big but in tolerance
+allCellCoords(:,(normOfCoordinates < 1+tole) == (normOfCoordinates > 1)) ...
+    = allCellCoords(:,(normOfCoordinates < 1+tole) == (normOfCoordinates > 1))...
+    ./repmat(normOfCoordinates(:,(normOfCoordinates < 1+tole) == (normOfCoordinates > 1)),[3,1]);
+
+% Get rounded cell centroid coordinates
+allCellCoords = round(...
+    (allCellCoords + repmat([1;1;1], 1, size(allCellCoords,2)))...
+    * size(accumulator,1) / 2 );
+
+% Rewrite the cell coordinates into linear indexing
+indPoints = sub2ind(gatheredData.registered.registeredSize...
+    ,allCellCoords(1,:),allCellCoords(2,:),allCellCoords(3,:));
+
+% Find out how many points are on the same gridpoint
+[uniquePoints,ai,~] = unique(indPoints,'stable');
+
+% Values give number of points on that gridpoint
+accumulator(uniquePoints) = 1;
+
+if numel(uniquePoints) < numel(indPoints);
+    indPoints(ai)=[];
+    l = numel(indPoints);
+    while l > 0
+        [uniquePoints,ai,~] = unique(indPoints,'stable');
+        accumulator(uniquePoints) = accumulator(uniquePoints)+1;
+        indPoints(ai) = [];
+        l = numel(indPoints);
+    end
 end
 
 % -- Convolve over the points -- %
 
+heatmapTopMIP  = smoothHeatmap(max(accumulator,[],3),0.05,'disk');
+heatmapHeadMIP = smoothHeatmap(reshape(max(accumulator,[],2),[size(accumulator,1),size(accumulator,3)]),0.05,'disk');
+heatmapSideMIP = smoothHeatmap(reshape(max(accumulator,[],1),[size(accumulator,2),size(accumulator,3)]),0.05,'disk');
+
+heatmapTopSum  = smoothHeatmap(sum(accumulator,3),0.05,'disk');
+heatmapHeadSum = smoothHeatmap(reshape(sum(accumulator,2),[size(accumulator,1),size(accumulator,3)]),0.05,'disk');
+heatmapSideSum = smoothHeatmap(reshape(sum(accumulator,1),[size(accumulator,2),size(accumulator,3)]),0.05,'disk');
 
 %% VISUALIZATION
-f1 = figure('Name','Heatmaps','units','normalized','outerposition',[0.25 0.25 0.5 0.5]);
+f1 = figure('Name','Heatmaps MIP','units','normalized','outerposition',[0.25 0.25 0.65 0.65]);
+
+% Set information box
+mTextBox = uicontrol('style','text');
 subplot(1,3,1), 
-imagesc(max(accumulator,[],3)),
+imagesc(heatmapTopMIP),
 title('MIP from the top'),
 axis square
+set(gca,'xtick',[],'ytick',[])
 subplot(1,3,2), 
-imagesc(reshape(max(accumulator,[],2),[size(accumulator,1),size(accumulator,3)])),
+imagesc(heatmapHeadMIP),
 title('MIP from the head'),
 axis square
+set(gca,'xtick',[],'ytick',[])
 subplot(1,3,3), 
-imagesc(reshape(max(accumulator,[],1),[size(accumulator,2),size(accumulator,3)])),
+imagesc(heatmapSideMIP),
 title('MIP from the side'),
 axis square
+set(gca,'xtick',[],'ytick',[])
+suptitle(['Number of processed dataset: ',num2str(numberOfResults),', Total number of cells: ', num2str(size(allCellCoords,2))]);
+
+f2 = figure('Name','Heatmaps summation','units','normalized','outerposition',[0.25 0.25 0.65 0.65]);
+
+% Set information box
+mTextBox = uicontrol('style','text');
+subplot(1,3,1), 
+imagesc(heatmapTopSum),
+title('Summation from the top'),
+axis square
+set(gca,'xtick',[],'ytick',[])
+subplot(1,3,2), 
+imagesc(heatmapHeadSum),
+title('Summation from the head'),
+axis square
+set(gca,'xtick',[],'ytick',[])
+subplot(1,3,3), 
+imagesc(heatmapSideSum),
+title('Summation from the side'),
+axis square
+set(gca,'xtick',[],'ytick',[])
+suptitle(['Number of processed dataset: ',num2str(numberOfResults),', Total number of cells: ', num2str(size(allCellCoords,2))]);
 
 %% SAVING
 
-fig_filename = [resultsPath '/MIP_Heatmaps.bmp'];
+if ~exist([resultsPath '/heatmaps'],'dir')
+    mkdir(resultsPath, 'heatmaps');
+end
+fig_filename = [resultsPath 'heatmaps/MIP_Heatmaps.bmp'];
 % saving figure as .bmp
 saveas(f1,fig_filename);
 
-results_filename = [resultsPath '/HeatmapAcculmulator.mat'];
+results_filename = [resultsPath, 'heatmaps/HeatmapAcculmulator.mat'];
         
 % save heatmap
 save(results_filename, 'accumulator');
 
+disp('Heatmap saved in heatmaps directory.');
 %% USER OUTPUT
 disp('All results in folder processed!');
