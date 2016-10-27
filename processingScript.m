@@ -20,7 +20,7 @@ reference_vector = [1; 0; 0];
 
 % some output variables
 debug_level = 0;
-visualization = 1;
+visualization = 0;
 
 %% PREPARE RESULTS DIRECTORY
 checkDirectory(resultsPath);
@@ -44,7 +44,7 @@ resolution(1:2) = resolution(1:2) / scale;
 fprintf(['Processing dataset: (0,' num2str(numberOfExperiments) ')']); 
     
 % process all existing data sequentially
-for experiment=1:numberOfExperiments
+for experiment=1%:numberOfExperiments
     
     % show remotecurrent experiment number
     dispCounter(experiment, numberOfExperiments);
@@ -135,7 +135,7 @@ for experiment=1:numberOfExperiments
         gatheredData.processed.cellsMIP = computeMIP(processedData.cells);
         gatheredData.processed.cellCoordinates = processedData.cellCoordinates;
         gatheredData.processed.originalSize = size(processedData.GFP);
-        
+        gatheredData.processed.ellipsoid = ellipsoid;
         % important registered data
         gatheredData.registered.DapiMIP = computeMIP(registeredData.Dapi);
         gatheredData.registered.GFPMIP = computeMIP(registeredData.GFP);
@@ -144,6 +144,9 @@ for experiment=1:numberOfExperiments
         gatheredData.registered.cellsMIP = computeMIP(registeredData.cells);
         gatheredData.registered.cellCoordinates = registeredData.cellCoordinates;
         gatheredData.registered.registeredSize = size(registeredData.GFP);
+        gatheredData.registered.trafoEllipsoid = transformationMatrix;
+        gatheredData.registered.trafoRegression = rotationMatrix;
+        
         % visualize results if needed
         if visualization == 1
             visualizeResults_new(gatheredData);

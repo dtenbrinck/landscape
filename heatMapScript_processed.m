@@ -35,7 +35,7 @@ end
 load([resultsPathAccepted,'/',fileNames{1,1}]);
 
 % Initialize accumulator
-accumulator = zeros(gatheredData.registered.registeredSize);
+accumulator = zeros(gatheredData.processed.originalSize);
 
 % Original data size (in mu)
 origSize = gatheredData.processed.originalSize;
@@ -52,23 +52,8 @@ for result = 1:numberOfResults
     load([resultsPathAccepted,'/',fileNames{result,1}])
     
     % Get all cell center coordinates
-    allCellCoords = horzcat(allCellCoords, gatheredData.registered.cellCoordinates);
+    allCellCoords = horzcat(allCellCoords, gatheredData.processed.cellCoordinates);
 end
-
-% Ignore all that are out of the domain
-allCellCoords(:,sum(abs(allCellCoords)>1)>=1) = [];
-
-% Compute norm of each column
-normOfCoordinates = sqrt(sum(allCellCoords.^2,1));
-
-% Ignore all coordinates outside the sphere with a tolerance tole
-allCellCoords(:,normOfCoordinates > 1+tole) = [];
-normOfCoordinates(:,normOfCoordinates > 1+tole) = [];
-
-% Normalize the coordinates that are too big but in tolerance
-allCellCoords(:,(normOfCoordinates < 1+tole) == (normOfCoordinates > 1)) ...
-    = allCellCoords(:,(normOfCoordinates < 1+tole) == (normOfCoordinates > 1))...
-    ./repmat(normOfCoordinates(:,(normOfCoordinates < 1+tole) == (normOfCoordinates > 1)),[3,1]);
 
 % Get rounded cell centroid coordinates
 allCellCoords = round(...
@@ -76,7 +61,7 @@ allCellCoords = round(...
     * size(accumulator,1) / 2 );
 %%
 % Rewrite the cell coordinates into linear indexing
-indPoints = sub2ind(gatheredData.registered.registeredSize...
+indPoints = sub2ind(gatheredData.processed.originalSize...
     ,allCellCoords(2,:),allCellCoords(1,:),allCellCoords(3,:));
 
 % Find out how many points are on the same gridpoint
@@ -99,26 +84,21 @@ end
 % -- Convolve over the points -- %
 
 heatmapTopMIP  = smoothHeatmap(max(accumulator,[],3),0.05,'disk');
-heatmapHeadMIP = smoothHeatmap(reshape(max(accumulator,[],2),[size(accumulator,1),size(accumulator,3)]),0.05,'disk');
-heatmapSideMIP = smoothHeatmap(reshape(max(accumulator,[],1),[size(accumulator,2),size(accumulator,3)]),0.05,'disk');
+heatmapHeadMIP = smoothHeatmap(reshape(max(accumulator,[],2),[size(accumulator,1),size(accumulator,3)]),0.005,'disk');
+heatmapSideMIP = smoothHeatmap(reshape(max(accumulator,[],1),[size(accumulator,2),size(accumulator,3)]),0.005,'disk');
 
 heatmapTopSum  = smoothHeatmap(sum(accumulator,3),0.05,'disk');
-heatmapHeadSum = smoothHeatmap(reshape(sum(accumulator,2),[size(accumulator,1),size(accumulator,3)]),0.05,'disk');
-heatmapSideSum = smoothHeatmap(reshape(sum(accumulator,1),[size(accumulator,2),size(accumulator,3)]),0.05,'disk');
+heatmapHeadSum = smoothHeatmap(reshape(sum(accumulator,2),[size(accumulator,1),size(accumulator,3)]),0.005,'disk');
+heatmapSideSum = smoothHeatmap(reshape(sum(accumulator,1),[size(accumulator,2),size(accumulator,3)]),0.005,'disk');
 
 % -- Scale them into the same scale -- %
 
-maxScaleMIPregistered ...
-    = max([max(heatmapTopMIP(:)),max(heatmapHeadMIP(:)),max(heatmapSideMIP(:))]);
-maxScaleSumregistered ...
-    = max([max(heatmapTopSum(:)),max(heatmapHeadSum(:)),max(heatmapSideSum(:))]);
 climsMIP = [0,maxScaleMIPregistered];
 climsSum = [0,maxScaleSumregistered];
-%% VISUALIZATION
 
-% -- scaled -- %
+%% VISUALIZATION
 mycolormap = jet(256);
-f1 = figure('Name','Heatmaps MIP (scaled)','units','normalized','outerposition',[0.25 0.25 0.65 0.65]);
+f1 = figure('Name','Heatmaps MIP (not registered)','units','normalized','outerposition',[0.25 0.25 0.8 0.8]);
 colormap(mycolormap);
 
 % Set information box
@@ -128,27 +108,27 @@ title('MIP from the top'),
 axis square
 xlabel(gca,'Head \leftarrow \rightarrow Tail','FontSize',13);
 ylabel(gca,'Left \leftarrow \rightarrow Right','FontSize',13);
-set(gca,'xtick',[],'ytick',[])
+% set(gca,'xtick',[],'ytick',[])
 subplot(1,3,2), 
 imagesc(heatmapHeadMIP',climsMIP),
 title('MIP from the head'),
 axis square
 ylabel(gca,'Bottom \leftarrow \rightarrow Top','FontSize',13);
 xlabel(gca,'Left \leftarrow \rightarrow Right','FontSize',13);
-set(gca,'xtick',[],'ytick',[])
+% set(gca,'xtick',[],'ytick',[])
 subplot(1,3,3), 
 imagesc(heatmapSideMIP',climsMIP),
 title('MIP from the side'),
 axis square
 ylabel(gca,'Bottom \leftarrow \rightarrow Top','FontSize',13);
 xlabel(gca,'Tail \leftarrow \rightarrow Head','FontSize',13);
-set(gca,'xtick',[],'ytick',[])
+% set(gca,'xtick',[],'ytick',[])
 pca = get(gca,'position');
 colorbar 
 set(gca,'position',pca);
 suptitle(['Number of processed dataset: ',num2str(numberOfResults),', Total number of cells: ', num2str(size(allCellCoords,2))]);
 
-f2 = figure('Name','Heatmaps summation (scaled)','units','normalized','outerposition',[0.25 0.25 0.65 0.65]);
+f2 = figure('Name','Heatmaps summation (not registered)','units','normalized','outerposition',[0.25 0.25 0.8 0.8]);
 colormap(mycolormap);
 % Set information box
 subplot(1,3,1), 
@@ -157,30 +137,29 @@ title('Summation from the top'),
 axis square
 xlabel(gca,'Head \leftarrow \rightarrow Tail','FontSize',13);
 ylabel(gca,'Left \leftarrow \rightarrow Right','FontSize',13);
-set(gca,'xtick',[],'ytick',[])
+% set(gca,'xtick',[],'ytick',[])
 subplot(1,3,2), 
 imagesc(heatmapHeadSum',climsSum),
 title('Summation from the head'),
 axis square
 ylabel(gca,'Bottom \leftarrow \rightarrow Top','FontSize',13);
 xlabel(gca,'Left \leftarrow \rightarrow Right','FontSize',13);
-set(gca,'xtick',[],'ytick',[])
+% set(gca,'xtick',[],'ytick',[])
 subplot(1,3,3), 
 imagesc(heatmapSideSum',climsSum),
 title('Summation from the side'),
 axis square
 ylabel(gca,'Bottom \leftarrow \rightarrow Top','FontSize',13);
 xlabel(gca,'Tail \leftarrow \rightarrow Head','FontSize',13);
-set(gca,'xtick',[],'ytick',[])
+% set(gca,'xtick',[],'ytick',[])
 pca = get(gca,'position');
 colorbar 
 set(gca,'position',pca);
 suptitle(['Number of processed dataset: ',num2str(numberOfResults),', Total number of cells: ', num2str(size(allCellCoords,2))]);
 
-
 % -- unscaled -- %
 mycolormap = jet(256);
-f3 = figure('Name','Heatmaps MIP (unscaled)','units','normalized','outerposition',[0.25 0.25 0.65 0.65]);
+f3 = figure('Name','Heatmaps MIP (unscaled)','units','normalized','outerposition',[0.25 0.25 0.8 0.8]);
 colormap(mycolormap);
 
 % Set information box
@@ -190,7 +169,7 @@ title('MIP from the top'),
 axis square
 xlabel(gca,'Head \leftarrow \rightarrow Tail','FontSize',13);
 ylabel(gca,'Left \leftarrow \rightarrow Right','FontSize',13);
-set(gca,'xtick',[],'ytick',[])
+% set(gca,'xtick',[],'ytick',[])
 pca = get(gca,'position');
 colorbar 
 set(gca,'position',pca);
@@ -200,7 +179,7 @@ title('MIP from the head'),
 axis square
 ylabel(gca,'Bottom \leftarrow \rightarrow Top','FontSize',13);
 xlabel(gca,'Left \leftarrow \rightarrow Right','FontSize',13);
-set(gca,'xtick',[],'ytick',[])
+% set(gca,'xtick',[],'ytick',[])
 pca = get(gca,'position');
 colorbar 
 set(gca,'position',pca);
@@ -210,22 +189,22 @@ title('MIP from the side'),
 axis square
 ylabel(gca,'Bottom \leftarrow \rightarrow Top','FontSize',13);
 xlabel(gca,'Tail \leftarrow \rightarrow Head','FontSize',13);
-set(gca,'xtick',[],'ytick',[])
+% set(gca,'xtick',[],'ytick',[])
 pca = get(gca,'position');
 colorbar 
 set(gca,'position',pca);
 suptitle(['Number of processed dataset: ',num2str(numberOfResults),', Total number of cells: ', num2str(size(allCellCoords,2))]);
 
-f4 = figure('Name','Heatmaps summation (unscaled)','units','normalized','outerposition',[0.25 0.25 0.65 0.65]);
+f4 = figure('Name','Heatmaps summation (unscaled)','units','normalized','outerposition',[0.25 0.25 0.8 0.8]);
 colormap(mycolormap);
 % Set information box
 subplot(1,3,1), 
 imagesc(heatmapTopSum),
 title('Summation from the top'),
 axis square
-xlabel(gca,'Head \leftarrow \rightarrow Tail','FontSize',13);
-ylabel(gca,'Left \leftarrow \rightarrow Right','FontSize',13);
-set(gca,'xtick',[],'ytick',[])
+xlabel(gca,'Head \leftarrow \rightarrow Tail','FontSize',11);
+ylabel(gca,'Left \leftarrow \rightarrow Right','FontSize',11);
+% set(gca,'xtick',[],'ytick',[])
 pca = get(gca,'position');
 colorbar 
 set(gca,'position',pca);
@@ -233,9 +212,9 @@ subplot(1,3,2),
 imagesc(heatmapHeadSum'),
 title('Summation from the head'),
 axis square
-ylabel(gca,'Bottom \leftarrow \rightarrow Top','FontSize',13);
-xlabel(gca,'Left \leftarrow \rightarrow Right','FontSize',13);
-set(gca,'xtick',[],'ytick',[])
+ylabel(gca,'Bottom \leftarrow \rightarrow Top','FontSize',11);
+xlabel(gca,'Left \leftarrow \rightarrow Right','FontSize',11);
+% set(gca,'xtick',[],'ytick',[])
 pca = get(gca,'position');
 colorbar 
 set(gca,'position',pca);
@@ -243,34 +222,32 @@ subplot(1,3,3),
 imagesc(heatmapSideSum'),
 title('Summation from the side'),
 axis square
-ylabel(gca,'Bottom \leftarrow \rightarrow Top','FontSize',13);
-xlabel(gca,'Tail \leftarrow \rightarrow Head','FontSize',13);
-set(gca,'xtick',[],'ytick',[])
+ylabel(gca,'Bottom \leftarrow \rightarrow Top','FontSize',11);
+xlabel(gca,'Tail \leftarrow \rightarrow Head','FontSize',11);
+% set(gca,'xtick',[],'ytick',[])
 pca = get(gca,'position');
 colorbar 
 set(gca,'position',pca);
 suptitle(['Number of processed dataset: ',num2str(numberOfResults),', Total number of cells: ', num2str(size(allCellCoords,2))]);
-
 
 %% SAVING
 
 if ~exist([resultsPath '/heatmaps'],'dir')
     mkdir(resultsPath, 'heatmaps');
 end
-fig_filename = [resultsPath '/heatmaps/MIP_Heatmaps.png'];
-% saving figure as .png
+fig_filename = [resultsPath '/heatmaps/MIP_Heatmaps_not_registered.png'];
+% saving figure as .bmp
 saveas(f1,fig_filename);
-fig_filename = [resultsPath '/heatmaps/SUM_Heatmaps.png'];
-% saving figure as .png
+fig_filename = [resultsPath '/heatmaps/SUM_Heatmaps_not_registered.png'];
+% saving figure as .bmp
 saveas(f2,fig_filename);
-fig_filename = [resultsPath '/heatmaps/MIP_Heatmaps(unscaled).png'];
+fig_filename = [resultsPath '/heatmaps/MIP_Heatmaps_not_registered(unscaled).png'];
 % saving figure as .png
 saveas(f3,fig_filename);
-fig_filename = [resultsPath '/heatmaps/SUM_Heatmaps(unscaled).png'];
+fig_filename = [resultsPath '/heatmaps/SUM_Heatmaps_not_registered(unscaled).png'];
 % saving figure as .png
 saveas(f4,fig_filename);
-
-results_filename = [resultsPath, '/heatmaps/HeatmapAcculmulator.mat'];
+results_filename = [resultsPath, '/heatmaps/HeatmapAcculmulator_not_registered.mat'];
         
 % save heatmap
 save(results_filename, 'accumulator');
