@@ -9,7 +9,7 @@ sizeCells = 20; %um
 sizeOfPixel = 0.29; %um
 sizeCellsPixel = round(sizeCells/sizeOfPixel);
 %% SET PATH
-resultsPath = './results/Small/'; % DONT APPEND '/' TO DIRECTORY NAME!!!
+resultsPath = './results/Heatmap'; % DONT APPEND '/' TO DIRECTORY NAME!!!
 resultsPathAccepted = [resultsPath,'/accepted'];
 
 %% GET FILES TO PROCESS
@@ -77,8 +77,8 @@ allCellCoords = round(...
 
 % Rewrite the cell coordinates into linear indexing
 indPoints = sub2ind(gatheredData.registered.registeredSize...
-    ,allCellCoords(1,:),allCellCoords(2,:),allCellCoords(3,:));
-
+    ,allCellCoords(2,:),allCellCoords(1,:),allCellCoords(3,:));
+%%
 % Find out how many points are on the same gridpoint
 [uniquePoints,ai,~] = unique(indPoints,'stable');
 
@@ -107,45 +107,56 @@ heatmapHeadSum = smoothHeatmap(reshape(sum(accumulator,2),[size(accumulator,1),s
 heatmapSideSum = smoothHeatmap(reshape(sum(accumulator,1),[size(accumulator,2),size(accumulator,3)]),0.05,'disk');
 
 %% VISUALIZATION
+mycolormap = jet(256);
 f1 = figure('Name','Heatmaps MIP','units','normalized','outerposition',[0.25 0.25 0.65 0.65]);
-
+colormap(mycolormap);
 % Set information box
-mTextBox = uicontrol('style','text');
 subplot(1,3,1), 
 imagesc(heatmapTopMIP),
 title('MIP from the top'),
 axis square
+xlabel(gca,'Head \leftarrow \rightarrow Tail','FontSize',13);
+ylabel(gca,'Left \leftarrow \rightarrow Right','FontSize',13);
 set(gca,'xtick',[],'ytick',[])
 subplot(1,3,2), 
-imagesc(heatmapHeadMIP),
+imagesc(heatmapHeadMIP'),
 title('MIP from the head'),
 axis square
+ylabel(gca,'Bottom \leftarrow \rightarrow Top','FontSize',13);
+xlabel(gca,'Left \leftarrow \rightarrow Right','FontSize',13);
 set(gca,'xtick',[],'ytick',[])
 subplot(1,3,3), 
-imagesc(heatmapSideMIP),
+imagesc(heatmapSideMIP'),
 title('MIP from the side'),
 axis square
+ylabel(gca,'Bottom \leftarrow \rightarrow Top','FontSize',13);
+xlabel(gca,'Tail \leftarrow \rightarrow Head','FontSize',13);
 set(gca,'xtick',[],'ytick',[])
 suptitle(['Number of processed dataset: ',num2str(numberOfResults),', Total number of cells: ', num2str(size(allCellCoords,2))]);
 
 f2 = figure('Name','Heatmaps summation','units','normalized','outerposition',[0.25 0.25 0.65 0.65]);
-
+colormap(mycolormap);
 % Set information box
-mTextBox = uicontrol('style','text');
 subplot(1,3,1), 
 imagesc(heatmapTopSum),
 title('Summation from the top'),
 axis square
+xlabel(gca,'Head \leftarrow \rightarrow Tail','FontSize',13);
+ylabel(gca,'Left \leftarrow \rightarrow Right','FontSize',13);
 set(gca,'xtick',[],'ytick',[])
 subplot(1,3,2), 
-imagesc(heatmapHeadSum),
+imagesc(heatmapHeadSum'),
 title('Summation from the head'),
 axis square
+ylabel(gca,'Bottom \leftarrow \rightarrow Top','FontSize',13);
+xlabel(gca,'Left \leftarrow \rightarrow Right','FontSize',13);
 set(gca,'xtick',[],'ytick',[])
 subplot(1,3,3), 
-imagesc(heatmapSideSum),
+imagesc(heatmapSideSum'),
 title('Summation from the side'),
 axis square
+ylabel(gca,'Bottom \leftarrow \rightarrow Top','FontSize',13);
+xlabel(gca,'Tail \leftarrow \rightarrow Head','FontSize',13);
 set(gca,'xtick',[],'ytick',[])
 suptitle(['Number of processed dataset: ',num2str(numberOfResults),', Total number of cells: ', num2str(size(allCellCoords,2))]);
 
@@ -154,11 +165,14 @@ suptitle(['Number of processed dataset: ',num2str(numberOfResults),', Total numb
 if ~exist([resultsPath '/heatmaps'],'dir')
     mkdir(resultsPath, 'heatmaps');
 end
-fig_filename = [resultsPath 'heatmaps/MIP_Heatmaps.bmp'];
+fig_filename = [resultsPath '/heatmaps/MIP_Heatmaps.bmp'];
 % saving figure as .bmp
 saveas(f1,fig_filename);
+fig_filename = [resultsPath '/heatmaps/SUM_Heatmaps.bmp'];
+% saving figure as .bmp
+saveas(f2,fig_filename);
 
-results_filename = [resultsPath, 'heatmaps/HeatmapAcculmulator.mat'];
+results_filename = [resultsPath, '/heatmaps/HeatmapAcculmulator.mat'];
         
 % save heatmap
 save(results_filename, 'accumulator');
