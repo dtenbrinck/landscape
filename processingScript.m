@@ -67,11 +67,11 @@ for experiment=1%:numberOfExperiments
         [processedData.cells, processedData.cellCoordinates] = segmentCells(processedData.mCherry, resolution);
         
         % check the orientation of the embryo and flip to be head-right
-        headOrientation = determineHeadOrientation(computeMIP(processedData.landmark));
-        if strcmp(headOrientation, 'right')
-            if debug_level >= 1; disp('Rotating data...'); end
-            processedData = flipOrientation(processedData);
-        end
+%         headOrientation = determineHeadOrientation(computeMIP(processedData.landmark));
+%         if strcmp(headOrientation, 'right')
+%             if debug_level >= 1; disp('Rotating data...'); end
+%             processedData = flipOrientation(processedData);
+%         end
         
         % estimate embryo surface by fitting an ellipsoid
         if debug_level >= 1; disp('Estimating embryo surface...'); end
