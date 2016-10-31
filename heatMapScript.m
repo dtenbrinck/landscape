@@ -8,6 +8,7 @@ sizeCells = 20; %um
 % Size of the Pixel
 sizeOfPixel = 0.29; %um
 sizeCellsPixel = round(sizeCells/sizeOfPixel);
+radius = 5;
 %% SET PATH
 resultsPath = './results/Heatmap'; % DONT APPEND '/' TO DIRECTORY NAME!!!
 resultsPathAccepted = [resultsPath,'/accepted'];
@@ -40,70 +41,28 @@ accumulator = zeros(gatheredData.registered.registeredSize);
 % Original data size (in mu)
 origSize = gatheredData.processed.originalSize;
 % Accumulator size
-accSize = size(accumulator);
+sizeAcc = size(accumulator);
+gridSize = sizeAcc(1);
 
-% All coordinates of cell centers
-allCellCoords = double.empty(3,0);
 
-%% MAIN ACCUMULATOR LOOP
-for result = 1:numberOfResults
-    
-    % Load result data
-    load([resultsPathAccepted,'/',fileNames{result,1}])
-    
-    % Get all cell center coordinates
-    allCellCoords = horzcat(allCellCoords, gatheredData.registered.cellCoordinates);
-end
 
-% Ignore all that are out of the domain
-allCellCoords(:,sum(abs(allCellCoords)>1)>=1) = [];
+%% MAIN CODE
 
-% Compute norm of each column
-normOfCoordinates = sqrt(sum(allCellCoords.^2,1));
+% -- Compute all valid cell coordinates from the processed and registered data -- %
+allCellCoords = getAllValidCellCoords(sizeAcc(1),fileNames,numberOfResults,tole);
 
-% Ignore all coordinates outside the sphere with a tolerance tole
-allCellCoords(:,normOfCoordinates > 1+tole) = [];
-normOfCoordinates(:,normOfCoordinates > 1+tole) = [];
-
-% Normalize the coordinates that are too big but in tolerance
-allCellCoords(:,(normOfCoordinates < 1+tole) == (normOfCoordinates > 1)) ...
-    = allCellCoords(:,(normOfCoordinates < 1+tole) == (normOfCoordinates > 1))...
-    ./repmat(normOfCoordinates(:,(normOfCoordinates < 1+tole) == (normOfCoordinates > 1)),[3,1]);
-
-% Get rounded cell centroid coordinates
-allCellCoords = round(...
-    (allCellCoords + repmat([1;1;1], 1, size(allCellCoords,2)))...
-    * size(accumulator,1) / 2 );
-%%
-% Rewrite the cell coordinates into linear indexing
-indPoints = sub2ind(gatheredData.registered.registeredSize...
-    ,allCellCoords(2,:),allCellCoords(1,:),allCellCoords(3,:));
-
-% Find out how many points are on the same gridpoint
-[uniquePoints,ai,~] = unique(indPoints,'stable');
-
-% Values give number of points on that gridpoint
-accumulator(uniquePoints) = 1;
-
-if numel(uniquePoints) < numel(indPoints);
-    indPoints(ai)=[];
-    l = numel(indPoints);
-    while l > 0
-        [uniquePoints,ai,~] = unique(indPoints,'stable');
-        accumulator(uniquePoints) = accumulator(uniquePoints)+1;
-        indPoints(ai) = [];
-        l = numel(indPoints);
-    end
-end
+% -- Compute the Accumulator from the cell coordinates -- %
+accumulator = compAcc(allCellCoords, gridSize);
 
 % -- Convolve over the points -- %
+convAcc = computeConvAcc(accumulator,radius,2*radius+1);
 
-convAcc = computeConvAcc(accumulator,radius,sizeGrid);
-
+% -- Compute heatmap MIPs -- %
 heatmapTopMIP  = (max(convAcc,[],3));
 heatmapHeadMIP = (reshape(max(convAcc,[],2),[size(accumulator,1),size(accumulator,3)]));
 heatmapSideMIP = (reshape(max(convAcc,[],1),[size(accumulator,2),size(accumulator,3)]));
 
+% -- Compute heatmap Sums -- %
 heatmapTopSum  = (sum(convAcc,3));
 heatmapHeadSum = (reshape(sum(convAcc,2),[size(accumulator,1),size(accumulator,3)]));
 heatmapSideSum = (reshape(sum(convAcc,1),[size(accumulator,2),size(accumulator,3)]));
@@ -116,6 +75,7 @@ maxScaleSumregistered ...
     = max([max(heatmapTopSum(:)),max(heatmapHeadSum(:)),max(heatmapSideSum(:))]);
 climsMIP = [0,maxScaleMIPregistered];
 climsSum = [0,maxScaleSumregistered];
+
 %% VISUALIZATION
 
 % -- scaled -- %
