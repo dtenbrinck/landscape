@@ -98,13 +98,15 @@ end
 
 % -- Convolve over the points -- %
 
-heatmapTopMIP  = smoothHeatmap(max(accumulator,[],3),0.05,'disk');
-heatmapHeadMIP = smoothHeatmap(reshape(max(accumulator,[],2),[size(accumulator,1),size(accumulator,3)]),0.05,'disk');
-heatmapSideMIP = smoothHeatmap(reshape(max(accumulator,[],1),[size(accumulator,2),size(accumulator,3)]),0.05,'disk');
+convAcc = computeConvAcc(accumulator,radius,sizeGrid);
 
-heatmapTopSum  = smoothHeatmap(sum(accumulator,3),0.05,'disk');
-heatmapHeadSum = smoothHeatmap(reshape(sum(accumulator,2),[size(accumulator,1),size(accumulator,3)]),0.05,'disk');
-heatmapSideSum = smoothHeatmap(reshape(sum(accumulator,1),[size(accumulator,2),size(accumulator,3)]),0.05,'disk');
+heatmapTopMIP  = (max(convAcc,[],3));
+heatmapHeadMIP = (reshape(max(convAcc,[],2),[size(accumulator,1),size(accumulator,3)]));
+heatmapSideMIP = (reshape(max(convAcc,[],1),[size(accumulator,2),size(accumulator,3)]));
+
+heatmapTopSum  = (sum(convAcc,3));
+heatmapHeadSum = (reshape(sum(convAcc,2),[size(accumulator,1),size(accumulator,3)]));
+heatmapSideSum = (reshape(sum(convAcc,1),[size(accumulator,2),size(accumulator,3)]));
 
 % -- Scale them into the same scale -- %
 
