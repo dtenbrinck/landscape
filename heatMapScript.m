@@ -8,7 +8,19 @@ sizeCells = 20; %um
 % Size of the Pixel
 sizeOfPixel = 0.29; %um
 sizeCellsPixel = round(sizeCells/sizeOfPixel);
-radius = 5;
+option.cellradius = 5;
+heatmaptypes = {'MIP','SUM'};
+
+% Heatmap vis options
+option.slider = 1;  %in progress
+option.heatmaps.saveHMmat = 1;
+option.heatmaps.saveAccumulator = 1;
+option.heatmaps.types = {'MIP','SUM'};
+option.heatmaps.process = 1;
+option.heatmaps.save = 1;
+option.heatmaps.saveas = {'png','bmp'};
+option.heatmaps.disp = 1;
+option.heatmaps.scaled = 'both'; % 'true','false','both'
 %% SET PATH
 resultsPath = './results/Heatmap'; % DONT APPEND '/' TO DIRECTORY NAME!!!
 resultsPathAccepted = [resultsPath,'/accepted'];
@@ -35,48 +47,32 @@ end
 % Load first data set
 load([resultsPathAccepted,'/',fileNames{1,1}]);
 
-% Initialize accumulator
-accumulator = zeros(gatheredData.registered.registeredSize);
-
 % Original data size (in mu)
 origSize = gatheredData.processed.originalSize;
-% Accumulator size
-sizeAcc = size(accumulator);
-gridSize = sizeAcc(1);
+% grid size size
+gridSize = gatheredData.registered.registeredSize;
 
 
 
-%% MAIN CODE
+%% COMPUTE ACCUMULATOR
 
 % -- Compute all valid cell coordinates from the processed and registered data -- %
-allCellCoords = getAllValidCellCoords(sizeAcc(1),fileNames,numberOfResults,tole);
+allCellCoords = getAllValidCellCoords(gridSize,fileNames,numberOfResults,tole);
 
 % -- Compute the Accumulator from the cell coordinates -- %
 accumulator = compAcc(allCellCoords, gridSize);
 
-% -- Convolve over the points -- %
-convAcc = computeConvAcc(accumulator,radius,2*radius+1);
 
-% -- Compute heatmap MIPs -- %
-heatmapTopMIP  = (max(convAcc,[],3));
-heatmapHeadMIP = (reshape(max(convAcc,[],2),[size(accumulator,1),size(accumulator,3)]));
-heatmapSideMIP = (reshape(max(convAcc,[],1),[size(accumulator,2),size(accumulator,3)]));
+%% HANDLE HEATMAPS
+p.resultsPath = resultsPath;
+handleHeatmaps(accumulator,size(allCellCoords,2),numberOfResults,p,option);
 
-% -- Compute heatmap Sums -- %
-heatmapTopSum  = (sum(convAcc,3));
-heatmapHeadSum = (reshape(sum(convAcc,2),[size(accumulator,1),size(accumulator,3)]));
-heatmapSideSum = (reshape(sum(convAcc,1),[size(accumulator,2),size(accumulator,3)]));
 
-% -- Scale them into the same scale -- %
-
-maxScaleMIPregistered ...
-    = max([max(heatmapTopMIP(:)),max(heatmapHeadMIP(:)),max(heatmapSideMIP(:))]);
-maxScaleSumregistered ...
-    = max([max(heatmapTopSum(:)),max(heatmapHeadSum(:)),max(heatmapSideSum(:))]);
-climsMIP = [0,maxScaleMIPregistered];
-climsSum = [0,maxScaleSumregistered];
+%% COMPUTE HEATMAP
 
 %% VISUALIZATION
+
+
 
 % -- scaled -- %
 mycolormap = jet(256);

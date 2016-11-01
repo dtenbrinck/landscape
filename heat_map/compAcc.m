@@ -2,8 +2,10 @@ function [ accumulator ] = compAcc( allCellCoords, gridSize )
 %This function computes the accumulator for the heatmap 
 
 %% MAIN CODE
+
+accumulator = zeros(gridSize,gridSize,gridSize);
 % Rewrite the cell coordinates into linear indexing
-indPoints = sub2ind(gridSize...
+indPoints = sub2ind([gridSize,gridSize,gridSize]...
     ,allCellCoords(2,:),allCellCoords(1,:),allCellCoords(3,:));
 
 % Find out how many points are on the same gridpoint
