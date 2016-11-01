@@ -1,4 +1,4 @@
-function landmark = segmentGFP( data, resolution )
+function landmark = segmentGFP( data, GFPseg_parameter, resolution )
 
 % specify segmentation algorithm
 % TODO: Set via GUI!
@@ -46,14 +46,15 @@ if strcmp(method, 'CP') % Chambolle-Pock and thresholding
 elseif strcmp(method, 'k-means')  % k-means clustering
     
     % segment GFP using k-means clustering
-    k = 4;
+    k = GFPseg_parameter.k;
+    morphSize = GFPseg_parameter.morphSize;
     Xi = k_means_clustering(data, k, 'real');
     
     if strcmp(type,'k-channel')
         Xi = floor(Xi / k);
     elseif strcmp(type,'morph')
         Xi = Xi-2>0;
-        Xi = imopen(Xi,strel('disk',5));        
+        Xi = imopen(Xi,strel('disk',morphSize));        
     end
     
 end

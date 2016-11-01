@@ -1,17 +1,17 @@
 %% INITIALIZATION
 clear all; clc; close all;
 
-%% SET PATH
-resultsPath = './results/Small'; % DONT APPEND '/' TO DIRECTORY NAME!!!
+p = initializeScript('evaluate');
 
 %% GET FILES TO PROCESS
 
 % check results directory
-checkDirectory(resultsPath);
+checkDirectory(p.resultsPath);
 
 % get filenames of STK files in selected folder
-fileNames = getMATfilenames(resultsPath);
-
+fileNames = getMATfilenames(p.resultsPath);
+fileNames(find(strcmp(fileNames,'ParameterProcessing.mat'))) = [];
+fileNames(find(strcmp(fileNames,'ParameterHeatmap.mat'))) = [];
 % get number of experiments
 numberOfResults = size(fileNames,1);
 
@@ -46,10 +46,10 @@ for result = 1:numberOfResults
     switch choice
         case 'Accept'
             fprintf('\t -> Accepted!\n');
-            movefile([resultsPath '/' fileNames{result,1}], [resultsPath '/accepted/' fileNames{result,1}]);
+            movefile([p.resultsPath '/' fileNames{result,1}], [p.resultsPath '/accepted/' fileNames{result,1}]);
         case 'Reject'
             fprintf('\t -> Rejected!\n');
-            movefile([resultsPath '/' fileNames{result,1}], [resultsPath '/rejected/' fileNames{result,1}]);
+            movefile([p.resultsPath '/' fileNames{result,1}], [p.resultsPath '/rejected/' fileNames{result,1}]);
         otherwise
             fprintf('\t -> Dialog closed!\n');
     end

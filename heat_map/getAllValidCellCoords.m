@@ -1,4 +1,4 @@
-function [ allCellCoords ] = getAllValidCellCoords(sizeAcc,fileNames,numberOfResults,tole)
+function [ allCellCoords ] = getAllValidCellCoords(sizeAcc,fileNames,numberOfResults,tole,resultsPathAccepted)
 % This function computes the valid cell coordinates for the heatmap.
 % This will be done in multiple steps:
 % 1. load and gather all cell coordinates.

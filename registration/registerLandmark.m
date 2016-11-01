@@ -1,13 +1,18 @@
-function transformation = registerLandmark( landmarkCoordinates, reference_point, reference_vector, landmarkCharacteristic)
+function transformation = registerLandmark( landmarkCoordinates, reg_parameter)
 %REGISTERLANDMARK Summary of this function goes here
 %   Detailed explanation goes here
 
+reference_point = reg_parameter.reference_point;
+reference_vector = reg_parameter.reference_vector;
+landmarkCharacteristic = reg_parameter.landmarkCharacteristic;
+weight = reg_parameter.characteristicWeight;
 % Compute regression
+
 [pstar,vstar] = computeRegression_new(landmarkCoordinates','false');
 
 
 % Tilt refpstar onto the specified position
-[pstar,vstar] = getCharPos_daniel(pstar,vstar,landmarkCoordinates',landmarkCharacteristic);
+[pstar,vstar] = getCharPos_daniel(pstar,vstar,landmarkCoordinates',landmarkCharacteristic,weight);
 pstar = pstar/norm(pstar);
 vstar = vstar/norm(vstar);
 

@@ -1,4 +1,4 @@
-function [cells, centCoords] = segmentCells( data, resolution )
+function [cells, centCoords] = segmentCells( data, p, resolution )
 %SEGMENTDATA Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -55,8 +55,8 @@ if strcmp(method, 'CP') % Chambolle-Pock with thresholding
     Xi(u >= dataP.t) = 1;
     
 elseif strcmp(method,'k-means') % k-means clustering
-    
-    Xi = k_means_clustering(data, 3, 'real');
+    k = p.k;
+    Xi = k_means_clustering(data, k, 'real');
     Xi = floor(Xi / 3);
     
 end
@@ -72,7 +72,7 @@ j = 1;
 
 for i = 1:cc.NumObjects
     pixelList = cc.PixelIdxList{i};
-    if length(pixelList) > 50
+    if length(pixelList) > p.cellSize
         cellObjects{j} = pixelList;
         j = j+1;
     end
@@ -105,21 +105,6 @@ end
 cc = bwconncomp(cells);
 S = regionprops(cc,'centroid');
 centCoords = round(reshape([S.Centroid],[3,numel([S.Centroid])/3]));
-
-
-%tol = 0.1;
-%normCoords = sqrt(centCoords(1,:).^2+centCoords(2,:).^2+centCoords(3,:).^2);
-
-
-% Delete each point that is > 1+tol
-%centCoords(:,normCoords>1+tol) = [];
-%normCoords = sqrt(centCoords(1,:).^2+centCoords(2,:).^2+centCoords(3,:).^2);
-
-% Normalize each point that is > 1 but <= 1+tol
-%centCoords(:,normCoords>1&normCoords<1+tol) = ...
-%centCoords(:,(normCoords>1&normCoords<1+tol))...
-%    .*1./repmat(normCoords(:,(normCoords>1&normCoords<1+tol)),[3,1]);
-%centCoords = centCoords;
 
 end
 

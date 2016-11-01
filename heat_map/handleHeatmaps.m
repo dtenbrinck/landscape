@@ -33,10 +33,6 @@ if option.heatmaps.process == 1
         vis = 'off';
     end
     
-    % Standard figure layout
-    
-    
-    
     for i=1:size(option.heatmaps.types,2)
         currentType = option.heatmaps.types{i};
         figs = [figure('Visible','off'),figure('Visible','off'),...

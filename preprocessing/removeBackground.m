@@ -1,13 +1,13 @@
-function data = removeBackground( data )
+function data = removeBackground( data, rmbg_parameter )
 %REMOVEBACKGROUND Summary of this function goes here
 %   Detailed explanation goes here
 
 % TODO: Test best size of structuring element experimentally!
 
 % Generate structural elements for preprocessing
-struct_element_dapi = strel('disk',5);
-struct_element_gfp = strel('disk',50);
-struct_element_mCherry = strel('disk',11);
+struct_element_dapi = strel('disk',rmbg_parameter.dapiDiskSize);
+struct_element_gfp = strel('disk',rmbg_parameter.GFPDiskSize);
+struct_element_mCherry = strel('disk',rmbg_parameter.mCherryDiskSize);
 
 % preprocess Dapi data
 data.Dapi = imtophat(data.Dapi, struct_element_dapi);
