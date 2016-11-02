@@ -31,7 +31,7 @@ imagesc(HMS.(currentType).Side',[0,climMax]);
 set(sp3,'Tag','sp3');
 axis square
 ylabel(gca,'Bottom \leftarrow \rightarrow Top','FontSize',13);
-xlabel(gca,'Tail \leftarrow \rightarrow Head','FontSize',13);
+xlabel(gca,'Head \leftarrow \rightarrow Tail','FontSize',13);
 set(gca,'xtick',[],'ytick',[])
 pca = get(sp3,'position');
 colorbar;
