@@ -1,4 +1,4 @@
-function visualizeResults_new2(gatheredData)
+function visualizeResults_new2(f,gatheredData)
 %VISUALIZERESULTS Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -25,6 +25,5 @@ hold on; contour((gatheredData.registered.cellsMIP), [0.5 0.5], 'r', 'LineWidth'
 suptitle(['Results for file: ' strrep(gatheredData.filename,'_','\_')]);
 
 drawnow;
-pause(0.1);
 end
 

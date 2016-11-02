@@ -55,7 +55,6 @@ for result = 1:numberOfResults
             fprintf('\t -> Dialog closed!\n');
     end
     
-    close all;
 end
 
 %% USER OUTPUT
