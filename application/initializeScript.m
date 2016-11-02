@@ -42,7 +42,11 @@ elseif strcmp(scriptType,'evaluate')
     load([resultsPath,'/ParameterProcessing.mat']);
 elseif strcmp(scriptType,'heatmap')
     resultsPath = uigetdir('Please select a results folder to generate heatmap!');
-    load([resultsPath,'/ParameterProcessing.mat']);
+    if exist([resultsPath,'/ParameterProcessing.mat'],'file') == 2
+        load([resultsPath,'/ParameterProcessing.mat']);
+    else
+        p = ParameterProcessing();
+    end
     p_heat = ParameterHeatmap();
     merge = [fieldnames(p)', fieldnames(p_heat)';...
         struct2cell(p)',struct2cell(p_heat)']; 
