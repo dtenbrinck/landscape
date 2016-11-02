@@ -6,6 +6,8 @@ p = initializeScript('heatmap');
 
 % Get filenames of MAT files in selected folder
 fileNames = getMATfilenames(p.resultsPathAccepted);
+fileNames(find(strcmp(fileNames,'ParameterProcessing.mat'))) = [];
+fileNames(find(strcmp(fileNames,'ParameterHeatmap.mat'))) = [];
 
 % Get number of experiments
 numberOfResults = size(fileNames,1);

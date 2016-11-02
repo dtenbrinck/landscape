@@ -47,6 +47,7 @@ elseif strcmp(scriptType,'heatmap')
     else
         p = ParameterProcessing();
     end
+    p.resultsPath = resultsPath;
     p_heat = ParameterHeatmap();
     merge = [fieldnames(p)', fieldnames(p_heat)';...
         struct2cell(p)',struct2cell(p_heat)']; 
