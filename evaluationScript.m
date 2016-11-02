@@ -25,6 +25,7 @@ else
 end
 
 %% MAIN EVALUATION LOOP
+f = figure('units','normalized','outerposition',[0 0 1 1]); 
 for result = 1:numberOfResults
     
     % load result data
@@ -32,7 +33,7 @@ for result = 1:numberOfResults
     
     % visualize results
 %     visualizeResults(experimentData, processedData, registeredData);
-    visualizeResults_new(gatheredData);
+    visualizeResults_new2(f,gatheredData);
     
     % display user output
     fprintf(gatheredData.filename);
