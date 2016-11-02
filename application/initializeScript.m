@@ -4,24 +4,24 @@ function [ p ] = initializeScript( scriptType )
 % add current folder and subfolders to path variable
 addpath(genpath(pwd));
 
+% set default search path for data
+if exist('/4TB/data/SargonYigit/','dir') == 7
+    dataPath = '/4TB/data/SargonYigit/';
+elseif exist('E:/Embryo_Registration/data/SargonYigit/','dir') == 7
+    dataPath = 'E:/Embryo_Registration/data/SargonYigit/';
+else % in case the above folders don't exist take the current directory
+    dataPath = './data';
+end
+% set default search path for results
+if exist('/4TB/data/SargonYigit/','dir') == 7
+    resultsPath = '/media/piradmin/4TB/Results/results';
+else % in case the above folders don't exist take the current directory
+    resultsPath = './results';
+end
+
 if strcmp(scriptType,'process')
     % Load parameters from file
     p = ParameterProcessing();
-    
-    % set default search path for data
-    if exist('/4TB/data/SargonYigit/','dir') == 7
-        dataPath = '/4TB/data/SargonYigit/';
-    elseif exist('E:/Embryo_Registration/data/SargonYigit/','dir') == 7
-        dataPath = 'E:/Embryo_Registration/data/SargonYigit/';
-    else % in case the above folders don't exist take the current directory
-        dataPath = './data';
-    end
-    % set default search path for results
-    if exist('/4TB/data/SargonYigit/','dir') == 7
-        resultsPath = '/media/piradmin/4TB/Results/results';
-    else % in case the above folders don't exist take the current directory
-        resultsPath = './results';
-    end
 
     % Select data path
     p.dataPath = uigetdir(dataPath,'Please select a folder with the data!');
