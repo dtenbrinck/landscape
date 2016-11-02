@@ -18,7 +18,7 @@ numberOfResults = size(fileNames,1);
 % check if any results have been found
 if numberOfResults == 0
     disp('All results already processed or path to results folder wrong?');
-    disp(resultsPath);
+    disp(p.resultsPath);
     return;
 else
     disp([ num2str(numberOfResults) ' results found in folder for processing.']);
@@ -28,7 +28,7 @@ end
 for result = 1:numberOfResults
     
     % load result data
-    load(fileNames{result,1})
+    load([p.resultsPath,'/',fileNames{result,1}])
     
     % visualize results
 %     visualizeResults(experimentData, processedData, registeredData);
