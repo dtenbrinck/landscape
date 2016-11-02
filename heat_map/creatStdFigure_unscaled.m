@@ -12,7 +12,7 @@ imagesc(HMS.(currentType).Top);
 set(sp1,'Tag','sp1');
 axis square
 xlabel(gca,'Head \leftarrow \rightarrow Tail','FontSize',13);
-ylabel(gca,'Left \leftarrow \rightarrow Right','FontSize',13);
+ylabel(gca,'Right \leftarrow \rightarrow Left','FontSize',13);
 set(gca,'xtick',[],'ytick',[])
 pca = get(sp1,'position');
 colorbar;

@@ -15,7 +15,7 @@ imagesc(HMS.(currentType).Top,[0,climMax]);
 set(sp1,'Tag','sp1');
 axis square
 xlabel(gca,'Head \leftarrow \rightarrow Tail','FontSize',13);
-ylabel(gca,'Left \leftarrow \rightarrow Right','FontSize',13);
+ylabel(gca,'Right \leftarrow \rightarrow Left','FontSize',13);
 set(gca,'xtick',[],'ytick',[])
 
 sp2 = subplot(1,3,2);
