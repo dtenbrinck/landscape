@@ -38,10 +38,10 @@ if strcmp(scriptType,'process')
     
     
 elseif strcmp(scriptType,'evaluate')
-    resultsPath = uigetdir('Please select a results folder to evaluate!');
+    resultsPath = uigetdir(resultsPath,'Please select a results folder to evaluate!');
     load([resultsPath,'/ParameterProcessing.mat']);
 elseif strcmp(scriptType,'heatmap')
-    resultsPath = uigetdir('Please select a results folder to generate heatmap!');
+    resultsPath = uigetdir(resultsPath,'Please select a results folder to generate heatmap!');
     if exist([resultsPath,'/ParameterProcessing.mat'],'file') == 2
         load([resultsPath,'/ParameterProcessing.mat']);
     else
