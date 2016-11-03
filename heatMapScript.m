@@ -11,7 +11,7 @@ fileNames(find(strcmp(fileNames,'ParameterHeatmap.mat'))) = [];
 fileNames(find(strcmp(fileNames,'HeatmapAccumulator.mat'))) = [];
 
 if p.random == 1
-    filenNames = drawRandomNames(fileNames,p.numberOfRandom);
+    fileNames = drawRandomNames(fileNames,p.numberOfRandom);
 end
 % Get number of experiments
 numberOfResults = size(fileNames,1);
