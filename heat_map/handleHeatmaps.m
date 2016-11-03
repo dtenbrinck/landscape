@@ -78,5 +78,6 @@ end
 
 if option.slider == 1
     disp('Slider');
+    TheSlider(p,option,accumulator,convAcc,numOfAllCells,numberOfResults);
 end
 end

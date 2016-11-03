@@ -33,7 +33,7 @@ p.option.cellradius = 5;
 
 % - Slider options - %
 % Will show the Slider 
-p.option.slider = 1;  %in progress
+p.option.slider = 0;  %in progress
 
 % -- Options for the heatmap generation -- %
 
