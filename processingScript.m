@@ -57,7 +57,7 @@ for experiment=1:numberOfExperiments
         %%%%%%%%%%% VALIDITY CHECK FOR DEBUGGING
         if p.debug_level >= 2;
             disp('Transform data for validity check...');
-            [ transformedData, transformedResolution ] = transformDataToSphere( processedData, p.resolution, transformationMatrix, ellipsoid, samples_cube );
+            [ transformedData, transformedResolution ] = transformDataToSphere( processedData, p.resolution, transformationMatrix, ellipsoid, p.samples_cube );
         end
         
         % project landmark onto unit sphere

@@ -23,17 +23,25 @@ p.tole = 0.1;
 % size(accumulator) = [gridSize,gridSize,gridSize];
 p.gridSize = 256;
 
+% Select a given number of random filnames
+p.random = 1;
+
+% Select number of random filenames and process them
+p.numberOfRandom = 100;
 %% OPTIONS FOR THE HEATMAP HANDLER -- %
 % The cellradius in pixels in the sampled p.gridSize space.
 % So this needs to be changed to depending on gridSize.
 % The cell will be cellradius*2 pixels big. 
 % !!! NEED A BETTER APPROACH !!! %
 % Default: 5 with gridSize = 256
-p.option.cellradius = 5;
+p.option.cellradius = 7;
 
 % - Slider options - %
 % Will show the Slider 
 p.option.slider = 0;  %in progress
+
+% - Cropper options
+p.option.cropper = 1;
 
 % -- Options for the heatmap generation -- %
 

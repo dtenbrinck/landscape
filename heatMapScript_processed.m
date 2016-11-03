@@ -35,7 +35,7 @@ end
 load([resultsPathAccepted,'/',fileNames{1,1}]);
 
 % Initialize accumulator
-accumulator = zeros(gatheredData.processed.originalSize);
+accumulator = zeros(384,510,20);
 
 % Original data size (in mu)
 origSize = gatheredData.processed.originalSize;
@@ -61,6 +61,7 @@ allCellCoords = round(...
     * size(accumulator,1) / 2 );
 %%
 % Rewrite the cell coordinates into linear indexing
+gatheredData.processed.originalSize = [384,510,20];
 indPoints = sub2ind(gatheredData.processed.originalSize...
     ,allCellCoords(2,:),allCellCoords(1,:),allCellCoords(3,:));
 
@@ -83,18 +84,20 @@ end
 
 % -- Convolve over the points -- %
 
-heatmapTopMIP  = smoothHeatmap(max(accumulator,[],3),0.05,'disk');
-heatmapHeadMIP = smoothHeatmap(reshape(max(accumulator,[],2),[size(accumulator,1),size(accumulator,3)]),0.005,'disk');
-heatmapSideMIP = smoothHeatmap(reshape(max(accumulator,[],1),[size(accumulator,2),size(accumulator,3)]),0.005,'disk');
+diskFilt = fspecial('disk',round(256*0.05/2));
+diskFilt(diskFilt>0)=1;
+heatmapTopMIP  = max(convn(accumulator,diskFilt,'same'),[],3);
+heatmapHeadMIP = (reshape(max(convn(accumulator,diskFilt,'same'),[],2),[size(accumulator,1),size(accumulator,3)]));
+heatmapSideMIP = (reshape(max(convn(accumulator,diskFilt,'same'),[],1),[size(accumulator,2),size(accumulator,3)]));
 
-heatmapTopSum  = smoothHeatmap(sum(accumulator,3),0.05,'disk');
-heatmapHeadSum = smoothHeatmap(reshape(sum(accumulator,2),[size(accumulator,1),size(accumulator,3)]),0.005,'disk');
-heatmapSideSum = smoothHeatmap(reshape(sum(accumulator,1),[size(accumulator,2),size(accumulator,3)]),0.005,'disk');
+heatmapTopSum  = sum(convn(accumulator,diskFilt,'same'),3);
+heatmapHeadSum = (reshape(sum(convn(accumulator,diskFilt,'same'),2),[size(accumulator,1),size(accumulator,3)]));
+heatmapSideSum = (reshape(sum(convn(accumulator,diskFilt,'same'),1),[size(accumulator,2),size(accumulator,3)]));
 
 % -- Scale them into the same scale -- %
 
-climsMIP = [0,maxScaleMIPregistered];
-climsSum = [0,maxScaleSumregistered];
+climsMIP = [0,max([heatmapTopMIP(:);heatmapHeadMIP(:);heatmapSideMIP(:)])];
+climsSum = [0,max([heatmapTopSum(:);heatmapHeadSum(:);heatmapSideSum(:)])];
 
 %% VISUALIZATION
 mycolormap = jet(256);
@@ -102,21 +105,24 @@ f1 = figure('Name','Heatmaps MIP (not registered)','units','normalized','outerpo
 colormap(mycolormap);
 
 % Set information box
-subplot(1,3,1), 
-imagesc(heatmapTopMIP,climsMIP),
+sp = subplot(1,3,1); 
+sp.CLim = climsMIP;
+imagesc(heatmapTopMIP),
 title('MIP from the top'),
 axis square
 xlabel(gca,'Head \leftarrow \rightarrow Tail','FontSize',13);
-ylabel(gca,'Left \leftarrow \rightarrow Right','FontSize',13);
+ylabel(gca,'Right \leftarrow \rightarrow Left','FontSize',13);
 % set(gca,'xtick',[],'ytick',[])
-subplot(1,3,2), 
+sp = subplot(1,3,2);
+sp.CLim = climsMIP;
 imagesc(heatmapHeadMIP',climsMIP),
 title('MIP from the head'),
 axis square
 ylabel(gca,'Bottom \leftarrow \rightarrow Top','FontSize',13);
 xlabel(gca,'Left \leftarrow \rightarrow Right','FontSize',13);
 % set(gca,'xtick',[],'ytick',[])
-subplot(1,3,3), 
+sp = subplot(1,3,3);
+sp.CLim = climsMIP;
 imagesc(heatmapSideMIP',climsMIP),
 title('MIP from the side'),
 axis square
@@ -136,7 +142,7 @@ imagesc(heatmapTopSum,climsSum),
 title('Summation from the top'),
 axis square
 xlabel(gca,'Head \leftarrow \rightarrow Tail','FontSize',13);
-ylabel(gca,'Left \leftarrow \rightarrow Right','FontSize',13);
+ylabel(gca,'Right \leftarrow \rightarrow Left','FontSize',13);
 % set(gca,'xtick',[],'ytick',[])
 subplot(1,3,2), 
 imagesc(heatmapHeadSum',climsSum),
@@ -168,7 +174,7 @@ imagesc(heatmapTopMIP),
 title('MIP from the top'),
 axis square
 xlabel(gca,'Head \leftarrow \rightarrow Tail','FontSize',13);
-ylabel(gca,'Left \leftarrow \rightarrow Right','FontSize',13);
+ylabel(gca,'Right \leftarrow \rightarrow Left','FontSize',13);
 % set(gca,'xtick',[],'ytick',[])
 pca = get(gca,'position');
 colorbar 
@@ -203,7 +209,7 @@ imagesc(heatmapTopSum),
 title('Summation from the top'),
 axis square
 xlabel(gca,'Head \leftarrow \rightarrow Tail','FontSize',11);
-ylabel(gca,'Left \leftarrow \rightarrow Right','FontSize',11);
+ylabel(gca,'Right \leftarrow \rightarrow Left','FontSize',11);
 % set(gca,'xtick',[],'ytick',[])
 pca = get(gca,'position');
 colorbar 

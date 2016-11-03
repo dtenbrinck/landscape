@@ -9,7 +9,7 @@ p.resolution = [1.29, 1.29, 20];
 p.scale = 0.75;
 
 % some output variables
-p.debug_level = 0;
+p.debug_level = 2;
 p.visualization = 0;
 %% SEGMNENTATION
 % -- PREPROCESSING -- %
@@ -20,15 +20,17 @@ p.rmbg.mCherryDiskSize = 11;
 % -- GFP SEGMENTATION -- %
 p.GFPseg.k = 4;
 p.GFPseg.morphSize = 5;
+p.GFPseg.method = 'k-means'; % 'k-means', 'CP'
 % -- mCherry SEGMENTATION -- %
 p.mCherryseg.k = 3;
 p.mCherryseg.cellSize = 50; %in pixel
+p.mCherryseg.method = 'k-means'; % 'k-means', 'CP'
 % -- LANDMARK PROJECTION -- %
 p.samples_sphere = 128;
 %% REGISTRATION
 % -- REGISTRATION OF LANDMARK -- %
 p.reg.landmarkCharacteristic = 'middle';
-p.reg.characteristicWeight = 0.5;
+p.reg.characteristicWeight = 0.4;
 p.reg.reference_point = [0; 0; -1];
 p.reg.reference_vector = [1; 0; 0];
 % - register data - %

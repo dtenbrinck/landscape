@@ -2,9 +2,9 @@ function [cells, centCoords] = segmentCells( data, p, resolution )
 %SEGMENTDATA Summary of this function goes here
 %   Detailed explanation goes here
 
-method = 'k-means';
+% method = 'k-means';
 
-if strcmp(method, 'CP') % Chambolle-Pock with thresholding
+if strcmp(p.method, 'CP') % Chambolle-Pock with thresholding
     % get histogram
     [h, bins] = imhist(data(:));
     
@@ -54,10 +54,10 @@ if strcmp(method, 'CP') % Chambolle-Pock with thresholding
     Xi = zeros(size(dataP.f));
     Xi(u >= dataP.t) = 1;
     
-elseif strcmp(method,'k-means') % k-means clustering
+elseif strcmp(p.method,'k-means') % k-means clustering
     k = p.k;
     Xi = k_means_clustering(data, k, 'real');
-    Xi = floor(Xi / 3);
+    Xi = floor(Xi / k);
     
 end
 

@@ -8,7 +8,11 @@ p = initializeScript('heatmap');
 fileNames = getMATfilenames(p.resultsPathAccepted);
 fileNames(find(strcmp(fileNames,'ParameterProcessing.mat'))) = [];
 fileNames(find(strcmp(fileNames,'ParameterHeatmap.mat'))) = [];
+fileNames(find(strcmp(fileNames,'HeatmapAccumulator.mat'))) = [];
 
+if p.random == 1
+    filenNames = drawRandomNames(fileNames,p.numberOfRandom);
+end
 % Get number of experiments
 numberOfResults = size(fileNames,1);
 
@@ -27,7 +31,7 @@ end
 load([p.resultsPathAccepted,'/',fileNames{1,1}]);
 
 % Original data size (in mu)
-origSize = gatheredData.processed.originalSize;
+% origSize = gatheredData.processed.originalSize;
 
 %% COMPUTE ACCUMULATOR
 

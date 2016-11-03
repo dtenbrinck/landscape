@@ -80,4 +80,11 @@ if option.slider == 1
     disp('Slider');
     TheSlider(p,option,accumulator,convAcc,numOfAllCells,numberOfResults);
 end
+
+% -- if cropper should be shown --  %
+
+if option.cropper == 1
+    disp('Cropper');
+    CropRegion(accumulator,HMS.MIP.Top,200);
+end
 end
