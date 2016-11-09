@@ -10,7 +10,7 @@ function p =  ParameterHeatmap()
 % Size of the cells
 p.sizeCells = 20; %um
 % Size of the Pixel
-p.sizeOfPixel = 0.29; %um
+p.sizeOfPixel = 1.29; %um
 p.sizeCellsPixel = round(p.sizeCells/p.sizeOfPixel);
 
 % -- PROCSESSING OF THE CELLS -- %
@@ -24,7 +24,7 @@ p.tole = 0.1;
 p.gridSize = 256;
 
 % Select a given number of random filnames
-p.random = 1;
+p.random = 0;
 
 % Select number of random filenames and process them
 p.numberOfRandom = 100;

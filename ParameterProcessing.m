@@ -8,8 +8,8 @@ function p =  ParameterProcessing()
 p.resolution = [1.29, 1.29, 20];
 p.scale = 0.75;
 
-% some output variables
-p.debug_level = 2;
+% Debug variables
+p.debug_level = 0;
 p.visualization = 0;
 %% SEGMNENTATION
 % -- PREPROCESSING -- %

@@ -36,17 +36,22 @@ load([p.resultsPathAccepted,'/',fileNames{1,1}]);
 % Original data size (in mu)
 % origSize = gatheredData.processed.originalSize;
 
-%% COMPUTE ACCUMULATOR
+%% SUM UP DAPI INTENSITIES
 
-% -- Compute all valid cell coordinates from the processed and registered data -- %
-allCellCoords = getAllValidCellCoords(p.gridSize,fileNames,numberOfResults,p.tole,p.resultsPathAccepted);
+heatMapDapi = zeros(p.gridSize, p.gridSize);
 
-% -- Compute the Accumulator from the cell coordinates -- %
-accumulator = compAcc(allCellCoords, p.gridSize);
-
+for result = 1:numberOfResults
+    % Load result data
+    load([p.resultsPathAccepted,'/',fileNames{result,1}])
+    
+    % Get all cell center coordinates
+    heatMapDapi = heatMapDapi + gatheredData.registered.DapiMIP;
+end
+heatMapDapi = heatMapDapi ./ numberOfResults;
 
 %% HANDLE HEATMAPS ( Computation, drawing and saving ) 
-handleHeatmaps(accumulator,size(allCellCoords,2),numberOfResults,p,p.option);
+%handleHeatmaps(heatMapDapi,0,numberOfResults,p,p.option);
+figure; imagesc(heatMapDapi);
 
 %% USER OUTPUT
 

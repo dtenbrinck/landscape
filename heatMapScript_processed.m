@@ -6,7 +6,7 @@ tole = 0.1;
 % Size of the cells
 sizeCells = 20; %um
 % Size of the Pixel
-sizeOfPixel = 0.29; %um
+sizeOfPixel = 1.29; %um
 sizeCellsPixel = round(sizeCells/sizeOfPixel);
 %% SET PATH
 resultsPath = './results/Heatmap'; % DONT APPEND '/' TO DIRECTORY NAME!!!
