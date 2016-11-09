@@ -1,4 +1,4 @@
-%% INITIALIZATION
+git %% INITIALIZATION
 clear; clc; close all;
 
 % add current folder and subfolders to path
@@ -39,6 +39,7 @@ load([p.resultsPathAccepted,'/',fileNames{1,1}]);
 %% SUM UP DAPI INTENSITIES
 
 heatMapDapi = zeros(p.gridSize, p.gridSize);
+heatMapGFP = zeros(p.gridSize, p.gridSize);
 
 for result = 1:numberOfResults
     % Load result data
@@ -46,12 +47,15 @@ for result = 1:numberOfResults
     
     % Get all cell center coordinates
     heatMapDapi = heatMapDapi + gatheredData.registered.DapiMIP;
+    heatMapGFP = heatMapGFP + gatheredData.registered.GFPMIP;
 end
 heatMapDapi = heatMapDapi ./ numberOfResults;
+heatMapGFP = heatMapGFP ./ numberOfResults;
 
 %% HANDLE HEATMAPS ( Computation, drawing and saving ) 
 %handleHeatmaps(heatMapDapi,0,numberOfResults,p,p.option);
 figure; imagesc(heatMapDapi);
+figure; imagesc(heatMapGFP);
 
 %% USER OUTPUT
 
