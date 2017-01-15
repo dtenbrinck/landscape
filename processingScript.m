@@ -1,5 +1,6 @@
 %% INITIALIZATION
 clear; clc; close all;
+
 p = initializeScript('process');
 
 %% PREPARE RESULTS DIRECTORY
@@ -80,6 +81,9 @@ for experiment=1:numberOfExperiments
             visualizeProjectedLandmark(sphereCoordinates, landmarkOnSphere);
             visualizeProjectedLandmark(registered_sphere', landmarkOnSphere);
         end
+        
+%        % DEBUG
+%        transformedCoordinates = rotationMatrix * landmarkCoordinates';
         
         % compute registration transformation from original data space
         transformation_registration = transformationMatrix * rotationMatrix';

@@ -14,7 +14,7 @@ function [ sphereCoordinates, landmarkCoordinates, landmarkOnSphere ] = projectL
 %% Main Code:
 
 % % Sampling sphere
-[alpha, beta] = meshgrid(linspace(pi,2*pi,samples/2), linspace(0,2*pi,samples));
+[alpha, beta] = meshgrid(linspace(pi,2*pi,samples/2), linspace(0,2*pi,2*samples));
 Xs = sin(alpha) .* sin(beta);
 Ys = cos(beta);
 Zs = cos(alpha) .* sin(beta);
