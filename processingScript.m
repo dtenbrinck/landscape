@@ -1,6 +1,8 @@
 %% INITIALIZATION
 clear; clc; close all;
 
+addpath(genpath(pwd));
+
 p = initializeScript('process');
 
 %% PREPARE RESULTS DIRECTORY

@@ -59,6 +59,21 @@ elseif strcmp(p.method,'k-means') % k-means clustering
     Xi = k_means_clustering(data, k, 'real');
     Xi = floor(Xi / k);
     
+elseif strcmp(p.method, 'k-means_local') % k-means in every slice
+    k = p.k;
+    Xi = zeros(size(data));
+    for slice=1:size(data,3)
+        tmp = k_means_clustering(data(:,:,slice), k, 'real');
+        
+        test = sum(tmp(:) == 2);
+        if test > 1/10 * numel(tmp)
+            Xi(:,:,slice) = floor(tmp / k);
+        else
+            tmp2 = zeros(size(tmp));
+            tmp2(tmp >= 2) = 1;
+            Xi(:,:,slice) = tmp2;
+        end
+    end
 end
 
 % look for connected components

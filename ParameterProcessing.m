@@ -24,13 +24,13 @@ p.GFPseg.method = 'k-means'; % 'k-means', 'CP'
 % -- mCherry SEGMENTATION -- %
 p.mCherryseg.k = 3;
 p.mCherryseg.cellSize = 50; %in pixel
-p.mCherryseg.method = 'k-means'; % 'k-means', 'CP'
+p.mCherryseg.method = 'k-means_local'; % 'k-means', 'k-means_local', 'CP'
 % -- LANDMARK PROJECTION -- %
 p.samples_sphere = 128;
 %% REGISTRATION
 % -- REGISTRATION OF LANDMARK -- %
 p.reg.landmarkCharacteristic = 'middle';
-p.reg.characteristicWeight = 0.4;
+p.reg.characteristicWeight = 0.5;
 p.reg.reference_point = [0; 0; -1];
 p.reg.reference_vector = [1; 0; 0];
 % - register data - %
