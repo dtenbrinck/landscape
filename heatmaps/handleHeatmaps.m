@@ -10,7 +10,7 @@ if option.heatmaps.process == 1
     fprintf('Computing heatmaps...');
     
     % -- Convolve over the points -- %
-    convAcc = computeConvAcc(accumulator,option.cellradius,2*option.cellradius+1);
+    convAcc = convolveAccumulator(accumulator,option.cellradius,2*option.cellradius+1);
     
     % -- Compute heatmap heatmaps -- %
     HMS = generateHeatmap(convAcc,option.heatmaps.types);
@@ -78,13 +78,13 @@ end
 
 if option.slider == 1
     disp('Slider');
-    TheSlider(p,option,accumulator,convAcc,numOfAllCells,numberOfResults);
+    gui_slider(p,option,accumulator,convAcc,numOfAllCells,numberOfResults);
 end
 
 % -- if cropper should be shown --  %
 
 if option.cropper == 1
     disp('Cropper');
-    CropRegion(accumulator,HMS.MIP.Top,200);
+    gui_cropRegion(accumulator,HMS.MIP.Top,200);
 end
 end

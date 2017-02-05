@@ -1,5 +1,6 @@
 # ignore reference folde
 refs/
+presentations/
 /deploy_new_version.bat
 /deploy_hotfix.bat
 /.csync_journal.db

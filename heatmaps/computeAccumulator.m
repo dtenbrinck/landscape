@@ -1,4 +1,4 @@
-function [ accumulator ] = compAcc( allCellCoords, gridSize )
+function [ accumulator ] = computeAccumulator( allCellCoords, gridSize )
 %This function computes the accumulator for the heatmap 
 
 %% MAIN CODE

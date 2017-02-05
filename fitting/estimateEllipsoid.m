@@ -1,4 +1,4 @@
-function [ center, radii, evecs, v, chi2 ] = ellipsoid_fit_new( X, equals )
+function [ center, radii, evecs, v, chi2 ] = estimateEllipsoid( X, equals )
 %
 % Fit an ellispoid/sphere/paraboloid/hyperboloid to a set of xyz data points:
 %

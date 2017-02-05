@@ -1,9 +1,6 @@
 function [ p ] = initializeScript( scriptType )
 % Initializes the scripts
 
-% add current folder and subfolders to path variable
-addpath(genpath(pwd));
-
 % set default search path for data
 if exist('/4TB/data/SargonYigit/','dir') == 7
     dataPath = '/4TB/data/SargonYigit/';
@@ -60,7 +57,65 @@ elseif strcmp(scriptType,'heatmap')
     p = struct(merge{:});
     p.resultsPathAccepted = [p.resultsPath,'/accepted'];
     save([p.resultsPath,'/accepted/ParameterHeatmap.mat'],'p_heat');
-    mkdir([p.resultsPath,'/heatmaps']);
+    
+    if ~exist([p.resultsPath,'/heatmaps'],'dir')
+        mkdir([p.resultsPath,'/heatmaps']);
+    end
+    
+elseif strcmp(scriptType,'heatmapComparison')
+    
+    % get first directory
+    resultsPath1 = uigetdir(resultsPath,'Please select first results folder to generate heatmap!');
+    if exist([resultsPath1,'/accepted/ParameterProcessing.mat'],'file') == 2
+        load([resultsPath1,'/accepted/ParameterProcessing.mat']);
+        p1 = p;
+    else
+        p1 = ParameterProcessing();
+    end
+    
+    p1.resultsPath = [resultsPath1 '/heatmaps'];
+    if(exist(p1.resultsPath,'dir') ~= 7)
+       error('Chosen directory does not contain subfolder named ''heatmaps''!'); 
+    end
+%     p_heat = ParameterHeatmap();
+%     merge = [fieldnames(p)', fieldnames(p_heat)';...
+%         struct2cell(p)',struct2cell(p_heat)']; 
+%     p = struct(merge{:});
+    %p1.resultsPathAccepted1 = [p1.resultsPath1,'/accepted'];
+    %save([p1.resultsPath1,'/accepted/ParameterHeatmap.mat'],'p_heat');
+    
+    % get second directory
+    resultsPath2 = uigetdir(resultsPath,'Please select second results folder to generate heatmap!');
+    if exist([resultsPath2,'/accepted/ParameterProcessing.mat'],'file') == 2
+        load([resultsPath2,'/accepted/ParameterProcessing.mat']);
+        p2 = p;
+    else
+        p2 = ParameterProcessing();
+    end
+    
+    p2.resultsPath = [resultsPath2 '/heatmaps'];
+    if(exist(p2.resultsPath,'dir') ~= 7)
+       error('Chosen directory does not contain subfolder named ''heatmaps''!'); 
+    end
+    %p.resultsPathAccepted2 = [p1.resultsPath2,'/accepted'];
+    %save([p1.resultsPath2,'/accepted/ParameterHeatmap.mat'],'p_heat');
+    
+    % ask for results folder
+    btn = questdlg('Do you want to use an existing results folder or create a new one?','New folder?','Create new','Use existing','Create new');
+    if strcmp(btn,'Create new')
+        p3.resultsPath = uigetdir(resultsPath,'Please select a directory for the new folder!');
+        answ = inputdlg('Enter a name for the new folder!');
+        p3.resultsPath = [p3.resultsPath,'/',answ{1}];
+        mkdir(p3.resultsPath);
+    else
+        p3.resultsPath = uigetdir(resultsPath,'Please select a folder for the results!');
+    end
+
+    % wrap variables for output
+    clear p;
+    p.p1 = p1;
+    p.p2 = p2;
+    p.p3 = p3;
 end
 
 end

@@ -192,3 +192,4 @@ if get(hObject,'Value')
 else
     rotate3d(h.ax3D,'off');
 end
+end

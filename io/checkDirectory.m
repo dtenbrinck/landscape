@@ -3,7 +3,7 @@ function checkDirectory( path )
 %   Detailed explanation goes here
 
 % check first if we are in root directory
-if ~exist('./application','dir')
+if ~exist('./io','dir')
     error('Please start script only in root directory of software!');
 end
 

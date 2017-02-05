@@ -33,7 +33,7 @@ for result = 1:numberOfResults
     
     % visualize results
 %     visualizeResults(experimentData, processedData, registeredData);
-    visualizeResults_new2(f,gatheredData);
+    visualizeResults_evaluation(f,gatheredData);
     
     % display user output
     fprintf(gatheredData.filename);

@@ -1,4 +1,4 @@
-function visualizeResults_new2(f,gatheredData)
+function visualizeResults_evaluation(f,gatheredData)
 %VISUALIZERESULTS Summary of this function goes here
 %   Detailed explanation goes here
 

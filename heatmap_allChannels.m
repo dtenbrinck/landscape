@@ -5,6 +5,7 @@ clear; clc; close all;
 addpath(genpath(pwd));
 
 p = initializeScript('heatmap');
+
 %% GET FILES TO PROCESS
 
 % Get filenames of MAT files in selected folder
@@ -36,8 +37,7 @@ load([p.resultsPathAccepted,'/',fileNames{1,1}]);
 % Original data size (in mu)
 % origSize = gatheredData.processed.originalSize;
 
-%% SUM UP DAPI INTENSITIES
-
+%% COMPUTE AVERAGE MIPS FOR ALL CHANNELS
 heatMapDapi = zeros(p.gridSize, p.gridSize);
 heatMapGFP = zeros(p.gridSize, p.gridSize);
 heatMapmCherry = zeros(p.gridSize, p.gridSize);
@@ -57,9 +57,9 @@ heatMapmCherry = heatMapmCherry ./ numberOfResults;
 
 %% HANDLE HEATMAPS ( Computation, drawing and saving ) 
 %handleHeatmaps(heatMapDapi,0,numberOfResults,p,p.option);
-figure; imagesc(heatMapDapi);
-figure; imagesc(heatMapGFP);
-figure; imagesc(heatMapmCherry);
+figure; imagesc(heatMapDapi); title('Average of registered DAPI channels');
+figure; imagesc(heatMapGFP); title('Average of registered GFP channels');
+figure; imagesc(heatMapmCherry); title('Average of registered mCherry channels');
 
 %% USER OUTPUT
 

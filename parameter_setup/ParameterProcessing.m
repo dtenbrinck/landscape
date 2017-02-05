@@ -9,8 +9,8 @@ p.resolution = [1.29, 1.29, 20];
 p.scale = 0.75;
 
 % Debug variables
-p.debug_level = 0;
-p.visualization = 0;
+p.debug_level = 3;
+p.visualization = 1;
 %% SEGMNENTATION
 % -- PREPROCESSING -- %
 % - removing background -%
@@ -24,7 +24,7 @@ p.GFPseg.method = 'k-means'; % 'k-means', 'CP'
 % -- mCherry SEGMENTATION -- %
 p.mCherryseg.k = 3;
 p.mCherryseg.cellSize = 50; %in pixel
-p.mCherryseg.method = 'k-means_local'; % 'k-means', 'k-means_local', 'CP'
+p.mCherryseg.method = 'k-means'; % 'k-means', 'k-means_local', 'CP'
 % -- LANDMARK PROJECTION -- %
 p.samples_sphere = 128;
 %% REGISTRATION

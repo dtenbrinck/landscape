@@ -26,7 +26,7 @@ X = X * resolution(2);
 Z = Z * resolution(3);
 
 % fit ellipsoid to sharp points in areas in focus
-[ ellipsoid.center, ellipsoid.radii, ellipsoid.axes, ellipsoid.v, ~] = ellipsoid_fit( [ X Y Z ], '' );
+[ ellipsoid.center, ellipsoid.radii, ellipsoid.axes, ellipsoid.v, ~] = estimateEllipsoid( [ X Y Z ], '' );
 
 
 % check axes orientation and flip if necessary

@@ -1,4 +1,4 @@
-function convAcc = computeConvAcc(accumulator,radius,sizeGrid)
+function convAcc = convolveAccumulator(accumulator,radius,sizeGrid)
 % This function computes the convolution of the accumulator and a sphere
 % with a radius
 
