@@ -50,6 +50,11 @@ for factor = [1 2 4 8]
       end
     end
   end
+ 
+  %%% EXPERIMENTAL
+  cellradius = 7 / factor;
+  accum1_rzd = convolveAccumulator(accum1_rzd,cellradius,2*cellradius+1);
+  accum2_rzd = convolveAccumulator(accum2_rzd,cellradius,2*cellradius+1);
   
   % compute MIPs / SUMS
   sum1 = sum(accum1_rzd,3);
@@ -69,8 +74,8 @@ for factor = [1 2 4 8]
   sum_min_max = min(max(sum1(:)), max(sum2(:)));
   
   figure('units','normalized','outerposition',[0 0 1 1]); 
-  subplot(1,2,1);imagesc(sum1, [0 sum_min_max]); colorbar; axis image; title(p.p1.resultsPath);
-  subplot(1,2,2);imagesc(sum2, [0 sum_min_max]); colorbar; axis image; title(p.p2.resultsPath);
+  subplot(1,2,1);imagesc(sum1, [0 sum_min_max]); colorbar; axis image; title(p.p1.resultsPath); colormap jet;
+  subplot(1,2,2);imagesc(sum2, [0 sum_min_max]); colorbar; axis image; title(p.p2.resultsPath); colormap jet;
   ha = axes('Position',[0 0 1 1],'Xlim',[0 1],'Ylim',[0 1],'Box','off','Visible','off','Units','normalized', 'clipping' , 'off');
   text(0.5, 1,'\bf Relative, min-max scaling of sums','HorizontalAlignment','center','VerticalAlignment', 'top')
   print([result_path 'HeatmapComparison_SUM_factor_' num2str(factor) '_rel_minmax'],'-dpng');
@@ -79,8 +84,8 @@ for factor = [1 2 4 8]
   sum_max_max = max(max(mip1(:)), max(mip2(:)));
   
   figure('units','normalized','outerposition',[0 0 1 1]); 
-  subplot(1,2,1);imagesc(sum1, [0 sum_max_max]); colorbar; axis image; title(p.p1.resultsPath);
-  subplot(1,2,2);imagesc(sum2, [0 sum_max_max]); colorbar; axis image; title(p.p2.resultsPath);
+  subplot(1,2,1);imagesc(sum1, [0 sum_max_max]); colorbar; axis image; title(p.p1.resultsPath); colormap jet;
+  subplot(1,2,2);imagesc(sum2, [0 sum_max_max]); colorbar; axis image; title(p.p2.resultsPath); colormap jet;
   ha = axes('Position',[0 0 1 1],'Xlim',[0 1],'Ylim',[0 1],'Box','off','Visible','off','Units','normalized', 'clipping' , 'off');
   text(0.5, 1,'\bf Relative, max-max scaling of sums','HorizontalAlignment','center','VerticalAlignment', 'top')
   print([result_path 'HeatmapComparison_SUM_factor_' num2str(factor) '_rel_maxmax'],'-dpng');
@@ -92,8 +97,8 @@ for factor = [1 2 4 8]
   mip_min_max = min(max(mip1(:)), max(mip2(:)));
   
   figure('units','normalized','outerposition',[0 0 1 1]); 
-  subplot(1,2,1);imagesc(mip1, [0 mip_min_max]); colorbar; axis image; title(p.p1.resultsPath);
-  subplot(1,2,2);imagesc(mip2, [0 mip_min_max]); colorbar; axis image; title(p.p2.resultsPath);
+  subplot(1,2,1);imagesc(mip1, [0 mip_min_max]); colorbar; axis image; title(p.p1.resultsPath); colormap jet;
+  subplot(1,2,2);imagesc(mip2, [0 mip_min_max]); colorbar; axis image; title(p.p2.resultsPath); colormap jet;
   ha = axes('Position',[0 0 1 1],'Xlim',[0 1],'Ylim',[0 1],'Box','off','Visible','off','Units','normalized', 'clipping' , 'off');
   text(0.5, 1,'\bf Relative, min-max scaling','HorizontalAlignment','center','VerticalAlignment', 'top')
   print([result_path 'HeatmapComparison_MIP_factor_' num2str(factor) '_rel_minmax'],'-dpng');
@@ -102,8 +107,8 @@ for factor = [1 2 4 8]
   mip_max_max = max(max(mip1(:)), max(mip2(:)));
   
   figure('units','normalized','outerposition',[0 0 1 1]); 
-  subplot(1,2,1);imagesc(mip1, [0 mip_max_max]); colorbar; axis image; title(p.p1.resultsPath);
-  subplot(1,2,2);imagesc(mip2, [0 mip_max_max]); colorbar; axis image; title(p.p2.resultsPath);
+  subplot(1,2,1);imagesc(mip1, [0 mip_max_max]); colorbar; axis image; title(p.p1.resultsPath); colormap jet;
+  subplot(1,2,2);imagesc(mip2, [0 mip_max_max]); colorbar; axis image; title(p.p2.resultsPath); colormap jet;
   ha = axes('Position',[0 0 1 1],'Xlim',[0 1],'Ylim',[0 1],'Box','off','Visible','off','Units','normalized', 'clipping' , 'off');
   text(0.5, 1,'\bf Relative, max-max scaling','HorizontalAlignment','center','VerticalAlignment', 'top')
   print([result_path 'HeatmapComparison_MIP_factor_' num2str(factor) '_rel_maxmax'],'-dpng');
