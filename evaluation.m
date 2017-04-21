@@ -1,6 +1,8 @@
 %% INITIALIZATION
 clear all; clc; close all;
 
+addpath(genpath(pwd));
+
 p = initializeScript('evaluate');
 
 %% GET FILES TO PROCESS
