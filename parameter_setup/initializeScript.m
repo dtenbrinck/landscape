@@ -2,16 +2,16 @@ function [ p ] = initializeScript( scriptType )
 % Initializes the scripts
 
 % set default search path for data
-if exist('/4TB/data/SargonYigit/','dir') == 7
-    dataPath = '/4TB/data/SargonYigit/';
+if exist('/media/piradmin/4TB/data/Landscape/Static','dir') == 7
+    dataPath = '/media/piradmin/4TB/data/Landscape/Static';
 elseif exist('E:/Embryo_Registration/data/SargonYigit/','dir') == 7
     dataPath = 'E:/Embryo_Registration/data/SargonYigit/';
 else % in case the above folders don't exist take the current directory
     dataPath = './data';
 end
 % set default search path for results
-if exist('/4TB/data/SargonYigit/','dir') == 7
-    resultsPath = '/media/piradmin/4TB/Results/results';
+if exist('/media/piradmin/4TB/data/Landscape/Static','dir') == 7
+    resultsPath = '/media/piradmin/4TB/data/Landscape/Static/results';
 else % in case the above folders don't exist take the current directory
     resultsPath = './results';
 end

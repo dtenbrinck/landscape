@@ -1,8 +1,10 @@
-function [ data ] = loadExperimentData( experimentSets, dataPathName, waitbarHandle )
+function [ data ] = loadExperimentData( experimentSets, dataPathName, manRes )
 
 % initialize empty struct
 data = struct;
-
+manualset = manRes(1);
+manualxRes = manRes(2);
+manualyRes = manRes(3);
 % get amount of data to be processed
 numOfData = size(experimentSets,1);
 
@@ -43,10 +45,24 @@ for i=1:numOfData
     % save filename
     % ATTENTION: This assumes a fixed naming convention!
     data.(dataName).filename = experimentSets{i,1}{1}(1:end-11);
-    
+    % Check if resolutions are given in the dataset.
+    if isfield(TIFF,'x_resolution')
     % set resolution and size of 2D slices
-    xres = TIFF.('x_resolution');
-    yres = TIFF.('y_resolution');
+        xres = TIFF.('x_resolution');
+        yres = TIFF.('y_resolution'); 
+    elseif ~isfield(TIFF,'x_resolution') && manualset == 0
+        res = inputdlg({'No resolution given in the TIFF data. Please insert the correct resolution. xresolution:','yresolution:'},'No resolution');
+        xres = str2num(res{1});
+        yres = str2num(res{2});
+        data.manualxRes = xres;
+        data.manualyRes = yres;
+    elseif ~isfield(TIFF,'x_resolution') && manualset == 1;
+        xres = manualxRes;
+        yres = manualyRes;
+    end
+    % ATTEMPT TO FIX THE ERROR WITH THE STICHED EMBRYOS
+    %xres = 312; %trying to assign the same value as in every data we acquired so far
+    %yres = 312; %as above
     data.(dataName).x_resolution = xres(1);
     data.(dataName).y_resolution = yres(1);
     
@@ -57,7 +73,6 @@ for i=1:numOfData
     rmfield(data,dataName);
     continue;
   end
-  
   if exist('waitbarHandle','var')
     % update waitbar
     waitbar(i/numOfData, waitbarHandle);

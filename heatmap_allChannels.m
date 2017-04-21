@@ -57,9 +57,10 @@ heatMapmCherry = heatMapmCherry ./ numberOfResults;
 
 %% HANDLE HEATMAPS ( Computation, drawing and saving ) 
 %handleHeatmaps(heatMapDapi,0,numberOfResults,p,p.option);
-figure; imagesc(heatMapDapi); title('Average of registered DAPI channels');
-figure; imagesc(heatMapGFP); title('Average of registered GFP channels');
-figure; imagesc(heatMapmCherry); title('Average of registered mCherry channels');
+
+figure; imagesc(heatMapDapi); title('Average of registered DAPI channels');colormap('jet');
+figure; imagesc(heatMapGFP); title('Average of registered GFP channels');colormap('jet');
+figure; imagesc(heatMapmCherry); title('Average of registered mCherry channels');colormap('jet');
 
 %% USER OUTPUT
 
