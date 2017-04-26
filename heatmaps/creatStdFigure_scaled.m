@@ -1,4 +1,4 @@
-function [ stdFig, pca] = creatStdFigure_scaled( numberOfResults, numOfAllCells,HMS, currentType,i,option)
+function [ stdFig, pca] = creatStdFigure_scaled( numberOfResults, numOfAllCells,HMS, currentType)
 % Creates standard figure
 
 climMax = max([max(HMS.(currentType).Top(:)),max(HMS.(currentType).Head(:)),...
@@ -6,7 +6,7 @@ climMax = max([max(HMS.(currentType).Top(:)),max(HMS.(currentType).Head(:)),...
 
 mycolormap = jet(256);
 stdFig = figure('units','normalized','outerposition',[0.25 0.25 0.65 0.65]);
-set(stdFig,'Name',['Heatmaps ',char(option.heatmaps.types(i)),' (scaled)']);
+set(stdFig,'Name',['Heatmaps ',currentType,' (scaled)']);
 set(stdFig,'Visible','off');
 colormap(mycolormap);
 

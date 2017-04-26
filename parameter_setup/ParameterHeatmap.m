@@ -41,7 +41,7 @@ p.option.cellradius = 7;
 p.option.slider = 0;  %in progress
 
 % - Cropper options
-p.option.cropper = 1;
+p.option.cropper = 0;
 
 % -- Options for the heatmap generation -- %
 

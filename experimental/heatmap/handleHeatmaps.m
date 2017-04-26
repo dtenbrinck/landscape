@@ -45,7 +45,7 @@ if option.heatmaps.process == 1
         figs = [figure('Visible','off'),figure('Visible','off'),...
             figure('Visible','off'),figure('Visible','off')];
         if strcmp(option.heatmaps.scaled,'true')||strcmp(option.heatmaps.scaled,'both')
-            [f,pca] = creatStdFigure_scaled(numberOfResults,numOfAllCells,HMS,currentType,i,option);      
+            [f,pca] = creatStdFigure_scaled(numberOfResults,numOfAllCells,HMS,currentType);      
             figs(i+(2*(i-1))) = copyobj(f,0);
             set(findobj(figs(i+(2*(i-1))).Children,'Tag','sp3'),'position',pca);
             set(figs(i+(2*(i-1))),'Visible',vis);
@@ -62,7 +62,7 @@ if option.heatmaps.process == 1
         end
         if strcmp(option.heatmaps.scaled,'false')||strcmp(option.heatmaps.scaled,'both')
             % Create figure
-            f = creatStdFigure_unscaled(numberOfResults,numOfAllCells,HMS,currentType,i,option); 
+            f = creatStdFigure_unscaled(numberOfResults,numOfAllCells,HMS,currentType); 
             figs(i+1+(2*(i-1))) = copyobj(f,0);
             set(figs(i+1+(2*(i-1))),'Visible',vis);
             

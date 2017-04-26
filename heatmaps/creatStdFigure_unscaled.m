@@ -1,9 +1,9 @@
-function [ stdFig ] = creatStdFigure_unscaled( numberOfResults, numOfAllCells,HMS, currentType,i,option)
+function [ stdFig ] = creatStdFigure_unscaled( numberOfResults, numOfAllCells,HMS, currentType)
 % Creates standard figure
 
 mycolormap = jet(256);
 stdFig = figure('units','normalized','outerposition',[0.25 0.25 0.65 0.65]);
-set(stdFig,'Name',['Heatmaps ',char(option.heatmaps.types(i)),' (unscaled)']);
+set(stdFig,'Name',['Heatmaps ',currentType,' (unscaled)']);
 set(stdFig,'Visible','off');
 colormap(mycolormap);
 
