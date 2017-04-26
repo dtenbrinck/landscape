@@ -64,7 +64,9 @@ elseif exist('E:/Embryo_Registration/data/SargonYigit/','dir') == 7
 else % in case the above folders don't exist take the current directory
     dataPath = '/home/fjedor/Uni/Sciebo/Uni/SHK/SphereRepresentation/data';
 end
-path = uigetdir(dataPath,'Please select a accepted results folder to generate spherical heatmap!');
+% path = uigetdir(dataPath,'Please select a accepted results folder to generate spherical heatmap!');
+% path = '/media/piradmin/4TB/data/Landscape/Static/ody/10hpf/raw_data/pooled_data_sets/Results_AP_oriented_criteria_minimum_1_PGC_detected_all_601_embryos/accepted';
+path = '/media/piradmin/4TB/data/Landscape/Static/ody/10hpf/raw_data/pooled_data_sets/Results_AP_oriented_criteria_minimum_1_PGC_870_datasets_20170412/accepted';
 %--  GET FILES TO PROCESS -- %
 
 % Get filenames of MAT files in selected folder
@@ -75,22 +77,24 @@ fileNames(find(strcmp(fileNames,'HeatmapAccumulator.mat'))) = [];
 
 % Get number of experiments
 numberOfResults = size(fileNames,1);
-
+handles.numOfRes = numberOfResults;
 % Check if any results have been found
 
 % Get all cell coordinates
 handles.cellCoords = getAllValidCellCoords_woAcc(fileNames,numberOfResults,0.1,path)';
 
-
 % SET IT ON WHEN THE CONVOLUTION IS WORKING IN SOME WAY
 set(handles.upConv,'Visible','off')
 % Mouse over function
-set(gcf,'windowbuttonmotionfcn',@mousemove);
+set(findobj('Name','SphereHeatmap(Prototype)'),'windowbuttonmotionfcn',@mousemove);
 
-% Set Defaults
+% Set Defaults-
 
 % Set default sampling
-handles.sampling=100;
+handles.sampling = 100;
+handles.samp2D = 200;
+
+
 set(handles.edSampling,'Value',handles.sampling,'String',num2str(handles.sampling));
 % Set the sampling points
 [handles.xs,handles.ys,handles.zs] = sphere(handles.sampling);
@@ -107,6 +111,12 @@ set(handles.maxShell,'Value',handles.maxShellValue,'String',num2str(handles.maxS
 ableConv(handles);
 
 % -- Compute main results for visualization -- %
+
+% Flip z coordinate
+handles.cellCoords(:,3) = -handles.cellCoords(:,3);
+
+% Coordinates for 2D heatmap
+handles = evaluateFor2Dheatmap(handles);
 
 
 % Sample cells
@@ -126,6 +136,31 @@ guidata(hObject, handles);
 
 
 %% -- GENERAL FUNCTIONS -- %%
+
+function handles = evaluateFor2Dheatmap(handles)
+cellRad = 7;
+handles.cellCoordsHM = handles.cellCoords;
+handles.cellCoordsHM(:,3) = -handles.cellCoordsHM(:,3);
+%Throw all points that are outside of the shells aways
+normCellCoords = sqrt(sum(handles.cellCoords.^2,2));
+handles.cellCoordsHM((normCellCoords > handles.maxShellValue|normCellCoords < handles.minShellValue),:)=[];
+handles.cellCoordsHM = round((handles.cellCoordsHM+1)/2*handles.samp2D)+1;
+handles.Accumulator = computeAccumulator(handles.cellCoordsHM',handles.samp2D);
+handles.Accumulator = convolveAccumulator(handles.Accumulator,cellRad,2*cellRad+1);
+% Compute heatmaps
+handles.heatmaps = compHeatmaps(handles.Accumulator);
+
+
+
+    function heatmaps = compHeatmaps(accumulator)
+        heatmaps.MIP.Top = max(accumulator,[],3);
+        heatmaps.MIP.Head = reshape(max(accumulator,[],2),[size(accumulator,1),size(accumulator,3)]);
+        heatmaps.MIP.Side = reshape(max(accumulator,[],1),[size(accumulator,2),size(accumulator,3)]);
+        heatmaps.SUM.Top = sum(accumulator,3);
+        heatmaps.SUM.Head = reshape(sum(accumulator,2),[size(accumulator,1),size(accumulator,3)]);
+        heatmaps.SUM.Side = reshape(sum(accumulator,1),[size(accumulator,2),size(accumulator,3)]);
+    
+
 
 function handles = doConvolution(handles)
 handles =  samplePointsColor(handles);
@@ -162,8 +197,8 @@ visualization(handles);
 
 function mousemove(hObject,eventdata)
 % CB %
-h_axes = findobj(get(gcf,'Children'),'Tag','cbAxis');
-l1 = findobj(get(gcf,'Children'),'Tag','line1');
+h_axes = findobj(get(findobj('Name','SphereHeatmap(Prototype)'),'Children'),'Tag','cbAxis');
+l1 = findobj(get(findobj('Name','SphereHeatmap(Prototype)'),'Children'),'Tag','line1');
 delete(l1);
 C = get(h_axes,'currentpoint');
 if iscell(C)
@@ -215,9 +250,39 @@ else
     set(handles.rbCircular,'enable','on')
 end
 
+
+function handles = updateFigure2DHM(handles)
+    
+numOfAllCells = size(handles.cellCoords,1);
+delete(findobj('Tag','f2'));
+handles.f2 =  copyobj(creatStdFigure_scaled(handles.numOfRes,numOfAllCells...
+    ,handles.heatmaps,'MIP'),0); 
+set(handles.f2,'Visible','on','Tag','f2');    
+    
+delete(findobj('Tag','f3'));
+handles.f3 = copyobj(creatStdFigure_unscaled(handles.numOfRes,numOfAllCells...
+    ,handles.heatmaps,'MIP'),0); 
+set(handles.f3,'Visible','on','Tag','f3');
+
+delete(findobj('Tag','f4'));
+handles.f4 = copyobj(creatStdFigure_scaled(handles.numOfRes,numOfAllCells...
+    ,handles.heatmaps,'SUM'),0);      
+set(handles.f4,'Visible','on','Tag','f4');    
+        
+delete(findobj('Tag','f5'));
+handles.f5 = copyobj(creatStdFigure_unscaled(handles.numOfRes,numOfAllCells...
+    ,handles.heatmaps,'SUM'),0); 
+set(handles.f5,'Visible','on','Tag','f5');
+
+
+
+
 function visualization(handles)
 cla(handles.axes);
-
+if isfield(handles,'cellCoords')
+handles = evaluateFor2Dheatmap(handles);
+handles = updateFigure2DHM(handles);
+end
 hold(handles.axes,'on');
 % Visualize sphere
 if handles.tbSphere.Value == 1
@@ -321,7 +386,7 @@ miline = line([xlim(1),xlim(1),xlim(2),xlim(2)], ...
 
 
 function btndown(hObject,b)
-h_axes = findobj(get(gcf,'Children'),'Tag','cbAxis');
+h_axes = findobj(get(findobj('Name','SphereHeatmap(Prototype)'),'Children'),'Tag','cbAxis');
 handles = guidata(hObject);
 f_axes = handles.axes;
 C = get(h_axes,'currentpoint');
@@ -385,7 +450,8 @@ if size(axis,1) == 0 || strcmp(clear,'clear')
     delete(findobj('Tag','cbAxis'));
     caxis(handles.axes,[0,max(handles.spc(:))]);
     cb = colorbar(handles.axes,'Limits',[0,max(handles.spc(:))]);
-    h_axes = axes('position', cb.Position, 'ylim', cb.Limits,...
+    h_axes = axes(findobj('Name','SphereHeatmap(Prototype)'),...
+        'position', cb.Position, 'ylim', cb.Limits,...
         'Units','normalize','color', 'none', 'visible','off',...
         'Tag','cbAxis','ButtonDownFcn',@btndown,'PickableParts','all');
 elseif size(axis,1) == 1
@@ -394,7 +460,8 @@ elseif size(axis,1) == 1
         delete(axis)
         caxis(handles.axes,[0,max(handles.spc(:))]);
         cb = colorbar(handles.axes,'Limits',[0,max(handles.spc(:))]);
-        h_axes = axes('position', cb.Position, 'ylim', cb.Limits,...
+        h_axes = axes(findobj('Name','SphereHeatmap(Prototype)'),...
+            'position', cb.Position, 'ylim', cb.Limits,...
             'Units','normalize','color', 'none', 'visible','off',...
             'Tag','cbAxis','ButtonDownFcn',@btndown,'PickableParts','all');
     elseif size(lines,1)==1
@@ -403,7 +470,8 @@ elseif size(axis,1) == 1
         maxlevel = lines(1).YData(1);
         delete(findobj('Tag','cbAxis'));
         cb = colorbar(handles.axes,'Limits',[0,max(handles.spc(:))]);
-        h_axes = axes('position', cb.Position, 'ylim', cb.Limits,...
+        h_axes = axes(findobj('Name','SphereHeatmap(Prototype)'),...
+            'position', cb.Position, 'ylim', cb.Limits,...
             'Units','normalize','color', 'none', 'visible','off',...
             'Tag','cbAxis','ButtonDownFcn',@btndown,'PickableParts','all');
         ml = maxline(xlim,ylim,maxlevel,h_axes);
@@ -415,7 +483,8 @@ elseif size(axis,1) == 1
         [minlevel,minind] = min([lines(1).YData(2),lines(2).YData(2)]);
         delete(findobj('Tag','cbAxis'));
         cb = colorbar(handles.axes,'Limits',[0,max(handles.spc(:))]);
-        h_axes = axes('position', cb.Position, 'ylim', cb.Limits,...
+        h_axes = axes(findobj('Name','SphereHeatmap(Prototype)'),...
+            'position', cb.Position, 'ylim', cb.Limits,...
             'Units','normalize','color', 'none', 'visible','off',...
             'Tag','cbAxis','ButtonDownFcn',@btndown,'PickableParts','all');
         ml1 = maxline(xlim,ylim,maxlevel,h_axes);
@@ -474,7 +543,6 @@ function minShell_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
 
 
 function maxShell_Callback(hObject, eventdata, handles)
