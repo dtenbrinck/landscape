@@ -48,11 +48,17 @@ accumulator_registered = computeAccumulator(allCellCoords_registered, p.gridSize
 accumulator_unregistered = computeAccumulator(allCellCoords_unregistered, p.gridSize);
 
 
-%% HANDLE HEATMAPS ( Computation, drawing and saving ) 
+%% CONVOLVE ACCUMULATOR
 
-handleHeatmaps(accumulator_registered,size(allCellCoords_registered,2),numberOfResults,p,p.option,'registered');
-handleHeatmaps(accumulator_unregistered,size(allCellCoords_unregistered,2),numberOfResults,p,p.option,'unregistered');
+convAccumulator_registered = convolveAccumulator(accumulator_registered,p.option.cellradius,2*p.option.cellradius+1);
+convAccumulator_unregistered = convolveAccumulator(accumulator_unregistered,p.option.cellradius,2*p.option.cellradius+1);
 
+
+%% VISUALIZE COMPARISON OF MIPS FOR REGISTERED AND UNREGISTERED DATA
+
+figure;
+subplot(1,2,1); imagesc(max(convAccumulator_registered,[],3)); axis image; title('MIP for registered data');
+subplot(1,2,2); imagesc(max(convAccumulator_unregistered,[],3)); axis image; title('MIP for unregistered data');
 
 %% USER OUTPUT
 
