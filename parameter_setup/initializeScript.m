@@ -1,6 +1,17 @@
 function [ p ] = initializeScript( scriptType )
 % Initializes the scripts
 
+% add necessary folders
+addpath('./auxiliary/');
+addpath('./fitting/');
+addpath('./gui/');
+addpath('./heatmaps/');
+addpath('./io/');
+addpath('./preprocessing/');
+addpath('./registration/');
+addpath(genpath('./segmentation/'));
+addpath('./visualization/');
+
 % set default search path for data
 if exist('/media/piradmin/4TB/data/Landscape/Static','dir') == 7
     dataPath = '/media/piradmin/4TB/data/Landscape/Static';
@@ -119,4 +130,3 @@ elseif strcmp(scriptType,'heatmapComparison')
 end
 
 end
-

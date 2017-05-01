@@ -1,8 +1,10 @@
 %% INITIALIZATION
 clear; clc; close all;
 
-addpath(genpath(pwd));
+% add path for parameter setup
+addpath('./parameter_setup/');
 
+% load necessary variables
 p = initializeScript('process');
 
 % manual set resolution parameter

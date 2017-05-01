@@ -1,17 +1,18 @@
 %% INITIALIZATION
 clear; clc; close all;
 
-% add current folder and subfolders to path
-addpath(genpath(pwd));
+% add path for parameter setup
+addpath('./parameter_setup/');
 
+% load necessary variables
 p = initializeScript('heatmapComparison');
 
+
+%% GET ACCUMULATOR FILES TO PROCESS
 
 % define paths to heatmaps to be compared
 path1 = p.p1.resultsPath;
 path2 = p.p2.resultsPath;
-%path1 = './results/Heatmap_Comparison/Heatmap/Accumulator.mat';
-%path2 = './results/Heatmap_Comparison/Spadetail/Accumulator.mat';
 
 % define result path
 result_path = [p.p3.resultsPath '/'];

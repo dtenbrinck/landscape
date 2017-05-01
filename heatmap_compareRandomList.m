@@ -3,11 +3,11 @@ clear; clc; close all;
 
 percOfAll = 0.5;
 
-% add current folder and subfolders to path
-addpath(genpath(pwd));
+% add path for parameter setup
+addpath('./parameter_setup/');
 
+% load necessary variables
 p = initializeScript('heatmap');
-
 
 % define paths to heatmaps to be compared
 result_path = [p.resultsPath,'/'];

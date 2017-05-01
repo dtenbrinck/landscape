@@ -1,10 +1,13 @@
 %% INITIALIZATION
 clear; clc; close all;
 
-% add current folder and subfolders to path
-addpath(genpath(pwd));
+% add path for parameter setup
+addpath('./parameter_setup/');
 
+% load necessary variables
 p = initializeScript('heatmap');
+
+
 %% GET FILES TO PROCESS
 
 % Get filenames of MAT files in selected folder
