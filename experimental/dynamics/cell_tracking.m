@@ -11,6 +11,7 @@ addpath(genpath('./experimental/'));
 % load necessary variables
 p = initializeScript('process');
 rmpath('./preprocessing');
+rmpath('./segmentation');
 
 % manual set resolution parameter
 manRes = [0,0,0];
