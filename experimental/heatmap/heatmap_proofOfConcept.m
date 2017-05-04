@@ -8,6 +8,7 @@ p = initializeScript('heatmap');
 
 % define if to use mCherry channel or accumulator
 use_accumulator = true;
+use_mip = true;
 
 %% GET FILES TO PROCESS
 
@@ -107,11 +108,11 @@ if use_accumulator
     subplot(2,3,1); imagesc(max(convAccumulator_unregistered,[],3)); axis square; title('MIP of unregistered mCherry channel');
     subplot(2,3,4); imagesc(max(convAccumulator_registered,[],3)); axis square; title('MIP of registered mCherry channel');
 else
-    subplot(2,3,1); imagesc(heatMapmCherry_unregistered); axis square; title('MIP of unregistered mCherry channel');
+    subplot(2,3,1); imagesc(heatMapmCherry_unregistered); axis image; title('MIP of unregistered mCherry channel');
     subplot(2,3,4); imagesc(heatMapmCherry_registered); axis square; title('MIP of registered mCherry channel');
 end
 
-subplot(2,3,2); imagesc(heatMapDapi_unregistered); axis square; title('MIP of unregistered DAPI channel');
+subplot(2,3,2); imagesc(heatMapDapi_unregistered); axis image; title('MIP of unregistered DAPI channel');
 subplot(2,3,5); imagesc(heatMapDapi_registered); axis square; title('MIP of registered DAPI channel');
-subplot(2,3,3); imagesc(heatMapGFP_unregistered); axis square; title('MIP of unregistered GFP channel');
+subplot(2,3,3); imagesc(heatMapGFP_unregistered); axis image; title('MIP of unregistered GFP channel');
 subplot(2,3,6); imagesc(heatMapGFP_registered); axis square; title('MIP of registered GFP channel');
