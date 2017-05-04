@@ -38,35 +38,31 @@ end
 load([p.resultsPathAccepted,'/',fileNames{1,1}]);
 
 % Original data size (in mu)
-% origSize = gatheredData.processed.originalSize;
+origSize = gatheredData.processed.originalSize;
+ySize = origSize(1); xSize = origSize(2);
 
-%% COMPUTE ACCUMULATOR
+%% COMPUTE CONVOLVED ACCUMULATOR
 
-% -- Compute all valid cell coordinates from the unregistered and registered data -- %
-[allCellCoords_registered, allCellCoords_unregistered] = getAllValidCellCoords(p.gridSize,fileNames,numberOfResults,p.tole,p.resultsPathAccepted);
-
-% -- Compute the accumulator for the registered cells -- %
-accumulator_registered = computeAccumulator(allCellCoords_registered, p.gridSize);
-
-% -- Compute the accumulator for the unregistered cells -- %
-accumulator_unregistered = computeAccumulator(allCellCoords_unregistered, p.gridSize);
-
-
-%% CONVOLVE ACCUMULATOR
-
-convAccumulator_registered = convolveAccumulator(accumulator_registered,p.option.cellradius,2*p.option.cellradius+1);
-convAccumulator_unregistered = convolveAccumulator(accumulator_unregistered,p.option.cellradius,2*p.option.cellradius+1);
-
+if use_accumulator
+    % -- Compute all valid cell coordinates from the unregistered and registered data -- %
+    [allCellCoords_registered, allCellCoords_unregistered] = getAllValidCellCoords(p.gridSize,fileNames,numberOfResults,p.tole,p.resultsPathAccepted);
+    
+    % -- Compute the accumulator for the registered cells -- %
+    accumulator_registered = computeAccumulator(allCellCoords_registered, p.gridSize);
+    
+    % -- Compute the accumulator for the unregistered cells -- %
+    accumulator_unregistered = computeAccumulator(allCellCoords_unregistered, p.gridSize);
+    
+    % convolve accumulator with binary spherical mask with size of cells
+    convAccumulator_registered = convolveAccumulator(accumulator_registered,p.option.cellradius,2*p.option.cellradius+1);
+    convAccumulator_unregistered = convolveAccumulator(accumulator_unregistered,p.option.cellradius,2*p.option.cellradius+1);
+    
+end
 
 %% COMPUTE AVERAGE MIPS FOR ALL CHANNELS
 heatMapDapi_registered = zeros(p.gridSize, p.gridSize);
 heatMapGFP_registered = zeros(p.gridSize, p.gridSize);
 heatMapmCherry_registered = zeros(p.gridSize, p.gridSize);
-
-% make a test load for data size
-%TODO: Put this in p struct
-load([p.resultsPathAccepted,'/',fileNames{1,1}])
-[ySize, xSize] = size(gatheredData.processed.DapiMIP);
 
 heatMapDapi_unregistered = zeros(ySize, xSize);
 heatMapGFP_unregistered = zeros(ySize, xSize);
@@ -76,15 +72,28 @@ for result = 1:numberOfResults
     % Load result data
     load([p.resultsPathAccepted,'/',fileNames{result,1}])
     
-    % compute heatmaps for each channel for registered data
-    heatMapDapi_registered = heatMapDapi_registered + gatheredData.registered.DapiMIP;
-    heatMapGFP_registered = heatMapGFP_registered + gatheredData.registered.GFPMIP;
-    heatMapmCherry_registered = heatMapmCherry_registered + gatheredData.registered.mCherryMIP;
-    
-    % compute heatmaps for each channel for unregistered data
-    heatMapDapi_unregistered = heatMapDapi_unregistered + gatheredData.processed.DapiMIP;
-    heatMapGFP_unregistered = heatMapGFP_unregistered + gatheredData.processed.GFPMIP;
-    heatMapmCherry_unregistered = heatMapmCherry_unregistered + gatheredData.processed.mCherryMIP;
+    if use_mip
+        % compute heatmaps for each channel for registered data
+        heatMapDapi_registered = heatMapDapi_registered + gatheredData.registered.DapiMIP;
+        heatMapGFP_registered = heatMapGFP_registered + gatheredData.registered.GFPMIP;
+        heatMapmCherry_registered = heatMapmCherry_registered + gatheredData.registered.mCherryMIP;
+        
+        % compute heatmaps for each channel for unregistered data
+        heatMapDapi_unregistered = heatMapDapi_unregistered + gatheredData.processed.DapiMIP;
+        heatMapGFP_unregistered = heatMapGFP_unregistered + gatheredData.processed.GFPMIP;
+        heatMapmCherry_unregistered = heatMapmCherry_unregistered + gatheredData.processed.mCherryMIP;
+        
+    else % TODO: Implement summation of channels in processing script
+%         % compute heatmaps for each channel for registered data
+%         heatMapDapi_registered = heatMapDapi_registered + gatheredData.registered.DapiMIP;
+%         heatMapGFP_registered = heatMapGFP_registered + gatheredData.registered.GFPMIP;
+%         heatMapmCherry_registered = heatMapmCherry_registered + gatheredData.registered.mCherryMIP;
+%         
+%         % compute heatmaps for each channel for unregistered data
+%         heatMapDapi_unregistered = heatMapDapi_unregistered + gatheredData.processed.DapiMIP;
+%         heatMapGFP_unregistered = heatMapGFP_unregistered + gatheredData.processed.GFPMIP;
+%         heatMapmCherry_unregistered = heatMapmCherry_unregistered + gatheredData.processed.mCherryMIP;
+    end
 end
 %heatMapDapi_registered = heatMapDapi_registered ./ numberOfResults;
 %heatMapGFP_registered = heatMapGFP_registered ./ numberOfResults;
@@ -95,14 +104,14 @@ end
 figure;
 
 if use_accumulator
-    subplot(2,3,1); imagesc(max(convAccumulator_unregistered,[],3)); axis image; title('MIP of unregistered mCherry channel');
-    subplot(2,3,4); imagesc(max(convAccumulator_registered,[],3)); axis image; title('MIP of registered mCherry channel');
+    subplot(2,3,1); imagesc(max(convAccumulator_unregistered,[],3)); axis square; title('MIP of unregistered mCherry channel');
+    subplot(2,3,4); imagesc(max(convAccumulator_registered,[],3)); axis square; title('MIP of registered mCherry channel');
 else
-   subplot(2,3,1); imagesc(heatMapmCherry_unregistered); axis image; title('MIP of unregistered mCherry channel');
-   subplot(2,3,4); imagesc(heatMapmCherry_registered); axis image; title('MIP of registered mCherry channel');
+    subplot(2,3,1); imagesc(heatMapmCherry_unregistered); axis square; title('MIP of unregistered mCherry channel');
+    subplot(2,3,4); imagesc(heatMapmCherry_registered); axis square; title('MIP of registered mCherry channel');
 end
 
-subplot(2,3,2); imagesc(heatMapDapi_unregistered); axis image; title('MIP of unregistered DAPI channel');
-subplot(2,3,5); imagesc(heatMapDapi_registered); axis image; title('MIP of registered DAPI channel');
-subplot(2,3,3); imagesc(heatMapGFP_unregistered); axis image; title('MIP of unregistered GFP channel');
-subplot(2,3,6); imagesc(heatMapGFP_registered); axis image; title('MIP of registered GFP channel');
+subplot(2,3,2); imagesc(heatMapDapi_unregistered); axis square; title('MIP of unregistered DAPI channel');
+subplot(2,3,5); imagesc(heatMapDapi_registered); axis square; title('MIP of registered DAPI channel');
+subplot(2,3,3); imagesc(heatMapGFP_unregistered); axis square; title('MIP of unregistered GFP channel');
+subplot(2,3,6); imagesc(heatMapGFP_registered); axis square; title('MIP of registered GFP channel');

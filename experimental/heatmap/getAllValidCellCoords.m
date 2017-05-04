@@ -38,8 +38,8 @@ normOfCoordinates_registered = sqrt(sum(allCellCoords_registered.^2,1));
 %normOfCoordinates_unregistered = sqrt(sum(allCellCoords_unregistered.^2,1));
 
 % Ignore all coordinates outside the sphere with a tolerance tole
-allCellCoords_registered(:,normOfCoordinates_registered > 1+tole) = [];
-%allCellCoords_unregistered(:,normOfCoordinates_unregistered > 1+tole) = [];
+%allCellCoords_registered(:,normOfCoordinates_registered > 1+tole) = [];
+allCellCoords_registered(:,normOfCoordinates_registered > 2) = [];
 %normOfCoordinates(:,normOfCoordinates > 1+tole) = [];
 
 % -- 4. Step --%

@@ -3,6 +3,7 @@ function [ full_accumulator, cut_accumulator ] = computeAccumulator( allCellCoor
 
 % check if cell coordinates are given in reference space or in data space
 if max(allCellCoords(:)) < 3
+    
     transformed_cellCoords = round((allCellCoords + 1) * (gridSize-1)/2);
     transformed_cellCoords(1:2,:) = transformed_cellCoords(2:-1:1,:);
     cut_cellCoords = transformed_cellCoords;
