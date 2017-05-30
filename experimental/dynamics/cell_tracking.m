@@ -46,20 +46,20 @@ experimentData.y_resolution = 312;
 
 tmp1 = loadDynamicData([p.dataPath '/' fileNames{1}]); % load DAPI
 experimentData.Dapi = preprocessData(tmp1, p, 1); % preprocess DAPI
-generateGifFromDynamics(tmp1, 'DAPI_unprocessed.gif');
-generateGifFromDynamics(experimentData.Dapi, 'DAPI_processed.gif');
+generateGifFromDynamics(tmp1, [p.resultsPath '/DAPI_unprocessed.gif']);
+generateGifFromDynamics(experimentData.Dapi, [p.resultsPath '/DAPI_processed.gif']);
 clear tmp1; % delete original DAPI
 
 tmp2 = loadDynamicData([p.dataPath '/' fileNames{2}]); % load GFP
 experimentData.GFP = preprocessData(tmp2, p, 2); % preprocess GFP
-generateGifFromDynamics(tmp2, 'GFP_unprocessed.gif');
-generateGifFromDynamics(experimentData.GFP, 'GFP_processed.gif');
+generateGifFromDynamics(tmp2, [p.resultsPath '/GFP_unprocessed.gif']);
+generateGifFromDynamics(experimentData.GFP, [p.resultsPath '/GFP_processed.gif']);
 clear tmp2; % delete original DAPI
 
 tmp3 = loadDynamicData([p.dataPath '/' fileNames{3}]); % load mCherry
 experimentData.mCherry = preprocessData(tmp3, p, 3); % preprocess mCherry
-generateGifFromDynamics(tmp3, 'mCherry_unprocessed.gif');
-generateGifFromDynamics(experimentData.mCherry, 'mCherry_processed.gif');
+generateGifFromDynamics(tmp3, [p.resultsPath '/mCherry_unprocessed.gif']);
+generateGifFromDynamics(experimentData.mCherry, [p.resultsPath '/mCherry_processed.gif']);
 clear tmp3; % delete original DAPI
 
 
