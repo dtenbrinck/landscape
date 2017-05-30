@@ -5,7 +5,6 @@ clear; clc; close all;
 root_dir = fileparts(fileparts(pwd));
 
 % add path for parameter setup
-addpath('../segmentation/');
 addpath([root_dir '/parameter_setup/']);
 
 % load necessary variables
