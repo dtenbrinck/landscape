@@ -1,10 +1,14 @@
 %% INITIALIZATION
 clear; clc; close all;
 
-% add current folder and subfolders to path
-addpath(genpath('./../..'));
+% define root directory
+root_dir = fileparts(fileparts(pwd));
 
-p = initializeScript('heatmap');
+% add path for parameter setup
+addpath([root_dir '/parameter_setup/']);
+
+% load necessary variables
+p = initializeScript('heatmap', root_dir);
 
 % define if to use mCherry channel or accumulator
 use_accumulator = true;

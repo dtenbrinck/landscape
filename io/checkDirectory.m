@@ -2,11 +2,6 @@ function checkDirectory( path )
 %CHECKDIRECTORY Summary of this function goes here
 %   Detailed explanation goes here
 
-% check first if we are in root directory
-if ~exist('./io','dir')
-    error('Please start script only in root directory of software!');
-end
-
 % create parent folder
 if ~exist(path,'dir')
     mkdir('./', path);

@@ -1,11 +1,14 @@
 %% INITIALIZATION
-clear all; clc; close all;
+clear; clc; close all;
+
+% define root directory
+root_dir = pwd;
 
 % add path for parameter setup
-addpath('./parameter_setup/');
+addpath([root_dir '/parameter_setup/']);
 
 % load necessary variables
-p = initializeScript('evaluate');
+p = initializeScript('evaluate', root_dir);
 
 %% GET FILES TO PROCESS
 

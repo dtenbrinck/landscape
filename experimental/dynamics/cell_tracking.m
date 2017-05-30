@@ -1,17 +1,14 @@
 %% INITIALIZATION
 clear; clc; close all;
 
-% change directory to root directory
-cd ../../;
+% define root directory
+root_dir = fileparts(fileparts(pwd));
 
 % add path for parameter setup
-addpath('./parameter_setup/');
-addpath(genpath('./experimental/'));
+addpath([root_dir '/parameter_setup/']);
 
 % load necessary variables
-p = initializeScript('process');
-rmpath('./preprocessing');
-rmpath('./segmentation');
+p = initializeScript('processing', root_dir);
 
 % manual set resolution parameter
 manRes = [0,0,0];

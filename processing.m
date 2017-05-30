@@ -1,17 +1,22 @@
 %% INITIALIZATION
 clear; clc; close all;
 
+% define root directory
+root_dir = pwd;
+
 % add path for parameter setup
-addpath('./parameter_setup/');
+addpath([root_dir '/parameter_setup/']);
 
 % load necessary variables
-p = initializeScript('process');
+p = initializeScript('processing', root_dir);
 
 % manual set resolution parameter
 manRes = [0,0,0];
 
+
 %% PREPARE RESULTS DIRECTORY
 checkDirectory(p.resultsPath);
+
 
 %% LOAD DATA
 
