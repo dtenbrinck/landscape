@@ -20,7 +20,7 @@ if nargin < 5
 end
 
 % Set options for fmincon
-options = optimoptions('fmincon','Display','off','Algorithm','sqp','StepTolerance',1e-16);
+options = optimoptions('fmincon','Display','off','Algorithm','sqp'); % 'StepTolerance',1e-16
 
 % Compute the spherical regression
 [pstar,vstar] ...
