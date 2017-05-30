@@ -105,7 +105,7 @@ end
 figure;
 
 if use_accumulator
-    subplot(2,3,1); imagesc(max(convAccumulator_unregistered,[],3)); axis square; title('MIP of unregistered mCherry channel');
+    subplot(2,3,1); imagesc(max(convAccumulator_unregistered,[],3)); axis image; title('MIP of unregistered mCherry channel');
     subplot(2,3,4); imagesc(max(convAccumulator_registered,[],3)); axis square; title('MIP of registered mCherry channel');
 else
     subplot(2,3,1); imagesc(heatMapmCherry_unregistered); axis image; title('MIP of unregistered mCherry channel');
