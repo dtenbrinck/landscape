@@ -1,10 +1,14 @@
 %% INITIALIZATION
 clear; clc; close all;
 
-% add current folder and subfolders to path
-addpath(genpath('./../..'));
+% define root directory
+root_dir = fileparts(fileparts(pwd));
 
-p = initializeScript('heatmap');
+% add path for parameter setup
+addpath([root_dir '/parameter_setup/']);
+
+% load necessary variables
+p = initializeScript('heatmap', root_dir);
 
 % define if to use mCherry channel or accumulator
 use_accumulator = true;
@@ -105,7 +109,7 @@ end
 figure;
 
 if use_accumulator
-    subplot(2,3,1); imagesc(max(convAccumulator_unregistered,[],3)); axis square; title('MIP of unregistered mCherry channel');
+    subplot(2,3,1); imagesc(max(convAccumulator_unregistered,[],3)); axis image; title('MIP of unregistered mCherry channel');
     subplot(2,3,4); imagesc(max(convAccumulator_registered,[],3)); axis square; title('MIP of registered mCherry channel');
 else
     subplot(2,3,1); imagesc(heatMapmCherry_unregistered); axis image; title('MIP of unregistered mCherry channel');

@@ -1,13 +1,17 @@
 %% INITIALIZATION
 clear; clc; close all;
 
-percOfAll = 0.5;
+% define root directory
+root_dir = pwd;
 
 % add path for parameter setup
-addpath('./parameter_setup/');
+addpath([root_dir '/parameter_setup/']);
 
 % load necessary variables
-p = initializeScript('heatmap');
+p = initializeScript('heatmap', root_dir);
+
+% define ration of random data
+percOfAll = 0.5;
 
 % define paths to heatmaps to be compared
 result_path = [p.resultsPath,'/'];

@@ -1,17 +1,22 @@
 %% INITIALIZATION
 clear; clc; close all;
 
+% define root directory
+root_dir = pwd;
+
 % add path for parameter setup
-addpath('./parameter_setup/');
+addpath([root_dir '/parameter_setup/']);
 
 % load necessary variables
-p = initializeScript('process');
+p = initializeScript('processing', root_dir);
 
 % manual set resolution parameter
 manRes = [0,0,0];
 
+
 %% PREPARE RESULTS DIRECTORY
 checkDirectory(p.resultsPath);
+
 
 %% LOAD DATA
 
@@ -109,42 +114,12 @@ for experiment=1:numberOfExperiments
         % create filename to save results
         results_filename = [p.resultsPath '/' experimentData.filename '_results.mat'];
         
-        % save results
-        % only save needed results
-        gatheredData = struct;
-        gatheredData.filename = experimentData.filename;
-        % important experiment data
-        gatheredData.experiment.DapiMIP = computeMIP(experimentData.Dapi);
-        gatheredData.experiment.GFPMIP = computeMIP(experimentData.GFP);
-        gatheredData.experiment.mCherryMIP = computeMIP(experimentData.mCherry);
-        
-        % important processed data
-        gatheredData.processed.DapiMIP = computeMIP(processedData.Dapi);
-        gatheredData.processed.GFPMIP = computeMIP(processedData.GFP);
-        gatheredData.processed.mCherryMIP = computeMIP(processedData.mCherry);
-        gatheredData.processed.landmarkMIP = computeMIP(processedData.landmark);
-        gatheredData.processed.cellsMIP = computeMIP(processedData.cells);
-        gatheredData.processed.cellCoordinates = processedData.cellCoordinates;
-        gatheredData.processed.originalSize = size(processedData.GFP);
-        gatheredData.processed.ellipsoid = ellipsoid;
-        % important registered data
-        gatheredData.registered.DapiMIP = computeMIP(registeredData.Dapi);
-        gatheredData.registered.GFPMIP = computeMIP(registeredData.GFP);
-        gatheredData.registered.mCherryMIP = computeMIP(registeredData.mCherry);
-        gatheredData.registered.landmarkMIP = computeMIP(registeredData.landmark);
-        gatheredData.registered.cellsMIP = computeMIP(registeredData.cells);
-        gatheredData.registered.cellCoordinates = registeredData.cellCoordinates;
-        gatheredData.registered.registeredSize = size(registeredData.GFP);
-        gatheredData.registered.trafoEllipsoid = transformationMatrix;
-        gatheredData.registered.trafoRegression = rotationMatrix;
+        gatheredData = saveResults(experimentData, processedData, registeredData, ellipsoid, transformationMatrix, rotationMatrix, results_filename);
         
         % visualize results if needed
         if p.visualization == 1
             visualizeResults_new(gatheredData);
         end
-        
-        save(results_filename,'gatheredData');
-        %save(results_filename, 'experimentData', 'processedData', 'registeredData');
         
         if p.debug_level >= 1; disp('Saved results successfully!'); end
         

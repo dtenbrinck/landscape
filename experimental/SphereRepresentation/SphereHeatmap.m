@@ -65,8 +65,8 @@ else % in case the above folders don't exist take the current directory
     dataPath = '/home/fjedor/Uni/Sciebo/Uni/SHK/SphereRepresentation/data';
 end
 % path = uigetdir(dataPath,'Please select a accepted results folder to generate spherical heatmap!');
-% path = '/media/piradmin/4TB/data/Landscape/Static/ody/10hpf/raw_data/pooled_data_sets/Results_AP_oriented_criteria_minimum_1_PGC_detected_all_601_embryos/accepted';
-path = '/media/piradmin/4TB/data/Landscape/Static/ody/10hpf/raw_data/pooled_data_sets/Results_AP_oriented_criteria_minimum_1_PGC_870_datasets_20170412/accepted';
+path = '/media/piradmin/4TB/data/Landscape/Static/ody/10hpf/raw_data/pooled_data_sets/Results_AP_oriented_criteria_minimum_1_PGC_detected_all_601_embryos/accepted';
+% path = '/media/piradmin/4TB/data/Landscape/Static/ody/10hpf/raw_data/pooled_data_sets/Results_AP_oriented_criteria_minimum_1_PGC_870_datasets_20170412/accepted';
 %--  GET FILES TO PROCESS -- %
 
 % Get filenames of MAT files in selected folder
@@ -144,7 +144,7 @@ handles.cellCoordsHM(:,3) = -handles.cellCoordsHM(:,3);
 %Throw all points that are outside of the shells aways
 normCellCoords = sqrt(sum(handles.cellCoords.^2,2));
 handles.cellCoordsHM((normCellCoords > handles.maxShellValue|normCellCoords < handles.minShellValue),:)=[];
-handles.cellCoordsHM = round((handles.cellCoordsHM+1)/2*handles.samp2D)+1;
+handles.cellCoordsHM = round((handles.cellCoordsHM+1)/2*(handles.samp2D-1))+1;
 handles.Accumulator = computeAccumulator(handles.cellCoordsHM',handles.samp2D);
 handles.Accumulator = convolveAccumulator(handles.Accumulator,cellRad,2*cellRad+1);
 % Compute heatmaps
@@ -308,16 +308,16 @@ if handles.tbVisZeros.Value == 1
         elseif size(lines,1) == 1
             maxlevel = lines.Ydata(2);
             minlevel = 0;
-            scatter3(handles.axes,handles.xs(handles.spc>minlevel&handles.spc<maxlevel),...
-            handles.ys(handles.spc>minlevel&handles.spc<maxlevel),...
-            handles.zs(handles.spc>minlevel&handles.spc<maxlevel),...
+            scatter3(handles.axes,handles.xs(handles.spc>minlevel),...
+            handles.ys(handles.spc>minlevel),...
+            handles.zs(handles.spc>minlevel),...
             20,handles.spc(:),'filled');
         elseif size(lines,1) == 2
             [minlevel,~] = min([lines(1).YData(2),lines(2).YData(2)]);
             [maxlevel,~] = max([lines(1).YData(2),lines(2).YData(2)]);
-            scatter3(handles.axes,handles.xs(handles.spc>minlevel&handles.spc<maxlevel),...
-                handles.ys(handles.spc>minlevel&handles.spc<maxlevel),...
-                handles.zs(handles.spc>minlevel&handles.spc<maxlevel),...
+            scatter3(handles.axes,handles.xs(handles.spc>minlevel),...
+                handles.ys(handles.spc>minlevel),...
+                handles.zs(handles.spc>minlevel),...
                 20,handles.spc(:),'filled');
         end
     else
@@ -362,7 +362,7 @@ elseif handles.tbVisZeros.Value == 0
 end
 
 set(handles.axes,'XLim',[-1,1],'YLim',[-1,1],'ZLim',[-1,1]);
-colormap('jet')
+colormap(handles.axes,'jet')
 updateCB(handles);
 
 % -- functions for colorbar -- %

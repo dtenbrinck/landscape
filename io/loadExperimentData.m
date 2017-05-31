@@ -25,19 +25,19 @@ for i=1:numOfData
     pathFile = [dataPathName,'/',char(experimentSets{i,1})];
     TIFF = tiffread(pathFile);
     data.(dataName).Dapi ...
-      = double(reshape(cell2mat({TIFF(:).('data')}),TIFF(1).('height'),TIFF(1).('width'),size(TIFF,2)));
+      = single(reshape(cell2mat({TIFF(:).('data')}),TIFF(1).('height'),TIFF(1).('width'),size(TIFF,2)));
     
     % read GFP data set from tiff file into struct
     pathFile = [dataPathName,'/',char(experimentSets{i,2})];
     TIFF = tiffread(pathFile);
     data.(dataName).GFP ...
-      = double(reshape(cell2mat({TIFF(:).('data')}),TIFF(1).('height'),TIFF(1).('width'),size(TIFF,2)));
+      = single(reshape(cell2mat({TIFF(:).('data')}),TIFF(1).('height'),TIFF(1).('width'),size(TIFF,2)));
     
     % read mCherry data set from tiff file into struct
     pathFile = [dataPathName,'/',char(experimentSets{i,3})];
     TIFF = tiffread(pathFile);
     data.(dataName).mCherry ...
-      = double(reshape(cell2mat({TIFF(:).('data')}),TIFF(1).('height'),TIFF(1).('width'),size(TIFF,2)));
+      = single(reshape(cell2mat({TIFF(:).('data')}),TIFF(1).('height'),TIFF(1).('width'),size(TIFF,2)));
     
     
     % TODO: Check if all data sets have same size!
