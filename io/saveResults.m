@@ -9,11 +9,18 @@ gatheredData.filename = experimentData.filename;
 
 
 % important original data
-gatheredData.experiment.size = size(experimentData.Dapi);
-gatheredData.experiment.DapiMIP = computeMIP(experimentData.Dapi);
-gatheredData.experiment.GFPMIP = computeMIP(experimentData.GFP);
-gatheredData.experiment.mCherryMIP = computeMIP(experimentData.mCherry);
+gatheredData.experiment.size = size(processedData.Dapi);
 
+if isfield(experimentData,'Dapi')
+  gatheredData.experiment.DapiMIP = computeMIP(experimentData.Dapi);
+  gatheredData.experiment.GFPMIP = computeMIP(experimentData.GFP);
+  gatheredData.experiment.mCherryMIP = computeMIP(experimentData.mCherry);
+else
+  gatheredData.experiment.DapiMIP = experimentData.DapiMIP;
+  gatheredData.experiment.GFPMIP = experimentData.GFPMIP;
+  gatheredData.experiment.mCherryMIP = experimentData.mCherryMIP;
+end
+  
 
 % important processed data
 gatheredData.processed.size = size(processedData.Dapi);
@@ -26,6 +33,8 @@ gatheredData.processed.DapiMIP = computeMIP(processedData.Dapi);
 gatheredData.processed.GFPMIP = computeMIP(processedData.GFP);
 gatheredData.processed.mCherryMIP = computeMIP(processedData.mCherry);
 
+gatheredData.processed.landmark = logical(processedData.landmark);
+gatheredData.processed.cells = (processedData.landmark);
 gatheredData.processed.landmarkMIP = computeMIP(processedData.landmark);
 gatheredData.processed.cellsMIP = computeMIP(processedData.cells);
 gatheredData.processed.cellCoordinates = processedData.cellCoordinates;

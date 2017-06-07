@@ -33,15 +33,17 @@ else
 end
 
 %% MAIN EVALUATION LOOP
-f = figure('units','normalized','outerposition',[0 0 1 1]); 
-for result = 1:numberOfResults
+h = figure('units','normalized','outerposition',[0 0 1 1]); 
+result = 0;
+while result < numberOfResults
     
+    result = result + 1;
     % load result data
     load([p.resultsPath,'/',fileNames{result,1}])
     
     % visualize results
 %     visualizeResults(experimentData, processedData, registeredData);
-    visualizeResults_evaluation(f,gatheredData);
+    visualizeResults_evaluation(h,gatheredData);
     
     % display user output
     fprintf(gatheredData.filename);
@@ -57,20 +59,34 @@ for result = 1:numberOfResults
             fprintf('\t -> Accepted!\n');
             movefile([p.resultsPath '/' fileNames{result,1}], [p.resultsPath '/accepted/' fileNames{result,1}]);
         case 'Improve'
-            modifiedData = gui_manualSegmentation(gatheredData);
-            save([p.resultsPath,'/',fileNames{result,1}], 'modifiedData');
-            fprintf('\t -> Improved!\n');
+            modifiedData = gui_manualSegmentation(gatheredData,p);
+            if isempty(modifiedData)
+              fprintf('\t -> Improvement aborted!\n');
+              result = result - 1; % adjust for another try
+              continue;
+            end
+            %save([p.resultsPath,'/',fileNames{result,1}], 'gatheredData');
+            modifiedData.experiment.filename = modifiedData.filename;
+            saveResults(modifiedData.experiment, modifiedData.processed, modifiedData.registered,...
+                        modifiedData.processed.ellipsoid, modifiedData.registered.transformation_normalization, modifiedData.registered.transformation_rotation,...
+                        [p.resultsPath,'/',fileNames{result,1}] );
             result = result - 1; % adjust for another try
+            fprintf('\t -> Improved!\n');
         case 'Reject'
             fprintf('\t -> Rejected!\n');
             movefile([p.resultsPath '/' fileNames{result,1}], [p.resultsPath '/rejected/' fileNames{result,1}]);
-        otherwise
-            fprintf('\t -> Dialog closed!\n');
+      otherwise
+            fprintf('\t -> Evaluation aborted!\n');
+            aborted = true;
+            break;
     end
     
 end
 
 %% USER OUTPUT
-disp('All results in folder processed!');
+if exist('aborted','var')
+  disp('Evaluation script terminated by user.');
+else
+  disp('All results in folder processed!');
+end
 close all;
-clear all;
