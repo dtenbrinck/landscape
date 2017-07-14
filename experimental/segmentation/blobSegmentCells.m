@@ -4,9 +4,9 @@ function [cells, centCoords] = blobSegmentCells( data, p )
 
 
 % Preallocation
-thresholdValue = zeros(1,20);
-binaryImage = zeros(384,510,20);
-X = zeros(384,510,20);
+thresholdValue = zeros(1,size(data,3));
+binaryImage = zeros(size(data));
+X = zeros(size(data));
 
 % Check that user has the Image Processing Toolbox installed.
 hasIPT = license('test', 'image_toolbox');
