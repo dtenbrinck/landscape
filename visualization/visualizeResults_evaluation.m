@@ -16,10 +16,10 @@ subplot(3,3,6); imagesc((gatheredData.processed.mCherryMIP)); title('Segmentatio
 hold on; contour((gatheredData.processed.cellsMIP), [0.5 0.5], 'r', 'LineWidth', 2); hold off;
 
 % visualize segmentation results in registered data
-subplot(3,3,7); imagesc((gatheredData.registered.DapiMIP)); title('Registered DAPI channel');
-subplot(3,3,8); imagesc((gatheredData.registered.GFPMIP)); title('Segmentation in registered GFP channel');
+subplot(3,3,7); imagesc((gatheredData.registered.DapiMIP)); title('Registered DAPI channel'); axis image;
+subplot(3,3,8); imagesc((gatheredData.registered.GFPMIP)); title('Segmentation in registered GFP channel'); axis image;
 hold on; contour((gatheredData.registered.landmarkMIP), [0.5 0.5], 'r', 'LineWidth', 2); hold off;
-subplot(3,3,9); imagesc((gatheredData.registered.mCherryMIP)); title('Segmentation in registered mCherry channel');
+subplot(3,3,9); imagesc((gatheredData.registered.mCherryMIP)); title('Segmentation in registered mCherry channel'); axis image;
 hold on; contour((gatheredData.registered.cellsMIP), [0.5 0.5], 'r', 'LineWidth', 2); hold off;
 
 suptitle(['Results for file: ' strrep(gatheredData.filename,'_','\_')]);

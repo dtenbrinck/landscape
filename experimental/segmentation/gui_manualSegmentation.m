@@ -16,14 +16,17 @@ set(figHandle,'Units','normalized','Position',[0.1 0.1 0.9 0.9]);
 
 % add a button for being finished
 finish_button = uicontrol('Style', 'pushbutton', 'String', 'Finish',...
-  'Position', [550 20 50 20],...
+  'Position', [550 20 80 20],...
   'Callback', {@close_segmentation_GUI,figHandle});
+
+dataRange = maxData-minData;
+minorStep = 1/dataRange; majorStep = 10/dataRange;
 
 threshold_slider = uicontrol('Style', 'slider',...
   'Min',round(minData + 1),...
   'Max',round(maxData - 1),...
   'Value',round((minData + maxData) / 6),...
-  'SliderStep', [1/(maxData-minData), 10/(maxData-minData)],...
+  'SliderStep', [0.004 0.0402],...
   'Position', [300 20 150 20],...
   'Callback', {@threshold_image,mip,figHandle});
 
@@ -277,7 +280,7 @@ if yMin >= 0 && yMax < size(data,1) && xMin >= 0 && xMax < size(data,2)
   %profile viewer
   %profile off
 
-  set(contour_handle, 'ZData', segmentation | new_segmentation);
+  set(contour_handle, 'ZData', single(segmentation | new_segmentation));
   set(contour_handle, 'LevelList', 0.5);
   
   %ih = drawSegmentation(data,segmentation | new_segmentation);
@@ -310,14 +313,16 @@ end
 
 function update_segmentation(event,contour_handle,mip)
 
-threshold_value = round(get(event,'NewValue'));
-set(contour_handle,'ZData',mip >= threshold_value);
+%threshold_value = round(get(event,'NewValue'));
+threshold_value = round(event.AffectedObject.Value);
+set(contour_handle,'ZData',single(mip >= threshold_value));
 
 end
 
 function update_editField(event,editField_handle)
 
-slider_value = round(get(event,'NewValue'));
+%slider_value = round(get(event,'NewValue'));
+slider_value = round(event.AffectedObject.Value);
 set(editField_handle,'String',num2str(slider_value));
 
 end
@@ -326,7 +331,7 @@ end
 function threshold_image(src,~,mip,figHandle)
 
 threshold_value = get(src,'Value');
-setappdata(figHandle, 'segmentation', mip >= threshold_value);
+setappdata(figHandle, 'segmentation', single(mip >= threshold_value));
 
 end
 
