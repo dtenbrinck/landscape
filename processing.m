@@ -2,7 +2,7 @@
 clear; clc; close all;
 
 % define root directory
-root_dir = pwd;
+root_dir = fileparts(fileparts(pwd));
 
 % add path for parameter setup
 addpath([root_dir '/parameter_setup/']);
@@ -64,7 +64,7 @@ for experiment=1:numberOfExperiments
         processedData.landmark = segmentGFP(processedData.GFP, p.GFPseg, p.resolution);
         
         if p.debug_level >= 1; disp('Segmenting mCherry channel...'); end
-        [processedData.cells, processedData.cellCoordinates] = segmentCells(processedData.mCherry, p.mCherryseg, p.resolution);
+        [processedData.cells, processedData.cellCoordinates] = blobSegmentCells(processedData.mCherry, p.mCherryseg);
         
         % estimate embryo surface by fitting an ellipsoid
         if p.debug_level >= 1; disp('Estimating embryo surface...'); end
