@@ -65,8 +65,9 @@ else % in case the above folders don't exist take the current directory
     dataPath = '/home/fjedor/Uni/Sciebo/Uni/SHK/SphereRepresentation/data';
 end
 % path = uigetdir(dataPath,'Please select a accepted results folder to generate spherical heatmap!');
-path = '/media/piradmin/4TB/data/Landscape/Static/ody/10hpf/raw_data/pooled_data_sets/Results_AP_oriented_criteria_minimum_1_PGC_detected_all_601_embryos/accepted';
+%path = '/media/piradmin/4TB/data/Landscape/Static/ody/10hpf/raw_data/pooled_data_sets/Data/Results_AP_oriented_870_datasets_newsegmentationscript_20170630/accepted';
 % path = '/media/piradmin/4TB/data/Landscape/Static/ody/10hpf/raw_data/pooled_data_sets/Results_AP_oriented_criteria_minimum_1_PGC_870_datasets_20170412/accepted';
+path = '/media/piradmin/4TB/data/Landscape/Static/ody_sox32MO/10hpf/raw_data/resultsDrawSegmentation/accepted';
 %--  GET FILES TO PROCESS -- %
 
 % Get filenames of MAT files in selected folder
