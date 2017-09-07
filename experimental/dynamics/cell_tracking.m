@@ -71,7 +71,7 @@ numberOfExperiments = 1;
 
 for i = 1:numberOfExperiments
     
-    try
+    %try
         
         % extract number of timepoints
         numberOfTimepoints = size(experimentData.Dapi,4);
@@ -105,16 +105,16 @@ for i = 1:numberOfExperiments
         % track corrected centroids
         [tracks, adjacency_tracks] = cell_tracking(warpedCentroids);
         
-    catch ERROR_MSG  %% ONLY EXECUTED WHEN ERRORS HAPPENING
+    %catch ERROR_MSG  %% ONLY EXECUTED WHEN ERRORS HAPPENING
         
         % create filename to save results
-        results_filename = [p.resultsPath '/bug/' experimentData.filename '_results.mat'];
+    %    results_filename = [p.resultsPath '/bug/' experimentData.filename '_results.mat'];
         
         % save results
-        save(results_filename, 'ERROR_MSG');
+    %    save(results_filename, 'ERROR_MSG');
         
-        if p.debug_level >= 1; disp('Saved buggy dataset!'); end
+    %    if p.debug_level >= 1; disp('Saved buggy dataset!'); end
         
-    end
+    %end
     
 end
