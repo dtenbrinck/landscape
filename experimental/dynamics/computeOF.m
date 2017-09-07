@@ -1,23 +1,23 @@
-function flow = computeOF( experimentData.Dapi )
+function flow = computeOF( Dapi_data )
 % calculates velocity field for background flow in Dapi-channel
 
 addpath(genpath('../tracking/motionEstimationGUI'));
 
-flow  = zeros(size(experimentData.Dapi,1),size(experimentData.Dapi,2),size(experimentData.Dapi,3),size(experimentData.Dapi,4),3);
+flow  = zeros(size(Dapi_data,1),size(Dapi_data,2),size(Dapi_data,3),size(Dapi_data,4),3);
 scale = 1/8; % scaling factor in x and y direction for speeding up
 
-for step=1:size(experimentData.Dapi,4); % number of timesteps
+for step=1:size(Dapi_data,4); % number of timesteps
  
-    YFP1tmp = zeros(size(experimentData.Dapi,1),size(experimentData.Dapi,2),size(experimentData.Dapi,3)); 
+    YFP1tmp = zeros(size(Dapi_data,1),size(Dapi_data,2),size(Dapi_data,3)); 
     YFP2tmp = zeros(size(YFP1tmp));
     YFP1=zeros(size(YFP1tmp,1)*scale,size(YFP1tmp,2)*scale,31);  % scaled size
     YFP2=zeros(size(YFP1));
     
     %% pick and scale subsequent time steps
-    for i=0:size(experimentData.Dapi,3)-1 % number of z-slices
-        YFP1tmp(:,:,i+1)=experimentData.Dapi(:,:,i,step);
+    for i=0:size(Dapi_data,3)-1 % number of z-slices
+        YFP1tmp(:,:,i+1)=Dapi_data(:,:,i,step);
         YFP1(:,:,i+1)=imresize(YFP1tmp(:,:,i+1),scale,'cubic');
-        YFP2tmp(:,:,i+1)=experimentData.Dapi(:,:,i,step+1);
+        YFP2tmp(:,:,i+1)=Dapi_data(:,:,i,step+1);
         YFP2(:,:,i+1)=imresize(YFP2tmp(:,:,i+1),scale,'cubic');
     end
     
