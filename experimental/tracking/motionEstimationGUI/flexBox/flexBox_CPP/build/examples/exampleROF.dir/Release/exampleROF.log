@@ -1,0 +1,16 @@
+﻿Der Buildvorgang wurde am 03.04.2017 13:33:18 gestartet.
+     1>Projekt "D:\MotionBoxes\flexBox-master\flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6\build\examples\exampleROF.vcxproj" auf Knoten "3", Build Ziel(e).
+     1>CustomBuild:
+         Building Custom Rule D:/MotionBoxes/flexBox/flexBox_CPP/source/examples/CMakeLists.txt
+         CMake does not need to re-run because D:/MotionBoxes/flexBox-master/flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6/build/examples/CMakeFiles/generate.stamp is up-to-date.
+       ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\CL.exe /c /I"D:\MotionBoxes\flexBox-master\flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6\build\examples" /ID:\MotionBoxes\flexBox\flexBox_CPP\source\examples /ID:\MotionBoxes\flexBox\flexBox_CPP\source\. /ID:\MotionBoxes\flexBox\flexBox_CPP\source\data /ID:\MotionBoxes\flexBox\flexBox_CPP\source\operator /ID:\MotionBoxes\flexBox\flexBox_CPP\source\prox /ID:\MotionBoxes\flexBox\flexBox_CPP\source\solver /ID:\MotionBoxes\flexBox\flexBox_CPP\source\term /nologo /W3 /WX- /O2 /Ob2 /D WIN32 /D _WINDOWS /D NDEBUG /D "CMAKE_INTDIR=\"Release\"" /D _MBCS /Gm- /EHsc /MD /GS /fp:precise /Zc:wchar_t /Zc:forScope /GR /openmp /Fo"exampleROF.dir\Release\\" /Fd"exampleROF.dir\Release\vc120.pdb" /Gd /TP /errorReport:prompt D:\MotionBoxes\flexBox\flexBox_CPP\source\examples\exampleROF.cpp
+         exampleROF.cpp
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"D:\MotionBoxes\flexBox-master\flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6\build\examples\Release\exampleROF.exe" /INCREMENTAL:NO /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /PDB:"D:/MotionBoxes/flexBox-master/flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6/build/examples/Release/exampleROF.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:/MotionBoxes/flexBox-master/flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6/build/examples/Release/exampleROF.lib" /MACHINE:X64   /machine:x64 exampleROF.dir\Release\exampleROF.obj
+         exampleROF.vcxproj -> D:\MotionBoxes\flexBox-master\flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6\build\examples\Release\exampleROF.exe
+     1>Die Erstellung des Projekts "D:\MotionBoxes\flexBox-master\flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6\build\examples\exampleROF.vcxproj" ist abgeschlossen, Build Ziel(e).
+
+Build erfolgreich.
+
+Verstrichene Zeit 00:00:05.80

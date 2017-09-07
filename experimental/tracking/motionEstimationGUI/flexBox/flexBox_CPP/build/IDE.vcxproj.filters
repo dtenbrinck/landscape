@@ -1,0 +1,124 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="D:\MotionBoxes\flexBox\flexBox_CPP\source\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="D:\MotionBoxes\flexBox\flexBox_CPP\source\data\flexBoxData.h">
+      <Filter>data</Filter>
+    </None>
+    <None Include="D:\MotionBoxes\flexBox\flexBox_CPP\source\data\flexBoxDataCPU.h">
+      <Filter>data</Filter>
+    </None>
+    <None Include="D:\MotionBoxes\flexBox\flexBox_CPP\source\data\flexBoxDataGPU.h">
+      <Filter>data</Filter>
+    </None>
+    <None Include="D:\MotionBoxes\flexBox\flexBox_CPP\source\operator\flexDiagonalOperator.h">
+      <Filter>operator</Filter>
+    </None>
+    <None Include="D:\MotionBoxes\flexBox\flexBox_CPP\source\operator\flexGradientOperator.h">
+      <Filter>operator</Filter>
+    </None>
+    <None Include="D:\MotionBoxes\flexBox\flexBox_CPP\source\operator\flexIdentityOperator.h">
+      <Filter>operator</Filter>
+    </None>
+    <None Include="D:\MotionBoxes\flexBox\flexBox_CPP\source\operator\flexLinearOperator.h">
+      <Filter>operator</Filter>
+    </None>
+    <None Include="D:\MotionBoxes\flexBox\flexBox_CPP\source\operator\flexMatrix.h">
+      <Filter>operator</Filter>
+    </None>
+    <None Include="D:\MotionBoxes\flexBox\flexBox_CPP\source\operator\flexMatrixGPU.h">
+      <Filter>operator</Filter>
+    </None>
+    <None Include="D:\MotionBoxes\flexBox\flexBox_CPP\source\operator\flexSuperpixelOperator.h">
+      <Filter>operator</Filter>
+    </None>
+    <None Include="D:\MotionBoxes\flexBox\flexBox_CPP\source\operator\flexZeroOperator.h">
+      <Filter>operator</Filter>
+    </None>
+    <None Include="D:\MotionBoxes\flexBox\flexBox_CPP\source\operator\flexConcatOperator.h">
+      <Filter>operator</Filter>
+    </None>
+    <None Include="D:\MotionBoxes\flexBox\flexBox_CPP\source\prox\flexProx.h">
+      <Filter>prox</Filter>
+    </None>
+    <None Include="D:\MotionBoxes\flexBox\flexBox_CPP\source\prox\flexProxDualBoxConstraint.h">
+      <Filter>prox</Filter>
+    </None>
+    <None Include="D:\MotionBoxes\flexBox\flexBox_CPP\source\prox\flexProxDualDataKL.h">
+      <Filter>prox</Filter>
+    </None>
+    <None Include="D:\MotionBoxes\flexBox\flexBox_CPP\source\prox\flexProxDualDataL1.h">
+      <Filter>prox</Filter>
+    </None>
+    <None Include="D:\MotionBoxes\flexBox\flexBox_CPP\source\prox\flexProxDualDataL2.h">
+      <Filter>prox</Filter>
+    </None>
+    <None Include="D:\MotionBoxes\flexBox\flexBox_CPP\source\prox\flexProxDualFrobenius.h">
+      <Filter>prox</Filter>
+    </None>
+    <None Include="D:\MotionBoxes\flexBox\flexBox_CPP\source\prox\flexProxDualHuber.h">
+      <Filter>prox</Filter>
+    </None>
+    <None Include="D:\MotionBoxes\flexBox\flexBox_CPP\source\prox\flexProxDualL1Aniso.h">
+      <Filter>prox</Filter>
+    </None>
+    <None Include="D:\MotionBoxes\flexBox\flexBox_CPP\source\prox\flexProxDualL1Iso.h">
+      <Filter>prox</Filter>
+    </None>
+    <None Include="D:\MotionBoxes\flexBox\flexBox_CPP\source\prox\flexProxDualL2.h">
+      <Filter>prox</Filter>
+    </None>
+    <None Include="D:\MotionBoxes\flexBox\flexBox_CPP\source\prox\flexProxDualLabeling.h">
+      <Filter>prox</Filter>
+    </None>
+    <None Include="D:\MotionBoxes\flexBox\flexBox_CPP\source\solver\flexSolver.h">
+      <Filter>solver</Filter>
+    </None>
+    <None Include="D:\MotionBoxes\flexBox\flexBox_CPP\source\solver\flexSolverPrimalDual.h">
+      <Filter>solver</Filter>
+    </None>
+    <None Include="D:\MotionBoxes\flexBox\flexBox_CPP\source\solver\flexSolverPrimalDualCuda.h">
+      <Filter>solver</Filter>
+    </None>
+    <None Include="D:\MotionBoxes\flexBox\flexBox_CPP\source\term\flexTermDual.h">
+      <Filter>term</Filter>
+    </None>
+    <None Include="D:\MotionBoxes\flexBox\flexBox_CPP\source\wrappers\matlab\functions.cpp">
+      <Filter>matlab</Filter>
+    </None>
+    <None Include="D:\MotionBoxes\flexBox\flexBox_CPP\source\wrappers\matlab\functions.cu">
+      <Filter>matlab</Filter>
+    </None>
+    <None Include="D:\MotionBoxes\flexBox\flexBox_CPP\source\flexBox.h">
+      <Filter>misc</Filter>
+    </None>
+    <None Include="D:\MotionBoxes\flexBox\flexBox_CPP\source\tools.h">
+      <Filter>misc</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="data">
+      <UniqueIdentifier>{96C0F31B-F6F5-343B-8E6B-D19F7C7C0443}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="operator">
+      <UniqueIdentifier>{133A2388-5629-3F8E-898D-B119843570BE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="prox">
+      <UniqueIdentifier>{6A179E2C-63C1-356F-8DA6-0D156A5FCB77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="solver">
+      <UniqueIdentifier>{BD2A22D5-AA94-3D64-964A-6AD07782459E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="term">
+      <UniqueIdentifier>{B964B427-8B60-3BCF-A148-F6C74CD3849A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="matlab">
+      <UniqueIdentifier>{F5B95574-7FD9-3399-A674-DA0B3AF9EAF4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="misc">
+      <UniqueIdentifier>{F567C56E-6483-3AF1-AFA5-BD601F4EE035}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,332 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGUID>{1C9E345E-E931-34ED-8B8B-758705CF344B}</ProjectGUID>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>x64</Platform>
+    <ProjectName>Matlab</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+    <PropertyGroup>
+      <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\MotionBoxes\flexBox-master\flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6\build\wrappers\matlab\Debug\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Matlab.dir\Debug\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">flexBoxCPP</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.mexw64</TargetExt>
+      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\MotionBoxes\flexBox-master\flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6\build\wrappers\matlab\Release\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Matlab.dir\Release\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">flexBoxCPP</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.mexw64</TargetExt>
+      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\MotionBoxes\flexBox-master\flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6\build\wrappers\matlab\MinSizeRel\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Matlab.dir\MinSizeRel\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">flexBoxCPP</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.mexw64</TargetExt>
+      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkIncremental>
+      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</GenerateManifest>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\MotionBoxes\flexBox-master\flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6\build\wrappers\matlab\RelWithDebInfo\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Matlab.dir\RelWithDebInfo\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">flexBoxCPP</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.mexw64</TargetExt>
+      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</LinkIncremental>
+      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</GenerateManifest>
+    </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Program Files\Matlab2012b\extern\include;D:\MotionBoxes\flexBox\flexBox_CPP\source\.;D:\MotionBoxes\flexBox\flexBox_CPP\source\data;D:\MotionBoxes\flexBox\flexBox_CPP\source\operator;D:\MotionBoxes\flexBox\flexBox_CPP\source\prox;D:\MotionBoxes\flexBox\flexBox_CPP\source\solver;D:\MotionBoxes\flexBox\flexBox_CPP\source\term;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>Debug/</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <OpenMPSupport>true</OpenMPSupport>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;CMAKE_INTDIR="Debug";DLL_EXPORT_SYM=__declspec(dllexport);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;CMAKE_INTDIR=\"Debug\";DLL_EXPORT_SYM=__declspec(dllexport);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Program Files\Matlab2012b\extern\include;D:\MotionBoxes\flexBox\flexBox_CPP\source\.;D:\MotionBoxes\flexBox\flexBox_CPP\source\data;D:\MotionBoxes\flexBox\flexBox_CPP\source\operator;D:\MotionBoxes\flexBox\flexBox_CPP\source\prox;D:\MotionBoxes\flexBox\flexBox_CPP\source\solver;D:\MotionBoxes\flexBox\flexBox_CPP\source\term;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Program Files\Matlab2012b\extern\include;D:\MotionBoxes\flexBox\flexBox_CPP\source\.;D:\MotionBoxes\flexBox\flexBox_CPP\source\data;D:\MotionBoxes\flexBox\flexBox_CPP\source\operator;D:\MotionBoxes\flexBox\flexBox_CPP\source\prox;D:\MotionBoxes\flexBox\flexBox_CPP\source\solver;D:\MotionBoxes\flexBox\flexBox_CPP\source\term;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalOptions>%(AdditionalOptions)  /machine:x64</AdditionalOptions>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;C:\Program Files\Matlab2012b\extern\lib\win64\microsoft\libmx.lib;C:\Program Files\Matlab2012b\extern\lib\win64\microsoft\libmex.lib;C:\Program Files\Matlab2012b\extern\lib\win64\microsoft\libmex.lib;C:\Program Files\Matlab2012b\extern\lib\win64\microsoft\libmx.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>D:/MotionBoxes/flexBox-master/flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6/build/wrappers/matlab/Debug/flexBoxCPP.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/MotionBoxes/flexBox-master/flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6/build/wrappers/matlab/Debug/flexBoxCPP.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+      <Version></Version>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Program Files\Matlab2012b\extern\include;D:\MotionBoxes\flexBox\flexBox_CPP\source\.;D:\MotionBoxes\flexBox\flexBox_CPP\source\data;D:\MotionBoxes\flexBox\flexBox_CPP\source\operator;D:\MotionBoxes\flexBox\flexBox_CPP\source\prox;D:\MotionBoxes\flexBox\flexBox_CPP\source\solver;D:\MotionBoxes\flexBox\flexBox_CPP\source\term;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>Release/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <OpenMPSupport>true</OpenMPSupport>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR="Release";DLL_EXPORT_SYM=__declspec(dllexport);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat></DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"Release\";DLL_EXPORT_SYM=__declspec(dllexport);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Program Files\Matlab2012b\extern\include;D:\MotionBoxes\flexBox\flexBox_CPP\source\.;D:\MotionBoxes\flexBox\flexBox_CPP\source\data;D:\MotionBoxes\flexBox\flexBox_CPP\source\operator;D:\MotionBoxes\flexBox\flexBox_CPP\source\prox;D:\MotionBoxes\flexBox\flexBox_CPP\source\solver;D:\MotionBoxes\flexBox\flexBox_CPP\source\term;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Program Files\Matlab2012b\extern\include;D:\MotionBoxes\flexBox\flexBox_CPP\source\.;D:\MotionBoxes\flexBox\flexBox_CPP\source\data;D:\MotionBoxes\flexBox\flexBox_CPP\source\operator;D:\MotionBoxes\flexBox\flexBox_CPP\source\prox;D:\MotionBoxes\flexBox\flexBox_CPP\source\solver;D:\MotionBoxes\flexBox\flexBox_CPP\source\term;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalOptions>%(AdditionalOptions)  /machine:x64</AdditionalOptions>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;C:\Program Files\Matlab2012b\extern\lib\win64\microsoft\libmx.lib;C:\Program Files\Matlab2012b\extern\lib\win64\microsoft\libmex.lib;C:\Program Files\Matlab2012b\extern\lib\win64\microsoft\libmex.lib;C:\Program Files\Matlab2012b\extern\lib\win64\microsoft\libmx.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>D:/MotionBoxes/flexBox-master/flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6/build/wrappers/matlab/Release/flexBoxCPP.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/MotionBoxes/flexBox-master/flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6/build/wrappers/matlab/Release/flexBoxCPP.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+      <Version></Version>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Program Files\Matlab2012b\extern\include;D:\MotionBoxes\flexBox\flexBox_CPP\source\.;D:\MotionBoxes\flexBox\flexBox_CPP\source\data;D:\MotionBoxes\flexBox\flexBox_CPP\source\operator;D:\MotionBoxes\flexBox\flexBox_CPP\source\prox;D:\MotionBoxes\flexBox\flexBox_CPP\source\solver;D:\MotionBoxes\flexBox\flexBox_CPP\source\term;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>MinSizeRel/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <OpenMPSupport>true</OpenMPSupport>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR="MinSizeRel";DLL_EXPORT_SYM=__declspec(dllexport);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat></DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"MinSizeRel\";DLL_EXPORT_SYM=__declspec(dllexport);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Program Files\Matlab2012b\extern\include;D:\MotionBoxes\flexBox\flexBox_CPP\source\.;D:\MotionBoxes\flexBox\flexBox_CPP\source\data;D:\MotionBoxes\flexBox\flexBox_CPP\source\operator;D:\MotionBoxes\flexBox\flexBox_CPP\source\prox;D:\MotionBoxes\flexBox\flexBox_CPP\source\solver;D:\MotionBoxes\flexBox\flexBox_CPP\source\term;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Program Files\Matlab2012b\extern\include;D:\MotionBoxes\flexBox\flexBox_CPP\source\.;D:\MotionBoxes\flexBox\flexBox_CPP\source\data;D:\MotionBoxes\flexBox\flexBox_CPP\source\operator;D:\MotionBoxes\flexBox\flexBox_CPP\source\prox;D:\MotionBoxes\flexBox\flexBox_CPP\source\solver;D:\MotionBoxes\flexBox\flexBox_CPP\source\term;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalOptions>%(AdditionalOptions)  /machine:x64</AdditionalOptions>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;C:\Program Files\Matlab2012b\extern\lib\win64\microsoft\libmx.lib;C:\Program Files\Matlab2012b\extern\lib\win64\microsoft\libmex.lib;C:\Program Files\Matlab2012b\extern\lib\win64\microsoft\libmex.lib;C:\Program Files\Matlab2012b\extern\lib\win64\microsoft\libmx.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>D:/MotionBoxes/flexBox-master/flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6/build/wrappers/matlab/MinSizeRel/flexBoxCPP.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/MotionBoxes/flexBox-master/flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6/build/wrappers/matlab/MinSizeRel/flexBoxCPP.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+      <Version></Version>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Program Files\Matlab2012b\extern\include;D:\MotionBoxes\flexBox\flexBox_CPP\source\.;D:\MotionBoxes\flexBox\flexBox_CPP\source\data;D:\MotionBoxes\flexBox\flexBox_CPP\source\operator;D:\MotionBoxes\flexBox\flexBox_CPP\source\prox;D:\MotionBoxes\flexBox\flexBox_CPP\source\solver;D:\MotionBoxes\flexBox\flexBox_CPP\source\term;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>RelWithDebInfo/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <OpenMPSupport>true</OpenMPSupport>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR="RelWithDebInfo";DLL_EXPORT_SYM=__declspec(dllexport);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"RelWithDebInfo\";DLL_EXPORT_SYM=__declspec(dllexport);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Program Files\Matlab2012b\extern\include;D:\MotionBoxes\flexBox\flexBox_CPP\source\.;D:\MotionBoxes\flexBox\flexBox_CPP\source\data;D:\MotionBoxes\flexBox\flexBox_CPP\source\operator;D:\MotionBoxes\flexBox\flexBox_CPP\source\prox;D:\MotionBoxes\flexBox\flexBox_CPP\source\solver;D:\MotionBoxes\flexBox\flexBox_CPP\source\term;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Program Files\Matlab2012b\extern\include;D:\MotionBoxes\flexBox\flexBox_CPP\source\.;D:\MotionBoxes\flexBox\flexBox_CPP\source\data;D:\MotionBoxes\flexBox\flexBox_CPP\source\operator;D:\MotionBoxes\flexBox\flexBox_CPP\source\prox;D:\MotionBoxes\flexBox\flexBox_CPP\source\solver;D:\MotionBoxes\flexBox\flexBox_CPP\source\term;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalOptions>%(AdditionalOptions)  /machine:x64</AdditionalOptions>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;C:\Program Files\Matlab2012b\extern\lib\win64\microsoft\libmx.lib;C:\Program Files\Matlab2012b\extern\lib\win64\microsoft\libmex.lib;C:\Program Files\Matlab2012b\extern\lib\win64\microsoft\libmex.lib;C:\Program Files\Matlab2012b\extern\lib\win64\microsoft\libmx.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>D:/MotionBoxes/flexBox-master/flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6/build/wrappers/matlab/RelWithDebInfo/flexBoxCPP.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/MotionBoxes/flexBox-master/flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6/build/wrappers/matlab/RelWithDebInfo/flexBoxCPP.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+      <Version></Version>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\MotionBoxes\flexBox\flexBox_CPP\source\wrappers\matlab\CMakeLists.txt">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule D:/MotionBoxes/flexBox/flexBox_CPP/source/wrappers/matlab/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+C:\Users\l_frer01\Downloads\cmake-3.8.0-rc4-win64-x64\cmake-3.8.0-rc4-win64-x64\bin\cmake.exe -HD:/MotionBoxes/flexBox/flexBox_CPP/source -BD:/MotionBoxes/flexBox-master/flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6/build --check-stamp-file D:/MotionBoxes/flexBox-master/flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6/build/wrappers/matlab/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:/MotionBoxes/flexBox/flexBox_CPP/source/wrappers/matlab/CMakeLists.txt;D:\MotionBoxes\flexBox\flexBox_CPP\source\wrappers\matlab\CMakeLists.txt;D:\MotionBoxes\flexBox\flexBox_CPP\source\wrappers\matlab\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\MotionBoxes\flexBox-master\flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6\build\wrappers\matlab\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule D:/MotionBoxes/flexBox/flexBox_CPP/source/wrappers/matlab/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+C:\Users\l_frer01\Downloads\cmake-3.8.0-rc4-win64-x64\cmake-3.8.0-rc4-win64-x64\bin\cmake.exe -HD:/MotionBoxes/flexBox/flexBox_CPP/source -BD:/MotionBoxes/flexBox-master/flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6/build --check-stamp-file D:/MotionBoxes/flexBox-master/flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6/build/wrappers/matlab/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:/MotionBoxes/flexBox/flexBox_CPP/source/wrappers/matlab/CMakeLists.txt;D:\MotionBoxes\flexBox\flexBox_CPP\source\wrappers\matlab\CMakeLists.txt;D:\MotionBoxes\flexBox\flexBox_CPP\source\wrappers\matlab\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\MotionBoxes\flexBox-master\flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6\build\wrappers\matlab\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule D:/MotionBoxes/flexBox/flexBox_CPP/source/wrappers/matlab/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+C:\Users\l_frer01\Downloads\cmake-3.8.0-rc4-win64-x64\cmake-3.8.0-rc4-win64-x64\bin\cmake.exe -HD:/MotionBoxes/flexBox/flexBox_CPP/source -BD:/MotionBoxes/flexBox-master/flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6/build --check-stamp-file D:/MotionBoxes/flexBox-master/flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6/build/wrappers/matlab/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:/MotionBoxes/flexBox/flexBox_CPP/source/wrappers/matlab/CMakeLists.txt;D:\MotionBoxes\flexBox\flexBox_CPP\source\wrappers\matlab\CMakeLists.txt;D:\MotionBoxes\flexBox\flexBox_CPP\source\wrappers\matlab\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\MotionBoxes\flexBox-master\flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6\build\wrappers\matlab\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule D:/MotionBoxes/flexBox/flexBox_CPP/source/wrappers/matlab/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+C:\Users\l_frer01\Downloads\cmake-3.8.0-rc4-win64-x64\cmake-3.8.0-rc4-win64-x64\bin\cmake.exe -HD:/MotionBoxes/flexBox/flexBox_CPP/source -BD:/MotionBoxes/flexBox-master/flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6/build --check-stamp-file D:/MotionBoxes/flexBox-master/flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6/build/wrappers/matlab/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:/MotionBoxes/flexBox/flexBox_CPP/source/wrappers/matlab/CMakeLists.txt;D:\MotionBoxes\flexBox\flexBox_CPP\source\wrappers\matlab\CMakeLists.txt;D:\MotionBoxes\flexBox\flexBox_CPP\source\wrappers\matlab\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\MotionBoxes\flexBox-master\flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6\build\wrappers\matlab\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="D:\MotionBoxes\flexBox\flexBox_CPP\source\wrappers\matlab\functions.cpp"  />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="D:\MotionBoxes\flexBox-master\flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6\build\ZERO_CHECK.vcxproj">
+      <Project>849B7AB3-C501-371C-84EA-9727F1A61CEE</Project>
+      <Name>ZERO_CHECK</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,0 +1,12 @@
+﻿Der Buildvorgang wurde am 03.04.2017 13:33:17 gestartet.
+     1>Projekt "D:\MotionBoxes\flexBox-master\flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6\build\ZERO_CHECK.vcxproj" auf Knoten "2", Build Ziel(e).
+     1>CustomBuild:
+         Checking Build System
+         CMake does not need to re-run because D:/MotionBoxes/flexBox-master/flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6/build/CMakeFiles/generate.stamp is up-to-date.
+         CMake does not need to re-run because D:/MotionBoxes/flexBox-master/flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6/build/wrappers/matlab/CMakeFiles/generate.stamp is up-to-date.
+         CMake does not need to re-run because D:/MotionBoxes/flexBox-master/flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6/build/examples/CMakeFiles/generate.stamp is up-to-date.
+     1>Die Erstellung des Projekts "D:\MotionBoxes\flexBox-master\flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6\build\ZERO_CHECK.vcxproj" ist abgeschlossen, Build Ziel(e).
+
+Build erfolgreich.
+
+Verstrichene Zeit 00:00:00.67

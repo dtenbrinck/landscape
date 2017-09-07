@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="D:\MotionBoxes\flexBox-master\flexBox_CPP-f90f5a3d07cad29ec5c578396b0461ca8fa92df6\build\CMakeFiles\cde2228b7956ef2034f8b3f28f04dd91\INSTALL_force.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{3444C8EA-A48A-347C-875E-4DF2184FE44D}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

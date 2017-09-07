@@ -83,13 +83,9 @@ for i = 1:numberOfExperiments
         
         % initialize container for cell coordinates
         coordinates = cell(0,1);
-              
         
-        % PERFORM OPTICAL FLOW HERE
-        % flow = computeOF(experimentData.Dapi);
-        
-        % CORRECT MCHERRY CHANNEL WITH FLOW
-        % experimentData.mCherry = warping(experimentData.mCherry, flow);
+        % perform optical flow
+        flow = computeOF(experimentData.Dapi);
         
         % segment each channel separately
         for t = 1:numberOfTimepoints
@@ -103,8 +99,11 @@ for i = 1:numberOfExperiments
             coordinates{t} = cellCoordinates;
         end
         
-        % PERFORM TRACKING HERE
-        % tracks = cell_tracking(segmentation)
+        % correct position of segments with flow
+        warpedCentroids = warping(segmentation, flow);
+        
+        % track corrected centroids
+        [tracks, adjacency_tracks] = cell_tracking(warpedCentroids);
         
     catch ERROR_MSG  %% ONLY EXECUTED WHEN ERRORS HAPPENING
         
