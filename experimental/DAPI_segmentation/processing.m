@@ -67,7 +67,7 @@ for experiment=1:numberOfExperiments
         [processedData.nuclei, processedData.nucleiCoordinates] = segmentDAPI(processedData.Dapi, p.DAPIseg, p.resolution);
         
         % debug:
-        slideShow(processedData.Dapi, processedData.nuclei);
+        %slideShow(processedData.Dapi, processedData.nuclei);
         
         if p.debug_level >= 1; disp('Segmenting mCherry channel...'); end
         [processedData.cells, processedData.cellCoordinates] = blobSegmentCells(processedData.mCherry, p.mCherryseg);

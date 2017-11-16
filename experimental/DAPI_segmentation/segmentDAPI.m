@@ -100,7 +100,7 @@ cc = bwconncomp(Xi);
 nuclei = zeros(size(data));
 
 % initialize container for center coordinates
-centCoords = zeros(cc.NumObjects,3);
+centCoords = zeros(3,cc.NumObjects);
 
 % initialize counter variable for valid cells
 j = 0;
@@ -137,14 +137,14 @@ for i = 1:cc.NumObjects
   nuclei(y,x,z) = 1;
   
   % save center coordinates
-  centCoords(j,1) = y;
-  centCoords(j,2) = x;
-  centCoords(j,3) = z;
+  centCoords(1,j) = y;
+  centCoords(2,j) = x;
+  centCoords(3,j) = z;
    
 end
 
 % delete unfilled rows in matrix
-centCoords( centCoords(:,1) == 0, : ) = [];
+centCoords( :, centCoords(1,:) == 0 ) = [];
 
 end
 
