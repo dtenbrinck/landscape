@@ -64,7 +64,7 @@ for experiment=1:numberOfExperiments
         processedData.landmark = segmentGFP(processedData.GFP, p.GFPseg, p.resolution);
         
         if p.debug_level >= 1; disp('Segmenting DAPI channel...'); end
-        [processedData.nuclei, processedData.nucleiCoordinates] = segmentDAPI(processedData.Dapi, p.DAPIseg, p.resolution);
+        [~, processedData.nucleiCoordinates] = segmentDAPI(processedData.Dapi, p.DAPIseg, p.resolution);
         
         % debug:
         %slideShow(processedData.Dapi, processedData.nuclei);
@@ -81,7 +81,7 @@ for experiment=1:numberOfExperiments
         transformationMatrix = computeTransformationMatrix(ellipsoid);
         
         %%%%%%%%%%% VALIDITY CHECK FOR DEBUGGING
-        if p.debug_level >= 2;
+        if p.debug_level >= 2
             disp('Transform data for validity check...');
             [ transformedData, transformedResolution ] = transformDataToSphere( processedData, p.resolution, transformationMatrix, ellipsoid, p.samples_cube );
         end

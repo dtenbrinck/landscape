@@ -121,20 +121,44 @@ for i = 1:cc.NumObjects
   
   % extract current object locally
   local_object = data(min(Y(:)):max(Y(:)),min(X(:)):max(X(:)),min(Z(:)):max(Z(:)));
-  
+    
   % search for maximum value in local region
-  index_max = median(find(local_object == max(local_object(:))));
+  indices_max = find(local_object == max(local_object(:)));
   
   % compute local coordinates
-  [y_loc,x_loc,z_loc] = ind2sub(size(local_object), index_max);
+  [y_loc,x_loc,z_loc] = ind2sub(size(local_object), indices_max);
+  
+  if numel(indices_max) > 1
+      % get center index of bounding box
+      index_center = round(numel(local_object) / 2);
+  
+      % compute center coordinates
+      [y_c,x_c,z_c] = ind2sub(size(local_object), index_center);  
+  
+      % compute distances to center
+      distances = sum((repmat([y_c,x_c,z_c],numel(indices_max),1) - [y_loc,x_loc,z_loc]).^2, 2);
+      
+      % extract nearest entry
+      index_nearest = find(distances == min(distances));
+      
+      % get local coordinates
+      y_loc = y_loc(index_nearest);
+      x_loc = x_loc(index_nearest);
+      z_loc = z_loc(index_nearest);
+  
+  end
   
   % add offset of bounding box to get global coordinates
   y = y_loc + min(Y(:)) - 1;
   x = x_loc + min(X(:)) - 1;
   z = z_loc + min(Z(:)) - 1;
-  
+    
+  try
   % mark nuclei center coordinate in mask
   nuclei(y,x,z) = 1;
+  catch ERROR_MSG
+      stop = 1;
+  end
   
   % save center coordinates
   centCoords(1,j) = y;
