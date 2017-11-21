@@ -21,6 +21,7 @@ for result = 1:numberOfResults
     allCellCoords = horzcat(allCellCoords, gatheredData.registered.nucleiCoordinates);
 end
 
+return
 
 % -- 2. Step --%
 % Ignore all that are out of the domain
