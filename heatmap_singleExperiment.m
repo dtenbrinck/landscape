@@ -15,15 +15,15 @@ p = initializeScript('heatmap', root_dir);
 
 % Get filenames of MAT files in selected folder
 fileNames = getMATfilenames(p.resultsPathAccepted);
-fileNames(find(strcmp(fileNames,'ParameterProcessing.mat'))) = [];
-fileNames(find(strcmp(fileNames,'ParameterHeatmap.mat'))) = [];
-fileNames(find(strcmp(fileNames,'HeatmapAccumulator.mat'))) = [];
+fileNames(strcmp(fileNames,'ParameterProcessing.mat')) = [];
+fileNames(strcmp(fileNames,'ParameterHeatmap.mat')) = [];
+fileNames(strcmp(fileNames,'HeatmapAccumulator.mat')) = [];
 
 if p.random == 1
     fileNames = drawRandomNames(fileNames,p.numberOfRandom);
 end
 % Get number of experiments
-numberOfResults = size(fileNames,1);
+numberOfResults = numel(fileNames);
 
 % Check if any results have been found
 if numberOfResults == 0

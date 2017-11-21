@@ -21,15 +21,15 @@ path_accepted = p.resultsPathAccepted;
 
 % Get filenames of MAT files in selected folder
 fileNames = getMATfilenames(p.resultsPathAccepted);
-fileNames(find(strcmp(fileNames,'ParameterProcessing.mat'))) = [];
-fileNames(find(strcmp(fileNames,'ParameterHeatmap.mat'))) = [];
-fileNames(find(strcmp(fileNames,'HeatmapAccumulator.mat'))) = [];
+fileNames(strcmp(fileNames,'ParameterProcessing.mat')) = [];
+fileNames(strcmp(fileNames,'ParameterHeatmap.mat')) = [];
+fileNames(strcmp(fileNames,'HeatmapAccumulator.mat')) = [];
 
 [stackNames1,stackNames2] = drawRandomNames(fileNames,percOfAll);
 
 % Get number of experiments
-numberOfResults1 = size(stackNames1,1);
-numberOfResults2 = size(stackNames2,1);
+numberOfResults1 = numel(stackNames1);
+numberOfResults2 = numel(stackNames2);
 
 % Check if any results have been found
 if numberOfResults1 == 0
