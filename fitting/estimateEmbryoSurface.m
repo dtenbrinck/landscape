@@ -1,29 +1,7 @@
-function [ ellipsoid ] = estimateEmbryoSurface( Dapi_data, resolution )
-
-% generate three-dimensional Gaussian filter
-%g = generate3dGaussian(9, 1.5);
-
-% denoise DAPI channel by blurring
-%blurred = imfilter(Dapi_data, g, 'same','replicate');
-blurred = Dapi_data;
-
-% generate a three-dimensional Laplacian filter
-kernelLaplace = generate3dLaplacian(resolution);
-
-% determine sharp areas in DAPI channel by Laplacian filtering
-sharp_areas = normalizeData(imfilter(blurred, kernelLaplace, 'same', 'replicate'));
-
-% determine global threshold to detect sharp areas
-threshold = kittler_thresholding(sharp_areas);
-
-% determine sharp points
-sharp_points = find(sharp_areas > threshold);
-
-% convert indices to coordinates
-[Y, X, Z] = ind2sub(size(sharp_areas),sharp_points);
-Y = Y * resolution(1);
-X = X * resolution(2);
-Z = Z * resolution(3);
+function [ ellipsoid ] = estimateEmbryoSurface( nuclei_coord, resolution )
+Y = (nuclei_coord(1,:) * resolution(1))';
+X = (nuclei_coord(2,:) * resolution(2))';
+Z = (nuclei_coord(3,:) * resolution(3))';
 
 % fit ellipsoid to sharp points in areas in focus
 [ ellipsoid.center, ellipsoid.radii, ellipsoid.axes, ellipsoid.v, ~] = estimateEllipsoid( [ X Y Z ], '' );
