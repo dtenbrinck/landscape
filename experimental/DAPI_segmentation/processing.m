@@ -63,25 +63,22 @@ for experiment=1:numberOfExperiments
         if p.debug_level >= 1; disp('Segmenting GFP channel...'); end
         processedData.landmark = segmentGFP(processedData.GFP, p.GFPseg, p.resolution);
         
-        if p.debug_level >= 1; disp('Segmenting DAPI channel...'); end
-        [~, processedData.nucleiCoordinates] = segmentDAPI(processedData.Dapi, p.DAPIseg, p.resolution);
-        
-        % debug:
-        %slideShow(processedData.Dapi, processedData.nuclei);
-        
         if p.debug_level >= 1; disp('Segmenting mCherry channel...'); end
         [processedData.cells, processedData.cellCoordinates] = blobSegmentCells(processedData.mCherry, p.mCherryseg);
         
+        if p.debug_level >= 1; disp('Segmenting DAPI channel...'); end
+        [~, processedData.nucleiCoordinates] = segmentDAPI(processedData.Dapi, p.DAPIseg, p.resolution);
+
         % estimate embryo surface by fitting an ellipsoid
         if p.debug_level >= 1; disp('Estimating embryo surface...'); end
-        ellipsoid = estimateEmbryoSurface(processedData.Dapi, p.resolution);
+        ellipsoid = estimateEmbryoSurface(processedData.nucleiCoordinates, p.resolution);
         
         % compute transformation which normalizes the estimated ellipsoid to a unit sphere
         if p.debug_level >= 1; disp('Compute transformation from optimal ellipsoid...'); end
         transformationMatrix = computeTransformationMatrix(ellipsoid);
         
         %%%%%%%%%%% VALIDITY CHECK FOR DEBUGGING
-        if p.debug_level >= 2
+        if p.debug_level >= 2;
             disp('Transform data for validity check...');
             [ transformedData, transformedResolution ] = transformDataToSphere( processedData, p.resolution, transformationMatrix, ellipsoid, p.samples_cube );
         end
