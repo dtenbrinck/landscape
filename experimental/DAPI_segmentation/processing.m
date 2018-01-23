@@ -78,7 +78,7 @@ for experiment=1:numberOfExperiments
         transformationMatrix = computeTransformationMatrix(ellipsoid);
         
         %%%%%%%%%%% VALIDITY CHECK FOR DEBUGGING
-        if p.debug_level >= 2
+        if p.debug_level >= 2;
             disp('Transform data for validity check...');
             [ transformedData, transformedResolution ] = transformDataToSphere( processedData, p.resolution, transformationMatrix, ellipsoid, p.samples_cube );
         end

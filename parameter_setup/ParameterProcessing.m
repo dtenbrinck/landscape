@@ -2,8 +2,7 @@ function p =  ParameterProcessing()
 %% PARAMETERS PROCESSING SCRIPT
 % This file contains all parameters needed for the preocessing script with
 % discriptios of each parameter.        
-
-            
+  
 %% COMMON PARAMETER
 p.resolution = [1.29, 1.29, 20];
 p.scale = 0.75;
@@ -11,13 +10,17 @@ p.scale = 0.75;
 % Debug variables
 p.debug_level = 1; %1
 p.visualization = 0; %0
-%% SEGMNENTATION
-% -- PREPROCESSING -- %
-% - removing background -%
+
+%% PREPROCESSING
+% -- BACKGROUND REMOVAL -- %
 p.rmbg.dapiDiskSize = 5; %5
 p.rmbg.GFPDiskSize = 50; %50
 p.rmbg.mCherryDiskSize = 11; %11
 
+%% SEGMNENTATION
+% -- DAPI SEGMENTATION -- %
+p.DAPIseg.method = 'k-means'; % 'Laplacian', 'CP'
+p.DAPIseg.k = 3;
 % -- GFP SEGMENTATION -- %
 p.GFPseg.k = 4; %4 
 p.GFPseg.morphSize = 5; %5
