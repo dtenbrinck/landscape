@@ -70,10 +70,9 @@ error_rel = realmax;
 while error_rel > tol_rel
     H = hessianOfEnergyFunctional(v, x, y, z);
     g = gradientOfEnergyFunctional(v, x, y, z);
-    
     delta_v = H \g;
     error_rel = norm(delta_v) / norm(v);
-    v = v + delta_v;
+    v = v + delta_v';
 end
 
 if ( v(1) <= 0 || v(2) <= 0 || v(3) <= 0 )
