@@ -58,7 +58,7 @@ end
 % and center point in mean values of x, y and z 
 
 center = [mean(x); mean(y); mean(z)];
-radii = ones(1,3);
+radii = ones(3,1);
 v0(1:3) = 1./(radii.^2);
 v0(4:6) = -2*center./(radii.^2);
 v0(7) = sum ( (center.^2) ./ (radii.^2));
@@ -70,6 +70,7 @@ error_rel = realmax;
 while error_rel > tol_rel
     H = hessianOfEnergyFunctional(v, x, y, z);
     g = gradientOfEnergyFunctional(v, x, y, z);
+    
     delta_v = H \g;
     error_rel = norm(delta_v) / norm(v);
     v = v + delta_v;
