@@ -110,7 +110,7 @@ end
 
 %% components of gradient of energy function
 function grad = gradf1(v, x, y, z)
-grad = -2/3 * pi * 1/(v(1)^(-3/2)) * 1/sqrt(v(2)) * 1/sqrt(v(3));
+grad = -2/3 * pi * (v(1)^(-3/2)) * 1/sqrt(v(2)) * 1/sqrt(v(3));
 for i=1:length(x)
     w=[x(i)^2; y(i)^2; z(i)^2; x(i); y(i); z(i); 1];
     grad = grad + x(i)^2 * smearedHeaviside1stDerivative(v*w);
@@ -118,7 +118,7 @@ end
 end
 
 function grad = gradf2(v, x, y, z)
-grad = -2/3 * pi * 1/sqrt(v(1)) * 1/(v(2)^(-3/2)) * 1/sqrt(v(3));
+grad = -2/3 * pi * 1/sqrt(v(1)) * (v(2)^(-3/2)) * 1/sqrt(v(3));
 for i=1:length(x)
     w=[x(i)^2; y(i)^2; z(i)^2; x(i); y(i); z(i); 1];
     grad = grad + y(i)^2 * smearedHeaviside1stDerivative(v*w);
@@ -126,7 +126,7 @@ end
 end
 
 function grad = gradf3(v, x, y, z)
-grad = -2/3 * pi * 1/sqrt(v(1)) * 1/sqrt(v(2)) * 1/(v(3)^(-3/2));
+grad = -2/3 * pi * 1/sqrt(v(1)) * 1/sqrt(v(2)) * (v(3)^(-3/2));
 for i=1:length(x)
     w=[x(i)^2; y(i)^2; z(i)^2; x(i); y(i); z(i); 1];
     grad = grad + z(i)^2 * smearedHeaviside1stDerivative(v*w);
@@ -169,37 +169,37 @@ end
 % (Satz von Schwarz: df/dxdy = df/dydx)
 % first components influenced by volumetric part
 function h = hesse11( v, x, y, z)
-h = pi * 1/(v(1)^(-5/2)) * 1/(v(2)^(-1/2)) * 1/(v(3)^(-1/2));
+h = pi * (v(1)^(-5/2)) * (v(2)^(-1/2)) * (v(3)^(-1/2));
 prefixFactor = (x.^4);
 h = h + firstSummandInHesseIJ( v, x, y, z, prefixFactor);
 end
 
 function h = hesse22( v, x, y, z)
-h = pi * 1/(v(1)^(-1/2)) * 1/(v(2)^(-5/2)) * 1/(v(3)^(-1/2));
+h = pi * (v(1)^(-1/2)) * (v(2)^(-5/2)) * (v(3)^(-1/2));
 prefixFactor = (y.^4);
 h = h + firstSummandInHesseIJ( v, x, y, z, prefixFactor);
 end
 
 function h = hesse33( v, x, y, z)
-h = pi * 1/(v(1)^(-1/2)) * 1/(v(2)^(-1/2)) * 1/(v(3)^(-5/2));
+h = pi * (v(1)^(-1/2)) * (v(2)^(-1/2)) * (v(3)^(-5/2));
 prefixFactor = (z.^4);
 h = h + firstSummandInHesseIJ( v, x, y, z, prefixFactor);
 end
 
 function h = hesse12( v, x, y, z)
-h = 1/3 * pi * 1/(v(1)^(-3/2)) * 1/(v(2)^(-3/2)) * 1/(v(3)^(-1/2));
+h = 1/3 * pi * (v(1)^(-3/2)) * (v(2)^(-3/2)) * (v(3)^(-1/2));
 prefixFactor = (x.^2).*(y.^2);
 h = h + firstSummandInHesseIJ( v, x, y, z, prefixFactor);
 end
 
 function h = hesse13( v, x, y, z)
-h = 1/3 * pi * 1/(v(1)^(-3/2)) * 1/(v(2)^(-1/2)) * 1/(v(3)^(-3/2));
+h = 1/3 * pi * (v(1)^(-3/2)) * (v(2)^(-1/2)) * (v(3)^(-3/2));
 prefixFactor = (x.^2).*(z.^2);
 h = h + firstSummandInHesseIJ( v, x, y, z, prefixFactor);
 end
 
 function h = hesse23( v, x, y, z)
-h = 1/3 * pi * 1/(v(1)^(-1/2)) * 1/(v(2)^(-3/2)) * 1/(v(3)^(-3/2));
+h = 1/3 * pi * (v(1)^(-1/2)) * (v(2)^(-3/2)) * (v(3)^(-3/2));
 prefixFactor = (y.^2).*(z.^2);
 h = h + firstSummandInHesseIJ( v, x, y, z, prefixFactor);
 end
@@ -249,7 +249,7 @@ end
 
 % missing derivatives with 3rd coordinate
 function h = hesse34( v, x, y, z)
-prefixFactor = (z.^3).*(x);
+prefixFactor = (z.^2).*(x);
 h = firstSummandInHesseIJ( v, x, y, z, prefixFactor);
 end
 
@@ -275,17 +275,17 @@ h = firstSummandInHesseIJ( v, x, y, z, prefixFactor);
 end
 
 function h = hesse45( v, x, y, z)
-prefixFactor = (z.^2).*(y);
+prefixFactor = (x).*(y);
 h = firstSummandInHesseIJ( v, x, y, z, prefixFactor);
 end
 
 function h = hesse46( v, x, y, z)
-prefixFactor = (z.^3);
+prefixFactor = (x).*(z);
 h = firstSummandInHesseIJ( v, x, y, z, prefixFactor);
 end
 
 function h = hesse47( v, x, y, z)
-prefixFactor = (z.^2);
+prefixFactor = (x);
 h = firstSummandInHesseIJ( v, x, y, z, prefixFactor);
 end
 
@@ -296,12 +296,12 @@ h = firstSummandInHesseIJ( v, x, y, z, prefixFactor);
 end
 
 function h = hesse56( v, x, y, z)
-prefixFactor = (z.^2).*(y);
+prefixFactor = (y).*(z);
 h = firstSummandInHesseIJ( v, x, y, z, prefixFactor);
 end
 
 function h = hesse57( v, x, y, z)
-prefixFactor = (z.^3);
+prefixFactor = (y);
 h = firstSummandInHesseIJ( v, x, y, z, prefixFactor);
 end
 
@@ -312,7 +312,7 @@ h = firstSummandInHesseIJ( v, x, y, z, prefixFactor);
 end
 
 function h = hesse67( v, x, y, z)
-prefixFactor = (z.^2).*(y);
+prefixFactor = (z);
 h = firstSummandInHesseIJ( v, x, y, z, prefixFactor);
 end
 
