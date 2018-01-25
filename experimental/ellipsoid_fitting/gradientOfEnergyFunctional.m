@@ -12,7 +12,7 @@ end
 
 %% First derivative of a smeared Heaviside function
 function h = smearedHeaviside1stDerivative (x) 
-eps = 100;%1e-12;
+eps = 1;%1e-12;
 if ( abs(x) > eps ) 
     h = 0;
 else

@@ -20,7 +20,7 @@ end
 
 %% Second derivative of a smeared Heaviside function
 function h = smearedHeaviside2ndDerivative (x) 
-eps = 100;%e-12;
+eps = 1;%e-12;
 if ( abs(x) > eps ) 
     h = 0;
 else

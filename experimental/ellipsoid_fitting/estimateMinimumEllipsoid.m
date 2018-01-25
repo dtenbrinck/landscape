@@ -64,17 +64,23 @@ v0(4:6) = -2*center./(radii.^2);
 v0(7) = sum ( (center.^2) ./ (radii.^2));
 
 tol_rel = 1e-5;
+tol_abs = 1e-5;
+tol = 1e-12;
 v = v0;
+g = - gradientOfEnergyFunctional(v, x, y, z);
 error_rel = realmax;
-
-while error_rel > tol_rel
+error_abs = realmax;
+counter = 0;
+while ( error_rel > tol_rel && norm(g) > tol && error_abs > tol_abs)
     H = hessianOfEnergyFunctional(v, x, y, z);
-    g = gradientOfEnergyFunctional(v, x, y, z);
+    g = - gradientOfEnergyFunctional(v, x, y, z);
     delta_v = H \g;
-    error_rel = norm(delta_v) / norm(v);
-    v = v + delta_v';
+    error_abs = norm(delta_v);
+    error_rel = error_abs / norm(v);
+    v = v + delta_v';    
+    counter = counter + 1;
 end
-
+counter
 if ( v(1) <= 0 || v(2) <= 0 || v(3) <= 0 )
     error( 'Cannot compute radii of ellipsoid. Newton Iteration results in a negative value for 1/r_i^2 is negativ ' );
 end
