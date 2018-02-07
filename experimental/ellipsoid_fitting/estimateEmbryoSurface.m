@@ -15,56 +15,5 @@ for i=1:3
     end
 end
 
-% % show nuclei
-% figure; scatter3(nucleiCoordinates(:,1), nucleiCoordinates(:,2), nucleiCoordinates(:,3));
-% 
-% % render ellipsoid
-% mind = [1 1 1]; maxd = size(sharp_areas) .* resolution;
-% nsteps = maxd * 0.15;
-% step = ( maxd - mind ) ./ nsteps;
-% [ x, y, z ] = meshgrid( linspace( mind(2) - step(2), maxd(2) + step(2), nsteps(2) ), linspace( mind(1) - step(1), maxd(1) + step(1), nsteps(1) ), linspace( mind(3) - step(3), maxd(3) + step(3), nsteps(3) ) );
-% %[x, y, z] = meshgrid(1:maxd(1), 1:maxd(2), 1:maxd(3));
-% 
-% Ellipsoid = v(1) *x.*x +   v(2) * y.*y + v(3) * z.*z + ...
-%     2*v(4) *x.*y + 2*v(5)*x.*z + 2*v(6) * y.*z + ...
-%     2*v(7) *x    + 2*v(8)*y    + 2*v(9) * z;
-% figure;
-% p = patch( isosurface( x, y, z, Ellipsoid, -1*v(10) ) );
-% set( p, 'FaceColor', 'g', 'EdgeColor', 'none' );
-% view( -70, 40 );
-% axis vis3d equal;
-% %resolution = [1.720000000000000   1.720000000000000  20];
-% %daspect(resolution(3)./resolution)
-% camlight;
-% lighting phong;
-% 
-% 
-% 
-% %DEBUG
-% transformedCoordinates = (transform_normalization * (nucleiCoordinates - repmat(center', size(nucleiCoordinates,1), 1))')';
-% 
-% % estimate embryo shape by fitting ellipsoid to sharp areas
-% [center, radii, axes, v, ~] = fitEllipsoid(transformedCoordinates, [1/32 1/32 1/32]);
-% 
-% scatter3(transformedCoordinates(:,1), transformedCoordinates(:,2), transformedCoordinates(:,3));
-% 
-% 
-% % render ellipsoid
-% 
-% %[x, y, z] = meshgrid(1:maxd(1), 1:maxd(2), 1:maxd(3));
-% 
-% Ellipsoid = v(1) *x.*x +   v(2) * y.*y + v(3) * z.*z + ...
-%     2*v(4) *x.*y + 2*v(5)*x.*z + 2*v(6) * y.*z + ...
-%     2*v(7) *x    + 2*v(8)*y    + 2*v(9) * z;
-% figure;
-% p = patch( isosurface( x, y, z, Ellipsoid, -1*v(10) ) );
-% set( p, 'FaceColor', 'g', 'EdgeColor', 'none' );
-% view( -70, 40 );
-% axis vis3d equal;
-% %resolution = [1.720000000000000   1.720000000000000  20];
-% %daspect(resolution(3)./resolution)
-% camlight;
-% lighting phong;
-
 end
 

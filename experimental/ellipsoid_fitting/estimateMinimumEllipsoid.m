@@ -25,13 +25,8 @@ function [ center, radii, axes, v ] = estimateMinimumEllipsoid( X )
 % Solving Minimization Problem to find smallest ellipsoid fitting leaving
 % only few data points outside. 
 % Find minimizer of the following energy functional f:
-%  f (v = v_1, ..., v_7) = sum(over all data points) H(< (v_1, ..., v_7) , (x^2, y^2, z^2, x, y, z, 1) >)
-%           + 4/3 * pi * 1/sqrt(v_1) * 1/sqrt(v_2) * 1/sqrt(v_3)
+% TODO
 %
-%       first summand: smeared heaviside function of evaluated ellipsoid 
-%           equation in all data points; only includes distances of data 
-%                       points outside of ellipsoid
-%       second summand: volume of ellipsoid
 % Author:
 % Ramona Sasse
 % Date:
@@ -46,48 +41,7 @@ else
     z = X( :, 3 );
 end
 
-% need 7?! or more data points
-if length( x ) < 7
-   error( 'Must have at least 7 points to fit a unique ellipsoid' );
-end
 
-% to find minimizer of energy functional solve the optimality condition
-% grad(f(v)) = 0 with newton iteration
-
-% arbitrary starting vector v0 resulting from unit sphere with radii = 1 
-% and center point in mean values of x, y and z 
-
-center = [mean(x); mean(y); mean(z)];
-radii = ones(3,1);
-v0(1:3) = 1./(radii.^2);
-v0(4:6) = -2*center./(radii.^2);
-v0(7) = sum ( (center.^2) ./ (radii.^2));
-
-tol_rel = 1e-5;
-tol_abs = 1e-5;
-tol = 1e-12;
-v = v0;
-g = - gradientOfEnergyFunctional(v, x, y, z);
-error_rel = realmax;
-error_abs = realmax;
-counter = 0;
-while ( error_rel > tol_rel && norm(g) > tol && error_abs > tol_abs)
-    H = hessianOfEnergyFunctional(v, x, y, z);
-    g = - gradientOfEnergyFunctional(v, x, y, z);
-    delta_v = H \g;
-    error_abs = norm(delta_v);
-    error_rel = error_abs / norm(v);
-    v = v + delta_v';    
-    counter = counter + 1;
-end
-counter
-if ( v(1) <= 0 || v(2) <= 0 || v(3) <= 0 )
-    error( 'Cannot compute radii of ellipsoid. Newton Iteration results in a negative value for 1/r_i^2 is negativ ' );
-end
-
-% calculate output params
-radii = 1./sqrt(v(1:3));
-center = -v(4:6) ./ (2*v(1:3));
 
 end
 
