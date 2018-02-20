@@ -8,6 +8,7 @@ function [ registeredData ] = registerData( processedData, resolution, registrat
 % register segmentations using nearest neighbor interpolation
 [registeredData.landmark, ~] = transformVoxelData(single(processedData.landmark), resolution, registrationMatrix, ellipsoid.center, samples_cube, 'nearest');
 [registeredData.cells, ~] = transformVoxelData(single(processedData.cells), resolution, registrationMatrix, ellipsoid.center, samples_cube, 'nearest');
+[registeredData.nuclei, ~] = transformVoxelData(single(processedData.nuclei), resolution, registrationMatrix, ellipsoid.center, samples_cube, 'nearest');
 
 % register cell coordinates accordingly
 processedData.cellCoordinates(1,:) = processedData.cellCoordinates(1,:)*resolution(2);
