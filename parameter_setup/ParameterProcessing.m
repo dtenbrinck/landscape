@@ -30,7 +30,7 @@ p.GFPseg.method = 'k-means'; % 'k-means', 'CP'
 % default: 'kittler'
 % 'k-means': Spinning Disc (SD) Confocal Microscopy data
 % 'kittler': Epifluorescence Microscopy (EPI): kittler
-p.mCherryseg.binarization = 'k-means'; % 'k-means', 'kittler'
+p.mCherryseg.binarization = 'kittler'; % 'k-means', 'kittler'
 p.mCherryseg.k = 3; %3
 p.mCherryseg.cellSize = 50; %50. in pixel
 p.mCherryseg.method = 'k-means'; % 'k-means', 'k-means_local', 'CP'

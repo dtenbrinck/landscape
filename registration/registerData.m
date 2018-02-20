@@ -14,5 +14,11 @@ processedData.cellCoordinates(1,:) = processedData.cellCoordinates(1,:)*resoluti
 processedData.cellCoordinates(2,:) = processedData.cellCoordinates(2,:)*resolution(1);
 processedData.cellCoordinates(3,:) = processedData.cellCoordinates(3,:)*resolution(3);
 registeredData.cellCoordinates = transformCoordinates(processedData.cellCoordinates', ellipsoid.center, registrationMatrix^-1, [0; 0; 0]);
+
+% register nuclei coordinates accordingly
+processedData.nucleiCoordinates(1,:) = processedData.nucleiCoordinates(1,:)*resolution(2);
+processedData.nucleiCoordinates(2,:) = processedData.nucleiCoordinates(2,:)*resolution(1);
+processedData.nucleiCoordinates(3,:) = processedData.nucleiCoordinates(3,:)*resolution(3);
+registeredData.nucleiCoordinates = transformCoordinates(processedData.nucleiCoordinates', ellipsoid.center, registrationMatrix^-1, [0; 0; 0]);
 end
 
