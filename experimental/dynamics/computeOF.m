@@ -4,9 +4,9 @@ function flow = computeOF( Dapi_data )
 addpath(genpath('../tracking/motionEstimationGUI'));
 
 flow  = zeros(size(Dapi_data,1),size(Dapi_data,2),size(Dapi_data,3),size(Dapi_data,4),3);
-scale = 1/8; % scaling factor in x and y direction for speeding up
+scale = 1/4; % scaling factor in x and y direction for speeding up
 
-for step=1:size(Dapi_data,4); % number of timesteps
+for step=1:size(Dapi_data,4)-1; % number of timesteps
  
     YFP1tmp = zeros(size(Dapi_data,1),size(Dapi_data,2),size(Dapi_data,3)); 
     YFP2tmp = zeros(size(YFP1tmp));
@@ -14,7 +14,7 @@ for step=1:size(Dapi_data,4); % number of timesteps
     YFP2=zeros(size(YFP1));
     
     %% pick and scale subsequent time steps
-    for i=0:size(Dapi_data,3)-1 % number of z-slices
+    for i=1:size(Dapi_data,3) % number of z-slices
         YFP1tmp(:,:,i+1)=Dapi_data(:,:,i,step);
         YFP1(:,:,i+1)=imresize(YFP1tmp(:,:,i+1),scale,'cubic');
         YFP2tmp(:,:,i+1)=Dapi_data(:,:,i,step+1);
@@ -43,9 +43,9 @@ for step=1:size(Dapi_data,4); % number of timesteps
     %% rescale flow to obtain original resolution
     for j=1:3
         for i=1:size(flow,3)
-            flow(:,:,i)=imresize(v(:,:,i,step,j),1/scale,'cubic');
+            flow(:,:,i,step,j)=imresize(v(:,:,i,1,j),1/scale,'cubic');
             % visualize flow in single directions slide by slide in x-y
-%             fig(1);imagesc(flow(:,:,i,step,j));axis image;title(['Field ',num2str(i),', component ',num2str(j)]);colorbar;pause
+%             fig(1);imagesc(flow(:,:,i,1,j));axis image;title(['Field ',num2str(i),', component ',num2str(j)]);colorbar;pause
         end
     end
     

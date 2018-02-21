@@ -100,10 +100,10 @@ for i = 1:numberOfExperiments
         end
         
         % correct position of segments with flow
-        warpedCentroids = warping(segmentation, flow);
+        warpedCentroids = warping(coordinates, flow);
         
         % track corrected centroids
-        [tracks, adjacency_tracks] = cell_tracking(warpedCentroids);
+        [tracks, adjacency_tracks] = tracking(warpedCentroids);
         
     %catch ERROR_MSG  %% ONLY EXECUTED WHEN ERRORS HAPPENING
         
