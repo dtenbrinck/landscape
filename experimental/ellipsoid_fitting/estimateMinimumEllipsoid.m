@@ -19,8 +19,8 @@ function [ center, radii, axes, v ] = estimateMinimumEllipsoid( X )
 %                     ry = 1/sqrt(v_2)
 %                     rz = 1/sqrt(v_3)
 % * axes      -  the radii directions as columns of the 3x3 matrix
-% * v         -  the 7 parameters describing the ellipsoid algebraically: 
-%                Ax^2 + By^2 + Cz^2 + Dx + Ey + Fz + G = 0
+% * v         -  the 10 parameters describing the ellipsoid algebraically: 
+%                Ax^2 + By^2 + Cz^2 + 2Dxy + 2Exz + 2Fyz + 2Gx + 2Hy + 2Iz + J = 0
 %
 % Solving Minimization Problem to find smallest ellipsoid fitting leaving
 % only few data points outside. 
@@ -41,7 +41,10 @@ else
     z = X( :, 3 );
 end
 
-
+% need nine or more data points
+if length( x ) < 9  
+   error( 'Must have at least 9 points to fit a unique ellipsoid' );
+end
 
 end
 
