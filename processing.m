@@ -67,7 +67,7 @@ for experiment=1:numberOfExperiments
         [processedData.cells, processedData.cellCoordinates] = blobSegmentCells(processedData.mCherry, p.mCherryseg);
         
         if p.debug_level >= 1; disp('Segmenting DAPI channel...'); end
-        [~, processedData.nucleiCoordinates] = segmentDAPI(processedData.Dapi, p.DAPIseg, p.resolution);
+        [processedData.nuclei, processedData.nucleiCoordinates] = segmentDAPI(processedData.Dapi, p.DAPIseg, p.resolution);
 
         % estimate embryo surface by fitting an ellipsoid
         if p.debug_level >= 1; disp('Estimating embryo surface...'); end
@@ -78,7 +78,7 @@ for experiment=1:numberOfExperiments
         transformationMatrix = computeTransformationMatrix(ellipsoid);
         
         %%%%%%%%%%% VALIDITY CHECK FOR DEBUGGING
-        if p.debug_level >= 2;
+        if p.debug_level >= 2
             disp('Transform data for validity check...');
             [ transformedData, transformedResolution ] = transformDataToSphere( processedData, p.resolution, transformationMatrix, ellipsoid, p.samples_cube );
         end

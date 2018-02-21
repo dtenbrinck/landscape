@@ -2,10 +2,7 @@ function [cells, centCoords] = blobSegmentCells( data, p )
 
 % Segmentation of the cells with blob segmentation
 
-
 % Preallocation
-thresholdValue = zeros(1,size(data,3));
-binaryImage = zeros(size(data));
 X = zeros(size(data));
 
 % Check that user has the Image Processing Toolbox installed.
@@ -20,10 +17,19 @@ if ~hasIPT
     end
 end
 
-% Threshold the image to get a binary image (only 0's and 1's) of class "logical."
-for i = 1 : size(data,3)
-    thresholdValue(i) = kittler_thresholding(data(:,:,i), ones(size(data)));
-    binaryImage(:,:,i) = data(:,:,i) > thresholdValue(i);
+if strcmp('k-means', p.binarization)
+    % use k-means removing background and some noise
+    % to get a binary image (only 0's and 1's) of class "logical."
+    Xi = k_means_clustering(data, p.k, 'real');
+    Xi = floor(Xi / p.k);
+    binaryImage = Xi == 1;
+else
+    % use Kittler thresholding (default) to get a binary image (only 0's and 1's) of class "logical."
+    binaryImage = zeros(size(data));
+    for i = 1 : size(data,3)
+        thresholdValue = kittler_thresholding(data(:,:,i), ones(size(data)));
+        binaryImage(:,:,i) = data(:,:,i) > thresholdValue;
+    end 
 end
 
 % Do a "hole fill" to get rid of any background pixels or "holes" inside the blobs.
@@ -36,14 +42,16 @@ for i = 1 : size(data,3)
     labeledImage(:,:,i) = bwlabel(binaryImage(:,:,i), 8);
 end
 
+meanIntensityFactor = 0.5;
+minimalAreaSize = 20;
 for j = 1 : size(data,3)    % Loop over all layers.
     % Select certain blobs based using the ismember() function.
-    blobMeasurements = regionprops(labeledImage(:,:,j), data(:,:,j), 'all');
+    blobMeasurements = regionprops(labeledImage(:,:,j), data(:,:,j), 'MeanIntensity', 'Area' );
     allBlobIntensities = [blobMeasurements.MeanIntensity];
     allBlobAreas = [blobMeasurements.Area];
     % Get a list of the blobs that meet our criteria and we need to keep.
-    allowableIntensityIndexes = allBlobIntensities > (0.5 * mean(allBlobIntensities)); % Take objects with low intensity.
-    allowableAreaIndexes = allBlobAreas > 20; % Take the small objects.
+    allowableIntensityIndexes = allBlobIntensities > (meanIntensityFactor * mean(allBlobIntensities)); % remove objects with low intensity.
+    allowableAreaIndexes = allBlobAreas > minimalAreaSize; % remove small objects.
     keeperIndexes = find(allowableIntensityIndexes & allowableAreaIndexes);
     % Extract only those blobs that meet our criteria, and
     % eliminate those blobs that don't meet our criteria.
@@ -53,8 +61,7 @@ for j = 1 : size(data,3)    % Loop over all layers.
     maskedImageDime = data(:,:,j); % Simply a copy at first.
     maskedImageDime(~keeperBlobsImage) = 0;  % Set all non-keeper pixels to zero.
     
-    X(:,:,j) = maskedImageDime;
-    
+    X(:,:,j) = maskedImageDime;  
 end
 
 % Identify the layers of the cells
@@ -63,7 +70,7 @@ cells = zeros(size(data));
 j = 1;
 for i = 1 : cc.NumObjects
     pixelList = cc.PixelIdxList{i};
-    if length(pixelList) > p.cellSize
+     if length(pixelList) > p.cellSize
         cellObjects{j} = pixelList;
         j = j + 1;
     end
