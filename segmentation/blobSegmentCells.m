@@ -17,7 +17,7 @@ if ~hasIPT
     end
 end
 
-if strcmp('k-means', p.binarization)
+if isfield(p, 'binarization') && strcmp('k-means', p.binarization)
     % use k-means removing background and some noise
     % to get a binary image (only 0's and 1's) of class "logical."
     Xi = k_means_clustering(data, p.k, 'real');
