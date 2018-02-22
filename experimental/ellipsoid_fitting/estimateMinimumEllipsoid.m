@@ -20,10 +20,10 @@ function [ center, radii, evecs, v ] = estimateMinimumEllipsoid( X )
 % only allowing few data points to lie outside. 
 % Find minimizer v of the following energy functional f:
 % 
-%   argmin f(v) = sum of all data rows in X ( max(0, < v, w > ) ) 
-%                                           + volumetricPart(v)
+%   argmin f(v) = alpha * energyPart(v) + beta * volumetricPart(v)
 %
-% TODO volumetricPart(v)
+%   with:   energyPart(v) = sum of all data rows in X ( max(0, < v, w > ) ) 
+%           volumetricPart(v) = 1 / ( v_1 + v_2 + v_3 )
 %
 % with w = (x^2, y^2, z^2, 2*x*y, 2*x*z, 2*y*z, 2*x, 2*y, 2*z, 1)
 % and v initially derived from the implicit function describing 
@@ -59,7 +59,10 @@ function [ center, radii, evecs, v ] = estimateMinimumEllipsoid( X )
 % Date:
 % February, 2018
 %
-    
+
+% initialze weights for energy part and volumetric penalty part
+alpha = 1; beta = 1;
+
 if size( X, 2 ) ~= 3
     error( 'Input data must have three columns!' );
 else
@@ -73,7 +76,7 @@ if length( x ) < 10
    error( 'Must have at least 10 points to approximate an ellipsoidal fitting.' );
 end
 
-D = [ x .* x ...
+E = [ x .* x ...
     y .* y ...
     z .* z, ...
     2 * x .* y, ...
@@ -84,8 +87,12 @@ D = [ x .* x ...
     2 * z, ...
     1 + 0 * x ];  % ndatapoints x 10 ellipsoid parameters
 
+% initialize v
+v=zeros(10,1);
 
-%%%% TODO approx. minimizing v
+energyPart = sum(max(0,E*v));
+volumetricPart = 1/(v(1) + v(2) + v(3));
+functional = alpha * energyPart + beta * volumetricPart;
 
 % form the algebraic form of the ellipsoid
 V = [ v(1) v(4) v(5) v(7); ...
@@ -121,3 +128,8 @@ end
 
 end
 
+function energy = energyPart(v,E) 
+% calculate E*v, 
+energymax(0,E*v)  % ndatapoints x 10 ellipsoid parameters
+
+end
