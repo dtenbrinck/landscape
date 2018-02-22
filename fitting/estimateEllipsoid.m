@@ -184,6 +184,7 @@ T( 4, 1:3 ) = center';
 R = T * A * T';
 % solve the eigenproblem
 [ evecs, evals ] = eig( R( 1:3, 1:3 ) / -R( 4, 4 ) );
+
 radii = sqrt( 1 ./ diag( abs( evals ) ) );
 sgns = sign( diag( evals ) );
 radii = radii .* sgns;
