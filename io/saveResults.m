@@ -38,7 +38,9 @@ gatheredData.processed.cells = (processedData.landmark);
 gatheredData.processed.landmarkMIP = computeMIP(processedData.landmark);
 gatheredData.processed.cellsMIP = computeMIP(processedData.cells);
 gatheredData.processed.cellCoordinates = processedData.cellCoordinates;
-gatheredData.processed.nucleiMIP = computeMIP(processedData.nuclei);
+if isfield(processedData, 'nuclei') % check for backward compatibilty
+    gatheredData.processed.nucleiMIP = computeMIP(processedData.nuclei);
+end
 
 % important registered data
 gatheredData.registered.size = size(registeredData.Dapi);
@@ -58,8 +60,9 @@ gatheredData.registered.mCherryMIP = computeMIP(registeredData.mCherry);
 gatheredData.registered.landmarkMIP = computeMIP(registeredData.landmark);
 gatheredData.registered.cellsMIP = computeMIP(registeredData.cells);
 gatheredData.registered.cellCoordinates = registeredData.cellCoordinates;
-gatheredData.registered.nucleiMIP = computeMIP(registeredData.nuclei);
-
+if isfield(registeredData, 'nuclei') % check for backward compatibilty
+    gatheredData.registered.nucleiMIP = computeMIP(registeredData.nuclei);
+end
 save(results_filename,'gatheredData');
 end
 
