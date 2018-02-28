@@ -44,9 +44,9 @@ function [ center, radii, evecs, v ] = estimateMinimumEllipsoid( X )
 %   v_8     = H     = - ( m_21 * x_0 + m_22 * y_0 + m_23 * z_0 )
 %   v_9     = I     = - ( m_31 * x_0 + m_32 * y_0 + m_33 * z_0 )
 %   v_10    = J     = m_11 * x_0^2 + m_22 * y_0^2 + m_33 * z_0^2
-%                       + 2 * a_12 * x_0 * y_0  
-%                       + 2 * a_13 * x_0 * z_0 
-%                       + 2 * a_23 * y_0 * z_0 - 1
+%                       + 2 * m_12 * x_0 * y_0  
+%                       + 2 * m_13 * x_0 * z_0 
+%                       + 2 * m_23 * y_0 * z_0 - 1
 %
 % We observe that: V(1:3,1:3) = M(1:3,1:3)
 %
@@ -71,7 +71,7 @@ else
     z = X( :, 3 );
 end
 
-% need nine or more data points
+% need 10 or more data points
 if length( x ) < 10 
    error( 'Must have at least 10 points to approximate an ellipsoidal fitting.' );
 end
@@ -88,7 +88,14 @@ E = [ x .* x ...
     1 + 0 * x ];  % ndatapoints x 10 ellipsoid parameters
 
 % initialize v
+center=[mean(x); mean(y); mean(z)];
+radii=[abs(max(x - center(1))); abs(max(y - center(2)));abs(max(z - center(3)))]; 
+
 v=zeros(10,1);
+v(1:3) = (1./radii).^2;
+v(7:9) = - v(1:3) .* center;
+v(10) = v(1:3) .* (center.^2) - 1;
+
 
 energyPart = sum(max(0,E*v));
 volumetricPart = 1/(v(1) + v(2) + v(3));
