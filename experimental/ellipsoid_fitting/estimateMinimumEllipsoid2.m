@@ -1,5 +1,5 @@
 %% estimate minimal ellipsoid fitting for data set
-function [ center, radii, evecs, v ] = estimateMinimumEllipsoid( X )
+function [ center, radii, evecs, v ] = estimateMinimumEllipsoid2( X )
 %
 % Fit an ellispoid/sphere to a set of xyz data points:
 %
