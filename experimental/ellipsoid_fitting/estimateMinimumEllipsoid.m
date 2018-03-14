@@ -76,7 +76,7 @@ if length( x ) < 10
    error( 'Must have at least 10 points to approximate an ellipsoidal fitting.' );
 end
 
-E = [ x .* x ...
+W = [ x .* x ...
     y .* y ...
     z .* z, ...
     2 * x .* y, ...
@@ -89,7 +89,7 @@ E = [ x .* x ...
 
 % initialize v
 center=[mean(x); mean(y); mean(z)];
-radii=[abs(max(x - center(1))); abs(max(y - center(2)));abs(max(z - center(3)))]; 
+radii=[max(abs(x - center(1))); max(abs(y - center(2)));max(abs(z - center(3)))]; 
 
 v=zeros(10,1);
 v(1:3) = (1./radii).^2;
@@ -97,7 +97,7 @@ v(7:9) = - v(1:3) .* center;
 v(10) = v(1:3) .* (center.^2) - 1;
 
 
-energyPart = sum(max(0,E*v));
+energyPart = sum(max(0,W*v));
 volumetricPart = 1/(v(1) + v(2) + v(3));
 functional = alpha * energyPart + beta * volumetricPart;
 
@@ -135,8 +135,8 @@ end
 
 end
 
-function energy = energyPart(v,E) 
-% calculate E*v, 
-energymax(0,E*v)  % ndatapoints x 10 ellipsoid parameters
+function energy = energyPart(v,W) 
+% calculate W*v, 
+energymax(0,W*v)  % ndatapoints x 10 ellipsoid parameters
 
 end
