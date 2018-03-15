@@ -20,14 +20,16 @@ function [ center, radii, evecs, v ] = estimateMinimumEllipsoid( X )
 % only allowing few data points to lie outside. 
 % Find minimizer v of the following energy functional f:
 % 
-%   argmin f(v) = alpha * energyPart(v) + beta * volumetricPart(v)
+%   argmin f(v) = mu1 * energyPart(v) + mu2 * equidistantRadii(v) + 
+%                   mu3 * smallRadii(v)
 %
-%   with:   volumetricPart(v) = 1 / ( v_1 + v_2 + v_3 )
+%   with:   equidistantRadii(v) = 1 / (v_1 - v_2)^2 + 1 / (v_2 - v_3)^2 + 1 / (v_1 - v_3)^2 
+%           smallRadii(v) = 1 / v_1 + 1 / v_2 + 1 / v_3 
 %           energyPart(v) = sum of all data rows in X ( max(0, < v, w > ) )
 %            = sum of all data rows in X (log(exp(0) + exp( < v, w > )) )
 %            = sum of all data rows in X (log( 1 + exp( < v, w > )) )
-%            = sum of all data rows in X (S + log( exp(-S) + exp( < v, w > - S )) )
-%           with S = max<v,w> as a shift to prevent overflow
+%            = sum of all data rows in X (shift + log( exp(-shift) + exp( < v, w > - shift )) )
+%           with shift = max<v,w> as a shift to prevent over- and underflow
 %
 % with w = (x^2, y^2, z^2, 2*x*y, 2*x*z, 2*y*z, 2*x, 2*y, 2*z, 1)
 % and v initially derived from the implicit function describing 
@@ -65,7 +67,7 @@ function [ center, radii, evecs, v ] = estimateMinimumEllipsoid( X )
 %
 
 % initialze weights for energy part and volumetric penalty part
-alpha = 1; beta = 1;
+mu1 = 1; mu2 = 1; mu3 = 1;
 
 if size( X, 2 ) ~= 3
     error( 'Input data must have three columns!' );
@@ -91,50 +93,93 @@ W = [ x .* x ...
     2 * z, ...
     1 + 0 * x ];  % ndatapoints x 10 ellipsoid parameters
 
-% initialize v
-center=[mean(x); mean(y); mean(z)];
-radii=[max(abs(x - center(1))); max(abs(y - center(2)));max(abs(z - center(3)))]; 
+[radii, center, v] = initializeEllipsoidParams(x,y,z)
 
-v=zeros(10,1);
-v(1:3) = (1./radii).^2;
-v(7:9) = - v(1:3) .* center;
-v(10) = v(1:3) .* (center.^2) - 1;
+v = performConjugateGradientSteps(v, W, mu1, mu2, mu3);
 
-shift = max(W*v);
-energyPart = sum(shift + log(exp(-shift)+exp(W*v - S)));
-volumetricPart = 1/(v(1) + v(2) + v(3));
-functional = alpha * energyPart + beta * volumetricPart;
+[radii, center, evecs, v] = getEllipsoidParams(v);
 
-% form the algebraic form of the ellipsoid
-V = [ v(1) v(4) v(5) v(7); ...
-      v(4) v(2) v(6) v(8); ...
-      v(5) v(6) v(3) v(9); ...
-      v(7) v(8) v(9) v(10) ];
-% find the center of the ellipsoid
-center = -V( 1:3, 1:3 ) \ v( 7:9 );
-% form the corresponding translation matrix
-T = eye( 4 );
-T( 1:3, 4 ) = center;
-% translate the center to the origin: vec2 = T * vec1
-% [ (x;y;z)-(x_0; y_0; z_0) ]' * M * [ (x;y;z)-(x_0; y_0; z_0) ] 
-% [T * [ (x;y;z;1)-(x_0; y_0; z_0; 1) ] ]' * V * [ T * [ (x;y;z;1)-(x_0; y_0; z_0; 1) ] ] 
-% (x;y;z;1)' * T' * V * T * (x;y;z;1) 
-R = T' * V * T;
-% solve the eigenproblem after rescaling R as we only need the 3x3 part
-[ evecs, evals ] = eig( R( 1:3, 1:3 ) / -R( 4, 4 ) );
-% check that eigenvalues are positiv as required for a M to be pos. def.
-% with M as the 3x3 scaled and translated part of V
-for index=1:length(evals)
-   if evals(index,index) <= 0
-       error ('Cannot estimate ellipsoidal fitting (negative eigen values)!');
-   end
-end
-radii = sqrt( 1 ./ diag( evals) ) ;
-
-if abs( v(end) ) > 1e-6
-    v = -v / v(end); % normalize to the more conventional form with constant term = -1
-else
-    v = -sign( v(end) ) * v;
 end
 
+function [radii, center, v] = initializeEllipsoidParams(x,y,z)
+    center=[mean(x); mean(y); mean(z)];
+    radii=[max(abs(x - center(1))); max(abs(y - center(2)));max(abs(z - center(3)))]; 
+    v=zeros(10,1);
+    v(1:3) = (1./radii).^2;
+    v(7:9) = - v(1:3) .* center;
+    v(10) = v(1:3) .* (center.^2) - 1;
+end
+
+function [radii, center, evecs, v] = getEllipsoidParams(v)
+    % form the algebraic form of the ellipsoid
+    V = [ v(1) v(4) v(5) v(7); ...
+          v(4) v(2) v(6) v(8); ...
+          v(5) v(6) v(3) v(9); ...
+          v(7) v(8) v(9) v(10) ];
+    % find the center of the ellipsoid
+    center = -V( 1:3, 1:3 ) \ v( 7:9 );
+    % form the corresponding translation matrix
+    T = eye( 4 );
+    T( 1:3, 4 ) = center;
+    % translate the center to the origin: vec2 = T * vec1
+    % [ (x;y;z)-(x_0; y_0; z_0) ]' * M * [ (x;y;z)-(x_0; y_0; z_0) ] 
+    % [T * [ (x;y;z;1)-(x_0; y_0; z_0; 1) ] ]' * V * [ T * [ (x;y;z;1)-(x_0; y_0; z_0; 1) ] ] 
+    % (x;y;z;1)' * T' * V * T * (x;y;z;1) 
+    R = T' * V * T;
+    % solve the eigenproblem after rescaling R as we only need the 3x3 part
+    [ evecs, evals ] = eig( R( 1:3, 1:3 ) / -R( 4, 4 ) );
+    % check that eigenvalues are positiv as required for a M to be pos. def.
+    % with M as the 3x3 scaled and translated part of V
+    for index=1:length(evals)
+       if evals(index,index) <= 0
+           error ('Cannot estimate ellipsoidal fitting (negative eigen values)!');
+       end
+    end
+    radii = sqrt( 1 ./ diag( evals) ) ;
+
+    if abs( v(end) ) > 1e-6
+        v = -v / v(end); % normalize to the more conventional form with constant term = -1
+    else
+        v = -sign( v(end) ) * v;
+    end
+end
+
+function v = performConjugateGradientSteps(v, W, mu1, mu2, mu3)
+    functionValue = getCurrentFunctionValue(v, W, mu1, mu2, mu3);
+    gradient = getgetCurrentGradient(v, W, mu1, mu2, mu3);
+    descentDirection = -gradient;
+    k = 0;
+    TOL = 1e-6;
+    % Polak-Ribiere Variant
+    while ( k < 1000 && norm(gradient) > TOL)
+        steplengthAlpha = computeSteplength;
+        v = v + steplengthAlpha * descentDirection;
+        nextGradient = getgetCurrentGradient(v, W, mu1, mu2, mu3);
+        parameterBetaPR = nextGradient' * ( nextGradient-gradient) / (gradient' * gradient);
+        descentDirection = -nextGradient + parameterBetaPR * descentDirection;
+        gradient = nextGradient;
+        k = k+1;
+    end
+end
+
+function functionValue = getCurrentFunctionValue(v, W, mu1, mu2, mu3)
+    shift = max(W*v);
+    energyPart = sum(shift + log(exp(-shift)+exp(W*v - S)));
+    equidistantRadii = 1/(v(1) - v(2))^2 + 1/(v(3) - v(2))^2 + 1/(v(1) - v(3))^2;
+    smallRadii = 1/v(1) + 1/v(2) + 1/v(3);
+    functionValue = mu1 * energyPart + mu2 * equidistantRadii + mu3 * smallRadii;
+end
+
+function derivativeValue = getCurrentGradient(v, W, mu1, mu2, mu3)
+    shift = max(W*v);
+    energyPart = sum(exp(W*v - shift)/(exp(- shift) + exp(W*v - shift)) .* W', 2) ;
+    
+    equidistantRadii = zeros(10,1);
+    equidistantRadii(1) = 2/(v(1))^2 *( 1/v(2) + 1/v(3) - 2/v(1));
+    equidistantRadii(1) = 2/(v(2))^2 *( 1/v(1) + 1/v(3) - 2/v(2));
+    equidistantRadii(1) = 2/(v(3))^2 *( 1/v(2) + 1/v(1) - 2/v(3));
+    
+    smallRadii = zeros(10,1);
+    smallRadii(1:3) = -1./v(1:3).^2;
+    derivativeValue = mu1 * energyPart + mu2 * equidistantRadii + mu3 * smallRadii;
 end
