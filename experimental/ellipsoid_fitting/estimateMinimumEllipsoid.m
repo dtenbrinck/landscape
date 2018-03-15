@@ -146,13 +146,13 @@ end
 
 function v = performConjugateGradientSteps(v, W, mu1, mu2, mu3)
     functionValue = getCurrentFunctionValue(v, W, mu1, mu2, mu3);
-    gradient = getgetCurrentGradient(v, W, mu1, mu2, mu3);
+    gradient = getCurrentGradient(v, W, mu1, mu2, mu3);
     descentDirection = -gradient;
     k = 0;
     TOL = 1e-6;
     % Polak-Ribiere Variant
     while ( k < 1000 && norm(gradient) > TOL)
-        steplengthAlpha = computeSteplength;
+        steplengthAlpha = computeSteplength(v, descentDirection, W);
         v = v + steplengthAlpha * descentDirection;
         nextGradient = getgetCurrentGradient(v, W, mu1, mu2, mu3);
         parameterBetaPR = nextGradient' * ( nextGradient-gradient) / (gradient' * gradient);
@@ -160,6 +160,81 @@ function v = performConjugateGradientSteps(v, W, mu1, mu2, mu3)
         gradient = nextGradient;
         k = k+1;
     end
+end
+
+function alpha_star = computeSteplength(v, descentDirection, W, mu1, mu2, mu3)
+    % use a line search algorithm (p81, Algorithm 3.5)
+    c1 = 1e-4;
+    c2 = 0.1;
+    alpha0 = 0;
+    alphaMax = 1.5; % TODO ?!?! 
+    alpha = (alphaMax - alpha0 ) / 2; % TODO ?!?!
+    i = 1;
+    phi_0 = getPhiValue( alpha0, v, descentDirection, W, mu1, mu2, mu3);
+    phi_dash_0 = getPhiDerivative( alpha0, v, descentDirection, W, mu1, mu2, mu3);
+    phi_current = phi_0;
+    TOL = 1e-6;
+    while i < 100
+        phi_next = getPhiValue( alpha, v, descentDirection, W, mu1, mu2, mu3);
+        if ( (phi_next - phi_0 - c1 * alpha > TOL) || ...
+                (phi_next - phi_current >= TOL && i > 1) )
+            alpha_star = zoom(alpha_current, alpha_next);
+            break;
+        end
+        
+        phi_dash_next = getPhiDerivative( alpha, v, descentDirection, W, mu1, mu2, mu3);
+        if ( abs(phi_dash_next) + c2 * phi_dash_0 <= TOL )
+            alpha_star = alpha_next;
+            break;
+        end
+        
+        if (phi_dash_next >= TOL )
+            alpha_star = zoom(alpha_next, alpha_current);
+            break;
+        end
+        alpha = alpha + alphaMax/100; 
+        % TODO alpha in (alpha, alpha_max); should arrive at alpha_max in
+        % finite number of steps
+        
+    end
+    
+end
+
+function alpha_star = zoom(alpha_lower, alpha_higher, v, descentDirection, W, mu1, mu2, mu3, phi_0, phi_dash_0)
+    iteration = 0;
+    TOL = 1e-6;
+    while iteration < 100
+        alpha_j = findTrialStepLength();
+        phi_alpha_j = getPhiValue( alpha_j, v, descentDirection, W, mu1, mu2, mu3);
+        phi_alpha_lower = getPhiValue( alpha_lower, v, descentDirection, W, mu1, mu2, mu3);
+        if ( phi_alpha_j - phi_0 + c1 * alpha_j * phi_dash_0 > TOL || ...
+                phi_alpha_j - phi_alpha_lower >= TOL )
+            alpha_higher = alpha_j;
+        else
+            phi_dash_j = getPhiDerivative( alpha_j, v, descentDirection, W, mu1, mu2, mu3);
+            if ( abs(phi_dash_j) + c2 * phi_dash_0 ) 
+                alpha_star = alpha_j;
+                break;
+            end
+            if ( phi_dash_j * ( alpha_higher - alpha_lower) >= TOL )
+                alpha_higher = alpha_lower;
+            end
+            alpha_lower = alpha_j;
+        end
+            
+        iteration = iteration + 1;
+    end
+    % alpha_star = default_value?!
+end
+
+function phi = getPhiValue (alpha, v, descentDirection, W, mu1, mu2, mu3)
+    evaluationPoint = v + alpha * descentDirection;
+    phi = getCurrentFunctionValue( evaluationPoint, W, mu1, mu2, mu3);
+end
+
+function phi_dash = getPhiDerivative( alpha, v, descentDirection, W, mu1, mu2, mu3)
+    evaluationPoint = v + alpha * descentDirection;
+    phi_dash = descentDirection' * getCurrentGradient(evaluationPoint, W, mu1, mu2, mu3);
 end
 
 function functionValue = getCurrentFunctionValue(v, W, mu1, mu2, mu3)
