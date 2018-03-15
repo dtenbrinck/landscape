@@ -82,8 +82,8 @@ if length( x ) < 10
    error( 'Must have at least 10 points to approximate an ellipsoidal fitting.' );
 end
 
-W = [ x .* x ...
-    y .* y ...
+W = [ x .* x, ...
+    y .* y, ...
     z .* z, ...
     2 * x .* y, ...
     2 * x .* z, ...
@@ -93,7 +93,7 @@ W = [ x .* x ...
     2 * z, ...
     1 + 0 * x ];  % ndatapoints x 10 ellipsoid parameters
 
-[radii, center, v] = initializeEllipsoidParams(x,y,z)
+[radii, center, v] = initializeEllipsoidParams(x,y,z);
 
 v = performConjugateGradientSteps(v, W, mu1, mu2, mu3);
 
@@ -107,7 +107,7 @@ function [radii, center, v] = initializeEllipsoidParams(x,y,z)
     v=zeros(10,1);
     v(1:3) = (1./radii).^2;
     v(7:9) = - v(1:3) .* center;
-    v(10) = v(1:3) .* (center.^2) - 1;
+    v(10) = sum( v(1:3) .* (center.^2) ) - 1;
 end
 
 function [radii, center, evecs, v] = getEllipsoidParams(v)
@@ -150,61 +150,77 @@ function v = performConjugateGradientSteps(v, W, mu1, mu2, mu3)
     descentDirection = -gradient;
     k = 0;
     TOL = 1e-6;
+    maxIteration = 1000;
     % Polak-Ribiere Variant
-    while ( k < 1000 && norm(gradient) > TOL)
-        steplengthAlpha = computeSteplength(v, descentDirection, W);
+    while ( k < maxIteration && norm(gradient) > TOL)
+        steplengthAlpha = computeSteplength(v, descentDirection, W, mu1, mu2, mu3);
         v = v + steplengthAlpha * descentDirection;
-        nextGradient = getgetCurrentGradient(v, W, mu1, mu2, mu3);
+        nextGradient = getCurrentGradient(v, W, mu1, mu2, mu3);
         parameterBetaPR = nextGradient' * ( nextGradient-gradient) / (gradient' * gradient);
         descentDirection = -nextGradient + parameterBetaPR * descentDirection;
         gradient = nextGradient;
         k = k+1;
     end
+    if ( k >= maxIteration ) 
+        error ('Conjugate gradients did not converge yet!');
+    end
 end
 
 function alpha_star = computeSteplength(v, descentDirection, W, mu1, mu2, mu3)
-    % use a line search algorithm (p81, Algorithm 3.5)
+    % use a line search algorithm (p.81, Algorithm 3.5)
     c1 = 1e-4;
     c2 = 0.1;
-    alpha0 = 0;
-    alphaMax = 1.5; % TODO ?!?! 
-    alpha = (alphaMax - alpha0 ) / 2; % TODO ?!?!
+    alpha_current = 0;
+    alpha_max = 10; % TODO ?!?! 
+    alpha_next = (alpha_max - alpha_current ) / 2; % TODO ?!?!
     i = 1;
-    phi_0 = getPhiValue( alpha0, v, descentDirection, W, mu1, mu2, mu3);
-    phi_dash_0 = getPhiDerivative( alpha0, v, descentDirection, W, mu1, mu2, mu3);
+    phi_0 = getPhiValue( alpha_current, v, descentDirection, W, mu1, mu2, mu3);
+    phi_dash_0 = getPhiDerivative( alpha_current, v, descentDirection, W, mu1, mu2, mu3);
     phi_current = phi_0;
     TOL = 1e-6;
-    while i < 100
-        phi_next = getPhiValue( alpha, v, descentDirection, W, mu1, mu2, mu3);
-        if ( (phi_next - phi_0 - c1 * alpha > TOL) || ...
+    maxIteration = 100;
+    while i < maxIteration
+        phi_next = getPhiValue( alpha_next, v, descentDirection, W, mu1, mu2, mu3);
+        if ( (phi_next - phi_0 - c1 * alpha_next > TOL) || ...
                 (phi_next - phi_current >= TOL && i > 1) )
-            alpha_star = zoom(alpha_current, alpha_next);
+            alpha_star = zoom(alpha_current, alpha_next, ...
+                v, descentDirection, W, mu1, mu2, mu3, ...
+                phi_0, phi_dash_0, c1, c2);
             break;
         end
         
-        phi_dash_next = getPhiDerivative( alpha, v, descentDirection, W, mu1, mu2, mu3);
+        phi_dash_next = getPhiDerivative( alpha_next, v, descentDirection, W, mu1, mu2, mu3);
         if ( abs(phi_dash_next) + c2 * phi_dash_0 <= TOL )
             alpha_star = alpha_next;
             break;
         end
         
         if (phi_dash_next >= TOL )
-            alpha_star = zoom(alpha_next, alpha_current);
+            alpha_star = zoom(alpha_next, alpha_current, ...
+                v, descentDirection, W, mu1, mu2, mu3, ...
+                phi_0, phi_dash_0, c1, c2);
             break;
         end
-        alpha = alpha + alphaMax/100; 
-        % TODO alpha in (alpha, alpha_max); should arrive at alpha_max in
-        % finite number of steps
-        
+        alpha_current = alpha_next;
+        % next trial value with interpolation
+        alpha_next =  quadraticInterpolation(alpha_next, alpha_max, ...
+                    v, descentDirection, W, mu1, mu2, mu3);
     end
-    
+    if (i >= maxIteration) 
+        error('Steplength not yet found.')
+    end
 end
 
-function alpha_star = zoom(alpha_lower, alpha_higher, v, descentDirection, W, mu1, mu2, mu3, phi_0, phi_dash_0)
+function alpha_star = zoom(alpha_lower, alpha_higher, ...
+    v, descentDirection, W, mu1, mu2, mu3, ...
+    phi_0, phi_dash_0, c1, c2)
+    % use algorithm 3.6 to zoom in to appropriate step length
     iteration = 0;
     TOL = 1e-6;
-    while iteration < 100
-        alpha_j = findTrialStepLength();
+    maxIteration = 100;
+    while iteration < maxIteration
+        alpha_j = quadraticInterpolation(alpha_lower, alpha_higher, ...
+                    v, descentDirection, W, mu1, mu2, mu3);
         phi_alpha_j = getPhiValue( alpha_j, v, descentDirection, W, mu1, mu2, mu3);
         phi_alpha_lower = getPhiValue( alpha_lower, v, descentDirection, W, mu1, mu2, mu3);
         if ( phi_alpha_j - phi_0 + c1 * alpha_j * phi_dash_0 > TOL || ...
@@ -224,7 +240,21 @@ function alpha_star = zoom(alpha_lower, alpha_higher, v, descentDirection, W, mu
             
         iteration = iteration + 1;
     end
+    if (iteration >= maxIteration) 
+        error('Steplength not yet found. Zoom in stopped')
+    end
     % alpha_star = default_value?!
+end
+
+function alpha = quadraticInterpolation(alpha_lower, alpha_higher, ...
+                    v, descentDirection, W, mu1, mu2, mu3)
+    phi_dash_alpha_lower = getPhiDerivative( alpha_lower, v, descentDirection, W, mu1, mu2, mu3);
+    phi_alpha_lower = getPhiValue( alpha_lower, v, descentDirection, W, mu1, mu2, mu3);
+    phi_alpha_higher = getPhiValue( alpha_higher, v, descentDirection, W, mu1, mu2, mu3);
+    phi_dash_alpha_higher = getPhiDerivative( alpha_higher, v, descentDirection, W, mu1, mu2, mu3);
+    % find trial step length by using quadratic interpolation
+    alpha = -phi_dash_alpha_lower * alpha_higher^2 / ...
+        ( 2 * ( phi_alpha_higher - phi_alpha_lower - phi_dash_alpha_higher * alpha_higher));
 end
 
 function phi = getPhiValue (alpha, v, descentDirection, W, mu1, mu2, mu3)
@@ -239,7 +269,7 @@ end
 
 function functionValue = getCurrentFunctionValue(v, W, mu1, mu2, mu3)
     shift = max(W*v);
-    energyPart = sum(shift + log(exp(-shift)+exp(W*v - S)));
+    energyPart = sum(shift + log(exp(-shift)+exp(W*v - shift)));
     equidistantRadii = 1/(v(1) - v(2))^2 + 1/(v(3) - v(2))^2 + 1/(v(1) - v(3))^2;
     smallRadii = 1/v(1) + 1/v(2) + 1/v(3);
     functionValue = mu1 * energyPart + mu2 * equidistantRadii + mu3 * smallRadii;
@@ -247,7 +277,7 @@ end
 
 function derivativeValue = getCurrentGradient(v, W, mu1, mu2, mu3)
     shift = max(W*v);
-    energyPart = sum(exp(W*v - shift)/(exp(- shift) + exp(W*v - shift)) .* W', 2) ;
+    energyPart = sum(W'* (exp(W*v - shift)./(exp(- shift) + exp(W*v - shift)) ), 2) ;
     
     equidistantRadii = zeros(10,1);
     equidistantRadii(1) = 2/(v(1))^2 *( 1/v(2) + 1/v(3) - 2/v(1));
