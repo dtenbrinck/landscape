@@ -171,7 +171,7 @@ function alpha_star = computeSteplength(v, descentDirection, W, mu1, mu2, mu3)
     c1 = 1e-4;
     c2 = 0.1;
     alpha_current = 0;
-    alpha_max = 10; % TODO ?!?! 
+    alpha_max = 20; % TODO ?!?! 
     alpha_next = (alpha_max - alpha_current ) / 2; % TODO ?!?!
     i = 1;
     phi_0 = getPhiValue( alpha_current, v, descentDirection, W, mu1, mu2, mu3);
@@ -205,6 +205,7 @@ function alpha_star = computeSteplength(v, descentDirection, W, mu1, mu2, mu3)
         % next trial value with interpolation
         alpha_next =  quadraticInterpolation(alpha_next, alpha_max, ...
                     v, descentDirection, W, mu1, mu2, mu3);
+        i = i+1;
     end
     if (i >= maxIteration) 
         error('Steplength not yet found.')
