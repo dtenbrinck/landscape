@@ -145,24 +145,51 @@ function [radii, center, evecs, v] = getEllipsoidParams(v)
 end
 
 function v = performConjugateGradientSteps(v, W, mu1, mu2, mu3)
-    functionValue = getCurrentFunctionValue(v, W, mu1, mu2, mu3);
+    %functionValue = getCurrentFunctionValue(v, W, mu1, mu2, mu3);
     gradient = getCurrentGradient(v, W, mu1, mu2, mu3);
     descentDirection = -gradient;
     k = 0;
     TOL = 1e-6;
-    maxIteration = 1000;
+    maxIteration = 10000;
+    n = size(W,1);
     % Polak-Ribiere Variant
+    figure(1);
+    hold on;
     while ( k < maxIteration && norm(gradient) > TOL)
         steplengthAlpha = computeSteplength(v, descentDirection, W, mu1, mu2, mu3);
         v = v + steplengthAlpha * descentDirection;
         nextGradient = getCurrentGradient(v, W, mu1, mu2, mu3);
-        parameterBetaPR = nextGradient' * ( nextGradient-gradient) / (gradient' * gradient);
-        descentDirection = -nextGradient + parameterBetaPR * descentDirection;
+        %%% restart every n'th cycle
+        if ( mod(k,n) == 0 && k > 0 )
+            parameterBeta = 0;
+        else
+            fprintf('norm of next gradient: %e \n', nextGradient' * nextGradient);
+            fprintf('norm of current gradient: %e \n',gradient' * gradient);
+            parameterBetaFR = nextGradient' * nextGradient / (gradient' * gradient);
+            parameterBetaPR = nextGradient' * ( nextGradient-gradient) / (gradient' * gradient);
+            if ( parameterBetaPR < -parameterBetaFR ) 
+                parameterBeta = -parameterBetaFR;
+                %fprintf('choose -beta_FR');
+            elseif ( abs(parameterBetaPR) <= parameterBetaFR )
+                parameterBeta = parameterBetaPR;
+                %fprintf('choose beta_PR');
+            elseif (parameterBetaPR > parameterBetaFR )
+                parameterBeta = parameterBetaFR;
+                %fprintf('choose beta_FR');
+            end
+            if( k>0)
+                plot(k, nextGradient' * nextGradient, 'r*');
+                plot(k, gradient' * gradient, 'b*');
+            end
+        end
+        parameterBeta
+        descentDirection = -nextGradient + parameterBeta * descentDirection;
         gradient = nextGradient;
         k = k+1;
     end
     if ( k >= maxIteration ) 
-        error ('Conjugate gradients did not converge yet!');
+        
+        error ('Conjugate gradients did not converge yet! norm(gradient) = %e', norm(gradient));
     end
 end
 
@@ -171,7 +198,7 @@ function alpha_star = computeSteplength(v, descentDirection, W, mu1, mu2, mu3)
     c1 = 1e-4;
     c2 = 0.1;
     alpha_current = 0;
-    alpha_max = 20; % TODO ?!?! 
+    alpha_max = 10; % TODO ?!?! 
     alpha_next = (alpha_max - alpha_current ) / 2; % TODO ?!?!
     i = 1;
     phi_0 = getPhiValue( alpha_current, v, descentDirection, W, mu1, mu2, mu3);
@@ -269,7 +296,7 @@ function phi_dash = getPhiDerivative( alpha, v, descentDirection, W, mu1, mu2, m
 end
 
 function functionValue = getCurrentFunctionValue(v, W, mu1, mu2, mu3)
-    shift = max(W*v);
+    shift = max(W*v); % corresponds with point which lies furtherst outside of ellipsoid
     energyPart = sum(shift + log(exp(-shift)+exp(W*v - shift)));
     equidistantRadii = 1/(v(1) - v(2))^2 + 1/(v(3) - v(2))^2 + 1/(v(1) - v(3))^2;
     smallRadii = 1/v(1) + 1/v(2) + 1/v(3);
@@ -278,7 +305,7 @@ end
 
 function derivativeValue = getCurrentGradient(v, W, mu1, mu2, mu3)
     shift = max(W*v);
-    energyPart = sum(W'* (exp(W*v - shift)./(exp(- shift) + exp(W*v - shift)) ), 2) ;
+    energyPart = W'* (exp(W*v - shift)./(exp(- shift) + exp(W*v - shift)) );
     
     equidistantRadii = zeros(10,1);
     equidistantRadii(1) = 2/(v(1))^2 *( 1/v(2) + 1/v(3) - 2/v(1));
