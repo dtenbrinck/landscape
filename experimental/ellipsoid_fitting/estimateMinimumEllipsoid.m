@@ -256,7 +256,7 @@ function alpha_star = zoom(alpha_lower, alpha_higher, ...
             alpha_higher = alpha_j;
         else
             phi_dash_j = getPhiDerivative( alpha_j, v, descentDirection, W, mu1, mu2, mu3);
-            if ( abs(phi_dash_j) + c2 * phi_dash_0 ) 
+            if ( abs(phi_dash_j) + c2 * phi_dash_0 <= TOL) 
                 alpha_star = alpha_j;
                 break;
             end
