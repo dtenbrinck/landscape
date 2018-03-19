@@ -23,7 +23,7 @@ function [ center, radii, evecs, v ] = estimateMinimumEllipsoid( X )
 %   argmin f(v) = mu1 * energyPart(v) + mu2 * equidistantRadii(v) + 
 %                   mu3 * smallRadii(v)
 %
-%   with:   equidistantRadii(v) = 1 / (v_1 - v_2)^2 + 1 / (v_2 - v_3)^2 + 1 / (v_1 - v_3)^2 
+%   with:   equidistantRadii(v) = (1/v_1 - 1/v_2)^2 + (1/v_2 - 1/v_3)^2 + (1/v_1 - 1/v_3)^2 
 %           smallRadii(v) = 1 / v_1 + 1 / v_2 + 1 / v_3 
 %           energyPart(v) = sum of all data rows in X ( max(0, < v, w > ) )
 %            = sum of all data rows in X (log(exp(0) + exp( < v, w > )) )
@@ -300,7 +300,7 @@ end
 function functionValue = getCurrentFunctionValue(v, W, mu1, mu2, mu3)
     shift = max(W*v); % corresponds with point which lies furtherst outside of ellipsoid
     energyPart = sum(shift + log(exp(-shift)+exp(W*v - shift)));
-    equidistantRadii = 1/(v(1) - v(2))^2 + 1/(v(3) - v(2))^2 + 1/(v(1) - v(3))^2;
+    equidistantRadii = (1/v(1) - 1/v(2))^2 + (1/v(3) - 1/v(2))^2 + (1/v(1) - 1/v(3))^2;
     smallRadii = 1/v(1) + 1/v(2) + 1/v(3);
     functionValue = mu1 * energyPart + mu2 * equidistantRadii + mu3 * smallRadii;
 end
