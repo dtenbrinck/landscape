@@ -145,7 +145,7 @@ function [radii, center, evecs, v] = getEllipsoidParams(v)
 end
 
 function v = performConjugateGradientSteps(v, W, mu1, mu2, mu3)
-    functionValue = getCurrentFunctionValue(v, W, mu1, mu2, mu3)
+    %functionValue = getCurrentFunctionValue(v, W, mu1, mu2, mu3)
     gradient = getCurrentGradient(v, W, mu1, mu2, mu3);
     % descent direction p
     p = -gradient; 
@@ -159,6 +159,12 @@ function v = performConjugateGradientSteps(v, W, mu1, mu2, mu3)
     while ( k < maxIteration && norm(gradient) > TOL)
         % step length alpha
         alpha = computeSteplength(v, p, W, mu1, mu2, mu3);
+        % stopping criteria if relative change of consecutive iterates v is
+        % too small
+        if ( norm ( alpha * p ) / norm (v) < TOL )
+            fprintf ('Stopping CG iteration due to too small relative change of consecutive iterates!');
+            break;
+        end
         v = v + alpha * p;
         nextGradient = getCurrentGradient(v, W, mu1, mu2, mu3);
         %%% restart every n'th cycle
@@ -207,7 +213,9 @@ function alpha_star = computeSteplength(v, descentDirection, W, mu1, mu2, mu3)
     phi_0 = getPhiValue( alpha_current, v, descentDirection, W, mu1, mu2, mu3);
     phi_dash_0 = getPhiDerivative( alpha_current, v, descentDirection, W, mu1, mu2, mu3);
     phi_current = phi_0;
-    maxIteration = 100;
+    % stopping criteria if we cannot attain lower function value after ten
+    % trial step lengths (p. 62 / 83)
+    maxIteration = 10; 
     while i < maxIteration
         phi_next = getPhiValue( alpha_next, v, descentDirection, W, mu1, mu2, mu3);
         if ( (phi_next > phi_0 + c1 * alpha_next * phi_dash_0) || ...
@@ -238,7 +246,7 @@ function alpha_star = computeSteplength(v, descentDirection, W, mu1, mu2, mu3)
         i = i+1;
     end
     if (i >= maxIteration) 
-        error('Steplength not yet found.')
+        fprintf('Could not determine next step length after ten trial steps!')
     end
 end
 
@@ -281,10 +289,9 @@ function alpha = quadraticInterpolation(alpha_lower, alpha_higher, ...
     phi_dash_alpha_lower = getPhiDerivative( alpha_lower, v, descentDirection, W, mu1, mu2, mu3);
     phi_alpha_lower = getPhiValue( alpha_lower, v, descentDirection, W, mu1, mu2, mu3);
     phi_alpha_higher = getPhiValue( alpha_higher, v, descentDirection, W, mu1, mu2, mu3);
-    phi_dash_alpha_higher = getPhiDerivative( alpha_higher, v, descentDirection, W, mu1, mu2, mu3);
     % find trial step length by using quadratic interpolation
     alpha = -phi_dash_alpha_lower * alpha_higher^2 / ...
-        ( 2 * ( phi_alpha_higher - phi_alpha_lower - phi_dash_alpha_higher * alpha_higher));
+        ( 2 * ( phi_alpha_higher - phi_alpha_lower - phi_dash_alpha_lower * alpha_higher));
 end
 
 function phi = getPhiValue (alpha, v, descentDirection, W, mu1, mu2, mu3)
