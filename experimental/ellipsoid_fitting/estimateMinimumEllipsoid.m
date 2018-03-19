@@ -192,7 +192,6 @@ function v = performConjugateGradientSteps(v, W, mu1, mu2, mu3)
         k = k+1;
     end
     if ( k >= maxIteration ) 
-        
         error ('Conjugate gradients did not converge yet! norm(gradient) = %e', norm(gradient));
     end
 end
@@ -208,12 +207,11 @@ function alpha_star = computeSteplength(v, descentDirection, W, mu1, mu2, mu3)
     phi_0 = getPhiValue( alpha_current, v, descentDirection, W, mu1, mu2, mu3);
     phi_dash_0 = getPhiDerivative( alpha_current, v, descentDirection, W, mu1, mu2, mu3);
     phi_current = phi_0;
-    TOL = 1e-6;
     maxIteration = 100;
     while i < maxIteration
         phi_next = getPhiValue( alpha_next, v, descentDirection, W, mu1, mu2, mu3);
-        if ( (phi_next - phi_0 - c1 * alpha_next > TOL) || ...
-                (phi_next - phi_current >= TOL && i > 1) )
+        if ( (phi_next > phi_0 + c1 * alpha_next * phi_dash_0) || ...
+                (phi_next >= phi_current && i > 1) )
             alpha_star = zoom(alpha_current, alpha_next, ...
                 v, descentDirection, W, mu1, mu2, mu3, ...
                 phi_0, phi_dash_0, c1, c2);
@@ -221,17 +219,18 @@ function alpha_star = computeSteplength(v, descentDirection, W, mu1, mu2, mu3)
         end
         
         phi_dash_next = getPhiDerivative( alpha_next, v, descentDirection, W, mu1, mu2, mu3);
-        if ( abs(phi_dash_next) + c2 * phi_dash_0 <= TOL )
+        if ( abs(phi_dash_next) <= -c2 * phi_dash_0 )
             alpha_star = alpha_next;
             break;
         end
         
-        if (phi_dash_next >= TOL )
+        if (phi_dash_next >= 0 )
             alpha_star = zoom(alpha_next, alpha_current, ...
                 v, descentDirection, W, mu1, mu2, mu3, ...
                 phi_0, phi_dash_0, c1, c2);
             break;
         end
+        
         alpha_current = alpha_next;
         % next trial value with interpolation
         alpha_next =  quadraticInterpolation(alpha_next, alpha_max, ...
@@ -248,23 +247,22 @@ function alpha_star = zoom(alpha_lower, alpha_higher, ...
     phi_0, phi_dash_0, c1, c2)
     % use algorithm 3.6 to zoom in to appropriate step length
     iteration = 0;
-    TOL = 1e-6;
     maxIteration = 100;
     while iteration < maxIteration
         alpha_j = quadraticInterpolation(alpha_lower, alpha_higher, ...
                     v, descentDirection, W, mu1, mu2, mu3);
         phi_alpha_j = getPhiValue( alpha_j, v, descentDirection, W, mu1, mu2, mu3);
         phi_alpha_lower = getPhiValue( alpha_lower, v, descentDirection, W, mu1, mu2, mu3);
-        if ( phi_alpha_j - phi_0 + c1 * alpha_j * phi_dash_0 > TOL || ...
-                phi_alpha_j - phi_alpha_lower >= TOL )
+        if ( phi_alpha_j > phi_0 + c1 * alpha_j * phi_dash_0 || ...
+                phi_alpha_j >= phi_alpha_lower )
             alpha_higher = alpha_j;
         else
             phi_dash_j = getPhiDerivative( alpha_j, v, descentDirection, W, mu1, mu2, mu3);
-            if ( abs(phi_dash_j) + c2 * phi_dash_0 <= TOL) 
+            if ( abs(phi_dash_j) <= -c2 * phi_dash_0 ) 
                 alpha_star = alpha_j;
                 break;
             end
-            if ( phi_dash_j * ( alpha_higher - alpha_lower) >= TOL )
+            if ( phi_dash_j * ( alpha_higher - alpha_lower) >= 0 )
                 alpha_higher = alpha_lower;
             end
             alpha_lower = alpha_j;
