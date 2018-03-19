@@ -145,7 +145,7 @@ function [radii, center, evecs, v] = getEllipsoidParams(v)
 end
 
 function v = performConjugateGradientSteps(v, W, mu1, mu2, mu3)
-    %functionValue = getCurrentFunctionValue(v, W, mu1, mu2, mu3);
+    functionValue = getCurrentFunctionValue(v, W, mu1, mu2, mu3)
     gradient = getCurrentGradient(v, W, mu1, mu2, mu3);
     % descent direction p
     p = -gradient; 
