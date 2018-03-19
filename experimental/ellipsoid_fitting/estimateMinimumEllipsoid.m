@@ -147,7 +147,8 @@ end
 function v = performConjugateGradientSteps(v, W, mu1, mu2, mu3)
     %functionValue = getCurrentFunctionValue(v, W, mu1, mu2, mu3);
     gradient = getCurrentGradient(v, W, mu1, mu2, mu3);
-    descentDirection = -gradient;
+    % descent direction p
+    p = -gradient; 
     k = 0;
     TOL = 1e-6;
     maxIteration = 10000;
@@ -156,25 +157,28 @@ function v = performConjugateGradientSteps(v, W, mu1, mu2, mu3)
     figure(1);
     hold on;
     while ( k < maxIteration && norm(gradient) > TOL)
-        steplengthAlpha = computeSteplength(v, descentDirection, W, mu1, mu2, mu3);
-        v = v + steplengthAlpha * descentDirection;
+        % step length alpha
+        alpha = computeSteplength(v, p, W, mu1, mu2, mu3);
+        v = v + alpha * p;
         nextGradient = getCurrentGradient(v, W, mu1, mu2, mu3);
         %%% restart every n'th cycle
         if ( mod(k,n) == 0 && k > 0 )
-            parameterBeta = 0;
+            beta = 0;
         else
             fprintf('norm of next gradient: %e \n', nextGradient' * nextGradient);
             fprintf('norm of current gradient: %e \n',gradient' * gradient);
-            parameterBetaFR = nextGradient' * nextGradient / (gradient' * gradient);
-            parameterBetaPR = nextGradient' * ( nextGradient-gradient) / (gradient' * gradient);
-            if ( parameterBetaPR < -parameterBetaFR ) 
-                parameterBeta = -parameterBetaFR;
+            % betaFR = beta for Fletcher-Reeves variant
+            betaFR = nextGradient' * nextGradient / (gradient' * gradient);
+            % betaFR = beta for Polak-Ribiere variant
+            betaPR = nextGradient' * ( nextGradient-gradient) / (gradient' * gradient);
+            if ( betaPR < -betaFR ) 
+                beta = -betaFR;
                 %fprintf('choose -beta_FR');
-            elseif ( abs(parameterBetaPR) <= parameterBetaFR )
-                parameterBeta = parameterBetaPR;
+            elseif ( abs(betaPR) <= betaFR )
+                beta = betaPR;
                 %fprintf('choose beta_PR');
-            elseif (parameterBetaPR > parameterBetaFR )
-                parameterBeta = parameterBetaFR;
+            elseif (betaPR > betaFR )
+                beta = betaFR;
                 %fprintf('choose beta_FR');
             end
             if( k>0)
@@ -182,8 +186,8 @@ function v = performConjugateGradientSteps(v, W, mu1, mu2, mu3)
                 plot(k, gradient' * gradient, 'b*');
             end
         end
-        parameterBeta
-        descentDirection = -nextGradient + parameterBeta * descentDirection;
+        beta
+        p = -nextGradient + beta * p;
         gradient = nextGradient;
         k = k+1;
     end
