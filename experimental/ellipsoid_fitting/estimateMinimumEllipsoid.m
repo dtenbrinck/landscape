@@ -67,7 +67,7 @@ function [ center, radii, evecs, v ] = estimateMinimumEllipsoid( X )
 %
 
 % initialze weights for energy part and volumetric penalty part
-mu1 = 1; mu2 = 1; mu3 = 1;
+mu1 = 1; mu2 = 0; mu3 = 1;
 
 if size( X, 2 ) ~= 3
     error( 'Input data must have three columns!' );
