@@ -336,7 +336,7 @@ function derivativeValue = getCurrentGradient(v, W, mu1, mu2, mu3)
     smallRadii(1:3) = -1./v(1:3).^2;
     
     positiveComponents = zeros(10,1);
-    positiveComponents(1:3) = exp(v(1:3)) ./ (1+exp(v(1:3)));
+    positiveComponents(1:3) = -exp(-v(1:3)) ./ (1+exp(-v(1:3)));
     derivativeValue = mu1 * energyPart + mu2 * equidistantRadii + mu3 * smallRadii ...
         + mu3 * positiveComponents;
 end
