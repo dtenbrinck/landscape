@@ -30,8 +30,11 @@ function [ center, radii, evecs, v ] = estimateMinimumEllipsoid( X )
 %            = sum of all data rows in X (log( 1 + exp( < v, w > )) )
 %            = sum of all data rows in X (shift + log( exp(-shift) + exp( < v, w > - shift )) )
 %           with shift = max<v,w> as a shift to prevent over- and underflow
+%           
+%           include penalty or barrier terms to ensure that v_1,v_2,v_3>0
 %           positiveComponents(v) = max(0,-v_1) + max(0,-v_2) + max(0,-v_3)
 %            = log(1+exp(-v_1)) + log(1+exp(-v_2)) + log(1+exp(-v_3))
+%           positiveComponents(v) = log(v_1) + log(v_2) + log(v_3)
 %
 % with w = (x^2, y^2, z^2, 2*x*y, 2*x*z, 2*y*z, 2*x, 2*y, 2*z, 1)
 % and v initially derived from the implicit function describing 
@@ -166,12 +169,12 @@ function v = performConjugateGradientSteps(v, W, mu1, mu2, mu3)
         % stopping criteria if relative change of consecutive iterates v is
         % too small (p. 62 / 83)
         if ( norm ( alpha * p ) / norm (v) < TOL )
-            fprintf ('Stopping CG iteration due to too small relative change of consecutive iterates!');
+            fprintf ('Stopping CG iteration due to too small relative change of consecutive iterates!\n');
             break;
         end
-        v = v + alpha * p;
         v
         functionValue = getCurrentFunctionValue(v, W, mu1, mu2, mu3)
+        v = v + alpha * p;
         nextGradient = getCurrentGradient(v, W, mu1, mu2, mu3);
         % restart every n'th cycle (p. 124 / 145)
         if ( mod(k,n) == 0 && k > 0 )
@@ -288,7 +291,7 @@ function alpha_star = zoom(alpha_lower, alpha_higher, ...
         iteration = iteration + 1;
     end
     if (iteration >= maxIteration) 
-        error('Steplength not yet found. Zoom in stopped')
+        fprintf('Steplength not yet found. Zoom in stopped\n');
     end
     % alpha_star = default_value?!
 end
