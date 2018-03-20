@@ -21,7 +21,7 @@ function [ center, radii, evecs, v ] = estimateMinimumEllipsoid( X )
 % Find minimizer v of the following energy functional f:
 % 
 %   argmin f(v) = mu1 * energyPart(v) + mu2 * equidistantRadii(v) + 
-%                   mu3 * smallRadii(v)
+%                   mu3 * smallRadii(v) + mu4 * positiveComponents(v)
 %
 %   with:   equidistantRadii(v) = (1/v_1 - 1/v_2)^2 + (1/v_2 - 1/v_3)^2 + (1/v_1 - 1/v_3)^2 
 %           smallRadii(v) = 1 / v_1 + 1 / v_2 + 1 / v_3 
@@ -30,6 +30,8 @@ function [ center, radii, evecs, v ] = estimateMinimumEllipsoid( X )
 %            = sum of all data rows in X (log( 1 + exp( < v, w > )) )
 %            = sum of all data rows in X (shift + log( exp(-shift) + exp( < v, w > - shift )) )
 %           with shift = max<v,w> as a shift to prevent over- and underflow
+%           positiveComponents(v) = max(0,-v_1) + max(0,-v_2) + max(0,-v_3)
+%            = log(1+exp(-v_1)) + log(1+exp(-v_2)) + log(1+exp(-v_3))
 %
 % with w = (x^2, y^2, z^2, 2*x*y, 2*x*z, 2*y*z, 2*x, 2*y, 2*z, 1)
 % and v initially derived from the implicit function describing 
@@ -68,6 +70,7 @@ function [ center, radii, evecs, v ] = estimateMinimumEllipsoid( X )
 
 % initialze weights for energy part and volumetric penalty part
 mu1 = 1; mu2 = 0; mu3 = 1;
+mu4=mu3; % currently
 
 if size( X, 2 ) ~= 3
     error( 'Input data must have three columns!' );
@@ -155,6 +158,7 @@ function v = performConjugateGradientSteps(v, W, mu1, mu2, mu3)
     n = size(W,1);
     % Polak-Ribiere Variant
     figure(1);
+    clf;
     hold on;
     while ( k < maxIteration && norm(gradient) > TOL)
         % step length alpha
@@ -314,7 +318,9 @@ function functionValue = getCurrentFunctionValue(v, W, mu1, mu2, mu3)
     energyPart = sum(shift + log(exp(-shift)+exp(W*v - shift)));
     equidistantRadii = (1/v(1) - 1/v(2))^2 + (1/v(3) - 1/v(2))^2 + (1/v(1) - 1/v(3))^2;
     smallRadii = 1/v(1) + 1/v(2) + 1/v(3);
-    functionValue = mu1 * energyPart + mu2 * equidistantRadii + mu3 * smallRadii;
+    positiveComponents = log(1+exp(-v(1))) + log(1+exp(-v(2))) + log(1+exp(-v(3)));
+    functionValue = mu1 * energyPart + mu2 * equidistantRadii + mu3 * smallRadii ...
+       + mu3 * positiveComponents;
 end
 
 function derivativeValue = getCurrentGradient(v, W, mu1, mu2, mu3)
@@ -328,5 +334,9 @@ function derivativeValue = getCurrentGradient(v, W, mu1, mu2, mu3)
     
     smallRadii = zeros(10,1);
     smallRadii(1:3) = -1./v(1:3).^2;
-    derivativeValue = mu1 * energyPart + mu2 * equidistantRadii + mu3 * smallRadii;
+    
+    positiveComponents = zeros(10,1);
+    positiveComponents(1:3) = exp(v(1:3)) ./ (1+exp(v(1:3)));
+    derivativeValue = mu1 * energyPart + mu2 * equidistantRadii + mu3 * smallRadii ...
+        + mu3 * positiveComponents;
 end
