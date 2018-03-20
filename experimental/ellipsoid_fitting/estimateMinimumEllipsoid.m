@@ -23,18 +23,13 @@ function [ center, radii, evecs, v ] = estimateMinimumEllipsoid( X )
 %   argmin f(v) = mu1 * energyPart(v) + mu2 * equidistantRadii(v) + 
 %                   mu3 * smallRadii(v) + mu4 * positiveComponents(v)
 %
-%   with:   equidistantRadii(v) = (1/v_1 - 1/v_2)^2 + (1/v_2 - 1/v_3)^2 + (1/v_1 - 1/v_3)^2 
+%   with:   equidistantRadii(v) = (v_1 - v_2)^2 + (v_2 - v_3)^2 + (v_1 - v_3)^2 
 %           smallRadii(v) = 1 / v_1 + 1 / v_2 + 1 / v_3 
 %           energyPart(v) = sum of all data rows in X ( max(0, < v, w > ) )
-%            = sum of all data rows in X (log(exp(0) + exp( < v, w > )) )
-%            = sum of all data rows in X (log( 1 + exp( < v, w > )) )
-%            = sum of all data rows in X (shift + log( exp(-shift) + exp( < v, w > - shift )) )
+%            = sum of all data rows in X eps*(log(exp(0) + exp( 1/eps * < v, w > )) )
+%            = sum of all data rows in X eps*(log( 1 + exp( 1/eps * < v, w > )) )
+%            = sum of all data rows in X eps*(shift + log( exp(-shift) + exp( 1/eps * < v, w > - shift )) )
 %           with shift = max<v,w> as a shift to prevent over- and underflow
-%           
-%           include penalty or barrier terms to ensure that v_1,v_2,v_3>0
-%           positiveComponents(v) = max(0,-v_1) + max(0,-v_2) + max(0,-v_3)
-%            = log(1+exp(-v_1)) + log(1+exp(-v_2)) + log(1+exp(-v_3))
-%           positiveComponents(v) = log(v_1) + log(v_2) + log(v_3)
 %
 % with w = (x^2, y^2, z^2, 2*x*y, 2*x*z, 2*y*z, 2*x, 2*y, 2*z, 1)
 % and v initially derived from the implicit function describing 
@@ -73,7 +68,6 @@ function [ center, radii, evecs, v ] = estimateMinimumEllipsoid( X )
 
 % initialze weights for energy part and volumetric penalty part
 mu1 = 1; mu2 = 0; mu3 = 1;
-mu4=mu3; % currently
 
 if size( X, 2 ) ~= 3
     error( 'Input data must have three columns!' );
@@ -176,28 +170,28 @@ function v = performConjugateGradientSteps(v, W, mu1, mu2, mu3)
         functionValue = getCurrentFunctionValue(v, W, mu1, mu2, mu3)
         nextGradient = getCurrentGradient(v, W, mu1, mu2, mu3)
         % restart every n'th cycle (p. 124 / 145)
-        if ( mod(k,n) == 0 && k > 0 )
-            fprintf('Restarting CG iteration with beta = 0.\n');
+%         if ( mod(k,n) == 0 && k > 0 )
+            fprintf('Using currently gradient descent method\n');
             beta = 0;
-        else
-            fprintf('norm of next gradient: %e \n', norm(nextGradient));
-            fprintf('norm of current gradient: %e \n',norm(gradient));
-            % betaFR := beta for Fletcher-Reeves variant
-            betaFR = nextGradient' * nextGradient / (gradient' * gradient);
-            % betaFR := beta for Polak-Ribiere variant
-            betaPR = nextGradient' * ( nextGradient-gradient) / (gradient' * gradient);
-            if ( betaPR < -betaFR ) 
-                beta = -betaFR;
-            elseif ( abs(betaPR) <= betaFR )
-                beta = betaPR;
-            elseif (betaPR > betaFR )
-                beta = betaFR;
-            end
-            if( k>1)
-                plot(k, norm(nextGradient), 'r*');
-                plot(k, norm(gradient), 'b*');
-            end
-        end
+%         else
+%             fprintf('norm of next gradient: %e \n', norm(nextGradient));
+%             fprintf('norm of current gradient: %e \n',norm(gradient));
+%             % betaFR := beta for Fletcher-Reeves variant
+%             betaFR = nextGradient' * nextGradient / (gradient' * gradient);
+%             % betaFR := beta for Polak-Ribiere variant
+%             betaPR = nextGradient' * ( nextGradient-gradient) / (gradient' * gradient);
+%             if ( betaPR < -betaFR ) 
+%                 beta = -betaFR;
+%             elseif ( abs(betaPR) <= betaFR )
+%                 beta = betaPR;
+%             elseif (betaPR > betaFR )
+%                 beta = betaFR;
+%             end
+%             if( k>1)
+%                 plot(k, norm(nextGradient), 'r*');
+%                 plot(k, norm(gradient), 'b*');
+%             end
+%         end
         p = -nextGradient + beta * p;
         gradient = nextGradient;
         k = k+1;
@@ -339,12 +333,10 @@ end
 
 function functionValue = getCurrentFunctionValue(v, W, mu1, mu2, mu3)
     shift = max(W*v); % corresponds with point which lies furtherst outside of ellipsoid
-    energyPart = sum(shift + log(exp(-shift)+exp(W*v - shift)));
-    equidistantRadii = (1/v(1) - 1/v(2))^2 + (1/v(3) - 1/v(2))^2 + (1/v(1) - 1/v(3))^2;
+    energyPart = eps*sum(shift + log(exp(-shift)+exp(1/eps * W*v - shift)));
+    equidistantRadii = (v(1) - v(2))^2 + (v(3) - v(2))^2 + (v(1) - v(3))^2;
     smallRadii = 1/v(1) + 1/v(2) + 1/v(3);
-    positiveComponents = log(1+exp(-v(1))) + log(1+exp(-v(2))) + log(1+exp(-v(3)));
-    functionValue = mu1 * energyPart + mu2 * equidistantRadii + mu3 * smallRadii ...
-       + mu3 * positiveComponents;
+    functionValue = mu1 * energyPart + mu2 * equidistantRadii + mu3 * smallRadii;
 end
 
 function derivativeValue = getCurrentGradient(v, W, mu1, mu2, mu3)
@@ -358,9 +350,6 @@ function derivativeValue = getCurrentGradient(v, W, mu1, mu2, mu3)
     
     smallRadii = zeros(10,1);
     smallRadii(1:3) = -1./v(1:3).^2;
-    
-    positiveComponents = zeros(10,1);
-    positiveComponents(1:3) = -exp(-v(1:3)) ./ (1+exp(-v(1:3)));
-    derivativeValue = mu1 * energyPart + mu2 * equidistantRadii + mu3 * smallRadii ...
-        + mu3 * positiveComponents;
+
+    derivativeValue = mu1 * energyPart + mu2 * equidistantRadii + mu3 * smallRadii;
 end
