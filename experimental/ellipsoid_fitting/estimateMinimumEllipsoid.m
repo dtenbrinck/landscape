@@ -160,15 +160,16 @@ function v = performConjugateGradientSteps(v, W, mu1, mu2, mu3)
         % step length alpha
         alpha = computeSteplength(v, p, W, mu1, mu2, mu3);
         % stopping criteria if relative change of consecutive iterates v is
-        % too small
+        % too small (p. 62 / 83)
         if ( norm ( alpha * p ) / norm (v) < TOL )
             fprintf ('Stopping CG iteration due to too small relative change of consecutive iterates!');
             break;
         end
         v = v + alpha * p;
         nextGradient = getCurrentGradient(v, W, mu1, mu2, mu3);
-        %%% restart every n'th cycle
+        % restart every n'th cycle (p. 124 / 145)
         if ( mod(k,n) == 0 && k > 0 )
+            fprintf('Restarting CG iteration with beta = 0.\n');
             beta = 0;
         else
             fprintf('norm of next gradient: %e \n', nextGradient' * nextGradient);
@@ -213,30 +214,35 @@ function alpha_star = computeSteplength(v, descentDirection, W, mu1, mu2, mu3)
     phi_0 = getPhiValue( alpha_current, v, descentDirection, W, mu1, mu2, mu3);
     phi_dash_0 = getPhiDerivative( alpha_current, v, descentDirection, W, mu1, mu2, mu3);
     phi_current = phi_0;
-    % stopping criteria if we cannot attain lower function value after ten
-    % trial step lengths (p. 62 / 83)
-    maxIteration = 10; 
-    while i < maxIteration
+    maxIteration = 100; 
+    while i <= maxIteration
         phi_next = getPhiValue( alpha_next, v, descentDirection, W, mu1, mu2, mu3);
+        % stopping criteria if we cannot attain lower function value after ten
+        % trial step lengths (p. 62 / 83)
+        if ( mod(i,10) == 0 && phi_0 <= phi_next )
+            fprintf('Stopping line search because after ten iterations we could not find a lower function value.\n');
+            alpha_star = 0;
+            return;
+        end
         if ( (phi_next > phi_0 + c1 * alpha_next * phi_dash_0) || ...
                 (phi_next >= phi_current && i > 1) )
             alpha_star = zoom(alpha_current, alpha_next, ...
                 v, descentDirection, W, mu1, mu2, mu3, ...
                 phi_0, phi_dash_0, c1, c2);
-            break;
+            return;
         end
         
         phi_dash_next = getPhiDerivative( alpha_next, v, descentDirection, W, mu1, mu2, mu3);
         if ( abs(phi_dash_next) <= -c2 * phi_dash_0 )
             alpha_star = alpha_next;
-            break;
+            return;
         end
         
         if (phi_dash_next >= 0 )
             alpha_star = zoom(alpha_next, alpha_current, ...
                 v, descentDirection, W, mu1, mu2, mu3, ...
                 phi_0, phi_dash_0, c1, c2);
-            break;
+            return;
         end
         
         alpha_current = alpha_next;
@@ -246,8 +252,9 @@ function alpha_star = computeSteplength(v, descentDirection, W, mu1, mu2, mu3)
         i = i+1;
     end
     if (i >= maxIteration) 
-        fprintf('Could not determine next step length after ten trial steps!')
+        fprintf('Could not determine next step length after %d line search iterations!\n', maxIteration);
     end
+    alpha_star = alpha_next;
 end
 
 function alpha_star = zoom(alpha_lower, alpha_higher, ...
@@ -268,7 +275,7 @@ function alpha_star = zoom(alpha_lower, alpha_higher, ...
             phi_dash_j = getPhiDerivative( alpha_j, v, descentDirection, W, mu1, mu2, mu3);
             if ( abs(phi_dash_j) <= -c2 * phi_dash_0 ) 
                 alpha_star = alpha_j;
-                break;
+                return;
             end
             if ( phi_dash_j * ( alpha_higher - alpha_lower) >= 0 )
                 alpha_higher = alpha_lower;
