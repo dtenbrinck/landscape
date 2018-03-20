@@ -159,7 +159,6 @@ function v = performConjugateGradientSteps(v, W, mu1, mu2, mu3)
     TOL = 1e-6;
     maxIteration = 10000;
     n = size(W,1);
-    % Polak-Ribiere Variant
     figure(1);
     clf;
     hold on;
@@ -172,17 +171,17 @@ function v = performConjugateGradientSteps(v, W, mu1, mu2, mu3)
             fprintf ('Stopping CG iteration due to too small relative change of consecutive iterates!\n');
             break;
         end
+        v = v + alpha * p;
         v
         functionValue = getCurrentFunctionValue(v, W, mu1, mu2, mu3)
-        v = v + alpha * p;
-        nextGradient = getCurrentGradient(v, W, mu1, mu2, mu3);
+        nextGradient = getCurrentGradient(v, W, mu1, mu2, mu3)
         % restart every n'th cycle (p. 124 / 145)
         if ( mod(k,n) == 0 && k > 0 )
             fprintf('Restarting CG iteration with beta = 0.\n');
             beta = 0;
         else
-            fprintf('norm of next gradient: %e \n', nextGradient' * nextGradient);
-            fprintf('norm of current gradient: %e \n',gradient' * gradient);
+            fprintf('norm of next gradient: %e \n', norm(nextGradient));
+            fprintf('norm of current gradient: %e \n',norm(gradient));
             % betaFR := beta for Fletcher-Reeves variant
             betaFR = nextGradient' * nextGradient / (gradient' * gradient);
             % betaFR := beta for Polak-Ribiere variant
@@ -195,8 +194,8 @@ function v = performConjugateGradientSteps(v, W, mu1, mu2, mu3)
                 beta = betaFR;
             end
             if( k>1)
-                plot(k, nextGradient' * nextGradient, 'r*');
-                plot(k, gradient' * gradient, 'b*');
+                plot(k, norm(nextGradient), 'r*');
+                plot(k, norm(gradient), 'b*');
             end
         end
         p = -nextGradient + beta * p;
@@ -249,11 +248,18 @@ function alpha_star = computeSteplength(v, descentDirection, W, mu1, mu2, mu3)
                 phi_0, phi_dash_0, c1, c2);
             return;
         end
-        
         alpha_current = alpha_next;
         % next trial value with interpolation
         alpha_next =  quadraticInterpolation(alpha_next, alpha_max, ...
                     v, descentDirection, W, mu1, mu2, mu3);
+        %%%%%%%%%%%%%%%%%%%% TODO safeguard strategy %%%%%%%%%%%%%
+        % implement safeguard procedure (p.58, 79): if alpha_next (alpha_i)
+        % is not too close to alpha_current (alpha_i-1) or too much smaller
+        % than alpha_current (alpha_i-1), reset alpha_next:
+%         if ( alpha_current - alpha_next < TOL || ...
+%                 ( alpha_current - alpha_next ) / alpha_current < TOL ) 
+%            alpha_next = alpha_current / 2; 
+%         end
         i = i+1;
     end
     if (i >= maxIteration) 
@@ -268,9 +274,23 @@ function alpha_star = zoom(alpha_lower, alpha_higher, ...
     % use algorithm 3.6 to zoom in to appropriate step length
     iteration = 0;
     maxIteration = 100;
+    TOL = 1e-4;
     while iteration < maxIteration
         alpha_j = quadraticInterpolation(alpha_lower, alpha_higher, ...
                     v, descentDirection, W, mu1, mu2, mu3);
+        if ( iteration > 0 )
+            %%%%%%%%%%%%%%%%%%%% TODO safeguard strategy %%%%%%%%%%%%%
+            % implement safeguard procedure (p.58, 79): if alpha_next (alpha_i)
+            % is not too close to alpha_current (alpha_i-1) or too much smaller
+            % than alpha_current (alpha_i-1), reset alpha_next:
+            if ( alpha_last - alpha_j < TOL || ...
+                    ( alpha_last - alpha_j ) / alpha_last < TOL || ...
+                    abs(alpha_j ) < TOL )  % alpha_j shouldn't be too small
+               alpha_star = alpha_last / 2; 
+               return;
+            end
+        end
+        
         phi_alpha_j = getPhiValue( alpha_j, v, descentDirection, W, mu1, mu2, mu3);
         phi_alpha_lower = getPhiValue( alpha_lower, v, descentDirection, W, mu1, mu2, mu3);
         if ( phi_alpha_j > phi_0 + c1 * alpha_j * phi_dash_0 || ...
@@ -289,11 +309,12 @@ function alpha_star = zoom(alpha_lower, alpha_higher, ...
         end
             
         iteration = iteration + 1;
+        alpha_last = alpha_j;
     end
     if (iteration >= maxIteration) 
         fprintf('Steplength not yet found. Zoom in stopped\n');
     end
-    % alpha_star = default_value?!
+    alpha_star = alpha_j; % use last iterate as default return value
 end
 
 function alpha = quadraticInterpolation(alpha_lower, alpha_higher, ...
@@ -332,8 +353,8 @@ function derivativeValue = getCurrentGradient(v, W, mu1, mu2, mu3)
     
     equidistantRadii = zeros(10,1);
     equidistantRadii(1) = 2/(v(1))^2 *( 1/v(2) + 1/v(3) - 2/v(1));
-    equidistantRadii(1) = 2/(v(2))^2 *( 1/v(1) + 1/v(3) - 2/v(2));
-    equidistantRadii(1) = 2/(v(3))^2 *( 1/v(2) + 1/v(1) - 2/v(3));
+    equidistantRadii(2) = 2/(v(2))^2 *( 1/v(1) + 1/v(3) - 2/v(2));
+    equidistantRadii(3) = 2/(v(3))^2 *( 1/v(2) + 1/v(1) - 2/v(3));
     
     smallRadii = zeros(10,1);
     smallRadii(1:3) = -1./v(1:3).^2;
