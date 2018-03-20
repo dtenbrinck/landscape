@@ -153,6 +153,9 @@ function v = performConjugateGradientSteps(v, W, mu1, mu2, mu3)
     TOL = 1e-6;
     maxIteration = 10000;
     n = size(W,1);
+    % Polak-Ribiere Variant
+    figure(1);
+    hold on;
     while ( k < maxIteration && norm(gradient) > TOL)
         % step length alpha
         alpha = computeSteplength(v, p, W, mu1, mu2, mu3);
@@ -163,15 +166,19 @@ function v = performConjugateGradientSteps(v, W, mu1, mu2, mu3)
             break;
         end
         v = v + alpha * p;
+        v
+        functionValue = getCurrentFunctionValue(v, W, mu1, mu2, mu3)
         nextGradient = getCurrentGradient(v, W, mu1, mu2, mu3);
         % restart every n'th cycle (p. 124 / 145)
         if ( mod(k,n) == 0 && k > 0 )
             fprintf('Restarting CG iteration with beta = 0.\n');
             beta = 0;
         else
-            % betaFR = beta for Fletcher-Reeves variant
+            fprintf('norm of next gradient: %e \n', nextGradient' * nextGradient);
+            fprintf('norm of current gradient: %e \n',gradient' * gradient);
+            % betaFR := beta for Fletcher-Reeves variant
             betaFR = nextGradient' * nextGradient / (gradient' * gradient);
-            % betaFR = beta for Polak-Ribiere variant
+            % betaFR := beta for Polak-Ribiere variant
             betaPR = nextGradient' * ( nextGradient-gradient) / (gradient' * gradient);
             if ( betaPR < -betaFR ) 
                 beta = -betaFR;
@@ -179,6 +186,10 @@ function v = performConjugateGradientSteps(v, W, mu1, mu2, mu3)
                 beta = betaPR;
             elseif (betaPR > betaFR )
                 beta = betaFR;
+            end
+            if( k>1)
+                plot(k, nextGradient' * nextGradient, 'r*');
+                plot(k, gradient' * gradient, 'b*');
             end
         end
         p = -nextGradient + beta * p;
