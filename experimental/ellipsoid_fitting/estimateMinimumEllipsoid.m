@@ -66,8 +66,10 @@ function [ center, radii, evecs, v ] = estimateMinimumEllipsoid( X )
 %
 
 % initialze weights for energy part and volumetric penalty part
-mu1 = 1; mu2 = 0; mu3 = 1;
-eps = 1;
+inputParams.mu1 = 1;
+inputParams.mu2 = 1;
+inputParams.mu3 = 1;
+inputParams.eps = 1;
 
 if size( X, 2 ) ~= 3
     error( 'Input data must have three columns!' );
@@ -90,12 +92,31 @@ W = [ x .* x, ...
     2 * z, ...
     1 + 0 * x ];  % ndatapoints x 7 ellipsoid parameters
 
-[radii, center, v] = initializeEllipsoidParams(x,y,z);
+[radii, center, v0] = initializeEllipsoidParams(x,y,z);
 
-v = performConjugateGradientSteps(v, W, mu1, mu2, mu3, eps);
+[funct, grad_funct] = initializeFunctionalAndGradient(v0, W, inputParams);
+[phi, phi_dash] = initializePhiAndPhiDash (funct, grad_funct);
+
+v = performConjugateGradientSteps(v0, W, funct, grad_funct, phi, phi_dash);
 
 [radii, center] = getEllipsoidParams(v);
 evecs=0;
+end
+
+function [funct, grad_funct] = initializeFunctionalAndGradient(v0, W, inputParams)
+shift = max(W*v0); % corresponds with point which lies furtherst outside of ellipsoid
+funct = @(v) inputParams.mu1 * inputParams.eps*sum(shift + log(exp(-shift)+exp(1/inputParams.eps * W*v - shift))) + ...
+    inputParams.mu2 * ((v(1) - v(2))^2 + (v(3) - v(2))^2 + (v(1) - v(3))^2)+ ...
+    inputParams.mu3 * (1/v(1) + 1/v(2) + 1/v(3));
+
+grad_funct = @(v) inputParams.mu1 * W'* (exp(1/inputParams.eps .* W*v - shift)./(exp(- shift) + exp(1/inputParams.eps .* W*v - shift)) ) + ...
+    inputParams.mu2 * [2*(2*v(1) - v(2) - v(3));  2*(2*v(2) - v(1) - v(3)); 2*(2*v(3) - v(1) - v(2)); 0; 0; 0; 0] + ...
+    inputParams.mu3 * [-1./v(1:3).^2; 0; 0 ; 0; 0];
+end
+
+function [phi, phi_dash] = initializePhiAndPhiDash (funct, grad_funct)
+    phi = @(alpha, v, descentDirection) funct( v + alpha * descentDirection);
+    phi_dash = @(alpha, v, descentDirection) descentDirection' * grad_funct(v + alpha * descentDirection);
 end
 
 function [radii, center, v] = initializeEllipsoidParams(x,y,z)
@@ -115,20 +136,20 @@ function [radii, center] = getEllipsoidParams(v)
     % set eigenvectors evecs
 end
 
-function v = performConjugateGradientSteps(v, W, mu1, mu2, mu3, eps)
-    gradient = getCurrentGradient(v, W, mu1, mu2, mu3, eps);
+function v = performConjugateGradientSteps(v, W, funct, grad_funct, phi, phi_dash)
+    gradient = grad_funct(v);
     % descent direction p
     p = -gradient; 
     k = 0;
     TOL = 1e-6;
     maxIteration = 10000;
     n = size(W,1);
-    figure(1);
-    clf;
-    hold on;
+%     figure(1);
+%     clf;
+%     hold on;
     while ( k < maxIteration && norm(gradient) > TOL)
         % step length alpha
-        alpha = computeSteplength(v, p, W, mu1, mu2, mu3, eps);
+        alpha = computeSteplength(v, p, phi, phi_dash);
         % stopping criteria if relative change of consecutive iterates v is
         % too small (p. 62 / 83)
         if ( norm ( alpha * p ) / norm (v) < TOL )
@@ -136,7 +157,7 @@ function v = performConjugateGradientSteps(v, W, mu1, mu2, mu3, eps)
             break;
         end
         v = v + alpha * p;
-        nextGradient = getCurrentGradient(v, W, mu1, mu2, mu3, eps);
+        nextGradient = grad_funct(v);
         % restart every n'th cycle (p. 124 / 145)
 %         if ( mod(k,n) == 0 && k > 0 )
             fprintf('Using currently gradient descent method\n');
@@ -169,7 +190,7 @@ function v = performConjugateGradientSteps(v, W, mu1, mu2, mu3, eps)
     end
 end
 
-function alpha_star = computeSteplength(v, descentDirection, W, mu1, mu2, mu3, eps)
+function alpha_star = computeSteplength(v, descentDirection, phi, phi_dash)
     % use a line search algorithm (p.81, Algorithm 3.5)
     c1 = 1e-4;
     c2 = 0.1;
@@ -189,12 +210,12 @@ function alpha_star = computeSteplength(v, descentDirection, W, mu1, mu2, mu3, e
     end
     alpha_next = (alpha_max - alpha_current ) / 2; % TODO ?!?!
     i = 1;
-    phi_0 = getPhiValue( alpha_current, v, descentDirection, W, mu1, mu2, mu3, eps);
-    phi_dash_0 = getPhiDerivative( alpha_current, v, descentDirection, W, mu1, mu2, mu3, eps);
+    phi_0 = phi( alpha_current, v, descentDirection);
+    phi_dash_0 = phi_dash( alpha_current, v, descentDirection);
     phi_current = phi_0;
     maxIteration = 100; 
     while i <= maxIteration
-        phi_next = getPhiValue( alpha_next, v, descentDirection, W, mu1, mu2, mu3, eps);
+        phi_next = phi( alpha_next, v, descentDirection);
         % stopping criteria if we cannot attain lower function value after ten
         % trial step lengths (p. 62 / 83)
         if ( mod(i,10) == 0 && phi_0 <= phi_next )
@@ -205,12 +226,12 @@ function alpha_star = computeSteplength(v, descentDirection, W, mu1, mu2, mu3, e
         if ( (phi_next > phi_0 + c1 * alpha_next * phi_dash_0) || ...
                 (phi_next >= phi_current && i > 1) )
             alpha_star = zoom(alpha_current, alpha_next, ...
-                v, descentDirection, W, mu1, mu2, mu3, ...
-                phi_0, phi_dash_0, c1, c2, eps);
+                v, descentDirection, phi, phi_dash, ...
+                phi_0, phi_dash_0, c1, c2);
             return;
         end
         
-        phi_dash_next = getPhiDerivative( alpha_next, v, descentDirection, W, mu1, mu2, mu3, eps);
+        phi_dash_next = phi_dash( alpha_next, v, descentDirection);
         if ( abs(phi_dash_next) <= -c2 * phi_dash_0 )
             alpha_star = alpha_next;
             return;
@@ -218,14 +239,14 @@ function alpha_star = computeSteplength(v, descentDirection, W, mu1, mu2, mu3, e
         
         if (phi_dash_next >= 0 )
             alpha_star = zoom(alpha_next, alpha_current, ...
-                v, descentDirection, W, mu1, mu2, mu3, ...
-                phi_0, phi_dash_0, c1, c2, eps);
+                v, descentDirection, phi, phi_dash, ...
+                phi_0, phi_dash_0, c1, c2);
             return;
         end
         alpha_current = alpha_next;
         % next trial value with interpolation
         alpha_next =  quadraticInterpolation(alpha_next, alpha_max, ...
-                    v, descentDirection, W, mu1, mu2, mu3, eps);
+                    v, descentDirection, phi, phi_dash);
         %%%%%%%%%%%%%%%%%%%% TODO safeguard strategy %%%%%%%%%%%%%
         % implement safeguard procedure (p.58, 79): if alpha_next (alpha_i)
         % is not too close to alpha_current (alpha_i-1) or too much smaller
@@ -243,15 +264,14 @@ function alpha_star = computeSteplength(v, descentDirection, W, mu1, mu2, mu3, e
 end
 
 function alpha_star = zoom(alpha_lower, alpha_higher, ...
-    v, descentDirection, W, mu1, mu2, mu3, ...
-    phi_0, phi_dash_0, c1, c2, eps)
+    v, descentDirection, phi, phi_dash, phi_0, phi_dash_0, c1, c2)
     % use algorithm 3.6 to zoom in to appropriate step length
     iteration = 0;
     maxIteration = 100;
     TOL = 1e-4;
     while iteration < maxIteration
         alpha_j = quadraticInterpolation(alpha_lower, alpha_higher, ...
-                    v, descentDirection, W, mu1, mu2, mu3, eps);
+                    v, descentDirection, phi, phi_dash);
         if ( iteration > 0 )
             %%%%%%%%%%%%%%%%%%%% TODO safeguard strategy %%%%%%%%%%%%%
             % implement safeguard procedure (p.58, 79): if alpha_next (alpha_i)
@@ -265,13 +285,13 @@ function alpha_star = zoom(alpha_lower, alpha_higher, ...
             end
         end
         
-        phi_alpha_j = getPhiValue( alpha_j, v, descentDirection, W, mu1, mu2, mu3, eps);
-        phi_alpha_lower = getPhiValue( alpha_lower, v, descentDirection, W, mu1, mu2, mu3, eps);
+        phi_alpha_j = phi( alpha_j, v, descentDirection);
+        phi_alpha_lower = phi( alpha_lower, v, descentDirection);
         if ( phi_alpha_j > phi_0 + c1 * alpha_j * phi_dash_0 || ...
                 phi_alpha_j >= phi_alpha_lower )
             alpha_higher = alpha_j;
         else
-            phi_dash_j = getPhiDerivative( alpha_j, v, descentDirection, W, mu1, mu2, mu3, eps);
+            phi_dash_j = phi_dash( alpha_j, v, descentDirection);
             if ( abs(phi_dash_j) <= -c2 * phi_dash_0 ) 
                 alpha_star = alpha_j;
                 return;
@@ -292,44 +312,11 @@ function alpha_star = zoom(alpha_lower, alpha_higher, ...
 end
 
 function alpha = quadraticInterpolation(alpha_lower, alpha_higher, ...
-                    v, descentDirection, W, mu1, mu2, mu3, eps)
-    phi_dash_alpha_lower = getPhiDerivative( alpha_lower, v, descentDirection, W, mu1, mu2, mu3, eps);
-    phi_alpha_lower = getPhiValue( alpha_lower, v, descentDirection, W, mu1, mu2, mu3, eps);
-    phi_alpha_higher = getPhiValue( alpha_higher, v, descentDirection, W, mu1, mu2, mu3, eps);
+                    v, descentDirection, phi, phi_dash)
+    phi_dash_alpha_lower = phi_dash( alpha_lower, v, descentDirection);
+    phi_alpha_lower = phi( alpha_lower, v, descentDirection);
+    phi_alpha_higher = phi( alpha_higher, v, descentDirection);
     % find trial step length by using quadratic interpolation
     alpha = -phi_dash_alpha_lower * alpha_higher^2 / ...
         ( 2 * ( phi_alpha_higher - phi_alpha_lower - phi_dash_alpha_lower * alpha_higher));
-end
-
-function phi = getPhiValue (alpha, v, descentDirection, W, mu1, mu2, mu3, eps)
-    evaluationPoint = v + alpha * descentDirection;
-    phi = getCurrentFunctionValue( evaluationPoint, W, mu1, mu2, mu3, eps);
-end
-
-function phi_dash = getPhiDerivative( alpha, v, descentDirection, W, mu1, mu2, mu3, eps)
-    evaluationPoint = v + alpha * descentDirection;
-    phi_dash = descentDirection' * getCurrentGradient(evaluationPoint, W, mu1, mu2, mu3, eps);
-end
-
-function functionValue = getCurrentFunctionValue(v, W, mu1, mu2, mu3, eps)
-    shift = max(W*v); % corresponds with point which lies furtherst outside of ellipsoid
-    energyPart = eps*sum(shift + log(exp(-shift)+exp(1/eps * W*v - shift)));
-    equidistantRadii = (v(1) - v(2))^2 + (v(3) - v(2))^2 + (v(1) - v(3))^2;
-    smallRadii = 1/v(1) + 1/v(2) + 1/v(3);
-    functionValue = mu1 * energyPart + mu2 * equidistantRadii + mu3 * smallRadii;
-end
-
-function derivativeValue = getCurrentGradient(v, W, mu1, mu2, mu3, eps)
-    shift = max(W*v);
-    energyPart = W'* (exp(1/eps .* W*v - shift)./(exp(- shift) + exp(1/eps .* W*v - shift)) );
-    
-    equidistantRadii = zeros(7,1);
-    equidistantRadii(1) = 2*(2*v(1) - v(2) - v(3));
-    equidistantRadii(2) = 2*(2*v(2) - v(1) - v(3));
-    equidistantRadii(3) = 2*(2*v(3) - v(1) - v(2));
-    
-    smallRadii = zeros(7,1);
-    smallRadii(1:3) = -1./v(1:3).^2;
-
-    derivativeValue = mu1 * energyPart + mu2 * equidistantRadii + mu3 * smallRadii;
 end
