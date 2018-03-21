@@ -110,7 +110,7 @@ end
 % function [radii, center, evecs, v] = getEllipsoidParams(v)
 function [radii, center] = getEllipsoidParams(v)
     radii = sqrt( 1 ./ v(1:3) ) ;
-    center = -radii * v(4:6);
+    center = -radii .* v(4:6);
     % TODO transform v 
     % set eigenvectors evecs
 end
