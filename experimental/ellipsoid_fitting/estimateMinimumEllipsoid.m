@@ -95,7 +95,7 @@ W = [ x .* x, ...
 v = performConjugateGradientSteps(v, W, mu1, mu2, mu3, eps);
 
 [radii, center] = getEllipsoidParams(v);
-
+evecs=0;
 end
 
 function [radii, center, v] = initializeEllipsoidParams(x,y,z)
@@ -116,7 +116,6 @@ function [radii, center] = getEllipsoidParams(v)
 end
 
 function v = performConjugateGradientSteps(v, W, mu1, mu2, mu3, eps)
-    %functionValue = getCurrentFunctionValue(v, W, mu1, mu2, mu3, eps)
     gradient = getCurrentGradient(v, W, mu1, mu2, mu3, eps);
     % descent direction p
     p = -gradient; 
@@ -137,9 +136,7 @@ function v = performConjugateGradientSteps(v, W, mu1, mu2, mu3, eps)
             break;
         end
         v = v + alpha * p;
-        v
-        functionValue = getCurrentFunctionValue(v, W, mu1, mu2, mu3, eps)
-        nextGradient = getCurrentGradient(v, W, mu1, mu2, mu3, eps)
+        nextGradient = getCurrentGradient(v, W, mu1, mu2, mu3, eps);
         % restart every n'th cycle (p. 124 / 145)
 %         if ( mod(k,n) == 0 && k > 0 )
             fprintf('Using currently gradient descent method\n');
