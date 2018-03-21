@@ -100,6 +100,18 @@ W = [ x .* x, ...
 v = performConjugateGradientSteps(v0, W, funct, grad_funct, phi, phi_dash);
 
 [radii, center] = getEllipsoidParams(v);
+
+options = optimset('Display','iter','PlotFcns',@optimplotfval);
+v2 = fminsearch(funct, v0, options);
+% v2 = fminsearch(funct, v0);
+
+[radii2, center2] = getEllipsoidParams(v2);
+radii
+radii2
+center
+center2
+v
+v2
 evecs=0;
 end
 
@@ -153,9 +165,10 @@ function v = performConjugateGradientSteps(v, W, funct, grad_funct, phi, phi_das
         % stopping criteria if relative change of consecutive iterates v is
         % too small (p. 62 / 83)
         if ( norm ( alpha * p ) / norm (v) < TOL )
-            fprintf ('Stopping CG iteration due to too small relative change of consecutive iterates!\n');
+            fprintf ('Stopping CG iteration due to too small relative change of consecutive iterates after %d iterations!\n', k);
             break;
         end
+        funct(v)
         v = v + alpha * p;
         nextGradient = grad_funct(v);
         % restart every n'th cycle (p. 124 / 145)
@@ -188,6 +201,7 @@ function v = performConjugateGradientSteps(v, W, funct, grad_funct, phi, phi_das
     if ( k >= maxIteration ) 
         error ('Conjugate gradients did not converge yet! norm(gradient) = %e', norm(gradient));
     end
+    funct(v)
 end
 
 function alpha_star = computeSteplength(v, descentDirection, phi, phi_dash)
