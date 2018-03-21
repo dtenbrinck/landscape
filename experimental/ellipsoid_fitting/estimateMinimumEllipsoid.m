@@ -80,8 +80,8 @@ else
 end
 
 % need 10 or more data points
-if length( x ) < 7 
-   error( 'Must have at least 7 points to approximate an ellipsoidal fitting.' );
+if length( x ) < 6 
+   error( 'Must have at least 6 points to approximate an ellipsoidal fitting.' );
 end
 
 W = [ x .* x, ...
@@ -89,8 +89,7 @@ W = [ x .* x, ...
     z .* z, ...
     2 * x, ...
     2 * y, ...
-    2 * z, ...
-    1 + 0 * x ];  % ndatapoints x 7 ellipsoid parameters
+    2 * z];  % ndatapoints x 6 ellipsoid parameters
 
 [radii, center, v0] = initializeEllipsoidParams(x,y,z);
 
@@ -117,13 +116,14 @@ end
 
 function [funct, grad_funct] = initializeFunctionalAndGradient(v0, W, inputParams)
 shift = max(W*v0); % corresponds with point which lies furtherst outside of ellipsoid
-funct = @(v) inputParams.mu1 * inputParams.eps*sum(shift + log(exp(-shift)+exp(1/inputParams.eps * W*v - shift))) + ...
+funct = @(v) inputParams.mu1 * inputParams.eps*sum(shift + log(exp(-shift)+exp(1/inputParams.eps * (W*v + (v(4)^2 + v(5)^2 + v(6)^2 - 1)) - shift))) + ...
     inputParams.mu2 * ((v(1) - v(2))^2 + (v(3) - v(2))^2 + (v(1) - v(3))^2)+ ...
     inputParams.mu3 * (1/v(1) + 1/v(2) + 1/v(3));
-
-grad_funct = @(v) inputParams.mu1 * W'* (exp(1/inputParams.eps .* W*v - shift)./(exp(- shift) + exp(1/inputParams.eps .* W*v - shift)) ) + ...
-    inputParams.mu2 * [2*(2*v(1) - v(2) - v(3));  2*(2*v(2) - v(1) - v(3)); 2*(2*v(3) - v(1) - v(2)); 0; 0; 0; 0] + ...
-    inputParams.mu3 * [-1./v(1:3).^2; 0; 0 ; 0; 0];
+% TODO improve function and gradient 
+%W' + [0; 0; 0; 2 * v(4); + 2*v(5) + 2*v(6)]
+grad_funct = @(v) inputParams.mu1 * W'* (exp(1/inputParams.eps .* (W*v + (v(4)^2 + v(5)^2 + v(6)^2 - 1)) - shift)./(exp(- shift) + exp(1/inputParams.eps .* (W*v + (v(4)^2 + v(5)^2 + v(6)^2 - 1)) - shift)) ) + ...
+    inputParams.mu2 * [2*(2*v(1) - v(2) - v(3));  2*(2*v(2) - v(1) - v(3)); 2*(2*v(3) - v(1) - v(2)); 0; 0; 0] + ...
+    inputParams.mu3 * [-1./v(1:3).^2; 0; 0 ; 0];
 end
 
 function [phi, phi_dash] = initializePhiAndPhiDash (funct, grad_funct)
@@ -134,10 +134,9 @@ end
 function [radii, center, v] = initializeEllipsoidParams(x,y,z)
     center=[mean(x); mean(y); mean(z)];
     radii=[max(abs(x - center(1))); max(abs(y - center(2)));max(abs(z - center(3)))]; 
-    v=zeros(7,1);
+    v=zeros(6,1);
     v(1:3) = (1./radii).^2;
     v(4:6) = - (1./radii) .* center;
-    v(7) = sum( v(1:3) .* (center.^2) ) - 1;
 end
 
 % function [radii, center, evecs, v] = getEllipsoidParams(v)
