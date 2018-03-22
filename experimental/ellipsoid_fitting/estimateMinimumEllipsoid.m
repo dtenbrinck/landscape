@@ -91,36 +91,63 @@ W = [ x .* x, ...
     2 * y, ...
     2 * z];  % ndatapoints x 6 ellipsoid parameters
 
-[radii, center, v0] = initializeEllipsoidParams(x,y,z);
+fprintf('Initialize ellipsoid parameter so that ellipsoid contains all data points.\n');
+[radii0, center0, v0] = initializeEllipsoidParams(x,y,z);
+
 
 [funct, grad_funct] = initializeFunctionalAndGradient( W, inputParams);
 [phi, phi_dash] = initializePhiAndPhiDash (funct, grad_funct);
-
-v = performConjugateGradientSteps(v0, W, funct, grad_funct, phi, phi_dash);
-% v=v0;
-[radii, center] = getEllipsoidParams(v);
-
+fprintf('Approximate ellipsoid with quadratic approximation of non-diff. term.\n');
+[radii, center,v] = tryToApproximateEllipsoidParamsWithDescendingMethod(v0, W, funct, grad_funct, phi, phi_dash);
+fprintf('Approximate ellipsoid with quadratic approximation of non-diff term with MATLAB reference method.\n');
 options = optimset('Display','iter','PlotFcns',@optimplotfval);
 v2 = fminsearch(funct, v0); %, options);
-
 [radii2, center2] = getEllipsoidParams(v2);
-radii
-radii2
-center
-center2
-v
-v2
+
+[funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox (W, inputParams);
+[phi, phi_dash] = initializePhiAndPhiDash (funct, grad_funct);
+fprintf('Approximate ellipsoid with log. approximation of non-diff. term.\n');
+[radii1, center1,v1] = tryToApproximateEllipsoidParamsWithDescendingMethod(v0, W, funct, grad_funct, phi, phi_dash);
+fprintf('Approximate ellipsoid with log. approximation of non-diff. term with MATLAB reference method.\n');
+options = optimset('Display','iter','PlotFcns',@optimplotfval);
+v3 = fminsearch(funct, v0); %, options);
+[radii3, center3] = getEllipsoidParams(v3);
+
+
+table( radii0, radii, radii2, radii1, radii3)
+table( center0, center, center2, center1, center3 )
+table( v0, v, v2, v1, v3);
+
 evecs=0;
 
 % plot ellipsoid fittings
-fig = figure('Name', 'Scatter plot and resulting ellipsoid fittings','units','normalized','outerposition',[0 0 1 1]);
+figure('Name', 'Scatter plot and resulting ellipsoid fittings','units','normalized','outerposition',[0 0 1 1]);
 scatter3(X(:,1),X(:,2), X(:,3),'m','.');
 hold on;
+[x,y,z] = ellipsoid(center0(1), center0(2), center0(3), radii0(1), radii0(2), radii0(3), 20);
+surf(x,y,z, 'FaceAlpha',0.15, 'FaceColor', 'r', 'EdgeColor', 'none');
 [x,y,z] = ellipsoid(center(1), center(2), center(3), radii(1), radii(2), radii(3), 20);
 surf(x,y,z, 'FaceAlpha',0.15, 'FaceColor', 'm', 'EdgeColor', 'none');
 [x,y,z] = ellipsoid(center2(1), center2(2), center2(3), radii2(1), radii2(2), radii2(3), 20);
 surf(x,y,z, 'FaceAlpha',0.15, 'FaceColor', 'c', 'EdgeColor', 'none');
-legend('input data','ellipsoid estimation', 'reference estimation', 'Location', 'northeast');
+[x,y,z] = ellipsoid(center1(1), center1(2), center1(3), radii1(1), radii1(2), radii1(3), 20);
+surf(x,y,z, 'FaceAlpha',0.15, 'FaceColor', 'g', 'EdgeColor', 'none');
+[x,y,z] = ellipsoid(center3(1), center3(2), center3(3), radii3(1), radii3(2), radii3(3), 20);
+surf(x,y,z, 'FaceAlpha',0.15, 'FaceColor', 'b', 'EdgeColor', 'none');
+legend('input data','initialization ellipsoid', 'ellipsoid estimation (quadratic approx. of non-diff. term)','reference estimation ((quadratic approx. of non-diff. term)','ellipsoid estimation (log approx. of non-diff. term)', 'reference estimation (log approx. of non-diff. term)', 'Location', 'northeast');
+end
+
+function [radii, center, v] = tryToApproximateEllipsoidParamsWithDescendingMethod(v0, W, funct, grad_funct, phi, phi_dash)
+    try
+        v = performConjugateGradientSteps(v0, W, funct, grad_funct, phi, phi_dash);
+        [radii, center] = getEllipsoidParams(v);
+    catch ERROR_MSG
+        disp(ERROR_MSG);
+        fprintf('Setting default output parameter');
+        radii = zeros(3,1);
+        center = zeros(3,1);
+        v=zeros(6,1);
+    end
 end
 
 function [funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox( W, inputParams)
@@ -239,7 +266,7 @@ function alpha_star = computeSteplength(v, descentDirection, phi, phi_dash)
         alpha_max = min(alpha_max, -v(3)/descentDirection(3));
     end
     if (alpha_max == 1e10)
-       error('to do problem with alpha_max'); 
+       error('TODO problem with alpha_max'); 
     end
     alpha_next = (alpha_max - alpha_current ) / 2; % TODO ?!?!
     i = 1;
