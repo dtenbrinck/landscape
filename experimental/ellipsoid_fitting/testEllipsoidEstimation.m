@@ -21,6 +21,5 @@ function testEllipsoidEstimation
         0       0.99    0  ; ...
         0.99    0       0  ];
     X=[X1; -X1];
-    [ center, radii, axes, v ] = estimateMinimumEllipsoid( X );
-        
+    [ center, radii, axes, v ] = estimateMinimumEllipsoid( X );    
 end

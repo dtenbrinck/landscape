@@ -111,6 +111,19 @@ center2
 v
 v2
 evecs=0;
+
+% plot ellipsoid fittings
+fig = figure('Name', 'Scatter plot and resulting ellipsoid fittings','units','normalized','outerposition',[0 0 1 1]);
+subplot(1,2,1);
+scatter3(X(:,1),X(:,2), X(:,3),'m','.');
+hold on;
+[x,y,z] = ellipsoid(center(1), center(2), center(3), radii(1), radii(2), radii(3), 20);
+surf(x,y,z, 'FaceAlpha',0.15, 'FaceColor', 'm', 'EdgeColor', 'none');
+
+subplot(1,2,2);
+scatter3(X(:,1),X(:,2), X(:,3),'c','.');
+hold on;
+surf(x,y,z, 'FaceAlpha',0.15, 'FaceColor', 'c', 'EdgeColor', 'none');
 end
 
 function [funct, grad_funct] = initializeFunctionalAndGradient(v0, W, inputParams)
