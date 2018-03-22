@@ -93,11 +93,11 @@ W = [ x .* x, ...
 
 [radii, center, v0] = initializeEllipsoidParams(x,y,z);
 
-[funct, grad_funct] = initializeFunctionalAndGradient(v0, W, inputParams);
+[funct, grad_funct] = initializeFunctionalAndGradient( W, inputParams);
 [phi, phi_dash] = initializePhiAndPhiDash (funct, grad_funct);
 
-%v = performConjugateGradientSteps(v0, W, funct, grad_funct, phi, phi_dash);
-v=v0;
+v = performConjugateGradientSteps(v0, W, funct, grad_funct, phi, phi_dash);
+% v=v0;
 [radii, center] = getEllipsoidParams(v);
 
 options = optimset('Display','iter','PlotFcns',@optimplotfval);
@@ -123,17 +123,27 @@ surf(x,y,z, 'FaceAlpha',0.15, 'FaceColor', 'c', 'EdgeColor', 'none');
 legend('input data','ellipsoid estimation', 'reference estimation', 'Location', 'northeast');
 end
 
-function [funct, grad_funct] = initializeFunctionalAndGradient(v0, W, inputParams)
-shift = max(W*v0); % corresponds with point which lies furtherst outside of ellipsoid
-funct = @(v) inputParams.mu1 * inputParams.eps*sum(shift + ...
-    log( exp(-shift) + exp( 1/inputParams.eps * (W*v + (v(4)^2 + v(5)^2 + v(6)^2 - 1)) - shift ) ) ) + ...
+function [funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox( W, inputParams)
+funct = @(v) inputParams.mu1 * inputParams.eps*sum(...
+    log( exp( 1/inputParams.eps * (W*v + (v(4)^2 + v(5)^2 + v(6)^2 - 1)) ) ) ) + ...
     inputParams.mu2 * ((v(1) - v(2))^2 + (v(3) - v(2))^2 + (v(1) - v(3))^2)+ ...
     inputParams.mu3 * (1/v(1) + 1/v(2) + 1/v(3));
 
 n = size(W,1);
 grad_funct = @(v) inputParams.mu1 * ( W' + [0; 0; 0; 2*v(4); 2*v(5); 2*v(6)] * ones(1,n) ) * ...
-    ( exp(1/inputParams.eps .* (W*v + (v(4)^2 + v(5)^2 + v(6)^2 - 1)) - shift) ./ ...
-    ( exp(- shift) + exp(1/inputParams.eps .* (W*v + (v(4)^2 + v(5)^2 + v(6)^2 - 1)) - shift)) ) + ...
+    ( exp(1/inputParams.eps .* (W*v + (v(4)^2 + v(5)^2 + v(6)^2 - 1)) ) ./ ...
+    ( exp(1/inputParams.eps .* (W*v + (v(4)^2 + v(5)^2 + v(6)^2 - 1)) )) ) + ...
+    inputParams.mu2 * [2*(2*v(1) - v(2) - v(3));  2*(2*v(2) - v(1) - v(3)); 2*(2*v(3) - v(1) - v(2)); 0; 0; 0] + ...
+    inputParams.mu3 * [-1./v(1:3).^2; 0; 0 ; 0];
+end
+
+function [funct, grad_funct] = initializeFunctionalAndGradient(W, inputParams)
+funct = @(v) inputParams.mu1 * inputParams.eps*sum( (max(0, W*v + (v(4)^2 + v(5)^2 + v(6)^2 - 1) ) ).^2 ) + ...
+    inputParams.mu2 * ((v(1) - v(2))^2 + (v(3) - v(2))^2 + (v(1) - v(3))^2)+ ...
+    inputParams.mu3 * (1/v(1) + 1/v(2) + 1/v(3));
+
+n = size(W,1);
+grad_funct = @(v) inputParams.mu1 * ( ( W' + [0; 0; 0; 2*v(4); 2*v(5); 2*v(6)] * ones(1,n) ) * 2*(max(0, W*v + (v(4)^2 + v(5)^2 + v(6)^2 - 1) ) ) ) + ...
     inputParams.mu2 * [2*(2*v(1) - v(2) - v(3));  2*(2*v(2) - v(1) - v(3)); 2*(2*v(3) - v(1) - v(2)); 0; 0; 0] + ...
     inputParams.mu3 * [-1./v(1:3).^2; 0; 0 ; 0];
 end
@@ -179,12 +189,11 @@ function v = performConjugateGradientSteps(v, W, funct, grad_funct, phi, phi_das
             fprintf ('Stopping CG iteration due to too small relative change of consecutive iterates after %d iterations!\n', k);
             break;
         end
-        funct(v)
         v = v + alpha * p;
         nextGradient = grad_funct(v);
         % restart every n'th cycle (p. 124 / 145)
 %         if ( mod(k,n) == 0 && k > 0 )
-            fprintf('Using currently gradient descent method\n');
+            %fprintf('Using currently gradient descent method\n');
             beta = 0;
 %         else
 %             fprintf('norm of next gradient: %e \n', norm(nextGradient));
@@ -212,7 +221,6 @@ function v = performConjugateGradientSteps(v, W, funct, grad_funct, phi, phi_das
     if ( k >= maxIteration ) 
         error ('Conjugate gradients did not converge yet! norm(gradient) = %e', norm(gradient));
     end
-    funct(v)
 end
 
 function alpha_star = computeSteplength(v, descentDirection, phi, phi_dash)
