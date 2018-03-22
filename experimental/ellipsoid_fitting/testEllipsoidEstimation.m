@@ -21,5 +21,12 @@ function testEllipsoidEstimation
         0       0.99    0  ; ...
         0.99    0       0  ];
     X=[X1; -X1];
-    [ center, radii, axes, v ] = estimateMinimumEllipsoid( X );    
+   % [ center, radii, axes, v ] = estimateMinimumEllipsoid( X ); 
+    
+    % second test data set
+    n = 20;
+    [x,y,z] = ellipsoid(1,2,2,4,2,1,n-1);
+    X = [reshape(x, n*n, 1) + rand(n*n,1), reshape(y, n*n,1)+ randn(n*n,1), reshape(z, n*n, 1) + rand(n*n,1)];
+    X=[X;  15 2 1; 2 6 26; 0 3 0 ; 0 22 3];
+    [ center, radii, axes, v ] = estimateMinimumEllipsoid( X );
 end

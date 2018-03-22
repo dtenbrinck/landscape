@@ -96,8 +96,8 @@ W = [ x .* x, ...
 [funct, grad_funct] = initializeFunctionalAndGradient(v0, W, inputParams);
 [phi, phi_dash] = initializePhiAndPhiDash (funct, grad_funct);
 
-v = performConjugateGradientSteps(v0, W, funct, grad_funct, phi, phi_dash);
-
+%v = performConjugateGradientSteps(v0, W, funct, grad_funct, phi, phi_dash);
+v=v0;
 [radii, center] = getEllipsoidParams(v);
 
 options = optimset('Display','iter','PlotFcns',@optimplotfval);
@@ -114,16 +114,13 @@ evecs=0;
 
 % plot ellipsoid fittings
 fig = figure('Name', 'Scatter plot and resulting ellipsoid fittings','units','normalized','outerposition',[0 0 1 1]);
-subplot(1,2,1);
 scatter3(X(:,1),X(:,2), X(:,3),'m','.');
 hold on;
 [x,y,z] = ellipsoid(center(1), center(2), center(3), radii(1), radii(2), radii(3), 20);
 surf(x,y,z, 'FaceAlpha',0.15, 'FaceColor', 'm', 'EdgeColor', 'none');
-
-subplot(1,2,2);
-scatter3(X(:,1),X(:,2), X(:,3),'c','.');
-hold on;
+[x,y,z] = ellipsoid(center2(1), center2(2), center2(3), radii2(1), radii2(2), radii2(3), 20);
 surf(x,y,z, 'FaceAlpha',0.15, 'FaceColor', 'c', 'EdgeColor', 'none');
+legend('input data','ellipsoid estimation', 'reference estimation', 'Location', 'northeast');
 end
 
 function [funct, grad_funct] = initializeFunctionalAndGradient(v0, W, inputParams)
