@@ -101,8 +101,7 @@ v = performConjugateGradientSteps(v0, W, funct, grad_funct, phi, phi_dash);
 [radii, center] = getEllipsoidParams(v);
 
 options = optimset('Display','iter','PlotFcns',@optimplotfval);
-v2 = fminsearch(funct, v0, options);
-% v2 = fminsearch(funct, v0);
+v2 = fminsearch(funct, v0); %, options);
 
 [radii2, center2] = getEllipsoidParams(v2);
 radii
@@ -116,12 +115,15 @@ end
 
 function [funct, grad_funct] = initializeFunctionalAndGradient(v0, W, inputParams)
 shift = max(W*v0); % corresponds with point which lies furtherst outside of ellipsoid
-funct = @(v) inputParams.mu1 * inputParams.eps*sum(shift + log(exp(-shift)+exp(1/inputParams.eps * (W*v + (v(4)^2 + v(5)^2 + v(6)^2 - 1)) - shift))) + ...
+funct = @(v) inputParams.mu1 * inputParams.eps*sum(shift + ...
+    log( exp(-shift) + exp( 1/inputParams.eps * (W*v + (v(4)^2 + v(5)^2 + v(6)^2 - 1)) - shift ) ) ) + ...
     inputParams.mu2 * ((v(1) - v(2))^2 + (v(3) - v(2))^2 + (v(1) - v(3))^2)+ ...
     inputParams.mu3 * (1/v(1) + 1/v(2) + 1/v(3));
-% TODO improve function and gradient 
-%W' + [0; 0; 0; 2 * v(4); + 2*v(5) + 2*v(6)]
-grad_funct = @(v) inputParams.mu1 * W'* (exp(1/inputParams.eps .* (W*v + (v(4)^2 + v(5)^2 + v(6)^2 - 1)) - shift)./(exp(- shift) + exp(1/inputParams.eps .* (W*v + (v(4)^2 + v(5)^2 + v(6)^2 - 1)) - shift)) ) + ...
+
+n = size(W,1);
+grad_funct = @(v) inputParams.mu1 * ( W' + [0; 0; 0; 2*v(4); 2*v(5); 2*v(6)] * ones(1,n) ) * ...
+    ( exp(1/inputParams.eps .* (W*v + (v(4)^2 + v(5)^2 + v(6)^2 - 1)) - shift) ./ ...
+    ( exp(- shift) + exp(1/inputParams.eps .* (W*v + (v(4)^2 + v(5)^2 + v(6)^2 - 1)) - shift)) ) + ...
     inputParams.mu2 * [2*(2*v(1) - v(2) - v(3));  2*(2*v(2) - v(1) - v(3)); 2*(2*v(3) - v(1) - v(2)); 0; 0; 0] + ...
     inputParams.mu3 * [-1./v(1:3).^2; 0; 0 ; 0];
 end
