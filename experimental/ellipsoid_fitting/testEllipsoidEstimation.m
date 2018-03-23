@@ -1,4 +1,5 @@
 function testEllipsoidEstimation
+    close all;
     % 10 data points on or near unit sphere
     X1= [ 
         1       0       0;      ...

@@ -66,10 +66,8 @@ function [ center, radii, evecs, v ] = estimateMinimumEllipsoid( X , picfilename
 % February, 2018
 %
 
-% initialze weights for energy part and volumetric penalty part
 inputParams.mu1 = 1;
-inputParams.mu2 = 1;
-inputParams.mu3 = 1;
+inputParams.mu2 = 0.5; % equal weights for volumetric parts
 inputParams.eps = 1;
 
 if size( X, 2 ) ~= 3
@@ -138,9 +136,9 @@ function [radii, center, v] = tryToApproximateEllipsoidParamsWithDescentMethod(v
         [radii, center] = getEllipsoidParams(v);
     catch ERROR_MSG
         disp(ERROR_MSG);
-        fprintf('Setting default output parameter');
-        radii = zeros(3,1);
-        center = zeros(3,1);
+        fprintf('Setting default output parameter.\n');
+        radii = 1i*(ones(3,1));
+        center = 1i*(ones(3,1));
         v=zeros(6,1);
     end
 end
@@ -153,47 +151,50 @@ end
 
 function plotSeveralEllipsoidEstimations(sp, X, center_initial, radii_initial, center, radii, center_ref, radii_ref, titletext)
     hold(sp, 'on');
-    scatter3(X(:,1),X(:,2), X(:,3),'b','.');
-    plotOneEllipsoidEstimation( center_initial, radii_initial, 'g');
-    plotOneEllipsoidEstimation( center, radii, 'm');
-    plotOneEllipsoidEstimation( center_ref, radii_ref, 'c');
-    legend('input data','initialization ellipsoid', 'ellipsoid estimation','reference estimation', 'Location', 'northeast');
+    scatter3(X(:,1),X(:,2), X(:,3),'b','.', 'DisplayName', 'input data');
+    plotOneEllipsoidEstimation( center_initial, radii_initial, 'g', 'initialization ellipsoid');
+    plotOneEllipsoidEstimation( center, radii, 'm', 'ellipsoid estimation');
+    plotOneEllipsoidEstimation( center_ref, radii_ref, 'c','reference estimation');
+    legend('Location', 'northeast');
     title(titletext);
     view(3);
     hold(sp, 'off');
 end
 
-function plotOneEllipsoidEstimation( center, radii, color)
+function plotOneEllipsoidEstimation( center, radii, color, displayname)
+if isreal(center) && isreal(radii)
     [x,y,z] = ellipsoid(center(1), center(2), center(3), radii(1), radii(2), radii(3), 20);
-    surf(x,y,z, 'FaceAlpha',0.15, 'FaceColor', color, 'EdgeColor', 'none');
+    surf(x,y,z, 'FaceAlpha',0.15, 'FaceColor', color, 'EdgeColor', 'none', 'DisplayName', displayname);
+end
+    
 end
 
 function [funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox( W, inputParams)
-funct = @(v) inputParams.mu1 * inputParams.eps*sum(...
+funct = @(v) inputParams.eps*sum(...
     log( 1 + exp( 1/inputParams.eps * (W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) ) ) ) + ...
-    inputParams.mu2 * ((v(1) - v(2))^2 + (v(3) - v(2))^2 + (v(1) - v(3))^2)+ ...
-    inputParams.mu3 * (1/v(1) + 1/v(2) + 1/v(3));
+    inputParams.mu1 * ( inputParams.mu2 * ( (v(1) - v(2))^2 + (v(3) - v(2))^2 + (v(1) - v(3))^2 )+ ...
+    (1 - inputParams.mu2) * ( 1/v(1) + 1/v(2) + 1/v(3) ) );
 
 n = size(W,1);
-grad_funct = @(v) inputParams.mu1 * ( W' + ...
+grad_funct = @(v) ( W' + ...
     [-(v(4)/v(1))^2; -(v(5)/v(2))^2; -(v(6)/v(3))^2; 2*v(4)/v(1); 2*v(5)/v(2); 2*v(6)/v(3)] * ones(1,n) ) * ...
     ( exp(1/inputParams.eps .* (W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) ) ./ ...
     ( 1 + exp(1/inputParams.eps .* (W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) )) ) + ...
-    inputParams.mu2 * [2*(2*v(1) - v(2) - v(3));  2*(2*v(2) - v(1) - v(3)); 2*(2*v(3) - v(1) - v(2)); 0; 0; 0] + ...
-    inputParams.mu3 * [-1./v(1:3).^2; 0; 0 ; 0];
+    inputParams.mu1 * ( inputParams.mu2 * [2*(2*v(1) - v(2) - v(3));  2*(2*v(2) - v(1) - v(3)); 2*(2*v(3) - v(1) - v(2)); 0; 0; 0] + ...
+    (1 - inputParams.mu2) * [-1./v(1:3).^2; 0; 0 ; 0]);
 end
 
 function [funct, grad_funct] = initializeFunctionalAndGradientWithQuadraticMaxApprox(W, inputParams)
-funct = @(v) inputParams.mu1 * inputParams.eps*sum( (max(0, W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1) ) ).^2 ) + ...
-    inputParams.mu2 * ((v(1) - v(2))^2 + (v(3) - v(2))^2 + (v(1) - v(3))^2)+ ...
-    inputParams.mu3 * (1/v(1) + 1/v(2) + 1/v(3));
+funct = @(v) sum( (max(0, W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1) ) ).^2 ) + ...
+    inputParams.mu1 * ( inputParams.mu2 * ((v(1) - v(2))^2 + (v(3) - v(2))^2 + (v(1) - v(3))^2)+ ...
+    ( 1 - inputParams.mu2 ) * ( 1/v(1) + 1/v(2) + 1/v(3) ) );
 
 n = size(W,1);
-grad_funct = @(v) inputParams.mu1 * ( ( W' + ...
+grad_funct = @(v) ( ( W' + ...
     [-(v(4)/v(1))^2; -(v(5)/v(2))^2; -(v(6)/v(3))^2; 2*v(4)/v(1); 2*v(5)/v(2); 2*v(6)/v(3)] * ones(1,n) ) ...
     * 2 * (max(0, W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1) ) ) ) + ...
-    inputParams.mu2 * [2*(2*v(1) - v(2) - v(3));  2*(2*v(2) - v(1) - v(3)); 2*(2*v(3) - v(1) - v(2)); 0; 0; 0] + ...
-    inputParams.mu3 * [-1./v(1:3).^2; 0; 0 ; 0];
+    inputParams.mu1 * ( inputParams.mu2 * [2*(2*v(1) - v(2) - v(3));  2*(2*v(2) - v(1) - v(3)); 2*(2*v(3) - v(1) - v(2)); 0; 0; 0] + ...
+    ( 1 - inputParams.mu2 ) * [-1./v(1:3).^2; 0; 0 ; 0]);
 end
 
 function [phi, phi_dash] = initializePhiAndPhiDash (funct, grad_funct)
@@ -223,7 +224,7 @@ function v = performConjugateGradientSteps(v, W, grad_funct, phi, phi_dash)
     p = -gradient; 
     k = 0;
     TOL = 1e-6;
-    maxIteration = 10000;
+    maxIteration = 100000;
     n = size(W,1);
     while ( k < maxIteration && norm(gradient) > TOL)
         % step length alpha
@@ -231,6 +232,9 @@ function v = performConjugateGradientSteps(v, W, grad_funct, phi, phi_dash)
         % stopping criteria if relative change of consecutive iterates v is
         % too small (p. 62 / 83)
         if ( norm ( alpha * p ) / norm (v) < TOL )
+            if ( k < 1 && alpha == 0)
+               error('Line Search did not give a descent step length in first iteration step of CG method.')
+            end
             fprintf ('Stopping CG iteration due to too small relative change of consecutive iterates after %d iteration(s)!\n', k);
             break;
         end
@@ -257,7 +261,7 @@ function v = performConjugateGradientSteps(v, W, grad_funct, phi, phi_dash)
         k = k+1;
     end
     if ( k >= maxIteration ) 
-        error ('Conjugate gradients did not converge yet! norm(gradient) = %e', norm(gradient));
+        fprintf ('Conjugate gradients did not converge yet (max. iterations %d)! norm(gradient) = %e', maxIteration, norm(gradient));
     end
 end
 
@@ -267,13 +271,16 @@ function v = performGradientSteps(v, grad_funct, phi, phi_dash)
     p = -gradient; 
     k = 0;
     TOL = 1e-6;
-    maxIteration = 10000;
+    maxIteration = 100000;
     while ( k < maxIteration && norm(gradient) > TOL)
         % step length alpha
         alpha = computeSteplength(v, p, phi, phi_dash);
         % stopping criteria if relative change of consecutive iterates v is
         % too small (p. 62 / 83)
         if ( norm ( alpha * p ) / norm (v) < TOL )
+            if ( k < 1 && alpha == 0)
+               error('Line Search did not give a descent step length in first iteration step of gradiend descent method.')
+            end
             fprintf ('Stopping gradient descent iteration due to too small relative change of consecutive iterates after %d iteration(s)!\n', k);
             break;
         end
@@ -283,7 +290,7 @@ function v = performGradientSteps(v, grad_funct, phi, phi_dash)
         k = k+1;
     end
     if ( k >= maxIteration ) 
-        error ('Gradient descent method did not converge yet! norm(gradient) = %e', norm(gradient));
+        fprintf ('Gradient descent method did not converge yet (max. iterations %d)! norm(gradient) = %e', maxIteration, norm(gradient));
     end
 end
 
