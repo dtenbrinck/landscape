@@ -1,5 +1,5 @@
 %% estimate minimal ellipsoid fitting for data set
-function [ center, radii, evecs, v ] = estimateMinimumEllipsoid( X )
+function [ center_CG, radii_CG, evecs, v_CG ] = estimateMinimumEllipsoid( X , picfilename)
 %
 % Fit an ellispoid/sphere to a set of xyz data points:
 %
@@ -95,45 +95,47 @@ fprintf('Initialize ellipsoid parameter so that ellipsoid contains all data poin
 [radii_initial, center_initial, v_initial] = initializeEllipsoidParams(x,y,z);
 
 
-[funct, grad_funct] = initializeFunctionalAndGradient( W, inputParams);
+[funct, grad_funct] = initializeFunctionalAndGradientWithQuadraticMaxApprox( W, inputParams);
 [phi, phi_dash] = initializePhiAndPhiDash (funct, grad_funct);
 fprintf('Use quadratic approximation of non-diff. term.\n');
-[radii, center,v] = tryToApproximateEllipsoidParamsWithDescendingMethod(v_initial, W, funct, grad_funct, phi, phi_dash);
+[radii_CG, center_CG, v_CG] = tryToApproximateEllipsoidParamsWithDescentMethod(v_initial, W, grad_funct, phi, phi_dash, 'CG');
+[radii_grad, center_grad, v_grad] = tryToApproximateEllipsoidParamsWithDescentMethod(v_initial, W, grad_funct, phi, phi_dash, 'grad');
 [radii_ref, center_ref, v_ref] = getReferenceEllipsoidApproximation(funct, v_initial);
 fprintf('\n');
 [funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox (W, inputParams);
 [phi, phi_dash] = initializePhiAndPhiDash (funct, grad_funct);
 fprintf('Use logarithmic approximation of non-diff. term.\n');
-[radii1, center1,v1] = tryToApproximateEllipsoidParamsWithDescendingMethod(v_initial, W, funct, grad_funct, phi, phi_dash);
+[radii1_CG, center1_CG, v1_CG] = tryToApproximateEllipsoidParamsWithDescentMethod(v_initial, W, grad_funct, phi, phi_dash, 'CG');
+[radii1_grad, center1_grad, v1_grad] = tryToApproximateEllipsoidParamsWithDescentMethod(v_initial, W, grad_funct, phi, phi_dash, 'grad');
 [radii_ref1, center_ref1, v_ref1] = getReferenceEllipsoidApproximation(funct, v_initial);
 
-table( radii_initial, radii, radii_ref, radii1, radii_ref1)
-table( center_initial, center, center_ref, center1, center_ref1 )
-table( v_initial, v, v_ref, v1, v_ref1);
+table( radii_initial, radii_CG, radii_grad, radii_ref, radii1_CG, radii1_grad, radii_ref1)
+table( center_initial, center_CG, center_grad, center_ref, center1_CG, center1_grad, center_ref1 )
+table( v_initial, v_CG, v_grad, v_ref, v1_CG, v1_grad, v_ref1)
 
 evecs=0;
 
 % plot ellipsoid fittings
 figure('Name', 'Scatter plot and resulting ellipsoid fittings','units','normalized','outerposition',[0 0 1 1]);
-scatter3(X(:,1),X(:,2), X(:,3),'m','.');
-hold on;
-[x,y,z] = ellipsoid(center_initial(1), center_initial(2), center_initial(3), radii_initial(1), radii_initial(2), radii_initial(3), 20);
-surf(x,y,z, 'FaceAlpha',0.15, 'FaceColor', 'r', 'EdgeColor', 'none');
-[x,y,z] = ellipsoid(center(1), center(2), center(3), radii(1), radii(2), radii(3), 20);
-surf(x,y,z, 'FaceAlpha',0.15, 'FaceColor', 'm', 'EdgeColor', 'none');
-[x,y,z] = ellipsoid(center_ref(1), center_ref(2), center_ref(3), radii_ref(1), radii_ref(2), radii_ref(3), 20);
-surf(x,y,z, 'FaceAlpha',0.15, 'FaceColor', 'c', 'EdgeColor', 'none');
-[x,y,z] = ellipsoid(center1(1), center1(2), center1(3), radii1(1), radii1(2), radii1(3), 20);
-surf(x,y,z, 'FaceAlpha',0.15, 'FaceColor', 'g', 'EdgeColor', 'none');
-[x,y,z] = ellipsoid(center_ref1(1), center_ref1(2), center_ref1(3), radii_ref1(1), radii_ref1(2), radii_ref1(3), 20);
-surf(x,y,z, 'FaceAlpha',0.15, 'FaceColor', 'b', 'EdgeColor', 'none');
-legend('input data','initialization ellipsoid', 'ellipsoid estimation (quadratic approx. of non-diff. term)','reference estimation ((quadratic approx. of non-diff. term)','ellipsoid estimation (log approx. of non-diff. term)', 'reference estimation (log approx. of non-diff. term)', 'Location', 'northeast');
+sp = subplot(1,2,1);
+titletext = 'Approximation of non differentiable term with (max(0,...))^2';
+plotSeveralEllipsoidEstimations(sp, X, center_initial, radii_initial, center_CG, radii_CG, center_grad, radii_grad, center_ref, radii_ref, titletext);
+sp = subplot(1,2,2);
+titletext = 'Approximation of non differentiable term with log(1+eps(...))';
+plotSeveralEllipsoidEstimations(sp, X, center_initial, radii_initial, center1_CG, radii1_CG, center1_grad, radii1_grad, center_ref1, radii_ref1, titletext);
+print(['ellipsoid_estimation_' picfilename '.png'],'-dpng')
 end
 
-function [radii, center, v] = tryToApproximateEllipsoidParamsWithDescendingMethod(v0, W, funct, grad_funct, phi, phi_dash)
+function [radii, center, v] = tryToApproximateEllipsoidParamsWithDescentMethod(v0, W, grad_funct, phi, phi_dash, method)
     try
         fprintf('Approximate ellipsoid with descent method.\n');
-        v = performConjugateGradientSteps(v0, W, funct, grad_funct, phi, phi_dash);
+        if ( strcmp(method, 'CG'))
+            v = performConjugateGradientSteps(v0, W, grad_funct, phi, phi_dash);
+        elseif ( strcmp(method, 'grad'))
+            v = performGradientSteps(v0, grad_funct, phi, phi_dash);
+        else
+            error('No correct descent method given!\n');
+        end
         [radii, center] = getEllipsoidParams(v);
     catch ERROR_MSG
         disp(ERROR_MSG);
@@ -150,6 +152,24 @@ function [radii, center, v] = getReferenceEllipsoidApproximation(funct, v0)
     [radii, center] = getEllipsoidParams(v);
 end
 
+function plotSeveralEllipsoidEstimations(sp, X, center_initial, radii_initial, center_CG, radii_CG, center_grad, radii_grad, center_ref, radii_ref, titletext)
+    hold(sp, 'on');
+    scatter3(X(:,1),X(:,2), X(:,3),'b','.');
+    plotOneEllipsoidEstimation( center_initial, radii_initial, 'g');
+    plotOneEllipsoidEstimation( center_CG, radii_CG, 'm');
+    plotOneEllipsoidEstimation( center_grad, radii_grad, 'r');
+    plotOneEllipsoidEstimation( center_ref, radii_ref, 'c');
+    legend('input data','initialization ellipsoid', 'ellipsoid estimation (CG)','ellipsoid estimation (gradient)','reference estimation', 'Location', 'northeast');
+    title(titletext);
+    view(3);
+    hold(sp, 'off');
+end
+
+function plotOneEllipsoidEstimation( center, radii, color)
+    [x,y,z] = ellipsoid(center(1), center(2), center(3), radii(1), radii(2), radii(3), 20);
+    surf(x,y,z, 'FaceAlpha',0.15, 'FaceColor', color, 'EdgeColor', 'none');
+end
+
 function [funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox( W, inputParams)
 funct = @(v) inputParams.mu1 * inputParams.eps*sum(...
     log( exp( 1/inputParams.eps * (W*v + (v(4)^2 + v(5)^2 + v(6)^2 - 1)) ) ) ) + ...
@@ -164,7 +184,7 @@ grad_funct = @(v) inputParams.mu1 * ( W' + [0; 0; 0; 2*v(4); 2*v(5); 2*v(6)] * o
     inputParams.mu3 * [-1./v(1:3).^2; 0; 0 ; 0];
 end
 
-function [funct, grad_funct] = initializeFunctionalAndGradient(W, inputParams)
+function [funct, grad_funct] = initializeFunctionalAndGradientWithQuadraticMaxApprox(W, inputParams)
 funct = @(v) inputParams.mu1 * inputParams.eps*sum( (max(0, W*v + (v(4)^2 + v(5)^2 + v(6)^2 - 1) ) ).^2 ) + ...
     inputParams.mu2 * ((v(1) - v(2))^2 + (v(3) - v(2))^2 + (v(1) - v(3))^2)+ ...
     inputParams.mu3 * (1/v(1) + 1/v(2) + 1/v(3));
@@ -196,7 +216,7 @@ function [radii, center] = getEllipsoidParams(v)
     % set eigenvectors evecs
 end
 
-function v = performConjugateGradientSteps(v, W, funct, grad_funct, phi, phi_dash)
+function v = performConjugateGradientSteps(v, W, grad_funct, phi, phi_dash)
     gradient = grad_funct(v);
     % descent direction p
     p = -gradient; 
@@ -204,49 +224,72 @@ function v = performConjugateGradientSteps(v, W, funct, grad_funct, phi, phi_das
     TOL = 1e-6;
     maxIteration = 10000;
     n = size(W,1);
-%     figure(1);
-%     clf;
-%     hold on;
+    figure(1);
+    clf;
+    hold on;
     while ( k < maxIteration && norm(gradient) > TOL)
         % step length alpha
         alpha = computeSteplength(v, p, phi, phi_dash);
         % stopping criteria if relative change of consecutive iterates v is
         % too small (p. 62 / 83)
         if ( norm ( alpha * p ) / norm (v) < TOL )
-            fprintf ('Stopping CG iteration due to too small relative change of consecutive iterates after %d iterations!\n', k);
+            fprintf ('Stopping CG iteration due to too small relative change of consecutive iterates after %d iteration(s)!\n', k);
             break;
         end
         v = v + alpha * p;
         nextGradient = grad_funct(v);
         % restart every n'th cycle (p. 124 / 145)
-%         if ( mod(k,n) == 0 && k > 0 )
-            %fprintf('Using currently gradient descent method\n');
+        if ( mod(k,n) == 0 && k > 0 )
             beta = 0;
-%         else
-%             fprintf('norm of next gradient: %e \n', norm(nextGradient));
-%             fprintf('norm of current gradient: %e \n',norm(gradient));
-%             % betaFR := beta for Fletcher-Reeves variant
-%             betaFR = nextGradient' * nextGradient / (gradient' * gradient);
-%             % betaFR := beta for Polak-Ribiere variant
-%             betaPR = nextGradient' * ( nextGradient-gradient) / (gradient' * gradient);
-%             if ( betaPR < -betaFR ) 
-%                 beta = -betaFR;
-%             elseif ( abs(betaPR) <= betaFR )
-%                 beta = betaPR;
-%             elseif (betaPR > betaFR )
-%                 beta = betaFR;
-%             end
-%             if( k>1)
-%                 plot(k, norm(nextGradient), 'r*');
-%                 plot(k, norm(gradient), 'b*');
-%             end
-%         end
+        else
+            % betaFR := beta for Fletcher-Reeves variant
+            betaFR = nextGradient' * nextGradient / (gradient' * gradient);
+            % betaFR := beta for Polak-Ribiere variant
+            betaPR = nextGradient' * ( nextGradient-gradient) / (gradient' * gradient);
+            if ( betaPR < -betaFR ) 
+                beta = -betaFR;
+            elseif ( abs(betaPR) <= betaFR )
+                beta = betaPR;
+            elseif (betaPR > betaFR )
+                beta = betaFR;
+            end
+            if( k>1)
+                plot(k, norm(nextGradient), 'r*');
+                plot(k, norm(gradient), 'b*');
+            end
+        end
         p = -nextGradient + beta * p;
         gradient = nextGradient;
         k = k+1;
     end
     if ( k >= maxIteration ) 
         error ('Conjugate gradients did not converge yet! norm(gradient) = %e', norm(gradient));
+    end
+end
+
+function v = performGradientSteps(v, grad_funct, phi, phi_dash)
+    gradient = grad_funct(v);
+    % descent direction p
+    p = -gradient; 
+    k = 0;
+    TOL = 1e-6;
+    maxIteration = 10000;
+    while ( k < maxIteration && norm(gradient) > TOL)
+        % step length alpha
+        alpha = computeSteplength(v, p, phi, phi_dash);
+        % stopping criteria if relative change of consecutive iterates v is
+        % too small (p. 62 / 83)
+        if ( norm ( alpha * p ) / norm (v) < TOL )
+            fprintf ('Stopping gradient descent iteration due to too small relative change of consecutive iterates after %d iteration(s)!\n', k);
+            break;
+        end
+        v = v + alpha * p;
+        gradient = grad_funct(v);
+        p = -gradient;
+        k = k+1;
+    end
+    if ( k >= maxIteration ) 
+        error ('Gradient descent method did not converge yet! norm(gradient) = %e', norm(gradient));
     end
 end
 
@@ -266,9 +309,9 @@ function alpha_star = computeSteplength(v, descentDirection, phi, phi_dash)
         alpha_max = min(alpha_max, -v(3)/descentDirection(3));
     end
     if (alpha_max == 1e10)
-       error('TODO problem with alpha_max'); 
+       %disp('large alpha_max since no specific limit needed to keep track of constraints. '); 
     end
-    alpha_next = (alpha_max - alpha_current ) / 2; % TODO ?!?!
+    alpha_next = (alpha_max - alpha_current ) / 2; % initialize next alpha (TODO?)
     i = 1;
     phi_0 = phi( alpha_current, v, descentDirection);
     phi_dash_0 = phi_dash( alpha_current, v, descentDirection);
@@ -330,6 +373,11 @@ function alpha_star = zoom(alpha_lower, alpha_higher, ...
     maxIteration = 100;
     TOL = 1e-4;
     while iteration < maxIteration
+        if ( abs(alpha_lower-alpha_higher) < 1e-10)
+           fprintf('Zoom interval too small to zoom in further.\n');
+           alpha_star=alpha_lower;
+           return;
+        end
         alpha_j = quadraticInterpolation(alpha_lower, alpha_higher, ...
                     v, descentDirection, phi, phi_dash);
         if ( iteration > 0 )
