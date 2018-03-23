@@ -1,5 +1,5 @@
 %% estimate minimal ellipsoid fitting for data set
-function [ center_CG, radii_CG, evecs, v_CG ] = estimateMinimumEllipsoid( X , picfilename)
+function [ center, radii, evecs, v ] = estimateMinimumEllipsoid( X , picfilename, method)
 %
 % Fit an ellispoid/sphere to a set of xyz data points:
 %
@@ -98,20 +98,18 @@ fprintf('Initialize ellipsoid parameter so that ellipsoid contains all data poin
 [funct, grad_funct] = initializeFunctionalAndGradientWithQuadraticMaxApprox( W, inputParams);
 [phi, phi_dash] = initializePhiAndPhiDash (funct, grad_funct);
 fprintf('Use quadratic approximation of non-diff. term.\n');
-[radii_CG, center_CG, v_CG] = tryToApproximateEllipsoidParamsWithDescentMethod(v_initial, W, grad_funct, phi, phi_dash, 'CG');
-[radii_grad, center_grad, v_grad] = tryToApproximateEllipsoidParamsWithDescentMethod(v_initial, W, grad_funct, phi, phi_dash, 'grad');
+[radii, center, v] = tryToApproximateEllipsoidParamsWithDescentMethod(v_initial, W, grad_funct, phi, phi_dash, method);
 [radii_ref, center_ref, v_ref] = getReferenceEllipsoidApproximation(funct, v_initial);
 fprintf('\n');
 [funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox (W, inputParams);
 [phi, phi_dash] = initializePhiAndPhiDash (funct, grad_funct);
 fprintf('Use logarithmic approximation of non-diff. term.\n');
-[radii1_CG, center1_CG, v1_CG] = tryToApproximateEllipsoidParamsWithDescentMethod(v_initial, W, grad_funct, phi, phi_dash, 'CG');
-[radii1_grad, center1_grad, v1_grad] = tryToApproximateEllipsoidParamsWithDescentMethod(v_initial, W, grad_funct, phi, phi_dash, 'grad');
+[radii1, center1, v1] = tryToApproximateEllipsoidParamsWithDescentMethod(v_initial, W, grad_funct, phi, phi_dash, method);
 [radii_ref1, center_ref1, v_ref1] = getReferenceEllipsoidApproximation(funct, v_initial);
 
-table( radii_initial, radii_CG, radii_grad, radii_ref, radii1_CG, radii1_grad, radii_ref1)
-table( center_initial, center_CG, center_grad, center_ref, center1_CG, center1_grad, center_ref1 )
-table( v_initial, v_CG, v_grad, v_ref, v1_CG, v1_grad, v_ref1)
+table( radii_initial, radii, radii_ref, radii1, radii_ref1)
+table( center_initial, center, center_ref, center1, center_ref1 )
+table( v_initial, v, v_ref, v1, v_ref1)
 
 evecs=0;
 
@@ -119,11 +117,11 @@ evecs=0;
 figure('Name', 'Scatter plot and resulting ellipsoid fittings','units','normalized','outerposition',[0 0 1 1]);
 sp = subplot(1,2,1);
 titletext = 'Approximation of non differentiable term with (max(0,...))^2';
-plotSeveralEllipsoidEstimations(sp, X, center_initial, radii_initial, center_CG, radii_CG, center_grad, radii_grad, center_ref, radii_ref, titletext);
+plotSeveralEllipsoidEstimations(sp, X, center_initial, radii_initial, center, radii,  center_ref, radii_ref, titletext);
 sp = subplot(1,2,2);
 titletext = 'Approximation of non differentiable term with log(1+eps(...))';
-plotSeveralEllipsoidEstimations(sp, X, center_initial, radii_initial, center1_CG, radii1_CG, center1_grad, radii1_grad, center_ref1, radii_ref1, titletext);
-print(['ellipsoid_estimation_' picfilename '.png'],'-dpng')
+plotSeveralEllipsoidEstimations(sp, X, center_initial, radii_initial, center1, radii1, center_ref1, radii_ref1, titletext);
+print(['results/ellipsoid_estimation_' picfilename '.png'],'-dpng')
 end
 
 function [radii, center, v] = tryToApproximateEllipsoidParamsWithDescentMethod(v0, W, grad_funct, phi, phi_dash, method)
@@ -152,14 +150,13 @@ function [radii, center, v] = getReferenceEllipsoidApproximation(funct, v0)
     [radii, center] = getEllipsoidParams(v);
 end
 
-function plotSeveralEllipsoidEstimations(sp, X, center_initial, radii_initial, center_CG, radii_CG, center_grad, radii_grad, center_ref, radii_ref, titletext)
+function plotSeveralEllipsoidEstimations(sp, X, center_initial, radii_initial, center, radii, center_ref, radii_ref, titletext)
     hold(sp, 'on');
     scatter3(X(:,1),X(:,2), X(:,3),'b','.');
     plotOneEllipsoidEstimation( center_initial, radii_initial, 'g');
-    plotOneEllipsoidEstimation( center_CG, radii_CG, 'm');
-    plotOneEllipsoidEstimation( center_grad, radii_grad, 'r');
+    plotOneEllipsoidEstimation( center, radii, 'm');
     plotOneEllipsoidEstimation( center_ref, radii_ref, 'c');
-    legend('input data','initialization ellipsoid', 'ellipsoid estimation (CG)','ellipsoid estimation (gradient)','reference estimation', 'Location', 'northeast');
+    legend('input data','initialization ellipsoid', 'ellipsoid estimation','reference estimation', 'Location', 'northeast');
     title(titletext);
     view(3);
     hold(sp, 'off');
@@ -224,9 +221,6 @@ function v = performConjugateGradientSteps(v, W, grad_funct, phi, phi_dash)
     TOL = 1e-6;
     maxIteration = 10000;
     n = size(W,1);
-    figure(1);
-    clf;
-    hold on;
     while ( k < maxIteration && norm(gradient) > TOL)
         % step length alpha
         alpha = computeSteplength(v, p, phi, phi_dash);
@@ -252,10 +246,6 @@ function v = performConjugateGradientSteps(v, W, grad_funct, phi, phi_dash)
                 beta = betaPR;
             elseif (betaPR > betaFR )
                 beta = betaFR;
-            end
-            if( k>1)
-                plot(k, norm(nextGradient), 'r*');
-                plot(k, norm(gradient), 'b*');
             end
         end
         p = -nextGradient + beta * p;
