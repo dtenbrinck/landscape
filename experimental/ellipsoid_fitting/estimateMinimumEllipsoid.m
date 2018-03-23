@@ -20,17 +20,18 @@ function [ center, radii, evecs, v ] = estimateMinimumEllipsoid( X , picfilename
 % only allowing few data points to lie outside. 
 % Find minimizer v of the following energy functional f:
 % 
-%   argmin f(v) = mu1 * energyPart(v) + mu2 * equidistantRadii(v) + 
-%                   mu3 * smallRadii(v)
+%   argmin f(v) =  energyPart(v) + 
+%               mu1 * ( mu2 * equidistantRadii(v) + (1 - mu2) * smallRadii(v) )
 %
 %   with:   equidistantRadii(v) = (v_1 - v_2)^2 + (v_2 - v_3)^2 + (v_1 - v_3)^2 
 %           smallRadii(v) = 1 / v_1 + 1 / v_2 + 1 / v_3 
 %           energyPart(v) = sum of all data rows in X ( max(0, < v, w > ) )
+%       differentiable approximation for energyPart(v):
 %            = sum of all data rows in X eps*(log(exp(0) + exp( 1/eps * < v, w > )) )
 %            = sum of all data rows in X eps*(log( 1 + exp( 1/eps * < v, w > )) )
-%            = sum of all data rows in X eps*(shift + log( exp(-shift) + exp( 1/eps * < v, w > - shift )) )
-%           with shift = max<v,w> as a shift to prevent over- and underflow
-%
+%       alternative differentiable approximation for energyPart(v):
+%            = sum of all data rows in X ( max(0, < v, w > ) )^2
+%            
 % with w = (x^2, y^2, z^2, 2*x, 2*y, 2*z, 1)
 % and v initially derived from the implicit function describing 
 % an ellipsoid centered at center = (x_0; y_0; z_0)
@@ -182,7 +183,7 @@ grad_funct = @(v) inputParams.mu1 * ( W' + [0; 0; 0; 2*v(4); 2*v(5); 2*v(6)] * o
 end
 
 function [funct, grad_funct] = initializeFunctionalAndGradientWithQuadraticMaxApprox(W, inputParams)
-funct = @(v) inputParams.mu1 * inputParams.eps*sum( (max(0, W*v + (v(4)^2 + v(5)^2 + v(6)^2 - 1) ) ).^2 ) + ...
+funct = @(v) inputParams.mu1 * inputParams.eps*sum( (max(0, W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1) ) ).^2 ) + ...
     inputParams.mu2 * ((v(1) - v(2))^2 + (v(3) - v(2))^2 + (v(1) - v(3))^2)+ ...
     inputParams.mu3 * (1/v(1) + 1/v(2) + 1/v(3));
 
