@@ -92,24 +92,24 @@ W = [ x .* x, ...
     2 * z];  % ndatapoints x 6 ellipsoid parameters
 
 fprintf('Initialize ellipsoid parameter so that ellipsoid contains all data points.\n');
-[radii0, center0, v0] = initializeEllipsoidParams(x,y,z);
+[radii_initial, center_initial, v_initial] = initializeEllipsoidParams(x,y,z);
 
 
 [funct, grad_funct] = initializeFunctionalAndGradient( W, inputParams);
 [phi, phi_dash] = initializePhiAndPhiDash (funct, grad_funct);
 fprintf('Use quadratic approximation of non-diff. term.\n');
-[radii, center,v] = tryToApproximateEllipsoidParamsWithDescendingMethod(v0, W, funct, grad_funct, phi, phi_dash);
-[radii2, center2, v2] = getReferenceEllipsoidApproximation(funct, v0);
-
+[radii, center,v] = tryToApproximateEllipsoidParamsWithDescendingMethod(v_initial, W, funct, grad_funct, phi, phi_dash);
+[radii_ref, center_ref, v_ref] = getReferenceEllipsoidApproximation(funct, v_initial);
+fprintf('\n');
 [funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox (W, inputParams);
 [phi, phi_dash] = initializePhiAndPhiDash (funct, grad_funct);
 fprintf('Use logarithmic approximation of non-diff. term.\n');
-[radii1, center1,v1] = tryToApproximateEllipsoidParamsWithDescendingMethod(v0, W, funct, grad_funct, phi, phi_dash);
-[radii3, center3, v3] = getReferenceEllipsoidApproximation(funct, v0);
+[radii1, center1,v1] = tryToApproximateEllipsoidParamsWithDescendingMethod(v_initial, W, funct, grad_funct, phi, phi_dash);
+[radii_ref1, center_ref1, v_ref1] = getReferenceEllipsoidApproximation(funct, v_initial);
 
-table( radii0, radii, radii2, radii1, radii3)
-table( center0, center, center2, center1, center3 )
-table( v0, v, v2, v1, v3);
+table( radii_initial, radii, radii_ref, radii1, radii_ref1)
+table( center_initial, center, center_ref, center1, center_ref1 )
+table( v_initial, v, v_ref, v1, v_ref1);
 
 evecs=0;
 
@@ -117,15 +117,15 @@ evecs=0;
 figure('Name', 'Scatter plot and resulting ellipsoid fittings','units','normalized','outerposition',[0 0 1 1]);
 scatter3(X(:,1),X(:,2), X(:,3),'m','.');
 hold on;
-[x,y,z] = ellipsoid(center0(1), center0(2), center0(3), radii0(1), radii0(2), radii0(3), 20);
+[x,y,z] = ellipsoid(center_initial(1), center_initial(2), center_initial(3), radii_initial(1), radii_initial(2), radii_initial(3), 20);
 surf(x,y,z, 'FaceAlpha',0.15, 'FaceColor', 'r', 'EdgeColor', 'none');
 [x,y,z] = ellipsoid(center(1), center(2), center(3), radii(1), radii(2), radii(3), 20);
 surf(x,y,z, 'FaceAlpha',0.15, 'FaceColor', 'm', 'EdgeColor', 'none');
-[x,y,z] = ellipsoid(center2(1), center2(2), center2(3), radii2(1), radii2(2), radii2(3), 20);
+[x,y,z] = ellipsoid(center_ref(1), center_ref(2), center_ref(3), radii_ref(1), radii_ref(2), radii_ref(3), 20);
 surf(x,y,z, 'FaceAlpha',0.15, 'FaceColor', 'c', 'EdgeColor', 'none');
 [x,y,z] = ellipsoid(center1(1), center1(2), center1(3), radii1(1), radii1(2), radii1(3), 20);
 surf(x,y,z, 'FaceAlpha',0.15, 'FaceColor', 'g', 'EdgeColor', 'none');
-[x,y,z] = ellipsoid(center3(1), center3(2), center3(3), radii3(1), radii3(2), radii3(3), 20);
+[x,y,z] = ellipsoid(center_ref1(1), center_ref1(2), center_ref1(3), radii_ref1(1), radii_ref1(2), radii_ref1(3), 20);
 surf(x,y,z, 'FaceAlpha',0.15, 'FaceColor', 'b', 'EdgeColor', 'none');
 legend('input data','initialization ellipsoid', 'ellipsoid estimation (quadratic approx. of non-diff. term)','reference estimation ((quadratic approx. of non-diff. term)','ellipsoid estimation (log approx. of non-diff. term)', 'reference estimation (log approx. of non-diff. term)', 'Location', 'northeast');
 end
