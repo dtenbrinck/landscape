@@ -97,22 +97,15 @@ fprintf('Initialize ellipsoid parameter so that ellipsoid contains all data poin
 
 [funct, grad_funct] = initializeFunctionalAndGradient( W, inputParams);
 [phi, phi_dash] = initializePhiAndPhiDash (funct, grad_funct);
-fprintf('Approximate ellipsoid with quadratic approximation of non-diff. term.\n');
+fprintf('Use quadratic approximation of non-diff. term.\n');
 [radii, center,v] = tryToApproximateEllipsoidParamsWithDescendingMethod(v0, W, funct, grad_funct, phi, phi_dash);
-fprintf('Approximate ellipsoid with quadratic approximation of non-diff term with MATLAB reference method.\n');
-options = optimset('Display','iter','PlotFcns',@optimplotfval);
-v2 = fminsearch(funct, v0); %, options);
-[radii2, center2] = getEllipsoidParams(v2);
+[radii2, center2, v2] = getReferenceEllipsoidApproximation(funct, v0);
 
 [funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox (W, inputParams);
 [phi, phi_dash] = initializePhiAndPhiDash (funct, grad_funct);
-fprintf('Approximate ellipsoid with log. approximation of non-diff. term.\n');
+fprintf('Use logarithmic approximation of non-diff. term.\n');
 [radii1, center1,v1] = tryToApproximateEllipsoidParamsWithDescendingMethod(v0, W, funct, grad_funct, phi, phi_dash);
-fprintf('Approximate ellipsoid with log. approximation of non-diff. term with MATLAB reference method.\n');
-options = optimset('Display','iter','PlotFcns',@optimplotfval);
-v3 = fminsearch(funct, v0); %, options);
-[radii3, center3] = getEllipsoidParams(v3);
-
+[radii3, center3, v3] = getReferenceEllipsoidApproximation(funct, v0);
 
 table( radii0, radii, radii2, radii1, radii3)
 table( center0, center, center2, center1, center3 )
@@ -139,6 +132,7 @@ end
 
 function [radii, center, v] = tryToApproximateEllipsoidParamsWithDescendingMethod(v0, W, funct, grad_funct, phi, phi_dash)
     try
+        fprintf('Approximate ellipsoid with descent method.\n');
         v = performConjugateGradientSteps(v0, W, funct, grad_funct, phi, phi_dash);
         [radii, center] = getEllipsoidParams(v);
     catch ERROR_MSG
@@ -148,6 +142,12 @@ function [radii, center, v] = tryToApproximateEllipsoidParamsWithDescendingMetho
         center = zeros(3,1);
         v=zeros(6,1);
     end
+end
+
+function [radii, center, v] = getReferenceEllipsoidApproximation(funct, v0)
+    fprintf('Approximate ellipsoid with MATLAB reference method.\n');
+    v = fminsearch(funct, v0);
+    [radii, center] = getEllipsoidParams(v);
 end
 
 function [funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox( W, inputParams)
