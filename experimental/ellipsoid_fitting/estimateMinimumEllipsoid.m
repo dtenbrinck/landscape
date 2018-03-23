@@ -66,7 +66,8 @@ function [ center, radii, evecs, v ] = estimateMinimumEllipsoid( X , picfilename
 % February, 2018
 %
 
-inputParams.mu1 = 1;
+inputParams.mu1 = 10; 
+%inputParams.mu1 = 10; %results in really good approximation compared to reference ellipsoids
 inputParams.mu2 = 0.5; % equal weights for volumetric parts
 inputParams.eps = 1;
 
