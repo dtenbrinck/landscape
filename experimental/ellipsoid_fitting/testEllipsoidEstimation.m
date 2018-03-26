@@ -23,7 +23,7 @@ function testEllipsoidEstimation
         0.99    0       0  ];
     X=[X1; -X1];
     fprintf('Expecting an ellipsoid with radii=(1,1,1), center=(0,0,0)...\n');
-%     estimateMinimumEllipsoid( X, 'data_set1', 'grad', 10, 0.5 ); 
+    estimateMinimumEllipsoid( X, 'data_set1', 'grad', 10, 0.5 ); 
     
     % second test data set
     n = 20;

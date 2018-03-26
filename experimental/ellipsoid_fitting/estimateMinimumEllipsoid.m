@@ -236,7 +236,7 @@ function v = performGradientSteps(v, W, grad_funct, phi, phi_dash, method)
             if ( k < 1 && alpha == 0)
                error('Line Search did not give a descent step length in first iteration step.\n')
             end
-            fprintf ('Stopping gradient iteration due to too small relative change of consecutive iterates after %d iteration(s)!\n', k);
+            fprintf ('Stopping gradient after %d iteration(s) due to too small relative change of consecutive iterates!\n', k);
             break;
         end
         v = v + alpha * p;
