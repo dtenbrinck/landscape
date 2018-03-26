@@ -1,5 +1,5 @@
 %% estimate minimal ellipsoid fitting for data set
-function [ center, radii, evecs, v ] = estimateMinimumEllipsoid( X , picfilename, method)
+function [ center, radii, evecs, v ] = estimateMinimumEllipsoid( X , picfilename, method, mu1, mu2)
 %
 % Fit an ellispoid/sphere to a set of xyz data points:
 %
@@ -68,9 +68,9 @@ function [ center, radii, evecs, v ] = estimateMinimumEllipsoid( X , picfilename
 % February, 2018
 %
 
-inputParams.mu1 = 10; 
+inputParams.mu1 = mu1; 
 %inputParams.mu1 = 10; %results in really good approximation compared to reference ellipsoids
-inputParams.mu2 = 0.5; % equal weights for volumetric parts
+inputParams.mu2 = mu2; % equal weights for volumetric parts
 inputParams.eps = 1;
 
 if size( X, 2 ) ~= 3
@@ -111,7 +111,7 @@ fprintf('Use logarithmic approximation of non-diff. term.\n');
 
 table( radii_initial, radii, radii_ref, radii1, radii_ref1)
 table( center_initial, center, center_ref, center1, center_ref1 )
-table( v_initial, v, v_ref, v1, v_ref1)
+%table( v_initial, v, v_ref, v1, v_ref1)
 
 evecs=0;
 
@@ -128,14 +128,7 @@ end
 
 function [radii, center, v] = tryToApproximateEllipsoidParamsWithDescentMethod(v0, W, grad_funct, phi, phi_dash, method)
     try
-        fprintf('Approximate ellipsoid with descent method.\n');
-        if ( strcmp(method, 'CG'))
-            v = performConjugateGradientSteps(v0, W, grad_funct, phi, phi_dash);
-        elseif ( strcmp(method, 'grad'))
-            v = performGradientSteps(v0, grad_funct, phi, phi_dash);
-        else
-            error('No correct descent method given!\n');
-        end
+        v = performGradientSteps(v0, W, grad_funct, phi, phi_dash, method);
         [radii, center] = getEllipsoidParams(v);
     catch ERROR_MSG
         disp(ERROR_MSG);
@@ -221,7 +214,7 @@ function [radii, center] = getEllipsoidParams(v)
     % set eigenvectors evecs
 end
 
-function v = performConjugateGradientSteps(v, W, grad_funct, phi, phi_dash)
+function v = performGradientSteps(v, W, grad_funct, phi, phi_dash, method)
     gradient = grad_funct(v);
     % descent direction p
     p = -gradient; 
@@ -229,6 +222,9 @@ function v = performConjugateGradientSteps(v, W, grad_funct, phi, phi_dash)
     TOL = 1e-6;
     maxIteration = 100000;
     n = size(W,1);
+    if ( strcmp(lower(method), 'cg') )
+        fprintf('Using conjugate gradient method...\n');
+    end
     while ( k < maxIteration && norm(gradient) > TOL)
         % step length alpha
         alpha = computeSteplength(v, p, phi, phi_dash);
@@ -236,7 +232,7 @@ function v = performConjugateGradientSteps(v, W, grad_funct, phi, phi_dash)
         % too small (p. 62 / 83)
         if ( norm ( alpha * p ) / norm (v) < TOL )
             if ( k < 1 && alpha == 0)
-               error('Line Search did not give a descent step length in first iteration step of CG method.')
+               error('Line Search did not give a descent step length in first iteration step.')
             end
             fprintf ('Stopping CG iteration due to too small relative change of consecutive iterates after %d iteration(s)!\n', k);
             break;
@@ -244,7 +240,7 @@ function v = performConjugateGradientSteps(v, W, grad_funct, phi, phi_dash)
         v = v + alpha * p;
         nextGradient = grad_funct(v);
         % restart every n'th cycle (p. 124 / 145)
-        if ( mod(k,n) == 0 && k > 0 )
+        if ( strcmp(method, 'grad') || (mod(k,n) == 0 && k > 0) )
             beta = 0;
         else
             % betaFR := beta for Fletcher-Reeves variant
@@ -264,35 +260,6 @@ function v = performConjugateGradientSteps(v, W, grad_funct, phi, phi_dash)
         k = k+1;
     end
     if ( k >= maxIteration ) 
-        fprintf ('Conjugate gradients did not converge yet (max. iterations %d)! norm(gradient) = %e', maxIteration, norm(gradient));
-    end
-end
-
-function v = performGradientSteps(v, grad_funct, phi, phi_dash)
-    gradient = grad_funct(v);
-    % descent direction p
-    p = -gradient; 
-    k = 0;
-    TOL = 1e-6;
-    maxIteration = 100000;
-    while ( k < maxIteration && norm(gradient) > TOL)
-        % step length alpha
-        alpha = computeSteplength(v, p, phi, phi_dash);
-        % stopping criteria if relative change of consecutive iterates v is
-        % too small (p. 62 / 83)
-        if ( norm ( alpha * p ) / norm (v) < TOL )
-            if ( k < 1 && alpha == 0)
-               error('Line Search did not give a descent step length in first iteration step of gradiend descent method.')
-            end
-            fprintf ('Stopping gradient descent iteration due to too small relative change of consecutive iterates after %d iteration(s)!\n', k);
-            break;
-        end
-        v = v + alpha * p;
-        gradient = grad_funct(v);
-        p = -gradient;
-        k = k+1;
-    end
-    if ( k >= maxIteration ) 
         fprintf ('Gradient descent method did not converge yet (max. iterations %d)! norm(gradient) = %e', maxIteration, norm(gradient));
     end
 end
@@ -302,7 +269,7 @@ function alpha_star = computeSteplength(v, descentDirection, phi, phi_dash)
     c1 = 1e-4;
     c2 = 0.1;
     alpha_current = 0;
-    alpha_max = 1e10;
+    alpha_max = 1000;
     if (descentDirection(1) < 0 ) 
         alpha_max = min(alpha_max, -v(1)/descentDirection(1));
     end
