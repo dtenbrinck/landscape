@@ -14,7 +14,7 @@ function [ center, radii, evecs, v ] = estimateMinimumEllipsoid( X , picfilename
 % * radii     -  ellipsoid or other conic radii [a; b; c]
 % * evecs     -  the radii directions as columns of the 3x3 matrix
 % * v         -  the 7 parameters describing the ellipsoid algebraically: 
-%         Ax^2 + By^2 + Cz^2 + 2Dx + 2Ey + 2Fz + G = 0
+%         v_1*x^2 + v_2*y^2 + v_3*z^2 + 2*v_4*x + 2*v_5*y + 2*v_6*z + v_7 = 0
 %
 % Solving Minimization Problem to find smallest ellipsoid fitting when
 % only allowing few data points to lie outside. 
@@ -31,6 +31,7 @@ function [ center, radii, evecs, v ] = estimateMinimumEllipsoid( X , picfilename
 %            = sum of all data rows in X eps*(log( 1 + exp( 1/eps * < v, w > )) )
 %       alternative differentiable approximation for energyPart(v):
 %            = sum of all data rows in X ( max(0, < v, w > ) )^2
+%       regularisation parameter: mu1, mu2 with 0 <= mu2 <= 1
 %            
 % with w = (x^2, y^2, z^2, 2*x, 2*y, 2*z, 1)
 % and v initially derived from the implicit function describing 
@@ -40,26 +41,27 @@ function [ center, radii, evecs, v ] = estimateMinimumEllipsoid( X , picfilename
 % axis (1. Hauptachse) of the ellipsoid and rotate the data set accordingly
 %
 %       [(x-x_0)/a]^2 + [(y-y_0)/a]^2 + [(z-z_0)/a]^2 -1 = 0
-% <=>   Ax^2 + By^2 + Cz^2 + 2Dx + 2Ey + 2Fz + G = 0
+% <=>   v_1*x^2 + v_2*y^2 + v_3*z^2 + 2*v_4*x + 2*v_5*y + 2*v_6*z + v_7 = 0
 %
 % with:   
-%   v_1     = A     = 1/a^2
-%   v_2     = B     = 1/b^2
-%   v_3     = C     = 1/c^2
+%   v_1     = 1/a^2
+%   v_2     = 1/b^2
+%   v_3     = 1/c^2
 %
-%   v_4     = D     = -x_0/a
-%   v_5     = E     = -y_0/b
-%   v_6     = F     = -z_0/c
+%   v_4     = -x_0/a^2  = -x_0 * v_1
+%   v_5     = -y_0/b^2  = -y_0 * v_2
+%   v_6     = -z_0/c^2  = -z_0 * v_3
 %
-%   v_7     = G     =  (x_0/a)^2 + (y_0/b)^2 + (z_0/c)^2 - 1
+%   v_7     =  (x_0/a)^2 + (y_0/b)^2 + (z_0/c)^2 - 1
+%           =  v_4^2/v_1 + v_5^2/v_2 + v_6^2/v_3 - 1
 %
 %   Determine output parameter:
-% * center:     x_0 = - D * a = -D*v_4
-%               y_0 = - E * b = -E*v_5
-%               z_0 = - F * c = -F*v_6
-% * radii:      a = 1/sqrt(A) = 1/sqrt(v_1)
-%               b = 1/sqrt(B) = 1/sqrt(v_2)
-%               c = 1/sqrt(C) = 1/sqrt(v_3)
+% * radii:      a = 1/sqrt(v_1)
+%               b = 1/sqrt(v_2)
+%               c = 1/sqrt(v_3)
+% * center:     x_0 = -v_4*v_1
+%               y_0 = -v_5*v_2
+%               z_0 = -v_6*v_3
 % Author:
 % Ramona Sasse
 % Date:
@@ -208,13 +210,13 @@ function [radii, center, v] = initializeEllipsoidParams(x,y,z)
     radii=[max(abs(x - center(1))); max(abs(y - center(2)));max(abs(z - center(3)))]; 
     v=zeros(6,1);
     v(1:3) = (1./radii).^2;
-    v(4:6) = - (1./radii) .* center;
+    v(4:6) = - center .* v(1:3);
 end
 
 % function [radii, center, evecs, v] = getEllipsoidParams(v)
 function [radii, center] = getEllipsoidParams(v)
     radii = sqrt( 1 ./ v(1:3) ) ;
-    center = -radii .* v(4:6);
+    center = - v(4:6) ./ v(1:3);
     % TODO transform v 
     % set eigenvectors evecs
 end
