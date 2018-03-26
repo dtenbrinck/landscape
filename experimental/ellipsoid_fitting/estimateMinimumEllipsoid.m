@@ -288,6 +288,7 @@ function alpha_star = computeSteplength(v, descentDirection, phi, phi_dash)
     phi_dash_0 = phi_dash( alpha_current, v, descentDirection);
     phi_current = phi_0;
     maxIteration = 100; 
+    TOL = 1e-6;
     while i <= maxIteration
         phi_next = phi( alpha_next, v, descentDirection);
         % stopping criteria if we cannot attain lower function value after ten
@@ -325,10 +326,10 @@ function alpha_star = computeSteplength(v, descentDirection, phi, phi_dash)
         % implement safeguard procedure (p.58, 79): if alpha_next (alpha_i)
         % is not too close to alpha_current (alpha_i-1) or too much smaller
         % than alpha_current (alpha_i-1), reset alpha_next:
-%         if ( alpha_current - alpha_next < TOL || ...
-%                 ( alpha_current - alpha_next ) / alpha_current < TOL ) 
-%            alpha_next = alpha_current / 2; 
-%         end
+        if ( alpha_current - alpha_next < TOL || ...
+                ( alpha_current - alpha_next ) / alpha_current < TOL ) 
+           alpha_next = alpha_current / 2; 
+        end
         i = i+1;
     end
     if (i >= maxIteration) 
@@ -341,8 +342,8 @@ function alpha_star = zoom(alpha_lower, alpha_higher, ...
     v, descentDirection, phi, phi_dash, phi_0, phi_dash_0, c1, c2)
     % use algorithm 3.6 to zoom in to appropriate step length
     iteration = 0;
-    maxIteration = 100;
-    TOL = 1e-4;
+    maxIteration = 1000;
+    TOL = 1e-6;
     while iteration < maxIteration
         if ( abs(alpha_lower-alpha_higher) < 1e-10)
            fprintf('Zoom interval too small to zoom in further.\n');
