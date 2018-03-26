@@ -93,7 +93,7 @@ W = [ x .* x, ...
     2 * y, ...
     2 * z];  % ndatapoints x 6 ellipsoid parameters
 
-fprintf('Initialize ellipsoid parameter so that ellipsoid contains all data points.\n');
+fprintf('Initialize ellipsoid parameter so that ellipsoid contains all data points.\n\n');
 [radii_initial, center_initial, v_initial] = initializeEllipsoidParams(x,y,z);
 
 
@@ -140,7 +140,7 @@ function [radii, center, v] = tryToApproximateEllipsoidParamsWithDescentMethod(v
 end
 
 function [radii, center, v] = getReferenceEllipsoidApproximation(funct, v0)
-    fprintf('Approximate ellipsoid with MATLAB reference method.\n');
+    fprintf('Approximate ellipsoid with MATLAB reference method...\n');
     v = fminsearch(funct, v0);
     [radii, center] = getEllipsoidParams(v);
 end
@@ -222,8 +222,10 @@ function v = performGradientSteps(v, W, grad_funct, phi, phi_dash, method)
     TOL = 1e-6;
     maxIteration = 100000;
     n = size(W,1);
-    if ( strcmp(lower(method), 'cg') )
+    if ( strcmpi(method, 'cg') )
         fprintf('Using conjugate gradient method...\n');
+    else
+        fprintf('Using gradient descent method...\n');
     end
     while ( k < maxIteration && norm(gradient) > TOL)
         % step length alpha
@@ -232,9 +234,9 @@ function v = performGradientSteps(v, W, grad_funct, phi, phi_dash, method)
         % too small (p. 62 / 83)
         if ( norm ( alpha * p ) / norm (v) < TOL )
             if ( k < 1 && alpha == 0)
-               error('Line Search did not give a descent step length in first iteration step.')
+               error('Line Search did not give a descent step length in first iteration step.\n')
             end
-            fprintf ('Stopping CG iteration due to too small relative change of consecutive iterates after %d iteration(s)!\n', k);
+            fprintf ('Stopping gradient iteration due to too small relative change of consecutive iterates after %d iteration(s)!\n', k);
             break;
         end
         v = v + alpha * p;
@@ -260,7 +262,7 @@ function v = performGradientSteps(v, W, grad_funct, phi, phi_dash, method)
         k = k+1;
     end
     if ( k >= maxIteration ) 
-        fprintf ('Gradient descent method did not converge yet (max. iterations %d)! norm(gradient) = %e', maxIteration, norm(gradient));
+        fprintf ('Gradient descent method did not converge yet (max. iterations %d)! norm(gradient) = %e \n', maxIteration, norm(gradient));
     end
 end
 
@@ -279,7 +281,7 @@ function alpha_star = computeSteplength(v, descentDirection, phi, phi_dash)
     if (descentDirection(3) < 0 ) 
         alpha_max = min(alpha_max, -v(3)/descentDirection(3));
     end
-    if (alpha_max == 1e10)
+    if (alpha_max == 1000)
        %disp('large alpha_max since no specific limit needed to keep track of constraints. '); 
     end
     alpha_next = (alpha_max - alpha_current ) / 2; % initialize next alpha (TODO?)
