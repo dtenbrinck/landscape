@@ -22,8 +22,8 @@ function testEllipsoidEstimation
         0       0.99    0  ; ...
         0.99    0       0  ];
     X=[X1; -X1];
-    fprintf('Expecting an ellipsoid with radii=(1,1,1), center=(0,0,0)...\n');
-    estimateMinimumEllipsoid( X, 'data_set1', 'grad', 10, 0.5 ); 
+    fprintf('Expecting an ellipsoid with approx. radii=(1,1,1), center=(0,0,0)...\n');
+     estimateMinimumEllipsoid( X, 'data_set1', 'grad', 10, 0.5 ); 
     
     % second test data set
     n = 20;
@@ -34,6 +34,9 @@ function testEllipsoidEstimation
     disturbance2 = randn(n*n,1);
     X = [reshape(x, n*n, 1) + disturbance, reshape(y, n*n,1) + disturbance2, reshape(z, n*n, 1) + disturbance];
     X=[X;  15 2 1; 2 6 26; 0 3 0 ; 0 22 3];
-    fprintf('\n\nExpecting an ellipsoid with radii=(4,2,1), center=(1,2,2)...\n');
+    fprintf('\n\nExpecting an ellipsoid with approx. radii=(4,2,1), center=(1,2,2)...\n');
+    % improve regularisation params for approx. with (max(...))^2 term
+%     estimateMinimumEllipsoid( X , 'data_set2', 'grad', 400, 0.1);
+    % good reference approximation with log(...) term
     estimateMinimumEllipsoid( X , 'data_set2', 'grad', 3, 0.5);
 end

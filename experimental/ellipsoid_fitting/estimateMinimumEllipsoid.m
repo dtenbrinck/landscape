@@ -20,8 +20,10 @@ function [ center, radii, evecs, v ] = estimateMinimumEllipsoid( X , picfilename
 % only allowing few data points to lie outside. 
 % Find minimizer v of the following energy functional f:
 % 
-%   argmin f(v) =  energyPart(v) + 
-%               mu1 * ( mu2 * equidistantRadii(v) + (1 - mu2) * smallRadii(v) )
+%   argmin f(v) = argmin [ energyPart(v) + 
+%               mu1 * ( mu2 * equidistantRadii(v) 
+%                       + (1 - mu2) * smallRadii(v) ) ]
+%       s.t. v_1, v_2, v_3 > 0
 %
 %   with:   equidistantRadii(v) = (v_1 - v_2)^2 + (v_2 - v_3)^2 + (v_1 - v_3)^2 
 %           smallRadii(v) = 1 / v_1 + 1 / v_2 + 1 / v_3 
@@ -113,7 +115,7 @@ table( radii_initial, radii, radii_ref, radii1, radii_ref1)
 table( center_initial, center, center_ref, center1, center_ref1 )
 %table( v_initial, v, v_ref, v1, v_ref1)
 
-evecs=0;
+evecs=0; % TODO
 
 % plot ellipsoid fittings
 figure('Name', 'Scatter plot and resulting ellipsoid fittings','units','normalized','outerposition',[0 0 1 1]);
@@ -220,7 +222,7 @@ function v = performGradientSteps(v, W, grad_funct, phi, phi_dash, method)
     p = -gradient; 
     k = 0;
     TOL = 1e-6;
-    maxIteration = 100000;
+    maxIteration = 1000;
     n = size(W,1);
     if ( strcmpi(method, 'cg') )
         fprintf('Using conjugate gradient method...\n');
@@ -267,30 +269,31 @@ function v = performGradientSteps(v, W, grad_funct, phi, phi_dash, method)
 end
 
 function alpha_star = computeSteplength(v, descentDirection, phi, phi_dash)
-    % use a line search algorithm (p.81, Algorithm 3.5)
+    % use a line search algorithm (p.81, Algorithm 3.5)   
     c1 = 1e-4;
     c2 = 0.1;
     alpha_current = 0;
-    alpha_max = 1000;
+    alpha_limit = 1000;    
+
+    % Make sure that the constraints for v(1), v(2), v(3) > 0 are met
     if (descentDirection(1) < 0 ) 
-        alpha_max = min(alpha_max, -v(1)/descentDirection(1));
+        alpha_limit = min(alpha_limit, -v(1)/descentDirection(1));
     end
     if (descentDirection(2) < 0 ) 
-        alpha_max = min(alpha_max, -v(2)/descentDirection(2));
+        alpha_limit = min(alpha_limit, -v(2)/descentDirection(2));
     end
     if (descentDirection(3) < 0 ) 
-        alpha_max = min(alpha_max, -v(3)/descentDirection(3));
+        alpha_limit = min(alpha_limit, -v(3)/descentDirection(3));
     end
-    if (alpha_max == 1000)
-       %disp('large alpha_max since no specific limit needed to keep track of constraints. '); 
-    end
-    alpha_next = (alpha_max - alpha_current ) / 2; % initialize next alpha (TODO?)
-    i = 1;
+    
     phi_0 = phi( alpha_current, v, descentDirection);
     phi_dash_0 = phi_dash( alpha_current, v, descentDirection);
     phi_current = phi_0;
-    maxIteration = 100; 
-    TOL = 1e-6;
+    i = 1;
+    maxIteration = 30;
+    increase_steplength = (alpha_limit - alpha_current ) / maxIteration;
+    alpha_next = alpha_current +  increase_steplength; % initialize next alpha
+    
     while i <= maxIteration
         phi_next = phi( alpha_next, v, descentDirection);
         % stopping criteria if we cannot attain lower function value after ten
@@ -304,7 +307,7 @@ function alpha_star = computeSteplength(v, descentDirection, phi, phi_dash)
                 (phi_next >= phi_current && i > 1) )
             alpha_star = zoom(alpha_current, alpha_next, ...
                 v, descentDirection, phi, phi_dash, ...
-                phi_0, phi_dash_0, c1, c2);
+                phi_0, phi_dash_0, c1, c2); 
             return;
         end
         
@@ -322,16 +325,7 @@ function alpha_star = computeSteplength(v, descentDirection, phi, phi_dash)
         end
         alpha_current = alpha_next;
         % next trial value with interpolation
-        alpha_next =  quadraticInterpolation(alpha_next, alpha_max, ...
-                    v, descentDirection, phi, phi_dash);
-        %%%%%%%%%%%%%%%%%%%% TODO safeguard strategy %%%%%%%%%%%%%
-        % implement safeguard procedure (p.58, 79): if alpha_next (alpha_i)
-        % is not too close to alpha_current (alpha_i-1) or too much smaller
-        % than alpha_current (alpha_i-1), reset alpha_next:
-        if ( alpha_current - alpha_next < TOL || ...
-                ( alpha_current - alpha_next ) / alpha_current < TOL ) 
-           alpha_next = alpha_current / 2; 
-        end
+        alpha_next = alpha_current +  increase_steplength;
         i = i+1;
     end
     if (i >= maxIteration) 
@@ -344,7 +338,7 @@ function alpha_star = zoom(alpha_lower, alpha_higher, ...
     v, descentDirection, phi, phi_dash, phi_0, phi_dash_0, c1, c2)
     % use algorithm 3.6 to zoom in to appropriate step length
     iteration = 0;
-    maxIteration = 1000;
+    maxIteration = 30;
     TOL = 1e-6;
     while iteration < maxIteration
         if ( abs(alpha_lower-alpha_higher) < 1e-10)
