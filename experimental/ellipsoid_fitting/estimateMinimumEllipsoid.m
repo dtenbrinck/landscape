@@ -1,5 +1,5 @@
 %% estimate minimal ellipsoid fitting for data set
-function [ center, radii, evecs, v ] = estimateMinimumEllipsoid( X , picfilename, method, mu1, mu2)
+function [ center, radii, evecs, v ] = estimateMinimumEllipsoid( X , picfilename, method, mu1, mu2, eps)
 %
 % Fit an ellispoid/sphere to a set of xyz data points:
 %
@@ -7,7 +7,14 @@ function [ center, radii, evecs, v ] = estimateMinimumEllipsoid( X , picfilename
 %   [center, radii, evecs, v ] = estimateMinimumEllipsoid( [x y z] );
 %
 % Parameters:
-% * X, [x y z]   - Cartesian data, n x 3 matrix or three n x 1 vectors
+% * X, [x y z]      - Cartesian data, n x 3 matrix or three n x 1 vectors
+% * picfilename     - name to save png with estimated ellipsoids
+% * method          - 'cg' : conjugate gradient method
+%                     'grad' : gradient descent method
+% * mu1, mu2        - regularisation parameter, weights for volumetric
+%                     terms, 0<=mu2<=1
+% * eps             - parameter for smooth approximation with logarithm of 
+%                     kink in max(0,...) 
 %
 % Output:
 % * center    -  ellispoid center coordinates [x_0; y_0; z_0]
@@ -73,7 +80,7 @@ function [ center, radii, evecs, v ] = estimateMinimumEllipsoid( X , picfilename
 inputParams.mu1 = mu1; 
 %inputParams.mu1 = 10; %results in really good approximation compared to reference ellipsoids
 inputParams.mu2 = mu2; % equal weights for volumetric parts
-inputParams.eps = 1;
+inputParams.eps = eps;
 
 if size( X, 2 ) ~= 3
     error( 'Input data must have three columns!' );
@@ -343,11 +350,11 @@ function alpha_star = zoom(alpha_lower, alpha_higher, ...
     while iteration < maxIteration
         if ( abs(alpha_lower-alpha_higher) < 1e-10)
            fprintf('Zoom interval too small to zoom in further.\n');
-           alpha_star=alpha_lower;
+           alpha_star=alpha_higher;
            return;
         end
-        alpha_j = quadraticInterpolation(alpha_lower, alpha_higher, ...
-                    v, descentDirection, phi, phi_dash);
+        % use a bisection step
+        alpha_j = (alpha_lower + alpha_higher) / 2;
         if ( iteration > 0 )
             %%%%%%%%%%%%%%%%%%%% TODO safeguard strategy %%%%%%%%%%%%%
             % implement safeguard procedure (p.58, 79): if alpha_next (alpha_i)
@@ -385,14 +392,4 @@ function alpha_star = zoom(alpha_lower, alpha_higher, ...
         fprintf('Steplength not yet found. Zoom in stopped\n');
     end
     alpha_star = alpha_j; % use last iterate as default return value
-end
-
-function alpha = quadraticInterpolation(alpha_lower, alpha_higher, ...
-                    v, descentDirection, phi, phi_dash)
-    phi_dash_alpha_lower = phi_dash( alpha_lower, v, descentDirection);
-    phi_alpha_lower = phi( alpha_lower, v, descentDirection);
-    phi_alpha_higher = phi( alpha_higher, v, descentDirection);
-    % find trial step length by using quadratic interpolation
-    alpha = -phi_dash_alpha_lower * alpha_higher^2 / ...
-        ( 2 * ( phi_alpha_higher - phi_alpha_lower - phi_dash_alpha_lower * alpha_higher));
 end
