@@ -4,7 +4,7 @@ function testEllipsoidEstimation
     X = firstDataSet();
     fprintf('Expecting an ellipsoid with approx. radii=(1,1,1), center=(0,0,0)...\n');
     % TODO improve regularisation parameter and maybe vary eps
-%     estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 10, 0.5, 1, 'data_set1' );
+%     estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 10, 0.5, 1, 'data_set1', 0 );
     
     % second test data set
     X = secondDataSet();
@@ -25,24 +25,42 @@ function testEllipsoidEstimation
     estimateEllipsoidForDataSetAndPlotResults(Y, 'grad', 4, 0.5, 1, 'data_set3', 1 );
 end
 
-function estimateEllipsoidForDataSetAndPlotResults(X, descentMethod, mu1, mu2, eps, picfilename, activePCA)
-    
-    [center, radii, ~, radii_ref, center_ref] = estimateMinimumEllipsoid( X, descentMethod, 'sqr', mu1, mu2, eps, activePCA );
+function estimateEllipsoidForDataSetAndPlotResults(X, descentMethod, mu1, mu2, eps, datasetName, activePCA)
+    %%%%% TODO plots not correct
+    %%% current matlab ellipsoid function only creates ellipsoids with axis
+    %%% along the coordinate axis but here we need to use the given
+    %%% eigenvectors/axis (only important if PCA is active), additionally
+    %%% initilization ellipsoids currently not plottet correctly since they
+    %%% do not contain all needed points. Probably using (dont) need to
+    %%% transform center and use eigenvectors as well (in the initilization
+    %%% we assume an axis oriented ellipsoid so this should be too
+    %%% problematic
+    [center, radii, axis, radii_ref, center_ref, radii_initial, center_initial] = estimateMinimumEllipsoid( X, descentMethod, 'sqr', mu1, mu2, eps, activePCA );
     fprintf('\n');
-    [center1, radii1, ~, radii_ref1, center_ref1] = estimateMinimumEllipsoid( X, descentMethod, 'log', mu1, mu2, eps, activePCA );
-    [radii_initial, center_initial, ~, ~] = initializeEllipsoidParams(X);
+    [center1, radii1, axis1, radii_ref1, center_ref1, radii_initial1, center_initial1] = estimateMinimumEllipsoid( X, descentMethod, 'log', mu1, mu2, eps, activePCA );
     table( radii_initial, radii, radii_ref, radii1, radii_ref1)
     table( center_initial, center, center_ref, center1, center_ref1 )
 
     % plot ellipsoid fittings
-    figure('Name', 'Scatter plot and resulting ellipsoid fittings','units','normalized','outerposition',[0 0 1 1]);
+    figure('Name', "Scatter plot and resulting ellipsoid fittings for " + datasetName + ", PCA= " + activePCA,'units','normalized','outerposition',[0 0 1 1]);
     sp = subplot(1,2,1);
     titletext = 'Approximation of non differentiable term with (max(0,...))^2';
     plotSeveralEllipsoidEstimations(sp, X, center_initial, radii_initial, center, radii,  center_ref, radii_ref, titletext);
+    plotOrientationVectors(sp, center, axis);
     sp = subplot(1,2,2);
     titletext = 'Approximation of non differentiable term with log(1+eps(...))';
-    plotSeveralEllipsoidEstimations(sp, X, center_initial, radii_initial, center1, radii1, center_ref1, radii_ref1, titletext);
-%     print(['results/ellipsoid_estimation_' picfilename '.png'],'-dpng')
+    plotSeveralEllipsoidEstimations(sp, X, center_initial1, radii_initial1, center1, radii1, center_ref1, radii_ref1, titletext);
+    plotOrientationVectors(sp, center1, axis1);
+%     print(['results/ellipsoid_estimation_' datasetName '.png'],'-dpng')
+end
+
+function plotOrientationVectors(sp, center, axis)
+    hold(sp, 'on');
+    axis= 5*axis;
+    quiver3( center(1), center(2), center(3), axis(1,1), axis(2,1), axis(3,1), 'k', 'LineWidth', 2, 'Displayname','first axis');
+    quiver3( center(1), center(2), center(3), axis(1,2), axis(2,2), axis(3,2), 'r', 'LineWidth', 2, 'Displayname','second axis');
+    quiver3( center(1), center(2), center(3), axis(1,3), axis(2,3), axis(3,3), 'b', 'LineWidth', 2, 'Displayname','third axis');
+    hold(sp, 'off');
 end
 
 function plotSeveralEllipsoidEstimations(sp, X, center_initial, radii_initial, center, radii, center_ref, radii_ref, titletext)
@@ -51,7 +69,7 @@ function plotSeveralEllipsoidEstimations(sp, X, center_initial, radii_initial, c
     plotOneEllipsoidEstimation( center_initial, radii_initial, 'g', 'initialization ellipsoid');
     plotOneEllipsoidEstimation( center, radii, 'm', 'ellipsoid estimation');
     plotOneEllipsoidEstimation( center_ref, radii_ref, 'c','reference estimation');
-    legend('Location', 'northeast');
+    legend('Location', 'eastoutside');
     title(titletext);
     view(3);
     hold(sp, 'off');

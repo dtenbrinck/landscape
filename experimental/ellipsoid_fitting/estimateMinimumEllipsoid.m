@@ -1,5 +1,5 @@
 %% estimate minimal ellipsoid fitting for data set
-function [ center, radii, evecs, radii_ref, center_ref ] = estimateMinimumEllipsoid( X, descentMethod, maxDifferentiableApprox, mu1, mu2, eps, includePCA)
+function [ center, radii, axis, radii_ref, center_ref, radii_initial, center_initial ] = estimateMinimumEllipsoid( X, descentMethod, maxDifferentiableApprox, mu1, mu2, eps, includePCA)
 %
 % Fit an ellispoid/sphere to a set of xyz data points:
 %
@@ -113,7 +113,7 @@ W = [ x .* x, ...
     2 * z];  % ndatapoints x 6 ellipsoid parameters
 
 fprintf('Initialize ellipsoid parameter so that ellipsoid contains all data points.\n\n');
-[~, ~, v_initial, ~] = initializeEllipsoidParams(X);
+[radii_initial, center_initial, v_initial, ~] = initializeEllipsoidParams(X);
 
 if ( strcmpi(maxDifferentiableApprox, 'sqr'))
     fprintf('Use quadratic approximation of non-diff. term.\n');
@@ -127,10 +127,14 @@ end
 
 [phi, phi_dash] = initializePhiAndPhiDash (funct, grad_funct);
 [radii, center] = tryToApproximateEllipsoidParamsWithDescentMethod(v_initial, W, grad_funct, phi, phi_dash, descentMethod);
-[radii, center] = revertTransformation (radii, center, pca_transformation);
 [radii_ref, center_ref] = getReferenceEllipsoidApproximation(funct, v_initial);
-[radii_ref, center_ref] = revertTransformation (radii_ref, center_ref, pca_transformation);
-evecs=0; % TODO
+
+% invert coordinate transformation caused by PCA back for center vectors
+center = pca_transformation \ center;
+center_ref = pca_transformation \ center_ref;
+center_initial = pca_transformation \ center_initial;
+
+axis=pca_transformation';
 end
 
 function [radii, center] = tryToApproximateEllipsoidParamsWithDescentMethod(v0, W, grad_funct, phi, phi_dash, method)
@@ -149,11 +153,6 @@ function [radii, center] = getReferenceEllipsoidApproximation(funct, v0)
     fprintf('Approximate ellipsoid with MATLAB reference method...\n');
     v = fminsearch(funct, v0);
     [radii, center] = getEllipsoidParams(v);
-end
-
-function [radii, center] = revertTransformation (radii, center, pca_transformation)
-    radii = pca_transformation \ radii;
-    center = pca_transformation \ center;
 end
 
 function [funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox( W, inputParams)
