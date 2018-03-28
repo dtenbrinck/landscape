@@ -1,5 +1,5 @@
 %% estimate minimal ellipsoid fitting for data set
-function [ center, radii, evecs, v, radii_ref, center_ref, v_ref ] = estimateMinimumEllipsoid( X, descentMethod, maxDifferentiableApprox, mu1, mu2, eps)
+function [ center, radii, evecs, radii_ref, center_ref ] = estimateMinimumEllipsoid( X, descentMethod, maxDifferentiableApprox, mu1, mu2, eps, includePCA)
 %
 % Fit an ellispoid/sphere to a set of xyz data points:
 %
@@ -23,8 +23,6 @@ function [ center, radii, evecs, v, radii_ref, center_ref, v_ref ] = estimateMin
 % * center    -  ellispoid center coordinates [x_0; y_0; z_0]
 % * radii     -  ellipsoid or other conic radii [a; b; c]
 % * evecs     -  the radii directions as columns of the 3x3 matrix
-% * v         -  the 7 parameters describing the ellipsoid algebraically: 
-%         v_1*x^2 + v_2*y^2 + v_3*z^2 + 2*v_4*x + 2*v_5*y + 2*v_6*z + v_7 = 0
 %
 % Solving Minimization Problem to find smallest ellipsoid fitting when
 % only allowing few data points to lie outside. 
@@ -35,7 +33,9 @@ function [ center, radii, evecs, v, radii_ref, center_ref, v_ref ] = estimateMin
 %                       + (1 - mu2) * smallRadii(v) ) ]
 %       s.t. v_1, v_2, v_3 > 0
 %
-%   with:   equidistantRadii(v) = (v_1 - v_2)^2 + (v_2 - v_3)^2 + (v_1 - v_3)^2 
+%   with:   v describing describing the ellipsoid algebraically: 
+%      v_1*x^2 + v_2*y^2 + v_3*z^2 + 2*v_4*x + 2*v_5*y + 2*v_6*z + v_7 = 0
+%           equidistantRadii(v) = (v_1 - v_2)^2 + (v_2 - v_3)^2 + (v_1 - v_3)^2 
 %           smallRadii(v) = 1 / v_1 + 1 / v_2 + 1 / v_3 
 %           energyPart(v) = sum of all data rows in X ( max(0, < v, w > ) )
 
@@ -87,12 +87,14 @@ inputParams.mu1 = mu1;
 inputParams.mu2 = mu2; % equal weights for volumetric parts
 inputParams.eps = eps;
 
+pca_transformation = eye(3);
 if size( X, 2 ) ~= 3
     error( 'Input data must have three columns!' );
 else
-    % TODO include PCA
-%     pca_transformation = pca(X);
-%     X = (pca_transformation * X')';
+    if ( includePCA )
+        pca_transformation = (pca(X))';
+        X = (pca_transformation * X')';
+    end
     x = X( :, 1 );
     y = X( :, 2 );
     z = X( :, 3 );
@@ -124,12 +126,14 @@ else
 end
 
 [phi, phi_dash] = initializePhiAndPhiDash (funct, grad_funct);
-[radii, center, v] = tryToApproximateEllipsoidParamsWithDescentMethod(v_initial, W, grad_funct, phi, phi_dash, descentMethod);
-[radii_ref, center_ref, v_ref] = getReferenceEllipsoidApproximation(funct, v_initial);
+[radii, center] = tryToApproximateEllipsoidParamsWithDescentMethod(v_initial, W, grad_funct, phi, phi_dash, descentMethod);
+[radii, center] = revertTransformation (radii, center, pca_transformation);
+[radii_ref, center_ref] = getReferenceEllipsoidApproximation(funct, v_initial);
+[radii_ref, center_ref] = revertTransformation (radii_ref, center_ref, pca_transformation);
 evecs=0; % TODO
 end
 
-function [radii, center, v] = tryToApproximateEllipsoidParamsWithDescentMethod(v0, W, grad_funct, phi, phi_dash, method)
+function [radii, center] = tryToApproximateEllipsoidParamsWithDescentMethod(v0, W, grad_funct, phi, phi_dash, method)
     try
         v = performGradientSteps(v0, W, grad_funct, phi, phi_dash, method);
         [radii, center] = getEllipsoidParams(v);
@@ -138,14 +142,18 @@ function [radii, center, v] = tryToApproximateEllipsoidParamsWithDescentMethod(v
         fprintf('Setting default output parameter.\n');
         radii = 1i*(ones(3,1));
         center = 1i*(ones(3,1));
-        v=zeros(6,1);
     end
 end
 
-function [radii, center, v] = getReferenceEllipsoidApproximation(funct, v0)
+function [radii, center] = getReferenceEllipsoidApproximation(funct, v0)
     fprintf('Approximate ellipsoid with MATLAB reference method...\n');
     v = fminsearch(funct, v0);
     [radii, center] = getEllipsoidParams(v);
+end
+
+function [radii, center] = revertTransformation (radii, center, pca_transformation)
+    radii = pca_transformation \ radii;
+    center = pca_transformation \ center;
 end
 
 function [funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox( W, inputParams)
