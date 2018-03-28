@@ -1,5 +1,5 @@
 %% estimate minimal ellipsoid fitting for data set
-function [ center, radii, evecs, v ] = estimateMinimumEllipsoid( X , picfilename, method, mu1, mu2, eps)
+function [ center, radii, evecs, v, radii_ref, center_ref, v_ref ] = estimateMinimumEllipsoid( X, descentMethod, maxDifferentiableApprox, mu1, mu2, eps)
 %
 % Fit an ellispoid/sphere to a set of xyz data points:
 %
@@ -9,8 +9,11 @@ function [ center, radii, evecs, v ] = estimateMinimumEllipsoid( X , picfilename
 % Parameters:
 % * X, [x y z]      - Cartesian data, n x 3 matrix or three n x 1 vectors
 % * picfilename     - name to save png with estimated ellipsoids
-% * method          - 'cg' : conjugate gradient method
+% * descentMethod   - 'cg' : conjugate gradient method
 %                     'grad' : gradient descent method
+% * maxDifferentiableApprox - 'sqr' : approximate kink with (max(...))^2
+%                           - 'log' : approximate kink with log(...) 
+%                           (see below)
 % * mu1, mu2        - regularisation parameter, weights for volumetric
 %                     terms, 0<=mu2<=1
 % * eps             - parameter for smooth approximation with logarithm of 
@@ -35,10 +38,13 @@ function [ center, radii, evecs, v ] = estimateMinimumEllipsoid( X , picfilename
 %   with:   equidistantRadii(v) = (v_1 - v_2)^2 + (v_2 - v_3)^2 + (v_1 - v_3)^2 
 %           smallRadii(v) = 1 / v_1 + 1 / v_2 + 1 / v_3 
 %           energyPart(v) = sum of all data rows in X ( max(0, < v, w > ) )
+
 %       differentiable approximation for energyPart(v):
+%       (maxDifferentiableApprox = 'log')
 %            = sum of all data rows in X eps*(log(exp(0) + exp( 1/eps * < v, w > )) )
 %            = sum of all data rows in X eps*(log( 1 + exp( 1/eps * < v, w > )) )
 %       alternative differentiable approximation for energyPart(v):
+%       (maxDifferentiableApprox = 'sgr')
 %            = sum of all data rows in X ( max(0, < v, w > ) )^2
 %       regularisation parameter: mu1, mu2 with 0 <= mu2 <= 1
 %            
@@ -74,17 +80,19 @@ function [ center, radii, evecs, v ] = estimateMinimumEllipsoid( X , picfilename
 % Author:
 % Ramona Sasse
 % Date:
-% February, 2018
+% March, 2018
 %
 
 inputParams.mu1 = mu1; 
-%inputParams.mu1 = 10; %results in really good approximation compared to reference ellipsoids
 inputParams.mu2 = mu2; % equal weights for volumetric parts
 inputParams.eps = eps;
 
 if size( X, 2 ) ~= 3
     error( 'Input data must have three columns!' );
 else
+    % TODO include PCA
+%     pca_transformation = pca(X);
+%     X = (pca_transformation * X')';
     x = X( :, 1 );
     y = X( :, 2 );
     z = X( :, 3 );
@@ -103,36 +111,22 @@ W = [ x .* x, ...
     2 * z];  % ndatapoints x 6 ellipsoid parameters
 
 fprintf('Initialize ellipsoid parameter so that ellipsoid contains all data points.\n\n');
-[radii_initial, center_initial, v_initial] = initializeEllipsoidParams(x,y,z);
+[~, ~, v_initial, ~] = initializeEllipsoidParams(X);
 
+if ( strcmpi(maxDifferentiableApprox, 'sqr'))
+    fprintf('Use quadratic approximation of non-diff. term.\n');
+    [funct, grad_funct] = initializeFunctionalAndGradientWithQuadraticMaxApprox( W, inputParams);
+elseif ( strcmpi(maxDifferentiableApprox, 'log'))
+    fprintf('Use logarithmic approximation of non-diff. term.\n');
+    [funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox (W, inputParams);
+else
+   error('No or unknown type for approximation of max with differentiable function!') 
+end
 
-[funct, grad_funct] = initializeFunctionalAndGradientWithQuadraticMaxApprox( W, inputParams);
 [phi, phi_dash] = initializePhiAndPhiDash (funct, grad_funct);
-fprintf('Use quadratic approximation of non-diff. term.\n');
-[radii, center, v] = tryToApproximateEllipsoidParamsWithDescentMethod(v_initial, W, grad_funct, phi, phi_dash, method);
+[radii, center, v] = tryToApproximateEllipsoidParamsWithDescentMethod(v_initial, W, grad_funct, phi, phi_dash, descentMethod);
 [radii_ref, center_ref, v_ref] = getReferenceEllipsoidApproximation(funct, v_initial);
-fprintf('\n');
-[funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox (W, inputParams);
-[phi, phi_dash] = initializePhiAndPhiDash (funct, grad_funct);
-fprintf('Use logarithmic approximation of non-diff. term.\n');
-[radii1, center1, v1] = tryToApproximateEllipsoidParamsWithDescentMethod(v_initial, W, grad_funct, phi, phi_dash, method);
-[radii_ref1, center_ref1, v_ref1] = getReferenceEllipsoidApproximation(funct, v_initial);
-
-table( radii_initial, radii, radii_ref, radii1, radii_ref1)
-table( center_initial, center, center_ref, center1, center_ref1 )
-%table( v_initial, v, v_ref, v1, v_ref1)
-
 evecs=0; % TODO
-
-% plot ellipsoid fittings
-figure('Name', 'Scatter plot and resulting ellipsoid fittings','units','normalized','outerposition',[0 0 1 1]);
-sp = subplot(1,2,1);
-titletext = 'Approximation of non differentiable term with (max(0,...))^2';
-plotSeveralEllipsoidEstimations(sp, X, center_initial, radii_initial, center, radii,  center_ref, radii_ref, titletext);
-sp = subplot(1,2,2);
-titletext = 'Approximation of non differentiable term with log(1+eps(...))';
-plotSeveralEllipsoidEstimations(sp, X, center_initial, radii_initial, center1, radii1, center_ref1, radii_ref1, titletext);
-print(['results/ellipsoid_estimation_' picfilename '.png'],'-dpng')
 end
 
 function [radii, center, v] = tryToApproximateEllipsoidParamsWithDescentMethod(v0, W, grad_funct, phi, phi_dash, method)
@@ -152,26 +146,6 @@ function [radii, center, v] = getReferenceEllipsoidApproximation(funct, v0)
     fprintf('Approximate ellipsoid with MATLAB reference method...\n');
     v = fminsearch(funct, v0);
     [radii, center] = getEllipsoidParams(v);
-end
-
-function plotSeveralEllipsoidEstimations(sp, X, center_initial, radii_initial, center, radii, center_ref, radii_ref, titletext)
-    hold(sp, 'on');
-    scatter3(X(:,1),X(:,2), X(:,3),'b','.', 'DisplayName', 'input data');
-    plotOneEllipsoidEstimation( center_initial, radii_initial, 'g', 'initialization ellipsoid');
-    plotOneEllipsoidEstimation( center, radii, 'm', 'ellipsoid estimation');
-    plotOneEllipsoidEstimation( center_ref, radii_ref, 'c','reference estimation');
-    legend('Location', 'northeast');
-    title(titletext);
-    view(3);
-    hold(sp, 'off');
-end
-
-function plotOneEllipsoidEstimation( center, radii, color, displayname)
-if isreal(center) && isreal(radii)
-    [x,y,z] = ellipsoid(center(1), center(2), center(3), radii(1), radii(2), radii(3), 20);
-    surf(x,y,z, 'FaceAlpha',0.15, 'FaceColor', color, 'EdgeColor', 'none', 'DisplayName', displayname);
-end
-    
 end
 
 function [funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox( W, inputParams)
@@ -205,14 +179,6 @@ end
 function [phi, phi_dash] = initializePhiAndPhiDash (funct, grad_funct)
     phi = @(alpha, v, descentDirection) funct( v + alpha * descentDirection);
     phi_dash = @(alpha, v, descentDirection) descentDirection' * grad_funct(v + alpha * descentDirection);
-end
-
-function [radii, center, v] = initializeEllipsoidParams(x,y,z)
-    center=[mean(x); mean(y); mean(z)];
-    radii=[max(abs(x - center(1))); max(abs(y - center(2)));max(abs(z - center(3)))]; 
-    v=zeros(6,1);
-    v(1:3) = (1./radii).^2;
-    v(4:6) = - center .* v(1:3);
 end
 
 % function [radii, center, evecs, v] = getEllipsoidParams(v)
@@ -356,8 +322,7 @@ function alpha_star = zoom(alpha_lower, alpha_higher, ...
         % use a bisection step
         alpha_j = (alpha_lower + alpha_higher) / 2;
         if ( iteration > 0 )
-            %%%%%%%%%%%%%%%%%%%% TODO safeguard strategy %%%%%%%%%%%%%
-            % implement safeguard procedure (p.58, 79): if alpha_next (alpha_i)
+            % safeguard procedure (p.58, 79): if alpha_next (alpha_i)
             % is too close to alpha_current (alpha_i-1) or too much smaller
             % than alpha_current (alpha_i-1), reset alpha_next:
             if ( alpha_last - alpha_j < TOL || ...
