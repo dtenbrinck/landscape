@@ -39,12 +39,12 @@ function estimateEllipsoidForDataSetAndPlotResults(X, descentMethod, mu1, mu2, e
     % plot ellipsoid fittings
     figure('Name', "Scatter plot and resulting ellipsoid fittings for " + datasetName + ", PCA= " + isPCAactive,'units','normalized','outerposition',[0 0 1 1]);
     sp = subplot(1,2,1);
-    titletext = "Approximation of non differentiable term with (max(0,...))^2, PCA=" + isPCAactive;
+    titletext = datasetName + ": Approximation of non differentiable term with (max(0,...))^2, PCA=" + isPCAactive;
     plotSeveralEllipsoidEstimations(sp, X, center_initial, radii_initial,...
         center, radii,  center_ref, radii_ref, titletext, isPCAactive, axis);
     plotOrientationVectors(sp, center, axis);
     sp = subplot(1,2,2);
-    titletext = "Approximation of non differentiable term with log(1+eps(...)), PCA=" + isPCAactive;
+    titletext = datasetName + ": Approximation of non differentiable term with log(1+eps(...)), PCA=" + isPCAactive;
     plotSeveralEllipsoidEstimations(sp, X, center_initial1, radii_initial1,...
         center1, radii1, center_ref1, radii_ref1, titletext, isPCAactive, axis);
     plotOrientationVectors(sp, center1, axis1);
@@ -68,7 +68,7 @@ function plotSeveralEllipsoidEstimations(sp, X, center_initial, radii_initial,..
     plotOneEllipsoidEstimation( center_ref, radii_ref, 'c','reference estimation', isPCAactive, axis);
     plotOneEllipsoidEstimation( center_initial, radii_initial, 'g', 'initialization ellipsoid', isPCAactive, axis);
     legend('Location', 'eastoutside');
-    title(titletext);
+    title(titletext, 'Interpreter', 'none');
     view(3);
     hold(sp, 'off');
 end
