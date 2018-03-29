@@ -155,6 +155,23 @@ function [radii, center] = getReferenceEllipsoidApproximation(funct, v0)
     [radii, center] = getEllipsoidParams(v);
 end
 
+function [radii, center, v, axis] = initializeEllipsoidParams(X)
+    if size( X, 2 ) ~= 3
+    error( 'Input data must have three columns!' );
+    else
+        x = X( :, 1 );
+        y = X( :, 2 );
+        z = X( :, 3 );
+        center=[mean(x); mean(y); mean(z)];
+        radiiMax = max(sqrt(sum((X-center') .* (X-center'), 2)));
+        radii=[radiiMax; radiiMax; radiiMax]; 
+        v=zeros(6,1);
+        v(1:3) = (1./radii).^2;
+        v(4:6) = - center .* v(1:3);
+        axis = eye(3);
+    end
+end
+
 function [funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox( W, inputParams)
 funct = @(v) inputParams.eps*sum(...
     log( 1 + exp( 1/inputParams.eps * (W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) ) ) ) + ...

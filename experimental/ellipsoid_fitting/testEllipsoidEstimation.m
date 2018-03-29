@@ -4,7 +4,10 @@ function testEllipsoidEstimation
     X = firstDataSet();
     fprintf('Expecting an ellipsoid with approx. radii=(1,1,1), center=(0,0,0)...\n');
     % TODO improve regularisation parameter and maybe vary eps
-%     estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 10, 0.5, 1, 'data_set1', 0 );
+    fprintf('Without PCA...\n');
+    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 10, 0.5, 1, 'data_set1', 0 );
+    fprintf('With PCA...\n');
+    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 10, 0.5, 1, 'data_set1', 1 );
     
     % second test data set
     X = secondDataSet();
@@ -26,12 +29,6 @@ function testEllipsoidEstimation
 end
 
 function estimateEllipsoidForDataSetAndPlotResults(X, descentMethod, mu1, mu2, eps, datasetName, isPCAactive)
-    %%%%% TODO plots not correct
-    %%% initilization ellipsoids currently are not plottet correctly since they
-    %%% do not contain all needed points. Probably using (dont) need to
-    %%% transform center and use eigenvectors as well (in the initilization
-    %%% we assume an axis oriented ellipsoid so this should be too
-    %%% problematic
     [center, radii, axis, radii_ref, center_ref, radii_initial, center_initial] = estimateMinimumEllipsoid( X, descentMethod, 'sqr', mu1, mu2, eps, isPCAactive );
     fprintf('\n');
     [center1, radii1, axis1, radii_ref1, center_ref1, radii_initial1, center_initial1] = estimateMinimumEllipsoid( X, descentMethod, 'log', mu1, mu2, eps, isPCAactive );
@@ -41,12 +38,12 @@ function estimateEllipsoidForDataSetAndPlotResults(X, descentMethod, mu1, mu2, e
     % plot ellipsoid fittings
     figure('Name', "Scatter plot and resulting ellipsoid fittings for " + datasetName + ", PCA= " + isPCAactive,'units','normalized','outerposition',[0 0 1 1]);
     sp = subplot(1,2,1);
-    titletext = 'Approximation of non differentiable term with (max(0,...))^2';
+    titletext = "Approximation of non differentiable term with (max(0,...))^2, PCA=" + isPCAactive;
     plotSeveralEllipsoidEstimations(sp, X, center_initial, radii_initial,...
         center, radii,  center_ref, radii_ref, titletext, isPCAactive, axis);
     plotOrientationVectors(sp, center, axis);
     sp = subplot(1,2,2);
-    titletext = 'Approximation of non differentiable term with log(1+eps(...))';
+    titletext = "Approximation of non differentiable term with log(1+eps(...)), PCA=" + isPCAactive;
     plotSeveralEllipsoidEstimations(sp, X, center_initial1, radii_initial1,...
         center1, radii1, center_ref1, radii_ref1, titletext, isPCAactive, axis);
     plotOrientationVectors(sp, center1, axis1);
@@ -68,8 +65,7 @@ function plotSeveralEllipsoidEstimations(sp, X, center_initial, radii_initial,..
     scatter3(X(:,1),X(:,2), X(:,3),'b','.', 'DisplayName', 'input data');
     plotOneEllipsoidEstimation( center, radii, 'm', 'ellipsoid estimation', isPCAactive, axis);
     plotOneEllipsoidEstimation( center_ref, radii_ref, 'c','reference estimation', isPCAactive, axis);
-    % initialization ellipsoid is always oriented along the coordinate axis
-    plotOneEllipsoidEstimation( center_initial, radii_initial, 'g', 'initialization ellipsoid', 0, axis);
+    plotOneEllipsoidEstimation( center_initial, radii_initial, 'g', 'initialization ellipsoid', isPCAactive, axis);
     legend('Location', 'eastoutside');
     title(titletext);
     view(3);
