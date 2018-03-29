@@ -25,31 +25,30 @@ function testEllipsoidEstimation
     estimateEllipsoidForDataSetAndPlotResults(Y, 'grad', 4, 0.5, 1, 'data_set3', 1 );
 end
 
-function estimateEllipsoidForDataSetAndPlotResults(X, descentMethod, mu1, mu2, eps, datasetName, activePCA)
+function estimateEllipsoidForDataSetAndPlotResults(X, descentMethod, mu1, mu2, eps, datasetName, isPCAactive)
     %%%%% TODO plots not correct
-    %%% current matlab ellipsoid function only creates ellipsoids with axis
-    %%% along the coordinate axis but here we need to use the given
-    %%% eigenvectors/axis (only important if PCA is active), additionally
-    %%% initilization ellipsoids currently not plottet correctly since they
+    %%% initilization ellipsoids currently are not plottet correctly since they
     %%% do not contain all needed points. Probably using (dont) need to
     %%% transform center and use eigenvectors as well (in the initilization
     %%% we assume an axis oriented ellipsoid so this should be too
     %%% problematic
-    [center, radii, axis, radii_ref, center_ref, radii_initial, center_initial] = estimateMinimumEllipsoid( X, descentMethod, 'sqr', mu1, mu2, eps, activePCA );
+    [center, radii, axis, radii_ref, center_ref, radii_initial, center_initial] = estimateMinimumEllipsoid( X, descentMethod, 'sqr', mu1, mu2, eps, isPCAactive );
     fprintf('\n');
-    [center1, radii1, axis1, radii_ref1, center_ref1, radii_initial1, center_initial1] = estimateMinimumEllipsoid( X, descentMethod, 'log', mu1, mu2, eps, activePCA );
+    [center1, radii1, axis1, radii_ref1, center_ref1, radii_initial1, center_initial1] = estimateMinimumEllipsoid( X, descentMethod, 'log', mu1, mu2, eps, isPCAactive );
     table( radii_initial, radii, radii_ref, radii1, radii_ref1)
     table( center_initial, center, center_ref, center1, center_ref1 )
 
     % plot ellipsoid fittings
-    figure('Name', "Scatter plot and resulting ellipsoid fittings for " + datasetName + ", PCA= " + activePCA,'units','normalized','outerposition',[0 0 1 1]);
+    figure('Name', "Scatter plot and resulting ellipsoid fittings for " + datasetName + ", PCA= " + isPCAactive,'units','normalized','outerposition',[0 0 1 1]);
     sp = subplot(1,2,1);
     titletext = 'Approximation of non differentiable term with (max(0,...))^2';
-    plotSeveralEllipsoidEstimations(sp, X, center_initial, radii_initial, center, radii,  center_ref, radii_ref, titletext);
+    plotSeveralEllipsoidEstimations(sp, X, center_initial, radii_initial,...
+        center, radii,  center_ref, radii_ref, titletext, isPCAactive, axis);
     plotOrientationVectors(sp, center, axis);
     sp = subplot(1,2,2);
     titletext = 'Approximation of non differentiable term with log(1+eps(...))';
-    plotSeveralEllipsoidEstimations(sp, X, center_initial1, radii_initial1, center1, radii1, center_ref1, radii_ref1, titletext);
+    plotSeveralEllipsoidEstimations(sp, X, center_initial1, radii_initial1,...
+        center1, radii1, center_ref1, radii_ref1, titletext, isPCAactive, axis);
     plotOrientationVectors(sp, center1, axis1);
 %     print(['results/ellipsoid_estimation_' datasetName '.png'],'-dpng')
 end
@@ -63,21 +62,33 @@ function plotOrientationVectors(sp, center, axis)
     hold(sp, 'off');
 end
 
-function plotSeveralEllipsoidEstimations(sp, X, center_initial, radii_initial, center, radii, center_ref, radii_ref, titletext)
+function plotSeveralEllipsoidEstimations(sp, X, center_initial, radii_initial,...
+        center, radii, center_ref, radii_ref, titletext, isPCAactive, axis)
     hold(sp, 'on');
     scatter3(X(:,1),X(:,2), X(:,3),'b','.', 'DisplayName', 'input data');
-    plotOneEllipsoidEstimation( center_initial, radii_initial, 'g', 'initialization ellipsoid');
-    plotOneEllipsoidEstimation( center, radii, 'm', 'ellipsoid estimation');
-    plotOneEllipsoidEstimation( center_ref, radii_ref, 'c','reference estimation');
+    plotOneEllipsoidEstimation( center, radii, 'm', 'ellipsoid estimation', isPCAactive, axis);
+    plotOneEllipsoidEstimation( center_ref, radii_ref, 'c','reference estimation', isPCAactive, axis);
+    % initialization ellipsoid is always oriented along the coordinate axis
+    plotOneEllipsoidEstimation( center_initial, radii_initial, 'g', 'initialization ellipsoid', 0, axis);
     legend('Location', 'eastoutside');
     title(titletext);
     view(3);
     hold(sp, 'off');
 end
 
-function plotOneEllipsoidEstimation( center, radii, color, displayname)
+function plotOneEllipsoidEstimation( center, radii, color, displayname, isPCAactive, axis)
     if isreal(center) && isreal(radii)
-        [x,y,z] = ellipsoid(center(1), center(2), center(3), radii(1), radii(2), radii(3), 20);
+        n = 20;
+        [x,y,z] = ellipsoid(0, 0, 0, radii(1), radii(2), radii(3), n-1);
+        if ( isPCAactive )
+            rotatedCoordinates = axis' * [reshape(x,1,n*n); reshape(y,1,n*n); reshape(z,1,n*n)];
+            x = reshape(rotatedCoordinates(1, : ), [n, n]);
+            y = reshape(rotatedCoordinates(2, : ), [n, n]);
+            z = reshape(rotatedCoordinates(3, : ), [n, n]);
+        end
+        x = x + center(1);
+        y = y + center(2);
+        z = z + center(3);
         surf(x,y,z, 'FaceAlpha',0.15, 'FaceColor', color, 'EdgeColor', 'none', 'DisplayName', displayname);
     end
 end
