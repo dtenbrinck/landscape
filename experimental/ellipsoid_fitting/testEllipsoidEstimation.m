@@ -34,6 +34,7 @@ function estimateEllipsoidForDataSetAndPlotResults(X, descentMethod, mu1, mu2, e
     [center1, radii1, axis1, radii_ref1, center_ref1, radii_initial1, center_initial1] = estimateMinimumEllipsoid( X, descentMethod, 'log', mu1, mu2, eps, isPCAactive );
     table( radii_initial, radii, radii_ref, radii1, radii_ref1)
     table( center_initial, center, center_ref, center1, center_ref1 )
+    volumes = 4/3*pi*[ prod(radii_initial), prod(radii), prod(radii_ref), prod(radii1), prod(radii_ref1)]
 
     % plot ellipsoid fittings
     figure('Name', "Scatter plot and resulting ellipsoid fittings for " + datasetName + ", PCA= " + isPCAactive,'units','normalized','outerposition',[0 0 1 1]);
