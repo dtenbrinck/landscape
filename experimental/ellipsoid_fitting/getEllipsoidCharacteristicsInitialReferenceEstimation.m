@@ -87,33 +87,13 @@ inputParams.mu1 = mu1;
 inputParams.mu2 = mu2; % equal weights for volumetric parts
 inputParams.eps = eps;
 
-pca_transformation = eye(3);
-if size( X, 2 ) ~= 3
-    error( 'Input data must have three columns!' );
-else
-    if ( includePCA )
-        pca_transformation = (pca(X))';
-        X = (pca_transformation * X')';
-    end
-    x = X( :, 1 );
-    y = X( :, 2 );
-    z = X( :, 3 );
-end
-
-% need 10 or more data points
-if length( x ) < 6 
-   error( 'Must have at least 6 points to approximate an ellipsoidal fitting.' );
-end
-
-W = [ x .* x, ...
-    y .* y, ...
-    z .* z, ...
-    2 * x, ...
-    2 * y, ...
-    2 * z];  % ndatapoints x 6 ellipsoid parameters
-
-fprintf('Initialize ellipsoid parameter so that ellipsoid contains all data points.\n\n');
-[radii_initial, center_initial, v_initial, ~] = initializeEllipsoidParams(X);
+% [W, X, ~] = prepareCoordinateMatrixAndOrientationMatrix(X, includePCA);
+% [~, ~, v_initial] = initializeEllipsoidParams(X, 'pre');
+% 
+% X = removeFirstOutliers(W,v_initial, X);
+% do initialization again with improved data set
+[W, X, pca_transformation] = prepareCoordinateMatrixAndOrientationMatrix(X, includePCA);
+[radii_initial, center_initial, v_initial] = initializeEllipsoidParams(X, '');
 
 if ( strcmpi(maxDifferentiableApprox, 'sqr'))
     fprintf('Use quadratic approximation of non-diff. term.\n');
@@ -137,6 +117,37 @@ center_initial = pca_transformation \ center_initial;
 axis=pca_transformation';
 end
 
+function [W, X, pca_transformation] = prepareCoordinateMatrixAndOrientationMatrix(X, includePCA)
+    pca_transformation = eye(3);
+    if size( X, 2 ) ~= 3
+        error( 'Input data must have three columns!' );
+    else
+        if ( includePCA )
+            pca_transformation = (pca(X))';
+            X = (pca_transformation * X')';
+        end
+        x = X( :, 1 );
+        y = X( :, 2 );
+        z = X( :, 3 );
+    end
+
+    % need 10 or more data points
+    if length( x ) < 6 
+       error( 'Must have at least 6 points to approximate an ellipsoidal fitting.' );
+    end
+
+    W = [ x .* x, ...
+        y .* y, ...
+        z .* z, ...
+        2 * x, ...
+        2 * y, ...
+        2 * z];  % ndatapoints x 6 ellipsoid parameters
+end
+
+function X = removeFirstOutliers(W, v, X)
+    X = X( W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3)) - 1 <= 0, :);
+end
+
 function [radii, center] = tryToApproximateEllipsoidParamsWithDescentMethod(v0, W, grad_funct, phi, phi_dash, method)
     try
         v = performGradientSteps(v0, W, grad_funct, phi, phi_dash, method);
@@ -155,22 +166,26 @@ function [radii, center] = getReferenceEllipsoidApproximation(funct, v0)
     [radii, center] = getEllipsoidParams(v);
 end
 
-function [radii, center, v, axis] = initializeEllipsoidParams(X)
+function [radii, center, v] = initializeEllipsoidParams(X, radiiSelection)
     if size( X, 2 ) ~= 3
     error( 'Input data must have three columns!' );
     else
         x = X( :, 1 );
         y = X( :, 2 );
         z = X( :, 3 );
-        center=[mean(x); mean(y); mean(z)];
-        radiiMax = max(sqrt(sum((X-center') .* (X-center'), 2)));
-        radii=[radiiMax; radiiMax; radiiMax];
-        radiiMean = mean(sqrt(sum((X-center') .* (X-center'), 2)));
-%         radii=[radiiMean; radiiMean; radiiMean]; 
+        center=[mean(x); mean(y); min(z) + range(z) * 50/60];
+        if ( strcmpi(radiiSelection, 'pre'))
+            % prestep initialization for outlier removal
+            radiiComponent = mean(sqrt(sum((X-center') .* (X-center'), 2)));
+            % add additionally 10% 
+            radiiComponent = radiiComponent + 0.1*radiiComponent;
+        else
+            radiiComponent = max(sqrt(sum((X-center') .* (X-center'), 2)));
+        end
+        radii=[radiiComponent; radiiComponent; radiiComponent]; 
         v=zeros(6,1);
         v(1:3) = (1./radii).^2;
         v(4:6) = - center .* v(1:3);
-        axis = eye(3);
     end
 end
 

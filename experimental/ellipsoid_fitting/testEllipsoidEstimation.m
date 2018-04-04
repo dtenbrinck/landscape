@@ -1,6 +1,21 @@
 function testEllipsoidEstimation
-    close all;
-    
+    close all;    
+%     testSampleTestCases();
+    testOrigDataSet();
+end
+
+function testOrigDataSet()
+    % test with original data
+    load('data.mat');
+    X=data;
+    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0.09, 0.03, 1, 'data_set_orig', 0 );
+    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0.09, 0.03, 1, 'data_set_orig', 1 );
+    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0.08, 0.03, 1, 'data_set_orig', 1 );
+    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0.05, 0.03, 1, 'data_set_orig', 1 );
+    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0.03, 0.05, 1, 'data_set_orig', 1 );
+end
+
+function testSampleTestCases()
     X = firstDataSet();
     fprintf('Expecting an ellipsoid with approx. radii=(1,1,1), center=(0,0,0)...\n');
     % TODO improve regularisation parameter and maybe vary eps
@@ -27,7 +42,6 @@ function testEllipsoidEstimation
     fprintf('With PCA...\n');
     estimateEllipsoidForDataSetAndPlotResults(Y, 'grad', 4, 0.5, 1, 'data_set3', 1 );
 end
-
 function estimateEllipsoidForDataSetAndPlotResults(X, descentMethod, mu1, mu2, eps, datasetName, isPCAactive)
     [center, radii, axis, radii_ref, center_ref, radii_initial, center_initial] = getEllipsoidCharacteristicsInitialReferenceEstimation( X, descentMethod, 'sqr', mu1, mu2, eps, isPCAactive );
     fprintf('\n');
@@ -53,7 +67,7 @@ end
 
 function plotOrientationVectors(sp, center, axis)
     hold(sp, 'on');
-    axis= 5*axis;
+    axis= 100*axis;
     quiver3( center(1), center(2), center(3), axis(1,1), axis(2,1), axis(3,1), 'k', 'LineWidth', 2, 'Displayname','first axis');
     quiver3( center(1), center(2), center(3), axis(1,2), axis(2,2), axis(3,2), 'r', 'LineWidth', 2, 'Displayname','second axis');
     quiver3( center(1), center(2), center(3), axis(1,3), axis(2,3), axis(3,3), 'b', 'LineWidth', 2, 'Displayname','third axis');
@@ -63,7 +77,7 @@ end
 function plotSeveralEllipsoidEstimations(sp, X, center_initial, radii_initial,...
         center, radii, center_ref, radii_ref, titletext, isPCAactive, axis)
     hold(sp, 'on');
-    scatter3(X(:,1),X(:,2), X(:,3),'b','.', 'DisplayName', 'input data');
+    scatter3(X(:,1),X(:,2), X(:,3),'b','.', 'DisplayName', 'input data', 'MarkerFaceAlpha',0.1);
     plotOneEllipsoidEstimation( center, radii, 'm', 'ellipsoid estimation', isPCAactive, axis);
     plotOneEllipsoidEstimation( center_ref, radii_ref, 'c','reference estimation', isPCAactive, axis);
     plotOneEllipsoidEstimation( center_initial, radii_initial, 'g', 'initialization ellipsoid', isPCAactive, axis);
@@ -86,7 +100,7 @@ function plotOneEllipsoidEstimation( center, radii, color, displayname, isPCAact
         x = x + center(1);
         y = y + center(2);
         z = z + center(3);
-        surf(x,y,z, 'FaceAlpha',0.15, 'FaceColor', color, 'EdgeColor', 'none', 'DisplayName', displayname);
+        surf(x,y,z, 'FaceAlpha',0.3, 'FaceColor', color, 'EdgeColor', 'none', 'DisplayName', displayname);
     end
 end
 
