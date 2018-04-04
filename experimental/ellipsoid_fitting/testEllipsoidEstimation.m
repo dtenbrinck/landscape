@@ -48,7 +48,7 @@ function estimateEllipsoidForDataSetAndPlotResults(X, descentMethod, mu1, mu2, e
     plotSeveralEllipsoidEstimations(sp, X, center_initial1, radii_initial1,...
         center1, radii1, center_ref1, radii_ref1, titletext, isPCAactive, axis);
     plotOrientationVectors(sp, center1, axis1);
-    print("results/ellipsoid_estimation_" + datasetName + "_PCA=" + isPCAactive + ".png",'-dpng');
+%     print("results/ellipsoid_estimation_" + datasetName + "_PCA=" + isPCAactive + ".png",'-dpng');
 end
 
 function plotOrientationVectors(sp, center, axis)

@@ -164,7 +164,9 @@ function [radii, center, v, axis] = initializeEllipsoidParams(X)
         z = X( :, 3 );
         center=[mean(x); mean(y); mean(z)];
         radiiMax = max(sqrt(sum((X-center') .* (X-center'), 2)));
-        radii=[radiiMax; radiiMax; radiiMax]; 
+        radii=[radiiMax; radiiMax; radiiMax];
+        radiiMean = mean(sqrt(sum((X-center') .* (X-center'), 2)));
+%         radii=[radiiMean; radiiMean; radiiMean]; 
         v=zeros(6,1);
         v(1:3) = (1./radii).^2;
         v(4:6) = - center .* v(1:3);
@@ -181,8 +183,8 @@ funct = @(v) inputParams.eps*sum(...
 n = size(W,1);
 grad_funct = @(v) ( W' + ...
     [-(v(4)/v(1))^2; -(v(5)/v(2))^2; -(v(6)/v(3))^2; 2*v(4)/v(1); 2*v(5)/v(2); 2*v(6)/v(3)] * ones(1,n) ) * ...
-    ( exp(1/inputParams.eps .* (W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) ) ./ ...
-    ( 1 + exp(1/inputParams.eps .* (W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) )) ) + ...
+    ( exp((1/inputParams.eps) * (W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) ) ./ ...
+    ( 1 + exp((1/inputParams.eps) * (W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) )) ) + ...
     inputParams.mu1 * ( inputParams.mu2 * [2*(2*v(1) - v(2) - v(3));  2*(2*v(2) - v(1) - v(3)); 2*(2*v(3) - v(1) - v(2)); 0; 0; 0] + ...
     (1 - inputParams.mu2) * [-1./v(1:3).^2; 0; 0 ; 0]);
 end
@@ -321,7 +323,7 @@ function alpha_star = computeSteplength(v, descentDirection, phi, phi_dash)
             return;
         end
         alpha_current = alpha_next;
-        % next trial value with interpolation
+        % next trial value
         alpha_next = alpha_current +  increase_steplength;
         i = i+1;
     end

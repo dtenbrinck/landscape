@@ -31,8 +31,8 @@ if strcmp(scriptType,'processing')
   p = ParameterProcessing();
   
   % Select data path
-  p.dataPath = 'H:\CiM\imaging-zebrafish\source_code\embryo_registration\data';
-  p.resultsPath = 'H:\CiM\imaging-zebrafish\source_code\embryo_registration\experimental\ellipsoid_fitting\results';
+  p.dataPath = 'G:\CiM\imaging-zebrafish\source_code\embryo_registration\data';
+  p.resultsPath = 'G:\CiM\imaging-zebrafish\source_code\embryo_registration\experimental\ellipsoid_fitting\results';
  %%%%%%%%TODO temporarily use fix paths for data input and result files
 %   p.dataPath = uigetdir(dataPath,'Please select a folder with the data!');
 %   btn = questdlg('Do you want to use an existing results folder or create a new one?','New folder?','Create new','Use existing','Create new');
