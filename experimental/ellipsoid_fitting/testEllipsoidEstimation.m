@@ -16,7 +16,7 @@ function testEllipsoidEstimation
     fprintf('Without PCA...\n');
     estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 4, 0.5, 1, 'data_set2', 0 );
     fprintf('With PCA...\n');
-    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 4, 0.5, 1, 'data_set3', 1 );
+    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 4, 0.5, 1, 'data_set2', 1 );
     
     % Manipulate second data set by rotating it around the coordinate axis
     Y = thirdDataSet(X);
@@ -29,9 +29,9 @@ function testEllipsoidEstimation
 end
 
 function estimateEllipsoidForDataSetAndPlotResults(X, descentMethod, mu1, mu2, eps, datasetName, isPCAactive)
-    [center, radii, axis, radii_ref, center_ref, radii_initial, center_initial] = estimateMinimumEllipsoid( X, descentMethod, 'sqr', mu1, mu2, eps, isPCAactive );
+    [center, radii, axis, radii_ref, center_ref, radii_initial, center_initial] = getEllipsoidCharacteristicsInitialReferenceEstimation( X, descentMethod, 'sqr', mu1, mu2, eps, isPCAactive );
     fprintf('\n');
-    [center1, radii1, axis1, radii_ref1, center_ref1, radii_initial1, center_initial1] = estimateMinimumEllipsoid( X, descentMethod, 'log', mu1, mu2, eps, isPCAactive );
+    [center1, radii1, axis1, radii_ref1, center_ref1, radii_initial1, center_initial1] = getEllipsoidCharacteristicsInitialReferenceEstimation( X, descentMethod, 'log', mu1, mu2, eps, isPCAactive );
     table( radii_initial, radii, radii_ref, radii1, radii_ref1)
     table( center_initial, center, center_ref, center1, center_ref1 )
     volumes = 4/3*pi*[ prod(radii_initial), prod(radii), prod(radii_ref), prod(radii1), prod(radii_ref1)]
@@ -48,7 +48,7 @@ function estimateEllipsoidForDataSetAndPlotResults(X, descentMethod, mu1, mu2, e
     plotSeveralEllipsoidEstimations(sp, X, center_initial1, radii_initial1,...
         center1, radii1, center_ref1, radii_ref1, titletext, isPCAactive, axis);
     plotOrientationVectors(sp, center1, axis1);
-%     print(['results/ellipsoid_estimation_' datasetName '.png'],'-dpng')
+    print("results/ellipsoid_estimation_" + datasetName + "_PCA=" + isPCAactive + ".png",'-dpng');
 end
 
 function plotOrientationVectors(sp, center, axis)

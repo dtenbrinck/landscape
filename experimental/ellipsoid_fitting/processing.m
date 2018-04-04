@@ -59,12 +59,12 @@ for experiment=1:numberOfExperiments
         if p.debug_level >= 1; disp('Preprocessing data...'); end
         processedData = preprocessData(experimentData, p);
         
-        % segment data
-        if p.debug_level >= 1; disp('Segmenting GFP channel...'); end
-        processedData.landmark = segmentGFP(processedData.GFP, p.GFPseg, p.resolution);
-        
-        if p.debug_level >= 1; disp('Segmenting mCherry channel...'); end
-        [processedData.cells, processedData.cellCoordinates] = blobSegmentCells(processedData.mCherry, p.mCherryseg);
+%         % segment data
+%         if p.debug_level >= 1; disp('Segmenting GFP channel...'); end
+%         processedData.landmark = segmentGFP(processedData.GFP, p.GFPseg, p.resolution);
+%         
+%         if p.debug_level >= 1; disp('Segmenting mCherry channel...'); end
+%         [processedData.cells, processedData.cellCoordinates] = blobSegmentCells(processedData.mCherry, p.mCherryseg);
         
         if p.debug_level >= 1; disp('Segmenting DAPI channel...'); end
         [processedData.nuclei, processedData.nucleiCoordinates] = segmentDAPI(processedData.Dapi, p.DAPIseg, p.resolution);
@@ -75,58 +75,58 @@ for experiment=1:numberOfExperiments
         
         ellipsoid2 = estimateEmbryoSurface2(processedData.nucleiCoordinates, p.resolution);
         
-        % compute transformation which normalizes the estimated ellipsoid to a unit sphere
-        if p.debug_level >= 1; disp('Compute transformation from optimal ellipsoid...'); end
-        transformationMatrix = computeTransformationMatrix(ellipsoid);
-        
-        %%%%%%%%%%% VALIDITY CHECK FOR DEBUGGING
-        if p.debug_level >= 2
-            disp('Transform data for validity check...');
-            [ transformedData, transformedResolution ] = transformDataToSphere( processedData, p.resolution, transformationMatrix, ellipsoid, p.samples_cube );
-        end
-        
-        % project landmark onto unit sphere
-        if p.debug_level >= 1; disp('Projecting landmark onto embryo surface...'); end
-        [sphereCoordinates, landmarkCoordinates, landmarkOnSphere] = ...
-            projectLandmarkOnSphere(processedData.landmark, p.resolution, ellipsoid, p.samples_sphere);
-        
-        % estimate optimal rotation to register data to reference point with reference orientation
-        if p.debug_level >= 1; disp('Estimating transformation from projected landmark...'); end        
-        rotationMatrix = ...
-            registerLandmark(landmarkCoordinates, p.reg);
-        
-        %%%%%%%%%%% VALIDITY CHECK FOR DEBUGGING
-        if p.debug_level >= 2
-            % transform projected landmark with estimated rotation
-            registered_sphere = ...
-                transformCoordinates(sphereCoordinates, [0 0 0]', rotationMatrix, [0 0 0]');
-            
-            % visualize projection on unit sphere
-            visualizeProjectedLandmark(sphereCoordinates, landmarkOnSphere);
-            visualizeProjectedLandmark(registered_sphere', landmarkOnSphere);
-        end
-        
-%        % DEBUG
-%        transformedCoordinates = rotationMatrix * landmarkCoordinates';
-        
-        % compute registration transformation from original data space
-        transformation_registration = transformationMatrix * rotationMatrix';
-        
-        % register data
-        if p.debug_level >= 1; disp('Registering data...'); end
-        registeredData = registerData( processedData, p.resolution, transformation_registration, ellipsoid, p.samples_cube);
-                
-        % create filename to save results
-        results_filename = [p.resultsPath '/' experimentData.filename '_results.mat'];
-        
-        gatheredData = saveResults(experimentData, processedData, registeredData, ellipsoid, transformationMatrix, rotationMatrix, results_filename);
-        
-        % visualize results if needed
-        if p.visualization == 1
-            visualizeResults_new(gatheredData);
-        end
-        
-        if p.debug_level >= 1; disp('Saved results successfully!'); end
+%         % compute transformation which normalizes the estimated ellipsoid to a unit sphere
+%         if p.debug_level >= 1; disp('Compute transformation from optimal ellipsoid...'); end
+%         transformationMatrix = computeTransformationMatrix(ellipsoid);
+%         
+%         %%%%%%%%%%% VALIDITY CHECK FOR DEBUGGING
+%         if p.debug_level >= 2
+%             disp('Transform data for validity check...');
+%             [ transformedData, transformedResolution ] = transformDataToSphere( processedData, p.resolution, transformationMatrix, ellipsoid, p.samples_cube );
+%         end
+%         
+%         % project landmark onto unit sphere
+%         if p.debug_level >= 1; disp('Projecting landmark onto embryo surface...'); end
+%         [sphereCoordinates, landmarkCoordinates, landmarkOnSphere] = ...
+%             projectLandmarkOnSphere(processedData.landmark, p.resolution, ellipsoid, p.samples_sphere);
+%         
+%         % estimate optimal rotation to register data to reference point with reference orientation
+%         if p.debug_level >= 1; disp('Estimating transformation from projected landmark...'); end        
+%         rotationMatrix = ...
+%             registerLandmark(landmarkCoordinates, p.reg);
+%         
+%         %%%%%%%%%%% VALIDITY CHECK FOR DEBUGGING
+%         if p.debug_level >= 2
+%             % transform projected landmark with estimated rotation
+%             registered_sphere = ...
+%                 transformCoordinates(sphereCoordinates, [0 0 0]', rotationMatrix, [0 0 0]');
+%             
+%             % visualize projection on unit sphere
+%             visualizeProjectedLandmark(sphereCoordinates, landmarkOnSphere);
+%             visualizeProjectedLandmark(registered_sphere', landmarkOnSphere);
+%         end
+%         
+% %        % DEBUG
+% %        transformedCoordinates = rotationMatrix * landmarkCoordinates';
+%         
+%         % compute registration transformation from original data space
+%         transformation_registration = transformationMatrix * rotationMatrix';
+%         
+%         % register data
+%         if p.debug_level >= 1; disp('Registering data...'); end
+%         registeredData = registerData( processedData, p.resolution, transformation_registration, ellipsoid, p.samples_cube);
+%                 
+%         % create filename to save results
+%         results_filename = [p.resultsPath '/' experimentData.filename '_results.mat'];
+%         
+%         gatheredData = saveResults(experimentData, processedData, registeredData, ellipsoid, transformationMatrix, rotationMatrix, results_filename);
+%         
+%         % visualize results if needed
+%         if p.visualization == 1
+%             visualizeResults_new(gatheredData);
+%         end
+%         
+%         if p.debug_level >= 1; disp('Saved results successfully!'); end
         
     catch ERROR_MSG  %% ONLY EXECUTED WHEN ERRORS HAPPENING
         

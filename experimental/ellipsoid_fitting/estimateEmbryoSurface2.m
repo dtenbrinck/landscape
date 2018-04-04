@@ -4,8 +4,9 @@ X = (nuclei_coord(2,:) * resolution(2))';
 Z = (nuclei_coord(3,:) * resolution(3))';
 
 % fit ellipsoid to sharp points in areas in focus
-[ ellipsoid.center, ellipsoid.radii, ellipsoid.axes, ellipsoid.v] = estimateMinimumEllipsoid( [ X Y Z ] );
-
+[ ellipsoid.center, ellipsoid.radii, ellipsoid.axes, ~,~,~,~] = ...
+    getEllipsoidCharacteristicsInitialReferenceEstimation...
+    ( [ X Y Z ], 'grad', 'log', 4, 0.5, 1, 1);
 
 % check axes orientation and flip if necessary
 orientation = diag(ellipsoid.axes);
