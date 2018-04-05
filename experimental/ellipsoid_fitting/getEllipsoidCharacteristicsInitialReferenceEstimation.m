@@ -1,5 +1,5 @@
 %% estimate minimal ellipsoid fitting for data set
-function [ center, radii, axis, radii_ref, center_ref, radii_initial, center_initial ] = getEllipsoidCharacteristicsInitialReferenceEstimation( X, descentMethod, maxDifferentiableApprox, mu1, mu2, mu3, eps, includePCA)
+function [ center, radii, axis, radii_ref, center_ref, radii_initial, center_initial ] = getEllipsoidCharacteristicsInitialReferenceEstimation( X, descentMethod, maxDifferentiableApprox, mu1, mu2, mu3, gamma, includePCA)
 %
 % Fit an ellispoid/sphere to a set of xyz data points:
 %
@@ -16,7 +16,7 @@ function [ center, radii, axis, radii_ref, center_ref, radii_initial, center_ini
 %                           (see below)
 % * mu1, mu2        - regularisation parameter, weights for volumetric
 %                     terms, 0<=mu2<=1
-% * eps             - parameter for smooth approximation with logarithm of 
+% * gamma             - parameter for smooth approximation with logarithm of 
 %                     kink in max(0,...) 
 %
 % Output:
@@ -41,8 +41,8 @@ function [ center, radii, axis, radii_ref, center_ref, radii_initial, center_ini
 
 %       differentiable approximation for energyPart(v):
 %       (maxDifferentiableApprox = 'log')
-%            = sum of all data rows in X eps*(log(exp(0) + exp( 1/eps * < v, w > )) )
-%            = sum of all data rows in X eps*(log( 1 + exp( 1/eps * < v, w > )) )
+%            = sum of all data rows in X gamma*(log(exp(0) + exp( 1/gamma * < v, w > )) )
+%            = sum of all data rows in X gamma*(log( 1 + exp( 1/gamma * < v, w > )) )
 %       alternative differentiable approximation for energyPart(v):
 %       (maxDifferentiableApprox = 'sgr')
 %            = sum of all data rows in X ( max(0, < v, w > ) )^2
@@ -86,7 +86,7 @@ function [ center, radii, axis, radii_ref, center_ref, radii_initial, center_ini
 inputParams.mu1 = mu1; 
 inputParams.mu2 = mu2; 
 inputParams.mu3 = mu3;
-inputParams.eps = eps;
+inputParams.gamma = gamma;
 
 % [W, X, ~] = prepareCoordinateMatrixAndOrientationMatrix(X, includePCA);
 % [~, ~, v_initial] = initializeEllipsoidParams(X, 'pre');
@@ -95,10 +95,9 @@ inputParams.eps = eps;
 % do initialization again with improved data set
 [W, X, pca_transformation] = prepareCoordinateMatrixAndOrientationMatrix(X, includePCA);
 [radii_initial, center_initial, v_initial] = initializeEllipsoidParams(X, '');
-
 if ( strcmpi(maxDifferentiableApprox, 'sqr'))
     fprintf('Use quadratic approximation of non-diff. term.\n');
-    [funct, grad_funct] = initializeFunctionalAndGradientWithQuadraticMaxApprox( W, inputParams);
+    [funct, grad_funct] = initializeFunctionalAndGradientWithQuadraticMaxApprox( W, inputParams); 
 elseif ( strcmpi(maxDifferentiableApprox, 'log'))
     fprintf('Use logarithmic approximation of non-diff. term.\n');
     [funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox (W, inputParams);
@@ -191,8 +190,8 @@ function [radii, center, v] = initializeEllipsoidParams(X, radiiSelection)
 end
 
 function [funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox( W, inputParams)
-funct = @(v) inputParams.eps*sum(...
-    log( 1 + exp( 1/inputParams.eps * (W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) ) ) ) + ...
+funct = @(v) inputParams.gamma*sum(...
+    log( 1 + exp( 1/inputParams.gamma * (W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) ) ) ) + ...
     inputParams.mu1 * ( inputParams.mu2 * ( (v(1) - v(2))^2 + (v(3) - v(2))^2 + (v(1) - v(3))^2 )+ ...
     ( 1 - inputParams.mu2 ) * ( 1/v(1) + 1/v(2) + 1/v(3) ) ) + ...
     inputParams.mu3 * sum(( W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)).^2);
@@ -200,8 +199,8 @@ funct = @(v) inputParams.eps*sum(...
 n = size(W,1);
 grad_funct = @(v) ( W' + ...
     [-(v(4)/v(1))^2; -(v(5)/v(2))^2; -(v(6)/v(3))^2; 2*v(4)/v(1); 2*v(5)/v(2); 2*v(6)/v(3)] * ones(1,n) ) * ...
-    ( exp((1/inputParams.eps) * (W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) ) ./ ...
-    ( 1 + exp((1/inputParams.eps) * (W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) )) ) + ...
+    ( exp((1/inputParams.gamma) * (W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) ) ./ ...
+    ( 1 + exp((1/inputParams.gamma) * (W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) )) ) + ...
     inputParams.mu1 * ( inputParams.mu2 * [2*(2*v(1) - v(2) - v(3));  2*(2*v(2) - v(1) - v(3)); 2*(2*v(3) - v(1) - v(2)); 0; 0; 0] + ...
     ( 1 - inputParams.mu2 ) * [-1./v(1:3).^2; 0; 0 ; 0]) + ...
     inputParams.mu3 * ( W' + ...
@@ -211,7 +210,7 @@ end
 
 function [funct, grad_funct] = initializeFunctionalAndGradientWithQuadraticMaxApprox(W, inputParams)
 funct = @(v) sum( (max(0, W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1) ) ).^2 ) + ...
-    inputParams.mu1 * ( inputParams.mu2 * ((v(1) - v(2))^2 + (v(3) - v(2))^2 + (v(1) - v(3))^2)+ ...
+    inputParams.mu1 * ( inputParams.mu2 * ( (v(1) - v(2))^2 + (v(3) - v(2))^2 + (v(1) - v(3))^2 )+ ...
     ( 1 - inputParams.mu2 ) * ( 1/v(1) + 1/v(2) + 1/v(3) ) ) + ...
     inputParams.mu3 * sum(( W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)).^2);
 
@@ -221,9 +220,9 @@ grad_funct = @(v) ( ( W' + ...
     * 2 * (max(0, W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1) ) ) ) + ...
     inputParams.mu1 * ( inputParams.mu2 * [2*(2*v(1) - v(2) - v(3));  2*(2*v(2) - v(1) - v(3)); 2*(2*v(3) - v(1) - v(2)); 0; 0; 0] + ...
     ( 1 - inputParams.mu2 ) * [-1./v(1:3).^2; 0; 0 ; 0]) + ...
-    inputParams.mu3 * ( W' + ...
+    inputParams.mu3 * (( W' + ...
     [-(v(4)/v(1))^2; -(v(5)/v(2))^2; -(v(6)/v(3))^2; 2*v(4)/v(1); 2*v(5)/v(2); 2*v(6)/v(3)] * ones(1,n) ) * ...
-    2 * ( W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1));
+    2 * ( W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)));
 end
 
 function [phi, phi_dash] = initializePhiAndPhiDash (funct, grad_funct)
@@ -308,7 +307,13 @@ function alpha_star = computeSteplength(v, descentDirection, phi, phi_dash)
     if (descentDirection(3) < 0 ) 
         alpha_limit = min(alpha_limit, -v(3)/descentDirection(3));
     end
-    
+    TOL = 1e-15;
+    if ( alpha_limit < TOL)
+        fprintf('Stopping line search since maximal steplength smaller than %e.\n', TOL);
+        alpha_star = 0;
+        return;
+    end
+        
     phi_0 = phi( alpha_current, v, descentDirection);
     phi_dash_0 = phi_dash( alpha_current, v, descentDirection);
     phi_current = phi_0;
@@ -364,7 +369,7 @@ function alpha_star = zoom(alpha_lower, alpha_higher, ...
     maxIteration = 30;
     TOL = 1e-6;
     while iteration < maxIteration
-        if ( abs(alpha_lower-alpha_higher) < 1e-10)
+        if ( abs(alpha_lower-alpha_higher) < TOL)
            fprintf('Zoom interval too small to zoom in further.\n');
            alpha_star=alpha_higher;
            return;

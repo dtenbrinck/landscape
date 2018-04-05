@@ -8,22 +8,17 @@ function testOrigDataSet()
     % test with original data
     load('data.mat');
     X=data;
-%     estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0.09, 0.03, 1, 'data_set_orig', 0 );
-%     estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0.09, 0.03, 1, 'data_set_orig', 1 );
-%     estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0.08, 0.03, 1, 'data_set_orig', 1 );
-%     estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0.05, 0.03, 1, 'data_set_orig', 1 );
-    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0.01, 0.05, 1, 1, 'data_set_orig', 1 );
-    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0.03, 0.05, 1, 1, 'data_set_orig', 1 );
-    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0, 0.05, 1, 1, 'data_set_orig', 1 );
-    % this regularisation parameter result in a solution for with the log
+
+    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0.01, 0.05, 0, 1, 'data_set_orig', 1 );
+    % this regularisation parameter result in a solution with the log
     % approximation
-%     estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0.03, 0.05, 1, 'data_set_orig', 1 );
+     estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0.03, 0.05, 0, 1, 'data_set_orig', 1 );
 end
 
 function testSampleTestCases()
     X = firstDataSet();
     fprintf('Expecting an ellipsoid with approx. radii=(1,1,1), center=(0,0,0)...\n');
-    % TODO improve regularisation parameter and maybe vary eps
+    % TODO improve regularisation parameter and maybe vary gamma
     fprintf('Without PCA...\n');
     estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 10, 0.5, 1, 'data_set1', 0 );
     fprintf('With PCA...\n');
@@ -32,7 +27,7 @@ function testSampleTestCases()
     % second test data set
     X = secondDataSet();
     fprintf('\n\nExpecting an ellipsoid with approx. radii=(4,2,1), center=(1,2,2)...\n');
-    % TODO improve regularisation parameter and maybe vary eps
+    % TODO improve regularisation parameter and maybe vary gamma
     fprintf('Without PCA...\n');
     estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 4, 0.5, 1, 'data_set2', 0 );
     fprintf('With PCA...\n');
@@ -41,16 +36,16 @@ function testSampleTestCases()
     % Manipulate second data set by rotating it around the coordinate axis
     Y = thirdDataSet(X);
     fprintf('\n\nExpecting an ellipsoid like the one before but rotated around 45° in each direction...\n');
-    % TODO improve regularisation parameter and maybe vary eps
+    % TODO improve regularisation parameter and maybe vary gamma
     fprintf('Without PCA...\n');
     estimateEllipsoidForDataSetAndPlotResults(Y, 'grad', 4, 0.5, 1, 'data_set3', 0 );
     fprintf('With PCA...\n');
     estimateEllipsoidForDataSetAndPlotResults(Y, 'grad', 4, 0.5, 1, 'data_set3', 1 );
 end
-function estimateEllipsoidForDataSetAndPlotResults(X, descentMethod, mu1, mu2, mu3, eps, datasetName, isPCAactive)
-    [center, radii, axis, radii_ref, center_ref, radii_initial, center_initial] = getEllipsoidCharacteristicsInitialReferenceEstimation( X, descentMethod, 'sqr', mu1, mu2, mu3, eps, isPCAactive );
+function estimateEllipsoidForDataSetAndPlotResults(X, descentMethod, mu1, mu2, mu3, gamma, datasetName, isPCAactive)
+    [center, radii, axis, radii_ref, center_ref, radii_initial, center_initial] = getEllipsoidCharacteristicsInitialReferenceEstimation( X, descentMethod, 'sqr', mu1, mu2, mu3, gamma, isPCAactive );
     fprintf('\n');
-    [center1, radii1, axis1, radii_ref1, center_ref1, radii_initial1, center_initial1] = getEllipsoidCharacteristicsInitialReferenceEstimation( X, descentMethod, 'log', mu1, mu2, mu3, eps, isPCAactive );
+    [center1, radii1, axis1, radii_ref1, center_ref1, radii_initial1, center_initial1] = getEllipsoidCharacteristicsInitialReferenceEstimation( X, descentMethod, 'log', mu1, mu2, mu3, gamma, isPCAactive );
     table( radii_initial, radii, radii_ref, radii1, radii_ref1)
     table( center_initial, center, center_ref, center1, center_ref1 )
     volumes = 4/3*pi*[ prod(radii_initial), prod(radii), prod(radii_ref), prod(radii1), prod(radii_ref1)]
@@ -63,7 +58,7 @@ function estimateEllipsoidForDataSetAndPlotResults(X, descentMethod, mu1, mu2, m
         center, radii,  center_ref, radii_ref, titletext, isPCAactive, axis);
     plotOrientationVectors(sp, center, axis);
     sp = subplot(1,2,2);
-    titletext = datasetName + ": Approximation of non differentiable term with log(1+eps(...)), PCA=" + isPCAactive;
+    titletext = datasetName + ": Approximation of non differentiable term with log(1+gamma(...)), PCA=" + isPCAactive;
     plotSeveralEllipsoidEstimations(sp, X, center_initial1, radii_initial1,...
         center1, radii1, center_ref1, radii_ref1, titletext, isPCAactive, axis);
     plotOrientationVectors(sp, center1, axis1);
