@@ -8,11 +8,7 @@ function testOrigDataSet()
     % test with original data
     load('data.mat');
     X=data;
-
-    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0.01, 0.05, 1, 1, 'data_set_orig', 1 );
-    % this regularisation parameter result in a solution with the log
-    % approximation
-     estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0.02, 0.05, 1, 1, 'data_set_orig', 1 );
+    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0.02, 0.05, 1.1, 1, 'data_set_orig', 1 );   
 end
 
 function testSampleTestCases()

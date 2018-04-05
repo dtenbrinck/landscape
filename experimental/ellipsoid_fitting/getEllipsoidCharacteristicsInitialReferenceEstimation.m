@@ -321,7 +321,6 @@ function alpha_star = computeSteplength(v, descentDirection, phi, phi_dash)
     maxIteration = 30;
     increase_steplength = (alpha_limit - alpha_current ) / maxIteration;
     alpha_next = alpha_current +  increase_steplength; % initialize next alpha
-    
     while i <= maxIteration
         phi_next = phi( alpha_next, v, descentDirection);
         % stopping criteria if we cannot attain lower function value after ten
@@ -367,10 +366,10 @@ function alpha_star = zoom(alpha_lower, alpha_higher, ...
     % use algorithm 3.6 to zoom in to appropriate step length
     iteration = 0;
     maxIteration = 30;
-    TOL = 1e-6;
+    TOL = 1e-16;
     while iteration < maxIteration
         if ( abs(alpha_lower-alpha_higher) < TOL)
-           fprintf('Zoom interval too small to zoom in further.\n');
+           fprintf('Zoom interval after %d zoom iterations too small to zoom in further.\n', iteration);
            alpha_star=alpha_higher;
            return;
         end
