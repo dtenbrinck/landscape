@@ -9,10 +9,10 @@ function testOrigDataSet()
     load('data.mat');
     X=data;
 
-    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0.01, 0.05, 0, 1, 'data_set_orig', 1 );
+    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0.01, 0.05, 1, 1, 'data_set_orig', 1 );
     % this regularisation parameter result in a solution with the log
     % approximation
-     estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0.03, 0.05, 0, 1, 'data_set_orig', 1 );
+     estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0.02, 0.05, 1, 1, 'data_set_orig', 1 );
 end
 
 function testSampleTestCases()
@@ -83,7 +83,7 @@ function plotSeveralEllipsoidEstimations(sp, X, center_initial, radii_initial,..
     plotOneEllipsoidEstimation( center_initial, radii_initial, 'g', 'initialization ellipsoid', isPCAactive, axis);
     legend('Location', 'eastoutside');
     title(titletext, 'Interpreter', 'none');
-    view(3);
+    view(90, 0);
     hold(sp, 'off');
 end
 
