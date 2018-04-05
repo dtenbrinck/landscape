@@ -8,11 +8,16 @@ function testOrigDataSet()
     % test with original data
     load('data.mat');
     X=data;
-    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0.09, 0.03, 1, 'data_set_orig', 0 );
-    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0.09, 0.03, 1, 'data_set_orig', 1 );
-    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0.08, 0.03, 1, 'data_set_orig', 1 );
-    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0.05, 0.03, 1, 'data_set_orig', 1 );
-    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0.03, 0.05, 1, 'data_set_orig', 1 );
+%     estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0.09, 0.03, 1, 'data_set_orig', 0 );
+%     estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0.09, 0.03, 1, 'data_set_orig', 1 );
+%     estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0.08, 0.03, 1, 'data_set_orig', 1 );
+%     estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0.05, 0.03, 1, 'data_set_orig', 1 );
+    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0.01, 0.05, 1, 1, 'data_set_orig', 1 );
+    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0.03, 0.05, 1, 1, 'data_set_orig', 1 );
+    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0, 0.05, 1, 1, 'data_set_orig', 1 );
+    % this regularisation parameter result in a solution for with the log
+    % approximation
+%     estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0.03, 0.05, 1, 'data_set_orig', 1 );
 end
 
 function testSampleTestCases()
@@ -42,10 +47,10 @@ function testSampleTestCases()
     fprintf('With PCA...\n');
     estimateEllipsoidForDataSetAndPlotResults(Y, 'grad', 4, 0.5, 1, 'data_set3', 1 );
 end
-function estimateEllipsoidForDataSetAndPlotResults(X, descentMethod, mu1, mu2, eps, datasetName, isPCAactive)
-    [center, radii, axis, radii_ref, center_ref, radii_initial, center_initial] = getEllipsoidCharacteristicsInitialReferenceEstimation( X, descentMethod, 'sqr', mu1, mu2, eps, isPCAactive );
+function estimateEllipsoidForDataSetAndPlotResults(X, descentMethod, mu1, mu2, mu3, eps, datasetName, isPCAactive)
+    [center, radii, axis, radii_ref, center_ref, radii_initial, center_initial] = getEllipsoidCharacteristicsInitialReferenceEstimation( X, descentMethod, 'sqr', mu1, mu2, mu3, eps, isPCAactive );
     fprintf('\n');
-    [center1, radii1, axis1, radii_ref1, center_ref1, radii_initial1, center_initial1] = getEllipsoidCharacteristicsInitialReferenceEstimation( X, descentMethod, 'log', mu1, mu2, eps, isPCAactive );
+    [center1, radii1, axis1, radii_ref1, center_ref1, radii_initial1, center_initial1] = getEllipsoidCharacteristicsInitialReferenceEstimation( X, descentMethod, 'log', mu1, mu2, mu3, eps, isPCAactive );
     table( radii_initial, radii, radii_ref, radii1, radii_ref1)
     table( center_initial, center, center_ref, center1, center_ref1 )
     volumes = 4/3*pi*[ prod(radii_initial), prod(radii), prod(radii_ref), prod(radii1), prod(radii_ref1)]
@@ -100,7 +105,7 @@ function plotOneEllipsoidEstimation( center, radii, color, displayname, isPCAact
         x = x + center(1);
         y = y + center(2);
         z = z + center(3);
-        surf(x,y,z, 'FaceAlpha',0.3, 'FaceColor', color, 'EdgeColor', 'none', 'DisplayName', displayname);
+        surf(x,y,z, 'FaceAlpha',0.15, 'FaceColor', color, 'EdgeColor', 'none', 'DisplayName', displayname);
     end
 end
 
