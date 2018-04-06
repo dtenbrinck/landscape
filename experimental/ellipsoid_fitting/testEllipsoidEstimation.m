@@ -5,20 +5,20 @@ function testEllipsoidEstimation
 end
 
 function testOrigDataSet()
+    fprintf('#########################\n');
+    fprintf('#########################\n');
     % test with original data
     load('data.mat');
     X=data;
     regularisationParams.mu1 = 0.0002; 
     regularisationParams.mu2 = 0.02; 
     regularisationParams.mu3 = 1;
-    regularisationParams.mu4 = 1;
+    regularisationParams.mu4 = 10;
     regularisationParams.gamma = 1;
     estimateEllipsoidForDataSetAndPlotResults(X, 'grad', regularisationParams, 'data_set_orig', 1 );  
     fprintf('#########################\n');
-%     estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0.2, 0.01, 10, 1, 'data_set_orig', 1 );  
-%     fprintf('#########################\n');
-%     estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 2, 0.01, 100, 1, 'data_set_orig', 1 );  
-%     fprintf('#########################\n');
+    regularisationParams.mu4 = 0;
+    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', regularisationParams, 'data_set_orig', 1 ); 
 end
 
 function testSampleTestCases()
@@ -53,9 +53,9 @@ function estimateEllipsoidForDataSetAndPlotResults(X, descentMethod, regularisat
     fprintf('\n');
     [center1, radii1, axis1, radii_ref1, center_ref1, radii_initial1, center_initial1] = getEllipsoidCharacteristicsInitialReferenceEstimation( X, descentMethod, 'log', regularisationParams, isPCAactive );
     table( radii_initial, radii, radii_ref, radii1, radii_ref1)
-    table( center_initial, center, center_ref, center1, center_ref1 )
-    volumes = 4/3*pi*[ prod(radii_initial), prod(radii), prod(radii_ref), prod(radii1), prod(radii_ref1)]
-%     return;
+%     table( center_initial, center, center_ref, center1, center_ref1 )
+%     volumes = 4/3*pi*[ prod(radii_initial), prod(radii), prod(radii_ref), prod(radii1), prod(radii_ref1)]
+     return;
     % plot ellipsoid fittings
     figure('Name', "Scatter plot and resulting ellipsoid fittings for " + datasetName + ", PCA= " + isPCAactive,'units','normalized','outerposition',[0 0 1 1]);
     sp = subplot(1,2,1);
