@@ -13,12 +13,14 @@ function testOrigDataSet()
     regularisationParams.mu1 = 0.0002; 
     regularisationParams.mu2 = 0.02; 
     regularisationParams.mu3 = 1;
-    regularisationParams.mu4 = 10;
+    regularisationParams.mu4 = 0.01;%1e4;
     regularisationParams.gamma = 1;
-    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', regularisationParams, 'data_set_orig', 1 );  
-    fprintf('#########################\n');
-    regularisationParams.mu4 = 0;
-    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', regularisationParams, 'data_set_orig', 1 ); 
+    mu4s = [0.001; 0.01; 0.1; 1; 10; 100; 1000; 100000; 0];
+    for (i = 1:length(mu4s))
+        regularisationParams.mu4 = mu4s(i);
+        fprintf('######################### with mu4 =%f \n', regularisationParams.mu4);
+        estimateEllipsoidForDataSetAndPlotResults(X, 'grad', regularisationParams, 'data_set_orig', 1 ); 
+    end
 end
 
 function testSampleTestCases()
@@ -55,9 +57,10 @@ function estimateEllipsoidForDataSetAndPlotResults(X, descentMethod, regularisat
     table( radii_initial, radii, radii_ref, radii1, radii_ref1)
 %     table( center_initial, center, center_ref, center1, center_ref1 )
 %     volumes = 4/3*pi*[ prod(radii_initial), prod(radii), prod(radii_ref), prod(radii1), prod(radii_ref1)]
-     return;
+      return;
     % plot ellipsoid fittings
-    figure('Name', "Scatter plot and resulting ellipsoid fittings for " + datasetName + ", PCA= " + isPCAactive,'units','normalized','outerposition',[0 0 1 1]);
+    figure('Name', "Scatter plot and resulting ellipsoid fittings for " + datasetName + ", PCA= " + isPCAactive,...
+        'units','pixels','outerposition',[0 0 1800 1000]);
     sp = subplot(1,2,1);
     titletext = datasetName + ": Approximation of non differentiable term with (max(0,...))^2, PCA=" + isPCAactive;
     plotSeveralEllipsoidEstimations(sp, X, center_initial, radii_initial,...
@@ -87,7 +90,7 @@ function plotSeveralEllipsoidEstimations(sp, X, center_initial, radii_initial,..
     plotOneEllipsoidEstimation( center, radii, 'm', 'ellipsoid estimation', isPCAactive, axis);
     plotOneEllipsoidEstimation( center_ref, radii_ref, 'c','reference estimation', isPCAactive, axis);
     plotOneEllipsoidEstimation( center_initial, radii_initial, 'g', 'initialization ellipsoid', isPCAactive, axis);
-    legend('Location', 'eastoutside');
+    legend('Location', 'southoutside');
     title(titletext, 'Interpreter', 'none');
     view(90, 0);
     hold(sp, 'off');

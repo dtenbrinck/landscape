@@ -92,6 +92,7 @@ function [ center, radii, axis, radii_ref, center_ref, radii_initial, center_ini
 [W, X, pca_transformation] = prepareCoordinateMatrixAndOrientationMatrix(X, includePCA);
 [radii_initial, center_initial, v_initial] = initializeEllipsoidParams(X, '');
 radiiMax = getMaximalRadiiLimits(X);
+radiiMax
 [volumetricregulariser, grad_volumetricRegulariser] = initializeVolumetricRegulariserFunctionalAndGradient(W, regularisationParams, radiiMax);
 if ( strcmpi(maxDifferentiableApprox, 'sqr'))
     fprintf('Use quadratic approximation of non-diff. term.\n');
@@ -194,7 +195,7 @@ function [radiiMax] = getMaximalRadiiLimits(X)
     radiiMax(1) = ( max(X(:,1)) - min(X(:,1)) )/ 2; 
     radiiMax(2) = ( max(X(:,2)) - min(X(:,2)) )/ 2;
     % assume that only half of ellipsoid in z direction is microscopied 
-    radiiMax(3) = ( max(X(:,3)) - min(X(:,3)) );
+    radiiMax(3) = ( max(X(:,3)) - min(X(:,3)) )/ 2 * 100/55;
     radiiMax=radiiMax';
 end
 
@@ -231,7 +232,11 @@ function [volumetricregulariser, grad_volumetricRegulariser] = initializeVolumet
     regularisationParams.mu2 * ( 1/v(1) + 1/v(2) + 1/v(3) )  + ...
     regularisationParams.mu3 * sum(( W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)).^2) + ...
     regularisationParams.mu4 * sum ( log( 1 + exp( (1./radiiMax).^2 - v(1:3)) ) );
+
+%     regularisationParams.mu4 * sum ( log( 1 + exp( (1./radiiMax).^2 - v(1:3)) ) );
 %     regularisationParams.mu4 * sum( ( max( zeros(3,1), (1./radiiMax).^2 - v(1:3) ) ).^2 );
+% the following approx. does not work well
+%     regularisationParams.mu4 * sum( ( max( zeros(3,1), 1./v(1:3) - radiiMax.^2 ) ).^2 );
 
 n = size(W,1);
 grad_volumetricRegulariser = @(v) ...
@@ -240,8 +245,13 @@ grad_volumetricRegulariser = @(v) ...
     regularisationParams.mu3 * (( W' + ...
     [-(v(4)/v(1))^2; -(v(5)/v(2))^2; -(v(6)/v(3))^2; 2*v(4)/v(1); 2*v(5)/v(2); 2*v(6)/v(3)] * ones(1,n) ) * ...
     2 * ( W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1))) + ...
-    regularisationParams.mu4 * [-1 ./( 1 + exp( (1./radiiMax).^2 - v(1:3)) );0; 0; 0 ];
+    regularisationParams.mu4 * [-exp( (1./radiiMax).^2 - v(1:3)) ./( 1 + exp( (1./radiiMax).^2 - v(1:3)) );0; 0; 0 ];
+
+%     regularisationParams.mu4 * [-exp( (1./radiiMax).^2 - v(1:3)) ./( 1 + exp( (1./radiiMax).^2 - v(1:3)) );0; 0; 0 ];
 %     regularisationParams.mu4 * [ -2* max( 0, (1./radiiMax).^2 - v(1:3) ); 0; 0; 0 ];
+% the following approx. does not work well
+%     regularisationParams.mu4 * [ -2* max( zeros(3,1), 1./v(1:3) - radiiMax.^2 )./(v(1:3).^2); 0; 0; 0 ]; 
+
 end
 
 function [phi, phi_dash] = initializePhiAndPhiDash (funct, grad_funct)
