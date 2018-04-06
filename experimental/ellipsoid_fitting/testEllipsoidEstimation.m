@@ -8,7 +8,7 @@ function testOrigDataSet()
     % test with original data
     load('data.mat');
     X=data;
-    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0.02, 0.05, 1.1, 1, 'data_set_orig', 1 );   
+    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', 0.0002, 0.02, 1, 1, 'data_set_orig', 1 );  
 end
 
 function testSampleTestCases()

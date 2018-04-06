@@ -1,6 +1,8 @@
 %% estimate minimal ellipsoid fitting for data set
-function [ center, radii, axis, radii_ref, center_ref, radii_initial, center_initial ] = getEllipsoidCharacteristicsInitialReferenceEstimation( X, descentMethod, maxDifferentiableApprox, mu1, mu2, mu3, gamma, includePCA)
-%
+function [ center, radii, axis, radii_ref, center_ref, radii_initial, center_initial ] ...
+    = getEllipsoidCharacteristicsInitialReferenceEstimation...
+    ( X, descentMethod, maxDifferentiableApprox, mu1, mu2, mu3, gamma, includePCA)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Fit an ellispoid/sphere to a set of xyz data points:
 %
 %   [center, radii, evecs, v ] = estimateMinimumEllipsoid( X )
@@ -14,8 +16,8 @@ function [ center, radii, axis, radii_ref, center_ref, radii_initial, center_ini
 % * maxDifferentiableApprox - 'sqr' : approximate kink with (max(...))^2
 %                           - 'log' : approximate kink with log(...) 
 %                           (see below)
-% * mu1, mu2        - regularisation parameter, weights for volumetric
-%                     terms, 0<=mu2<=1
+% * mu1, mu2, mu3     - regularisation parameter, weights for volumetric
+%                     terms
 % * gamma             - parameter for smooth approximation with logarithm of 
 %                     kink in max(0,...) 
 %
@@ -28,35 +30,37 @@ function [ center, radii, axis, radii_ref, center_ref, radii_initial, center_ini
 % only allowing few data points to lie outside. 
 % Find minimizer v of the following energy functional f:
 % 
-%   argmin f(v) = argmin [ energyPart(v) + 
-%               mu1 * ( mu2 * equidistantRadii(v) 
-%                       + (1 - mu2) * smallRadii(v) ) ]
+%   argmin f(v) = argmin [ energyPart(v) +  mu1 * equidistantRadii(v) 
+%                 + mu2 * smallRadii(v) + mu3 * surfaceDistances(v) ]
 %       s.t. v_1, v_2, v_3 > 0
 %
-%   with:   v describing describing the ellipsoid algebraically: 
-%      v_1*x^2 + v_2*y^2 + v_3*z^2 + 2*v_4*x + 2*v_5*y + 2*v_6*z + v_7 = 0
+%   with:   v describing describing the ellipsoid algebraically ellipsoid(v) = 0: 
+%      ellipsoid(v) = v_1*x^2 + v_2*y^2 + v_3*z^2 + 2*v_4*x + 2*v_5*y + 2*v_6*z 
+%                             + v_4^2 / v_1 + v_5^2 / v_2 + v_6^2 / v_3 - 1 
+%                   = < v, w> + v_4^2 / v_1 + v_5^2 / v_2 + v_6^2 / v_3 - 1 
+%               with w = (x^2, y^2, z^2, 2*x, 2*y, 2*z)
+%      
 %           equidistantRadii(v) = (v_1 - v_2)^2 + (v_2 - v_3)^2 + (v_1 - v_3)^2 
 %           smallRadii(v) = 1 / v_1 + 1 / v_2 + 1 / v_3 
-%           energyPart(v) = sum of all data rows in X ( max(0, < v, w > ) )
+%           surfaceDistances(v) = sum of all data rows in X  of ( ellipsoid(v)^2 )
+%           energyPart(v) = sum of all data rows in X  of 
+%               ( max(0, ellipsoid(v)) )
 
 %       differentiable approximation for energyPart(v):
 %       (maxDifferentiableApprox = 'log')
-%            = sum of all data rows in X gamma*(log(exp(0) + exp( 1/gamma * < v, w > )) )
-%            = sum of all data rows in X gamma*(log( 1 + exp( 1/gamma * < v, w > )) )
+%            = sum of all data rows in X gamma*(log(exp(0) + exp( 1/gamma * ellipsoid(v))) )
+%            = sum of all data rows in X gamma*(log( 1 + exp( 1/gamma * ellipsoid(v) )) )
 %       alternative differentiable approximation for energyPart(v):
 %       (maxDifferentiableApprox = 'sgr')
-%            = sum of all data rows in X ( max(0, < v, w > ) )^2
+%            = sum of all data rows in X ( max(0, ellipsoid(v) ) )^2
 %       regularisation parameter: mu1, mu2 with 0 <= mu2 <= 1
 %            
-% with w = (x^2, y^2, z^2, 2*x, 2*y, 2*z, 1)
 % and v initially derived from the implicit function describing 
 % an ellipsoid centered at center = (x_0; y_0; z_0)
 % and oriented along the coordinate axis 
-% TODO: it is important to to find with PCA of the data points the first 
-% axis (1. Hauptachse) of the ellipsoid and rotate the data set accordingly
 %
 %       [(x-x_0)/a]^2 + [(y-y_0)/a]^2 + [(z-z_0)/a]^2 -1 = 0
-% <=>   v_1*x^2 + v_2*y^2 + v_3*z^2 + 2*v_4*x + 2*v_5*y + 2*v_6*z + v_7 = 0
+% <=>   ellipsoid(v) = 0
 %
 % with:   
 %   v_1     = 1/a^2
@@ -66,9 +70,6 @@ function [ center, radii, axis, radii_ref, center_ref, radii_initial, center_ini
 %   v_4     = -x_0/a^2  = -x_0 * v_1
 %   v_5     = -y_0/b^2  = -y_0 * v_2
 %   v_6     = -z_0/c^2  = -z_0 * v_3
-%
-%   v_7     =  (x_0/a)^2 + (y_0/b)^2 + (z_0/c)^2 - 1
-%           =  v_4^2/v_1 + v_5^2/v_2 + v_6^2/v_3 - 1
 %
 %   Determine output parameter:
 % * radii:      a = 1/sqrt(v_1)
@@ -81,12 +82,12 @@ function [ center, radii, axis, radii_ref, center_ref, radii_initial, center_ini
 % Ramona Sasse
 % Date:
 % April, 2018
-%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-inputParams.mu1 = mu1; 
-inputParams.mu2 = mu2; 
-inputParams.mu3 = mu3;
-inputParams.gamma = gamma;
+regularisationParams.mu1 = mu1; 
+regularisationParams.mu2 = mu2; 
+regularisationParams.mu3 = mu3;
+regularisationParams.gamma = gamma;
 
 % [W, X, ~] = prepareCoordinateMatrixAndOrientationMatrix(X, includePCA);
 % [~, ~, v_initial] = initializeEllipsoidParams(X, 'pre');
@@ -95,18 +96,19 @@ inputParams.gamma = gamma;
 % do initialization again with improved data set
 [W, X, pca_transformation] = prepareCoordinateMatrixAndOrientationMatrix(X, includePCA);
 [radii_initial, center_initial, v_initial] = initializeEllipsoidParams(X, '');
+[volumetricregulariser, grad_volumetricRegulariser] = initializeVolumetricRegulariserFunctionalAndGradient(W, regularisationParams);
 if ( strcmpi(maxDifferentiableApprox, 'sqr'))
     fprintf('Use quadratic approximation of non-diff. term.\n');
-    [funct, grad_funct] = initializeFunctionalAndGradientWithQuadraticMaxApprox( W, inputParams); 
+    [funct, grad_funct] = initializeFunctionalAndGradientWithQuadraticMaxApprox( W, volumetricregulariser, grad_volumetricRegulariser); 
 elseif ( strcmpi(maxDifferentiableApprox, 'log'))
     fprintf('Use logarithmic approximation of non-diff. term.\n');
-    [funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox (W, inputParams);
+    [funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox (W, regularisationParams, volumetricregulariser, grad_volumetricRegulariser);
 else
    error('No or unknown type for approximation of max with differentiable function!') 
 end
 
 [phi, phi_dash] = initializePhiAndPhiDash (funct, grad_funct);
-[radii, center] = tryToApproximateEllipsoidParamsWithDescentMethod(v_initial, W, grad_funct, phi, phi_dash, descentMethod);
+[radii, center] = approximateEllipsoidParamsWithDescentMethod(v_initial, W, grad_funct, phi, phi_dash, descentMethod, funct);
 [radii_ref, center_ref] = getReferenceEllipsoidApproximation(funct, v_initial);
 
 % invert coordinate transformation caused by PCA back for center vectors
@@ -148,21 +150,23 @@ function X = removeFirstOutliers(W, v, X)
     X = X( W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3)) - 1 <= 0, :);
 end
 
-function [radii, center] = tryToApproximateEllipsoidParamsWithDescentMethod(v0, W, grad_funct, phi, phi_dash, method)
+function [radii, center] = approximateEllipsoidParamsWithDescentMethod(v0, W, grad_funct, phi, phi_dash, method, funct)
     try
         v = performGradientSteps(v0, W, grad_funct, phi, phi_dash, method);
         [radii, center] = getEllipsoidParams(v);
+        fprintf('################## est. energy %f\n', funct(v));
     catch ERROR_MSG
         disp(ERROR_MSG);
-        fprintf('Setting default output parameter.\n');
-        radii = 1i*(ones(3,1));
-        center = 1i*(ones(3,1));
+        %fprintf('Setting default output parameter.\n');
+        radii = ones(3,1);
+        center = ones(3,1);
     end
 end
 
 function [radii, center] = getReferenceEllipsoidApproximation(funct, v0)
-    fprintf('Approximate ellipsoid with MATLAB reference method...\n');
-    v = fminsearch(funct, v0);
+    %fprintf('Approximate ellipsoid with MATLAB reference method...\n');
+    [v, fval] = fminsearch(funct, v0);
+    fprintf('################## ref. energy %f\n', fval);
     [radii, center] = getEllipsoidParams(v);
 end
 
@@ -189,38 +193,41 @@ function [radii, center, v] = initializeEllipsoidParams(X, radiiSelection)
     end
 end
 
-function [funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox( W, inputParams)
-funct = @(v) inputParams.gamma*sum(...
-    log( 1 + exp( 1/inputParams.gamma * (W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) ) ) ) + ...
-    inputParams.mu1 * ( inputParams.mu2 * ( (v(1) - v(2))^2 + (v(3) - v(2))^2 + (v(1) - v(3))^2 )+ ...
-    ( 1 - inputParams.mu2 ) * ( 1/v(1) + 1/v(2) + 1/v(3) ) ) + ...
-    inputParams.mu3 * sum(( W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)).^2);
+function [funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox( W, regularisationParams, volumetricregulariser, grad_volumetricRegulariser)
+funct = @(v) regularisationParams.gamma*sum(...
+    log( 1 + exp( 1/regularisationParams.gamma * (W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) ) ) ) + ...
+    volumetricregulariser(v);
 
 n = size(W,1);
 grad_funct = @(v) ( W' + ...
     [-(v(4)/v(1))^2; -(v(5)/v(2))^2; -(v(6)/v(3))^2; 2*v(4)/v(1); 2*v(5)/v(2); 2*v(6)/v(3)] * ones(1,n) ) * ...
-    ( exp((1/inputParams.gamma) * (W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) ) ./ ...
-    ( 1 + exp((1/inputParams.gamma) * (W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) )) ) + ...
-    inputParams.mu1 * ( inputParams.mu2 * [2*(2*v(1) - v(2) - v(3));  2*(2*v(2) - v(1) - v(3)); 2*(2*v(3) - v(1) - v(2)); 0; 0; 0] + ...
-    ( 1 - inputParams.mu2 ) * [-1./v(1:3).^2; 0; 0 ; 0]) + ...
-    inputParams.mu3 * ( W' + ...
-    [-(v(4)/v(1))^2; -(v(5)/v(2))^2; -(v(6)/v(3))^2; 2*v(4)/v(1); 2*v(5)/v(2); 2*v(6)/v(3)] * ones(1,n) ) * ...
-    2 * ( W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1));
+    ( exp((1/regularisationParams.gamma) * (W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) ) ./ ...
+    ( 1 + exp((1/regularisationParams.gamma) * (W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) )) ) + ...
+    grad_volumetricRegulariser(v);
 end
 
-function [funct, grad_funct] = initializeFunctionalAndGradientWithQuadraticMaxApprox(W, inputParams)
+function [funct, grad_funct] = initializeFunctionalAndGradientWithQuadraticMaxApprox(W, volumetricregulariser, grad_volumetricRegulariser)
 funct = @(v) sum( (max(0, W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1) ) ).^2 ) + ...
-    inputParams.mu1 * ( inputParams.mu2 * ( (v(1) - v(2))^2 + (v(3) - v(2))^2 + (v(1) - v(3))^2 )+ ...
-    ( 1 - inputParams.mu2 ) * ( 1/v(1) + 1/v(2) + 1/v(3) ) ) + ...
-    inputParams.mu3 * sum(( W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)).^2);
+    volumetricregulariser(v);
 
 n = size(W,1);
 grad_funct = @(v) ( ( W' + ...
     [-(v(4)/v(1))^2; -(v(5)/v(2))^2; -(v(6)/v(3))^2; 2*v(4)/v(1); 2*v(5)/v(2); 2*v(6)/v(3)] * ones(1,n) ) ...
     * 2 * (max(0, W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1) ) ) ) + ...
-    inputParams.mu1 * ( inputParams.mu2 * [2*(2*v(1) - v(2) - v(3));  2*(2*v(2) - v(1) - v(3)); 2*(2*v(3) - v(1) - v(2)); 0; 0; 0] + ...
-    ( 1 - inputParams.mu2 ) * [-1./v(1:3).^2; 0; 0 ; 0]) + ...
-    inputParams.mu3 * (( W' + ...
+    grad_volumetricRegulariser(v);
+end
+
+function [volumetricregulariser, grad_volumetricRegulariser] = initializeVolumetricRegulariserFunctionalAndGradient(W, regularisationParams)
+    volumetricregulariser = @(v) ...
+    regularisationParams.mu1 * ( (v(1) - v(2))^2 + (v(3) - v(2))^2 + (v(1) - v(3))^2 )+ ...
+    regularisationParams.mu2 * ( 1/v(1) + 1/v(2) + 1/v(3) )  + ...
+    regularisationParams.mu3 * sum(( W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)).^2);
+
+n = size(W,1);
+grad_volumetricRegulariser = @(v) ...
+    regularisationParams.mu1 * [2*(2*v(1) - v(2) - v(3));  2*(2*v(2) - v(1) - v(3)); 2*(2*v(3) - v(1) - v(2)); 0; 0; 0] + ...
+    regularisationParams.mu2 * [-1./v(1:3).^2; 0; 0 ; 0] + ...
+    regularisationParams.mu3 * (( W' + ...
     [-(v(4)/v(1))^2; -(v(5)/v(2))^2; -(v(6)/v(3))^2; 2*v(4)/v(1); 2*v(5)/v(2); 2*v(6)/v(3)] * ones(1,n) ) * ...
     2 * ( W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)));
 end
@@ -247,9 +254,9 @@ function v = performGradientSteps(v, W, grad_funct, phi, phi_dash, method)
     maxIteration = 1000;
     n = size(W,1);
     if ( strcmpi(method, 'cg') )
-        fprintf('Using conjugate gradient method...\n');
+        %fprintf('Using conjugate gradient method...\n');
     else
-        fprintf('Using gradient descent method...\n');
+        %fprintf('Using gradient descent method...\n');
     end
     while ( k < maxIteration && norm(gradient) > TOL)
         % step length alpha
@@ -260,7 +267,7 @@ function v = performGradientSteps(v, W, grad_funct, phi, phi_dash, method)
             if ( k < 1 && alpha == 0)
                error('Line Search did not give a descent step length in first iteration step.\n')
             end
-            fprintf ('Stopping gradient after %d iteration(s) due to too small relative change of consecutive iterates!\n', k);
+            %fprintf ('Stopping gradient after %d iteration(s) due to too small relative change of consecutive iterates!\n', k);
             break;
         end
         v = v + alpha * p;
@@ -286,7 +293,7 @@ function v = performGradientSteps(v, W, grad_funct, phi, phi_dash, method)
         k = k+1;
     end
     if ( k >= maxIteration ) 
-        fprintf ('Gradient descent method did not converge yet (max. iterations %d)! norm(gradient) = %e \n', maxIteration, norm(gradient));
+        %fprintf ('Gradient descent method did not converge yet (max. iterations %d)! norm(gradient) = %e \n', maxIteration, norm(gradient));
     end
 end
 
@@ -309,7 +316,7 @@ function alpha_star = computeSteplength(v, descentDirection, phi, phi_dash)
     end
     TOL = 1e-15;
     if ( alpha_limit < TOL)
-        fprintf('Stopping line search since maximal steplength smaller than %e.\n', TOL);
+        %fprintf('Stopping line search since maximal steplength smaller than %e.\n', TOL);
         alpha_star = 0;
         return;
     end
@@ -326,7 +333,7 @@ function alpha_star = computeSteplength(v, descentDirection, phi, phi_dash)
         % stopping criteria if we cannot attain lower function value after ten
         % trial step lengths (p. 62 / 83)
         if ( mod(i,10) == 0 && phi_0 <= phi_next )
-            fprintf('Stopping line search because after ten iterations we could not find a lower function value.\n');
+            %fprintf('Stopping line search because after ten iterations we could not find a lower function value.\n');
             alpha_star = 0;
             return;
         end
@@ -356,7 +363,7 @@ function alpha_star = computeSteplength(v, descentDirection, phi, phi_dash)
         i = i+1;
     end
     if (i >= maxIteration) 
-        fprintf('Could not determine next step length after %d line search iterations!\n', maxIteration);
+        %fprintf('Could not determine next step length after %d line search iterations!\n', maxIteration);
     end
     alpha_star = alpha_next;
 end
@@ -369,7 +376,7 @@ function alpha_star = zoom(alpha_lower, alpha_higher, ...
     TOL = 1e-16;
     while iteration < maxIteration
         if ( abs(alpha_lower-alpha_higher) < TOL)
-           fprintf('Zoom interval after %d zoom iterations too small to zoom in further.\n', iteration);
+           %fprintf('Zoom interval after %d zoom iterations too small to zoom in further.\n', iteration);
            alpha_star=alpha_higher;
            return;
         end
@@ -408,7 +415,7 @@ function alpha_star = zoom(alpha_lower, alpha_higher, ...
         alpha_last = alpha_j;
     end
     if (iteration >= maxIteration) 
-        fprintf('Steplength not yet found. Zoom in stopped\n');
+        %fprintf('Steplength not yet found. Zoom in stopped\n');
     end
     alpha_star = alpha_j; % use last iterate as default return value
 end
