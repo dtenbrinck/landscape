@@ -45,6 +45,7 @@ function testSampleTestCases()
     fprintf('With PCA...\n');
     estimateEllipsoidForDataSetAndPlotResults(Y, 'grad', 4, 0.5, 1, 'data_set3', 1 );
 end
+
 function estimateEllipsoidForDataSetAndPlotResults(X, descentMethod, regularisationParams,datasetName, isPCAactive)
     [center, radii, axis, radii_ref, center_ref, radii_initial, center_initial] = getEllipsoidCharacteristicsInitialReferenceEstimation( X, descentMethod, 'sqr', regularisationParams, isPCAactive );
     fprintf('\n');
@@ -74,6 +75,31 @@ function estimateEllipsoidForDataSetAndPlotResults(X, descentMethod, regularisat
 %     print("results/ellipsoid_estimation_" + datasetName + "_PCA=" + isPCAactive + ".png",'-dpng');
 end
 
+function estimateEllipsoidForDataSetAndPlotResultsWithOldEstimation(X, descentMethod, regularisationParams,datasetName, isPCAactive)
+    [center, radii, axis, radii_ref, center_ref, radii_initial, center_initial] = getEllipsoidCharacteristicsInitialReferenceEstimation( X, descentMethod, 'sqr', regularisationParams, isPCAactive );
+    fprintf('\n');
+    [center1, radii1, axis1, radii_ref1, center_ref1, radii_initial1, center_initial1] = getEllipsoidCharacteristicsInitialReferenceEstimation( X, descentMethod, 'log', regularisationParams, isPCAactive );
+    table( radii_initial, radii, radii_ref, radii1, radii_ref1)
+    % plot ellipsoid fittings
+    fprintf('Plotting results...\n');
+    figure('Name', "Scatter plot and resulting ellipsoid fittings for " + datasetName + ", PCA= " + isPCAactive,...
+        'units','pixels','outerposition',[0 0 1800 1000]);
+    subplot(1,2,1);
+    hold on;
+    titletext = 'Embryo estimations';
+    plotSeveralEllipsoidEstimations(X, center_initial1, radii_initial1,...
+        center1, radii1, center_ref1, radii_ref1, titletext, isPCAactive, axis);
+    hold off;
+    subplot(1,2,2);
+    hold on;
+    titletext = 'Embryo estimations';
+    plotSeveralEllipsoidEstimations(X, center_initial1, radii_initial1,...
+        center1, radii1, center_ref1, radii_ref1, titletext, isPCAactive, axis);
+    view(3);
+    hold off;
+    print("results/ellipsoid_estimation_old_vs_new.png",'-dpng');
+end
+
 function plotOrientationVectors( center, axis)
     axis= 100*axis;
     quiver3( center(1), center(2), center(3), axis(1,1), axis(2,1), axis(3,1), 'k', 'LineWidth', 2, 'Displayname','first axis');
@@ -84,9 +110,9 @@ end
 function plotSeveralEllipsoidEstimations(X, center_initial, radii_initial,...
         center, radii, center_ref, radii_ref, titletext, isPCAactive, axis)
     scatter3(X(:,1),X(:,2), X(:,3),'b','.', 'DisplayName', 'input data', 'MarkerFaceAlpha',0.1);
-%     plotOneEllipsoidEstimation( center, radii, 'm', 'ellipsoid estimation', isPCAactive, axis);
+    plotOneEllipsoidEstimation( center, radii, 'm', 'ellipsoid estimation', isPCAactive, axis);
     plotOneEllipsoidEstimation( center_ref, radii_ref, 'c','reference estimation', isPCAactive, axis);
-%     plotOneEllipsoidEstimation( center_initial, radii_initial, 'g', 'initialization ellipsoid', isPCAactive, axis);
+    plotOneEllipsoidEstimation( center_initial, radii_initial, 'g', 'initialization ellipsoid', isPCAactive, axis);
     plotOldEllipsoidEstimation(X, [0.9100    0.4100    0.1700], 'old estimation');
     legend('Location', 'southoutside');
     title(titletext, 'Interpreter', 'none');
@@ -94,8 +120,9 @@ function plotSeveralEllipsoidEstimations(X, center_initial, radii_initial,...
 end
 
 function plotOldEllipsoidEstimation(X, color, displayname)
-    fprintf('Using least squares approximation as another reference ellipsoid...\n');
+    fprintf('Using least squares approximation to estimate another reference ellipsoid...\n');
     [ center, radii, axes, ~, ~] = estimateEllipsoid( X, '' );
+    radii
     plotOneEllipsoidEstimation( center, radii, color, displayname, 1, axes);
 end
 
