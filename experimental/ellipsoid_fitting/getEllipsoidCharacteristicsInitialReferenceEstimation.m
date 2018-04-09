@@ -92,7 +92,7 @@ function [ center, radii, axis, radii_ref, center_ref, radii_initial, center_ini
 [W, X, pca_transformation] = prepareCoordinateMatrixAndOrientationMatrix(X, includePCA);
 [radii_initial, center_initial, v_initial] = initializeEllipsoidParams(X, '');
 radiiMax = getMaximalRadiiLimits(X);
-radiiMax
+
 [volumetricregulariser, grad_volumetricRegulariser] = initializeVolumetricRegulariserFunctionalAndGradient(W, regularisationParams, radiiMax);
 if ( strcmpi(maxDifferentiableApprox, 'sqr'))
     fprintf('Use quadratic approximation of non-diff. term.\n');
@@ -149,7 +149,7 @@ end
 
 function [radii, center] = approximateEllipsoidParamsWithDescentMethod(v0, W, grad_funct, phi, phi_dash, method, funct)
     try
-        v = performGradientSteps(v0, W, grad_funct, phi, phi_dash, method);
+        v = performGradientSteps(v0, W, grad_funct, phi, phi_dash, method, funct);
         [radii, center] = getEllipsoidParams(v);
         fprintf('################## est. energy %f\n', funct(v));
     catch ERROR_MSG
@@ -162,7 +162,9 @@ end
 
 function [radii, center] = getReferenceEllipsoidApproximation(funct, v0)
     fprintf('Approximate ellipsoid with MATLAB reference method...\n');
-    [v, fval] = fminsearch(funct, v0);
+    [v, fval,exitflag,output] = fminsearch(funct, v0);
+    exitflag
+    output
     fprintf('################## ref. energy %f\n', fval);
     [radii, center] = getEllipsoidParams(v);
 end
@@ -267,12 +269,12 @@ function [radii, center] = getEllipsoidParams(v)
     % set eigenvectors evecs
 end
 
-function v = performGradientSteps(v, W, grad_funct, phi, phi_dash, method)
+function v = performGradientSteps(v, W, grad_funct, phi, phi_dash, method, funct)
     gradient = grad_funct(v);
     % descent direction p
     p = -gradient; 
     k = 0;
-    TOL = 1e-6;
+    TOL = 1e-15;
     maxIteration = 1000;
     n = size(W,1);
     if ( strcmpi(method, 'cg') )
@@ -293,6 +295,7 @@ function v = performGradientSteps(v, W, grad_funct, phi, phi_dash, method)
             break;
         end
         v = v + alpha * p;
+        fprintf('#####current energy: %f \n',funct(v));
         nextGradient = grad_funct(v);
         % restart every n'th cycle (p. 124 / 145)
         if ( strcmp(method, 'grad') || (mod(k,n) == 0 && k > 0) )
@@ -436,8 +439,9 @@ function alpha_star = zoom(alpha_lower, alpha_higher, ...
         iteration = iteration + 1;
         alpha_last = alpha_j;
     end
+    alpha_star = alpha_j; % use last iterate as default return value
     if (iteration >= maxIteration) 
         fprintf('Steplength not yet found. Zoom in stopped\n');
+        alpha_star = 0;
     end
-    alpha_star = alpha_j; % use last iterate as default return value
 end

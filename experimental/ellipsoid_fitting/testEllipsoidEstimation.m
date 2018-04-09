@@ -13,9 +13,10 @@ function testOrigDataSet()
     regularisationParams.mu1 = 0.0002; 
     regularisationParams.mu2 = 0.02; 
     regularisationParams.mu3 = 1;
-    regularisationParams.mu4 = 0.01;%1e4;
+    regularisationParams.mu4 = 0;%0.01;%1e4;
     regularisationParams.gamma = 1;
-    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', regularisationParams, 'data_set_orig0', 1 ); 
+    estimateEllipsoidForDataSetAndPlotResults(X, 'cg', regularisationParams, 'data_set_orig0', 1 ); 
+%     estimateEllipsoidForDataSetAndPlotResults(X, 'grad', regularisationParams, 'data_set_orig0', 1 ); 
 end
 
 function testSampleTestCases()
@@ -72,7 +73,7 @@ function estimateEllipsoidForDataSetAndPlotResults(X, descentMethod, regularisat
         center1, radii1, center_ref1, radii_ref1, titletext, isPCAactive, axis);
     plotOrientationVectors( center1, axis1);
     hold off;
-%     print("results/ellipsoid_estimation_" + datasetName + "_PCA=" + isPCAactive + ".png",'-dpng');
+%      print("results/ellipsoid_estimation_" + datasetName + "_PCA=" + isPCAactive + ".png",'-dpng');
 end
 
 function estimateEllipsoidForDataSetAndPlotResultsWithOldEstimation(X, descentMethod, regularisationParams,datasetName, isPCAactive)
@@ -122,7 +123,6 @@ end
 function plotOldEllipsoidEstimation(X, color, displayname)
     fprintf('Using least squares approximation to estimate another reference ellipsoid...\n');
     [ center, radii, axes, ~, ~] = estimateEllipsoid( X, '' );
-    radii
     plotOneEllipsoidEstimation( center, radii, color, displayname, 1, axes);
 end
 
