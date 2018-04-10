@@ -8,8 +8,8 @@ function testOrigDataSet()
     fprintf('#########################\n');
     fprintf('#########################\n');
     % test with original data
-    load('data.mat');
-    X=data;
+    load('data2.mat');
+    X=data2;
     regularisationParams.mu1 = 0.0002; 
     regularisationParams.mu2 = 0.02; 
     regularisationParams.mu3 = 1;

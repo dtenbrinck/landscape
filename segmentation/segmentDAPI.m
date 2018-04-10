@@ -76,12 +76,19 @@ end
 indices = find(Xi > 0);
 [tmpy, tmpx, tmpz] = ind2sub(size(Xi), indices);
 
-% initialize container for center coordinates
-centCoords = zeros(3,numel(indices));
-% set return variables
-centCoords(1,:) = tmpy;
-centCoords(2,:) = tmpx;
-centCoords(3,:) = tmpz;
-nuclei = Xi;
+cutIndex = length(tmpz);
+for cutIndexXi=(max(tmpz):-1:1)
+    if (length(tmpz(tmpz==cutIndexXi)) > 500)
+        cutIndex=find(tmpz==cutIndexXi+1,1)
+        break;
+    end
+end
 
+% initialize container for center coordinates
+centCoords = zeros(3,cutIndex);
+% set return variables
+centCoords(1,1:cutIndex) = tmpy(1:cutIndex);
+centCoords(2,1:cutIndex) = tmpx(1:cutIndex);
+centCoords(3,1:cutIndex) = tmpz(1:cutIndex);
+nuclei = Xi(:,:,1:cutIndexXi);
 end

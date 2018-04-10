@@ -185,7 +185,7 @@ function [radii, center, v] = initializeEllipsoidParams(X, radiiSelection)
         else
             radiiComponent = max(sqrt(sum((X-center') .* (X-center'), 2)));
         end
-        radii=[radiiComponent; radiiComponent; radiiComponent]; %300*ones(3,1);%
+        radii=[radiiComponent; radiiComponent; radiiComponent];
         v=zeros(6,1);
         v(1:3) = (1./radii).^2;
         v(4:6) = - center .* v(1:3);
