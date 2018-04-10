@@ -185,7 +185,7 @@ function [radii, center, v] = initializeEllipsoidParams(X, radiiSelection)
         else
             radiiComponent = max(sqrt(sum((X-center') .* (X-center'), 2)));
         end
-        radii=[radiiComponent; radiiComponent; radiiComponent]; 
+        radii=[radiiComponent; radiiComponent; radiiComponent]; %300*ones(3,1);%
         v=zeros(6,1);
         v(1:3) = (1./radii).^2;
         v(4:6) = - center .* v(1:3);
@@ -295,7 +295,7 @@ function v = performGradientSteps(v, W, grad_funct, phi, phi_dash, method, funct
             break;
         end
         v = v + alpha * p;
-        fprintf('#####current energy: %f \n',funct(v));
+%         fprintf('#####current energy: %f \n',funct(v));
         nextGradient = grad_funct(v);
         % restart every n'th cycle (p. 124 / 145)
         if ( strcmp(method, 'grad') || (mod(k,n) == 0 && k > 0) )

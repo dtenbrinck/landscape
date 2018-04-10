@@ -15,7 +15,7 @@ function testOrigDataSet()
     regularisationParams.mu3 = 1;
     regularisationParams.mu4 = 0;%0.01;%1e4;
     regularisationParams.gamma = 1;
-    estimateEllipsoidForDataSetAndPlotResults(X, 'cg', regularisationParams, 'data_set_orig0', 1 ); 
+    estimateEllipsoidForDataSetAndPlotResults(X, 'cg', regularisationParams, 'data_set_orig', 1 ); 
 %     estimateEllipsoidForDataSetAndPlotResults(X, 'grad', regularisationParams, 'data_set_orig0', 1 ); 
 end
 
@@ -58,7 +58,7 @@ function estimateEllipsoidForDataSetAndPlotResults(X, descentMethod, regularisat
     % plot ellipsoid fittings
     fprintf('Plotting results...\n');
     figure('Name', "Scatter plot and resulting ellipsoid fittings for " + datasetName + ", PCA= " + isPCAactive,...
-        'units','pixels','outerposition',[0 0 1800 1000]);
+        'units','pixels','outerposition',[0 0 1500 800]);
     subplot(1,2,1);
     hold on;
     titletext = datasetName + ": Approximation of non differentiable term with (max(0,...))^2, PCA=" + isPCAactive;
