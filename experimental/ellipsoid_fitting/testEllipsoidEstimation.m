@@ -5,18 +5,37 @@ function testEllipsoidEstimation
 end
 
 function testOrigDataSet()
-    fprintf('#########################\n');
-    fprintf('#########################\n');
-    % test with original data
-    load('data2.mat');
-    X=data2;
+    load('data.mat'); X=data;
+    % good regularisation params
     regularisationParams.mu1 = 0.0002; 
     regularisationParams.mu2 = 0.02; 
     regularisationParams.mu3 = 1;
-    regularisationParams.mu4 = 0;%0.01;%1e4;
-    regularisationParams.gamma = 1;
-    estimateEllipsoidForDataSetAndPlotResults(X, 'cg', regularisationParams, 'data_set_orig', 1 ); 
-%     estimateEllipsoidForDataSetAndPlotResults(X, 'grad', regularisationParams, 'data_set_orig0', 1 ); 
+    regularisationParams.mu4 = 0;
+    regularisationParams.gamma = 1;    
+    fprintf('#########################\n');
+    estimateEllipsoidForDataSetAndPlotResults(X, 'cg', regularisationParams, 'data_set_orig_1_tests', 1 );  
+    
+%     regularisationParams.mu1 = 0.2; 
+%     regularisationParams.mu2 = 0.02; 
+%     regularisationParams.mu3 = 1;
+%     regularisationParams.mu4 = 0;
+%     fprintf('#########################\n');
+%     
+%     regularisationParams.mu1 = 0.0002; 
+%     regularisationParams.mu2 = 0.02; 
+%     regularisationParams.mu3 = 0;
+%     regularisationParams.mu4 = 0;
+%     regularisationParams.gamma = 1;    
+%     fprintf('#########################\n');
+%     estimateEllipsoidForDataSetAndPlotResults(X, 'cg', regularisationParams, 'data_set_orig_2_approx', 1 );  
+%     
+%     regularisationParams.mu1 = 0.0002; 
+%     regularisationParams.mu2 = 2; 
+%     regularisationParams.mu3 = 1;
+%     regularisationParams.mu4 = 0;
+%     regularisationParams.gamma = 1;    
+%     fprintf('#########################\n');
+%     estimateEllipsoidForDataSetAndPlotResults(X, 'cg', regularisationParams, 'data_set_orig_3_approx', 1 );  
 end
 
 function testSampleTestCases()
@@ -57,23 +76,30 @@ function estimateEllipsoidForDataSetAndPlotResults(X, descentMethod, regularisat
 %       return;
     % plot ellipsoid fittings
     fprintf('Plotting results...\n');
-    figure('Name', "Scatter plot and resulting ellipsoid fittings for " + datasetName + ", PCA= " + isPCAactive,...
+    figure('Name', "Scatter plot and resulting ellipsoid fittings for " + datasetName,...
         'units','pixels','outerposition',[0 0 1500 800]);
     subplot(1,2,1);
     hold on;
-    titletext = datasetName + ": Approximation of non differentiable term with (max(0,...))^2, PCA=" + isPCAactive;
+    titletext = {datasetName; 'Approximation of non differentiable term with (max(0,...))^2'};
     plotSeveralEllipsoidEstimations(X, center_initial, radii_initial,...
         center, radii,  center_ref, radii_ref, titletext, isPCAactive, axis);
     plotOrientationVectors( center, axis);
     hold off;
     subplot(1,2,2);
     hold on;
-    titletext = datasetName + ": Approximation of non differentiable term with log(1+gamma(...)), PCA=" + isPCAactive;
+    titletext = {datasetName; 'Approximation of non differentiable term with log(1+gamma(...))'};
     plotSeveralEllipsoidEstimations(X, center_initial1, radii_initial1,...
         center1, radii1, center_ref1, radii_ref1, titletext, isPCAactive, axis);
     plotOrientationVectors( center1, axis1);
     hold off;
-%      print("results/ellipsoid_estimation_" + datasetName + "_PCA=" + isPCAactive + ".png",'-dpng');
+    descr = {['PCA= ' num2str(isPCAactive)]; 
+        ['mu_1=' num2str(regularisationParams.mu1)]; 
+        ['mu_2=' num2str(regularisationParams.mu2)]; 
+        ['mu_3=' num2str(regularisationParams.mu3)]; 
+        ['mu_4=' num2str(regularisationParams.mu4)]};
+    yl=ylim;zl=zlim;
+    text(0,yl(1)-200,zl(1)-100,descr);
+%     print("results/ellipsoid_estimation_" + datasetName + ".png",'-dpng');
 end
 
 function estimateEllipsoidForDataSetAndPlotResultsWithOldEstimation(X, descentMethod, regularisationParams,datasetName, isPCAactive)
