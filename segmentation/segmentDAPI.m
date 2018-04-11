@@ -2,6 +2,10 @@ function [nuclei, centCoords] = segmentDAPI( data, p, resolution )
 %SEGMENTDATA Summary of this function goes here
 %   Detailed explanation goes here
 
+% % reduce input data to use only slices with high intensities
+% cutIndex = find(max(max(data(:,:,1:size(data,3))))<175,1);
+% data=data(:,:,1:cutIndex);
+
 if strcmp(p.method, 'CP') % Chambolle-Pock with thresholding
   % get histogram
   [h, bins] = imhist(data(:));
@@ -76,19 +80,28 @@ end
 indices = find(Xi > 0);
 [tmpy, tmpx, tmpz] = ind2sub(size(Xi), indices);
 
-cutIndex = length(tmpz);
-for cutIndexXi=(max(tmpz):-1:1)
-    if (length(tmpz(tmpz==cutIndexXi)) > 500)
-        cutIndex=find(tmpz==cutIndexXi+1,1)
-        break;
-    end
-end
+% use only slices with more than 500 hundred cells found
+% cutIndex = length(tmpz);
+% for cutIndexXi=(max(tmpz):-1:1)
+%     if (length(tmpz(tmpz==cutIndexXi)) > 500)
+%         cutIndex=find(tmpz==cutIndexXi+1,1);
+%         break;
+%     end
+% end
+% 
+% % initialize container for center coordinates
+% centCoords = zeros(3,cutIndex);
+% % set return variables
+% centCoords(1,1:cutIndex) = tmpy(1:cutIndex);
+% centCoords(2,1:cutIndex) = tmpx(1:cutIndex);
+% centCoords(3,1:cutIndex) = tmpz(1:cutIndex);
+% nuclei = Xi(:,:,1:cutIndexXi);
 
 % initialize container for center coordinates
-centCoords = zeros(3,cutIndex);
+centCoords = zeros(3,numel(indices));
 % set return variables
-centCoords(1,1:cutIndex) = tmpy(1:cutIndex);
-centCoords(2,1:cutIndex) = tmpx(1:cutIndex);
-centCoords(3,1:cutIndex) = tmpz(1:cutIndex);
-nuclei = Xi(:,:,1:cutIndexXi);
+centCoords(1,:) = tmpy;
+centCoords(2,:) = tmpx;
+centCoords(3,:) = tmpz;
+nuclei = Xi;
 end
