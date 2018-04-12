@@ -1,36 +1,34 @@
 function testSampleDataSets()
     close all;
     X = firstDataSet();
-    %fprintf('Expecting an ellipsoid with approx. radii=(1,1,1), center=(0,0,0)...\n');
-    % TODO improve regularisation parameter and maybe vary gamma
-    %fprintf('Without PCA...\n');   
+    %fprintf('Expecting an ellipsoid with approx. radii=(1,1,1), center=(0,0,0)...\n'); 
     regularisationParams.mu1 = 10; 
     regularisationParams.mu2 = 0.5; 
     regularisationParams.mu3 = 0;
     regularisationParams.mu4 = 0;
     regularisationParams.gamma = 1; 
-    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', regularisationParams, 'ellipsoid_estimation_data_set1', 0 );
-    %fprintf('With PCA...\n');
-    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', regularisationParams, 'ellipsoid_estimation_data_set1', 1 );
+    title = 'ellipsoid_estimation_data_set1';
+    estimateEllipsoidWithAndWithoutPCA(X, regularisationParams, title);
     
     % second test data set
     X = secondDataSet();
-    %fprintf('\n\nExpecting an ellipsoid with approx. radii=(4,2,1), center=(1,2,2)...\n');
-    % TODO improve regularisation parameter and maybe vary gamma
-    %fprintf('Without PCA...\n');
+    %fprintf('\n\nExpecting an ellipsoid with approx. radii=(4,2,1), center=(1,2,2)...\n'); 
     regularisationParams.mu1 = 4; 
-    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', regularisationParams, 'ellipsoid_estimation_data_set2', 0 );
-    %fprintf('With PCA...\n');
-    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', regularisationParams, 'ellipsoid_estimation_data_set2', 1 );
+    title = 'ellipsoid_estimation_data_set2';
+    estimateEllipsoidWithAndWithoutPCA(X, regularisationParams, title);
     
     % Manipulate second data set by rotating it around the coordinate axis
     Y = thirdDataSet(X);
     %fprintf('\n\nExpecting an ellipsoid like the one before but rotated around 45° in each direction...\n');
-    % TODO improve regularisation parameter and maybe vary gamma
+    title = 'ellipsoid_estimation_data_set3';
+    estimateEllipsoidWithAndWithoutPCA(Y, regularisationParams, title);
+end
+
+function estimateEllipsoidWithAndWithoutPCA(X, regularisationParams, title)
     %fprintf('Without PCA...\n');
-    estimateEllipsoidForDataSetAndPlotResults(Y, 'grad', regularisationParams, 'ellipsoid_estimation_data_set3', 0 );
+    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', regularisationParams, title, 0 , title);
     %fprintf('With PCA...\n');
-    estimateEllipsoidForDataSetAndPlotResults(Y, 'grad', regularisationParams, 'ellipsoid_estimation_data_set3', 1 );
+    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', regularisationParams, title, 1 , title);
 end
 
 function X = firstDataSet()
