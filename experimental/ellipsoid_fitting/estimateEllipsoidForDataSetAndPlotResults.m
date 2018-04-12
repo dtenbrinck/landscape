@@ -1,53 +1,26 @@
 function estimateEllipsoidForDataSetAndPlotResults(X, descentMethod, regularisationParams, outputPath, isPCAactive, title)
-    [center, radii, axis, radii_ref, center_ref, radii_initial, center_initial] = getEllipsoidCharacteristicsInitialReferenceEstimation( X, descentMethod, 'sqr', regularisationParams, isPCAactive );
     %fprintf('\n');
     [center1, radii1, axis1, radii_ref1, center_ref1, radii_initial1, center_initial1] = getEllipsoidCharacteristicsInitialReferenceEstimation( X, descentMethod, 'log', regularisationParams, isPCAactive );
-     table( radii_initial, radii, radii_ref, radii1, radii_ref1)
+     table( radii_initial1, radii1, radii_ref1)
 %     table( center_initial, center, center_ref, center1, center_ref1 )
 %     volumes = 4/3*pi*[ prod(radii_initial), prod(radii), prod(radii_ref), prod(radii1), prod(radii_ref1)]
 %       return;
     % plot ellipsoid fittings
     %fprintf('Plotting results...\n');
-    figure('Name', "Scatter plot and resulting ellipsoid fittings for " + title,...
-        'units','pixels','outerposition',[0 0 1500 800]);
-    subplot(1,2,1);
-    hold on;
-    titletext = {title; 'Approximation of non differentiable term with (max(0,...))^2'};
-    plotSeveralEllipsoidEstimations(X, center_initial, radii_initial,...
-        center, radii,  center_ref, radii_ref, titletext, isPCAactive, axis);
-    plotOrientationVectors( center, axis);
-    hold off;
-    subplot(1,2,2);
-    hold on;
-    titletext = {title; 'Approximation of non differentiable term with log(1+gamma(...))'};
-    plotSeveralEllipsoidEstimations(X, center_initial1, radii_initial1,...
-        center1, radii1, center_ref1, radii_ref1, titletext, isPCAactive, axis);
-    plotOrientationVectors( center1, axis1);
-    hold off;
-    descr = {['PCA = ' num2str(isPCAactive)]; 
-        ['mu_1 = ' num2str(regularisationParams.mu1)]; 
-        ['mu_2 = ' num2str(regularisationParams.mu2)]; 
-        ['mu_3 = ' num2str(regularisationParams.mu3)]; 
-        ['mu_4 = ' num2str(regularisationParams.mu4)]};
-    yl = ylim; zl = zlim;
-    yt = yticks; zt = zticks;
-    text(0,yl(1)-2* (yt(2)-yt(1)),zl(1)-2*(zt(2)-zt(1)),descr);
-%     print("results/" + outputPath + ".png",'-dpng');
 
     figure;
     titletext = title;
     hold on;
     plotSeveralEllipsoidEstimations(X, center_initial1, radii_initial1,...
-        center1, radii1, center_ref1, radii_ref1, titletext, isPCAactive, axis);
+        center1, radii1, center_ref1, radii_ref1, titletext, isPCAactive, axis1);
     plotOrientationVectors( center1, axis1);
     descr = {['PCA = ' num2str(isPCAactive)]; 
         ['mu_1 = ' num2str(regularisationParams.mu1)]; 
         ['mu_2 = ' num2str(regularisationParams.mu2)]; 
         ['mu_3 = ' num2str(regularisationParams.mu3)]; 
         ['mu_4 = ' num2str(regularisationParams.mu4)]};
-    yl = ylim; zl = zlim;
-    yt = yticks; zt = zticks;
-    text(0,yl(1)-2* (yt(2)-yt(1)),zl(1)-2*(zt(2)-zt(1)),descr);
+    yl = ylim; zl = zlim; zt = zticks;
+    text(0,yl(1),zl(1)-2*(zt(2)-zt(1)),descr);
 %     print("results/" + outputPath + ".png",'-dpng');
 end
 
