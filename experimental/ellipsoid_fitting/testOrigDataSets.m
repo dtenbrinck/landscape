@@ -2,7 +2,7 @@ function testOrigDataSets()
     close all;   
     load('data.mat'); X=data;
     outputPathBase = 'regularisationTests/ellipsoid_estimation_orig_data';
-    testDataSetWithRegularisationParams(0, 0.02, 1, 0, X, [outputPathBase], 'test regularisation parameter');
+    testDataSetWithRegularisationParams(0, 0.02, 1, 0, X, [outputPathBase], 'ellipsoid estimations');
 end
 
 function testDataSetWithRegularisationParams(mu1, mu2, mu3, mu4, X, outputPath, title)
@@ -13,5 +13,5 @@ function testDataSetWithRegularisationParams(mu1, mu2, mu3, mu4, X, outputPath, 
     regularisationParams.gamma = 1; 
     fprintf(['######################################### ' title]); 
     regularisationParams
-    estimateEllipsoidForDataSetAndPlotResults(X, 'gradg', regularisationParams, outputPath, 1 , title);
+    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', regularisationParams, outputPath, 1 , title);
 end

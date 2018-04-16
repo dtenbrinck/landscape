@@ -233,11 +233,6 @@ function [volumetricregulariser, grad_volumetricRegulariser] = initializeVolumet
     regularisationParams.mu3 * sum(( W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)).^2) + ...
     regularisationParams.mu4 * sum ( log( 1 + exp( (1./radiiMax).^2 - v(1:3)) ) );
 
-%     regularisationParams.mu4 * sum ( log( 1 + exp( (1./radiiMax).^2 - v(1:3)) ) );
-%     regularisationParams.mu4 * sum( ( max( zeros(3,1), (1./radiiMax).^2 - v(1:3) ) ).^2 );
-% the following approx. does not work well
-%     regularisationParams.mu4 * sum( ( max( zeros(3,1), 1./v(1:3) - radiiMax.^2 ) ).^2 );
-
 n = size(W,1);
 grad_volumetricRegulariser = @(v) ...
     regularisationParams.mu1 * [2*(2*v(1) - v(2) - v(3));  2*(2*v(2) - v(1) - v(3)); 2*(2*v(3) - v(1) - v(2)); 0; 0; 0] + ...
@@ -246,12 +241,6 @@ grad_volumetricRegulariser = @(v) ...
     [-(v(4)/v(1))^2; -(v(5)/v(2))^2; -(v(6)/v(3))^2; 2*v(4)/v(1); 2*v(5)/v(2); 2*v(6)/v(3)] * ones(1,n) ) * ...
     2 * ( W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1))) + ...
     regularisationParams.mu4 * [-exp( (1./radiiMax).^2 - v(1:3)) ./( 1 + exp( (1./radiiMax).^2 - v(1:3)) );0; 0; 0 ];
-
-%     regularisationParams.mu4 * [-exp( (1./radiiMax).^2 - v(1:3)) ./( 1 + exp( (1./radiiMax).^2 - v(1:3)) );0; 0; 0 ];
-%     regularisationParams.mu4 * [ -2* max( 0, (1./radiiMax).^2 - v(1:3) ); 0; 0; 0 ];
-% the following approx. does not work well
-%     regularisationParams.mu4 * [ -2* max( zeros(3,1), 1./v(1:3) - radiiMax.^2 )./(v(1:3).^2); 0; 0; 0 ]; 
-
 end
 
 function [phi, phi_dash] = initializePhiAndPhiDash (funct, grad_funct)
