@@ -11,7 +11,6 @@ function testDataSetWithRegularisationParams(mu1, mu2, mu3, mu4, X, outputPath, 
     regularisationParams.mu3 = mu3;
     regularisationParams.mu4 = mu4;
     regularisationParams.gamma = 1; 
-    fprintf(['######################################### ' title]); 
     regularisationParams
-    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', regularisationParams, outputPath, 1 , title);
+    estimateEllipsoidForDataSetAndPlotResults(X, 'cg', regularisationParams, outputPath, 1 , title);
 end

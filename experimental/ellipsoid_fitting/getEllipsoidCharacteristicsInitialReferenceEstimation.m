@@ -167,6 +167,7 @@ function [radii, center, v] = initializeEllipsoidParams(X)
         y = X( :, 2 );
         z = X( :, 3 );
         center=[mean(x); mean(y); min(z) + range(z) * 50/60];
+        radiiComponent = max(sqrt(sum((X-center') .* (X-center'), 2)));
         radii=[radiiComponent; radiiComponent; radiiComponent];
         v=zeros(6,1);
         v(1:3) = (1./radii).^2;
@@ -205,7 +206,8 @@ function [volumetricregulariser, grad_volumetricRegulariser] = initializeVolumet
     volumetricregulariser = @(v) ...
     regularisationParams.mu1 * ( (v(1) - v(2))^2 + (v(3) - v(2))^2 + (v(1) - v(3))^2 )+ ...
     regularisationParams.mu2 * ( 1/v(1) + 1/v(2) + 1/v(3) )  + ...
-    regularisationParams.mu3 * sum(( W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)).^2);
+    regularisationParams.mu3 * sum(( W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)).^2) + ...
+    regularisationParams.mu4 * ( (max(0,-v(1)))^2 + (max(0,-v(2)))^2 + (max(0,-v(3)))^2);
 
 n = size(W,1);
 grad_volumetricRegulariser = @(v) ...
@@ -213,7 +215,8 @@ grad_volumetricRegulariser = @(v) ...
     regularisationParams.mu2 * [-1./v(1:3).^2; 0; 0 ; 0] + ...
     regularisationParams.mu3 * (( W' + ...
     [-(v(4)/v(1))^2; -(v(5)/v(2))^2; -(v(6)/v(3))^2; 2*v(4)/v(1); 2*v(5)/v(2); 2*v(6)/v(3)] * ones(1,n) ) * ...
-    2 * ( W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)));
+    2 * ( W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1))) +  ...
+    regularisationParams.mu4 * [ min(0,2*v(1)); max(0,2*v(2)); max(0,2*v(3)); 0; 0; 0];
 end
 
 function [phi, phi_dash] = initializePhiAndPhiDash (funct, grad_funct)
@@ -283,7 +286,7 @@ end
 function alpha_star = computeSteplength(v, descentDirection, phi, phi_dash)
     % use a line search algorithm (p.81, Algorithm 3.5)   
     c1 = 1e-4;
-    c2 = 0.1;
+    c2 = 0.1; % TODO vary c1, c2?!
     alpha_current = 0;
     alpha_limit = 10;    
 

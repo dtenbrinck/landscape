@@ -5,7 +5,6 @@ function testSampleDataSets()
     regularisationParams.mu1 = 10; 
     regularisationParams.mu2 = 0.5; 
     regularisationParams.mu3 = 0;
-    regularisationParams.mu4 = 0;
     regularisationParams.gamma = 1; 
     title = 'ellipsoid_estimation_data_set1';
     estimateEllipsoidWithAndWithoutPCA(X, regularisationParams, title);
