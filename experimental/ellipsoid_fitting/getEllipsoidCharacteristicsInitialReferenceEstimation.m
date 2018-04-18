@@ -91,9 +91,8 @@ function [ center, radii, axis, radii_ref, center_ref, radii_initial, center_ini
 % do initialization again with improved data set
 [W, X, pca_transformation] = prepareCoordinateMatrixAndOrientationMatrix(X, includePCA);
 [radii_initial, center_initial, v_initial] = initializeEllipsoidParams(X, '');
-radiiMax = getMaximalRadiiLimits(X);
 
-[volumetricregulariser, grad_volumetricRegulariser] = initializeVolumetricRegulariserFunctionalAndGradient(W, regularisationParams, radiiMax);
+[volumetricregulariser, grad_volumetricRegulariser] = initializeVolumetricRegulariserFunctionalAndGradient(W, regularisationParams);
 if ( strcmpi(maxDifferentiableApprox, 'sqr'))
     fprintf('Use quadratic approximation of non-diff. term.\n');
     [funct, grad_funct] = initializeFunctionalAndGradientWithQuadraticMaxApprox( W, volumetricregulariser, grad_volumetricRegulariser); 
@@ -226,12 +225,11 @@ grad_funct = @(v) ( ( W' + ...
 end
 
 function [volumetricregulariser, grad_volumetricRegulariser] = initializeVolumetricRegulariserFunctionalAndGradient...
-    (W, regularisationParams, radiiMax)
+    (W, regularisationParams)
     volumetricregulariser = @(v) ...
     regularisationParams.mu1 * ( (v(1) - v(2))^2 + (v(3) - v(2))^2 + (v(1) - v(3))^2 )+ ...
     regularisationParams.mu2 * ( 1/v(1) + 1/v(2) + 1/v(3) )  + ...
-    regularisationParams.mu3 * sum(( W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)).^2) + ...
-    regularisationParams.mu4 * sum ( log( 1 + exp( (1./radiiMax).^2 - v(1:3)) ) );
+    regularisationParams.mu3 * sum(( W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)).^2);
 
 n = size(W,1);
 grad_volumetricRegulariser = @(v) ...
@@ -239,8 +237,7 @@ grad_volumetricRegulariser = @(v) ...
     regularisationParams.mu2 * [-1./v(1:3).^2; 0; 0 ; 0] + ...
     regularisationParams.mu3 * (( W' + ...
     [-(v(4)/v(1))^2; -(v(5)/v(2))^2; -(v(6)/v(3))^2; 2*v(4)/v(1); 2*v(5)/v(2); 2*v(6)/v(3)] * ones(1,n) ) * ...
-    2 * ( W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1))) + ...
-    regularisationParams.mu4 * [-exp( (1./radiiMax).^2 - v(1:3)) ./( 1 + exp( (1./radiiMax).^2 - v(1:3)) );0; 0; 0 ];
+    2 * ( W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)));
 end
 
 function [phi, phi_dash] = initializePhiAndPhiDash (funct, grad_funct)
@@ -252,8 +249,6 @@ end
 function [radii, center] = getEllipsoidParams(v)
     radii = sqrt( 1 ./ v(1:3) ) ;
     center = - v(4:6) ./ v(1:3);
-    % TODO transform v 
-    % set eigenvectors evecs
 end
 
 function v = performGradientSteps(v, W, grad_funct, phi, phi_dash, method, funct)

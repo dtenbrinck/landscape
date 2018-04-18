@@ -17,8 +17,7 @@ function estimateEllipsoidForDataSetAndPlotResults(X, descentMethod, regularisat
     descr = {['PCA = ' num2str(isPCAactive)]; 
         ['mu_1 = ' num2str(regularisationParams.mu1)]; 
         ['mu_2 = ' num2str(regularisationParams.mu2)]; 
-        ['mu_3 = ' num2str(regularisationParams.mu3)]; 
-        ['mu_4 = ' num2str(regularisationParams.mu4)]};
+        ['mu_3 = ' num2str(regularisationParams.mu3)]};
     yl = ylim; zl = zlim; zt = zticks;
     text(0,yl(1),zl(1)-2*(zt(2)-zt(1)),descr);
 %     print("results/" + outputPath + ".png",'-dpng');
