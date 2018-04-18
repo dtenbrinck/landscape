@@ -84,13 +84,8 @@ function [ center, radii, axis, radii_ref, center_ref, radii_initial, center_ini
 % April, 2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% [W, X, ~] = prepareCoordinateMatrixAndOrientationMatrix(X, includePCA);
-% [~, ~, v_initial] = initializeEllipsoidParams(X, 'pre');
-% 
-% X = removeFirstOutliers(W,v_initial, X);
-% do initialization again with improved data set
 [W, X, pca_transformation] = prepareCoordinateMatrixAndOrientationMatrix(X, includePCA);
-[radii_initial, center_initial, v_initial] = initializeEllipsoidParams(X, '');
+[radii_initial, center_initial, v_initial] = initializeEllipsoidParams(X);
 
 [volumetricregulariser, grad_volumetricRegulariser] = initializeVolumetricRegulariserFunctionalAndGradient(W, regularisationParams);
 if ( strcmpi(maxDifferentiableApprox, 'sqr'))
@@ -142,10 +137,6 @@ function [W, X, pca_transformation] = prepareCoordinateMatrixAndOrientationMatri
         2 * z];  % ndatapoints x 6 ellipsoid parameters
 end
 
-function X = removeFirstOutliers(W, v, X)
-    X = X( W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3)) - 1 <= 0, :);
-end
-
 function [radii, center] = approximateEllipsoidParamsWithDescentMethod(v0, W, grad_funct, phi, phi_dash, method, funct)
     try
         v = performGradientSteps(v0, W, grad_funct, phi, phi_dash, method, funct);
@@ -161,12 +152,14 @@ end
 
 function [radii, center] = getReferenceEllipsoidApproximation(funct, v0, grad_funct)
     fprintf('Approximate ellipsoid with MATLAB reference method...\n');
+%     options = optimset('OutputFcn', @outfun);
+%     [v] = fminsearch(funct, v0, options);
     [v] = fminsearch(funct, v0);
     fprintf('########## ref. energy \t %f \t \t norm(grad(f(v))): %f\n', funct(v), norm(grad_funct(v)));
     [radii, center] = getEllipsoidParams(v);
 end
 
-function [radii, center, v] = initializeEllipsoidParams(X, radiiSelection)
+function [radii, center, v] = initializeEllipsoidParams(X)
     if size( X, 2 ) ~= 3
     error( 'Input data must have three columns!' );
     else
@@ -174,28 +167,11 @@ function [radii, center, v] = initializeEllipsoidParams(X, radiiSelection)
         y = X( :, 2 );
         z = X( :, 3 );
         center=[mean(x); mean(y); min(z) + range(z) * 50/60];
-        if ( strcmpi(radiiSelection, 'pre'))
-            % prestep initialization for outlier removal
-            radiiComponent = mean(sqrt(sum((X-center') .* (X-center'), 2)));
-            % add additionally 10% 
-            radiiComponent = radiiComponent + 0.1*radiiComponent;
-        else
-            radiiComponent = max(sqrt(sum((X-center') .* (X-center'), 2)));
-        end
         radii=[radiiComponent; radiiComponent; radiiComponent];
         v=zeros(6,1);
         v(1:3) = (1./radii).^2;
         v(4:6) = - center .* v(1:3);
     end
-end
-
-function [radiiMax] = getMaximalRadiiLimits(X)
-    % half of diameter in x and y direction
-    radiiMax(1) = ( max(X(:,1)) - min(X(:,1)) )/ 2; 
-    radiiMax(2) = ( max(X(:,2)) - min(X(:,2)) )/ 2;
-    % assume that only half of ellipsoid in z direction is microscopied 
-    radiiMax(3) = ( max(X(:,3)) - min(X(:,3)) )/ 2 * 100/55;
-    radiiMax=radiiMax';
 end
 
 function [funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox( W, regularisationParams, volumetricregulariser, grad_volumetricRegulariser)
@@ -254,7 +230,7 @@ end
 function v = performGradientSteps(v, W, grad_funct, phi, phi_dash, method, funct)
     gradient = grad_funct(v);
     % descent direction p
-    p = -gradient; 
+    p = -gradient;
     k = 0;
     TOL = 1e-15;
     maxIteration = 1000;
@@ -309,17 +285,20 @@ function alpha_star = computeSteplength(v, descentDirection, phi, phi_dash)
     c1 = 1e-4;
     c2 = 0.1;
     alpha_current = 0;
-    alpha_limit = 1000;    
+    alpha_limit = 10;    
 
     % Make sure that the constraints for v(1), v(2), v(3) > 0 are met
     if (descentDirection(1) < 0 ) 
         alpha_limit = min(alpha_limit, -v(1)/descentDirection(1));
+%         fprintf('##### v1 current alpha_limit %e \n', alpha_limit);
     end
     if (descentDirection(2) < 0 ) 
         alpha_limit = min(alpha_limit, -v(2)/descentDirection(2));
+%         fprintf('##### v2 current alpha_limit %e \n', alpha_limit);
     end
     if (descentDirection(3) < 0 ) 
         alpha_limit = min(alpha_limit, -v(3)/descentDirection(3));
+%         fprintf('##### v3 current alpha_limit %e \n', alpha_limit);
     end
     TOL = 1e-15;
     if ( alpha_limit < TOL)
@@ -332,7 +311,7 @@ function alpha_star = computeSteplength(v, descentDirection, phi, phi_dash)
     phi_dash_0 = phi_dash( alpha_current, v, descentDirection);
     phi_current = phi_0;
     i = 1;
-    maxIteration = 30;
+    maxIteration = 100;
     increase_steplength = (alpha_limit - alpha_current ) / maxIteration;
     alpha_next = alpha_current +  increase_steplength; % initialize next alpha
     while i <= maxIteration

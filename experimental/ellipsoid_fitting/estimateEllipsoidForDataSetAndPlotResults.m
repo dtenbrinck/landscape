@@ -35,7 +35,7 @@ function plotSeveralEllipsoidEstimations(X, center_initial, radii_initial,...
     scatter3(X(:,1),X(:,2), X(:,3),'b','.', 'DisplayName', 'input data', 'MarkerFaceAlpha',0.1);
     plotOneEllipsoidEstimation( center, radii, 'm', 'ellipsoid estimation', isPCAactive, axis);
     plotOneEllipsoidEstimation( center_ref, radii_ref, 'c','reference estimation', isPCAactive, axis);
-%     plotOneEllipsoidEstimation( center_initial, radii_initial, 'g', 'initialization ellipsoid', isPCAactive, axis);
+    plotOneEllipsoidEstimation( center_initial, radii_initial, 'g', 'initialization ellipsoid', isPCAactive, axis);
     plotOldEllipsoidEstimation(X, [0.9100    0.4100    0.1700], 'old estimation');
     legend('Location', 'southoutside');
     title(titletext, 'Interpreter', 'none');
