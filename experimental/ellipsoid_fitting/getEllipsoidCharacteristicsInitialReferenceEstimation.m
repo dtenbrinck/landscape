@@ -153,8 +153,11 @@ end
 function [radii, center] = getReferenceEllipsoidApproximation(funct, v0, grad_funct)
     fprintf('Approximate ellipsoid with MATLAB reference method...\n');
 %     options = optimset('OutputFcn', @outfun);
-%     [v] = fminsearch(funct, v0, options);
-    [v] = fminsearch(funct, v0);
+%     other input params: 'PlotFcns', @optimplotfval, options, 'Display','notify', 
+    options = optimset('TolX', 1e-8, 'TolFun', 1e-8);
+    [v, ~,~,output] = fminsearch(funct, v0, options);
+    output.message
+    output.iterations
     fprintf('########## ref. energy \t %f \t \t norm(grad(f(v))): %f\n', funct(v), norm(grad_funct(v)));
     [radii, center] = getEllipsoidParams(v);
 end
@@ -176,16 +179,16 @@ function [radii, center, v] = initializeEllipsoidParams(X)
 end
 
 function [funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox( W, regularisationParams, volumetricregulariser, grad_volumetricRegulariser)
-funct = @(v) regularisationParams.gamma*sum(...
+funct = @(v) 10^-8 * ( regularisationParams.gamma*sum(...
     log( 1 + exp( 1/regularisationParams.gamma * (W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) ) ) ) + ...
-    volumetricregulariser(v);
+    volumetricregulariser(v) );
 
 n = size(W,1);
-grad_funct = @(v) ( W' + ...
+grad_funct = @(v) 10^-8 * ( ( W' + ...
     [-(v(4)/v(1))^2; -(v(5)/v(2))^2; -(v(6)/v(3))^2; 2*v(4)/v(1); 2*v(5)/v(2); 2*v(6)/v(3)] * ones(1,n) ) * ...
     ( exp((1/regularisationParams.gamma) * (W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) ) ./ ...
     ( 1 + exp((1/regularisationParams.gamma) * (W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) )) ) + ...
-    grad_volumetricRegulariser(v);
+    grad_volumetricRegulariser(v) );
 end
 
 function [funct, grad_funct] = initializeFunctionalAndGradientWithQuadraticMaxApprox...
@@ -230,20 +233,23 @@ function [radii, center] = getEllipsoidParams(v)
     center = - v(4:6) ./ v(1:3);
 end
 
-function v = performGradientSteps(v, W, grad_funct, phi, phi_dash, method, funct)
+function v = performGradientSteps(v, W, grad_funct, phi, phi_dash, method, funct)    
+    energy = funct(v);
+    nextEnergy = 10^10;
     gradient = grad_funct(v);
     % descent direction p
     p = -gradient;
     k = 0;
-    TOL = 1e-15;
-    maxIteration = 1000;
+    TOL = 1e-9;
+    maxIteration = 5000;
     n = size(W,1);
     if ( strcmpi(method, 'cg') )
         fprintf('Using conjugate gradient method...\n');
     else
         fprintf('Using gradient descent method...\n');
     end
-    while ( k < maxIteration && norm(gradient) > TOL)
+    while ( k < maxIteration && norm(gradient) > TOL && ...
+            abs(energy-nextEnergy / energy ) > 1e-1  )
         % step length alpha
         alpha = computeSteplength(v, p, phi, phi_dash);
         % stopping criteria if relative change of consecutive iterates v is
@@ -256,7 +262,9 @@ function v = performGradientSteps(v, W, grad_funct, phi, phi_dash, method, funct
             break;
         end
         v = v + alpha * p;
-%         fprintf('#####current energy: %f \n',funct(v));
+        energy = nextEnergy;
+        nextEnergy = funct(v);
+%         fprintf('#####current energy: %f \n',nextEnergy);
         nextGradient = grad_funct(v);
         % restart every n'th cycle (p. 124 / 145)
         if ( strcmp(method, 'grad') || (mod(k,n) == 0 && k > 0) )
@@ -293,17 +301,14 @@ function alpha_star = computeSteplength(v, descentDirection, phi, phi_dash)
     % Make sure that the constraints for v(1), v(2), v(3) > 0 are met
     if (descentDirection(1) < 0 ) 
         alpha_limit = min(alpha_limit, -v(1)/descentDirection(1));
-%         fprintf('##### v1 current alpha_limit %e \n', alpha_limit);
     end
     if (descentDirection(2) < 0 ) 
         alpha_limit = min(alpha_limit, -v(2)/descentDirection(2));
-%         fprintf('##### v2 current alpha_limit %e \n', alpha_limit);
     end
     if (descentDirection(3) < 0 ) 
         alpha_limit = min(alpha_limit, -v(3)/descentDirection(3));
-%         fprintf('##### v3 current alpha_limit %e \n', alpha_limit);
     end
-    TOL = 1e-15;
+    TOL = 1e-8;
     if ( alpha_limit < TOL)
         fprintf('Stopping line search since maximal steplength smaller than %e.\n', TOL);
         alpha_star = 0;
@@ -403,7 +408,6 @@ function alpha_star = zoom(alpha_lower, alpha_higher, ...
         iteration = iteration + 1;
         alpha_last = alpha_j;
     end
-    alpha_star = alpha_j; % use last iterate as default return value
     if (iteration >= maxIteration) 
         fprintf('Steplength not yet found. Zoom in stopped\n');
         alpha_star = 0;
