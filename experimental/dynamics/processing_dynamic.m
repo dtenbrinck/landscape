@@ -11,7 +11,7 @@ addpath([root_dir '/parameter_setup/']);
 p = initializeScript('processing_dynamic', root_dir);
 
 % manual set resolution parameter
-manRes = [0,0,0];
+%manRes = [0,0,0];
 
 % set scale of x-y resolution
 p.scale = 0.5;
@@ -31,38 +31,32 @@ for i=1:numSubdirs
     namesSubdirs{i} = listSubdirs(i).name;
 end
 
-% processing all data is set to default
-process_data = ones(1, numSubdirs);
+% % processing all data is set to default
+% process_data = ones(1, numSubdirs);
+% 
+% % check if a common transformation is wanted and determine reference timepoint dataset
+% if p.commonTransformation == true
+%     midtime = round(numSubdirs/2);
+%     process_data = ~process_data;
+%     process_data(midtime) = 1;
+% end
+% 
+% % extract experiment data numbers to be processed
+% num_process_data = find(process_data);
 
-% check if a common transformation is wanted and determine reference timepoint dataset
-if p.commonTransformation == true
-    midtime = round(numSubdirs/2);
-    process_data = ~process_data;
-    process_data(midtime) = 1;
-end
 
-% extract experiment data numbers to be processed
-num_process_data = find(process_data);
-
-% set dummy filename
-%experimentData.filename = 'dynamic_data_experimental';
-
-% set dummy resolutions
-%experimentData.x_resolution = 312;
-%experimentData.y_resolution = 312;
-
-%% LOOP OVER ALL NEEDED DATA DIRECTORIES
+%% LOOP OVER ALL DATA DIRECTORIES
 
 % loop over all experiments that should be processed
-for i=num_process_data
+for i=numSubdirs
     path_data = [p.dataPath '/' namesSubdirs{i}];
     
-    fileNames = getTIFfilenames(path_data);
+    fileNamesTIF = getTIFfilenames(path_data);
     
     % get data of current experiment
     if p.debug_level >= 1; disp('Loading data...'); end
-    BFP = loadStaticTIF([path_data '/' fileNames{1}]); % load BFP
-    GFP = loadStaticTIF([path_data '/' fileNames{2}]); % load GFP
+    BFP = loadStaticTIF([path_data '/' fileNamesTIF{1}]); % load BFP
+    GFP = loadStaticTIF([path_data '/' fileNamesTIF{2}]); % load GFP
     
     if p.debug_level >= 1; disp('Preprocessing data...'); end
     %processedData.Dapi = preprocessData(BFP, p, 1); % preprocess BFP/DAPI
@@ -118,6 +112,31 @@ for i=num_process_data
     % compute registration transformation from original data space
     transformation_registration = transformationMatrix * rotationMatrix';
     
+    % get list of *.mat files in directory
+    fileNamesMAT = getMATfilenames(path_data);
+    
+    % get index of *.mat file containing the substring 'corrected'
+    fileIndex = find(contains(fileNamesMAT, 'corrected'));
+    
+    % load tracks of flow corrected PGC cells
+    tmp = load([path_data '/' fileNamesMAT{fileIndex}]);
+    PGC_tracks = tmp.tracks_PGC;
+    
+    % register data
+    if p.debug_level >= 1; disp('Registering data...'); end
+    registeredData = registerData( processedData, p.resolution, transformation_registration, ellipsoid, p.samples_cube);
+    
+    % create filename to save results
+    results_filename = [p.resultsPath '/' experimentData.filename '_results.mat'];
+    
+    gatheredData = saveResults(experimentData, processedData, registeredData, ellipsoid, transformationMatrix, rotationMatrix, results_filename);
+    
+    % visualize results if needed
+    if p.visualization == 1
+        visualizeResults_new(gatheredData);
+    end
+    
+    if p.debug_level >= 1; disp('Saved results successfully!'); end
 end
 
 %% USER OUTPUT
