@@ -182,7 +182,7 @@ function v = performGradientSteps(v, W, grad_funct, phi, phi_dash, method, funct
     % descent direction p
     p = -gradient;
     k = 0;
-    TOL = 1e-6;
+    TOL = 1e-5;
     maxIteration = 5000;
     n = size(W,1);
     if ( strcmpi(method, 'cg') )
