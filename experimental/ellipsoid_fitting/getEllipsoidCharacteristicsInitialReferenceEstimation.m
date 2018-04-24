@@ -1,7 +1,7 @@
 %% estimate minimal ellipsoid fitting for data set
 function [ center, radii, axis, radii_ref, center_ref, radii_initial, center_initial ] ...
     = getEllipsoidCharacteristicsInitialReferenceEstimation...
-    ( X, descentMethod, maxDifferentiableApprox, regularisationParams, includePCA)
+    ( X, descentMethod, regularisationParams, includePCA)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Fit an ellispoid/sphere to a set of xyz data points:
 %
@@ -13,9 +13,7 @@ function [ center, radii, axis, radii_ref, center_ref, radii_initial, center_ini
 % * picfilename     - name to save png with estimated ellipsoids
 % * descentMethod   - 'cg' : conjugate gradient method
 %                     'grad' : gradient descent method
-% * maxDifferentiableApprox - 'sqr' : approximate kink with (max(...))^2
-%                           - 'log' : approximate kink with log(...) 
-%                           (see below)
+%
 % * regularisationParams:
 %   mu1,mu2,mu3     - weights for volumetric terms
 % 	gamma           - parameter for smooth approximation with logarithm of 
@@ -51,9 +49,7 @@ function [ center, radii, axis, radii_ref, center_ref, radii_initial, center_ini
 %       (maxDifferentiableApprox = 'log')
 %            = sum of all data rows in X gamma*(log(exp(0) + exp( 1/gamma * ellipsoid(v))) )
 %            = sum of all data rows in X gamma*(log( 1 + exp( 1/gamma * ellipsoid(v) )) )
-%       alternative differentiable approximation for energyPart(v):
-%       (maxDifferentiableApprox = 'sgr')
-%            = sum of all data rows in X ( max(0, ellipsoid(v) ) )^2
+%
 %       regularisation parameter: mu1, mu2 with 0 <= mu2 <= 1
 %            
 % and v initially derived from the implicit function describing 
@@ -89,15 +85,8 @@ function [ center, radii, axis, radii_ref, center_ref, radii_initial, center_ini
 [radii_initial, center_initial, v_initial] = initializeEllipsoidParams(X);
 Wtransposed = W';
 [volumetricregulariser, grad_volumetricRegulariser] = initializeVolumetricRegulariserFunctionalAndGradient(W, regularisationParams, Wtransposed);
-if ( strcmpi(maxDifferentiableApprox, 'sqr'))
-    fprintf('Use quadratic approximation of non-diff. term.\n');
-    [funct, grad_funct] = initializeFunctionalAndGradientWithQuadraticMaxApprox( W, volumetricregulariser, grad_volumetricRegulariser, Wtransposed); 
-elseif ( strcmpi(maxDifferentiableApprox, 'log'))
-    fprintf('Use logarithmic approximation of non-diff. term.\n');
-    [funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox (W, regularisationParams, volumetricregulariser, grad_volumetricRegulariser, Wtransposed);
-else
-   error('No or unknown type for approximation of max with differentiable function!') 
-end
+
+[funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox (W, regularisationParams, volumetricregulariser, grad_volumetricRegulariser, Wtransposed);
 
 [phi, phi_dash] = initializePhiAndPhiDash (funct, grad_funct);
 tic % TODO remove stopwatch
@@ -380,19 +369,6 @@ grad_funct = @(v) regularisationParams.mu0 * ( ( Wtransposed + ...
     ( exp((1/regularisationParams.gamma) * (W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) ) ./ ...
     ( 1 + exp((1/regularisationParams.gamma) * (W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) )) ) + ...
     grad_volumetricRegulariser(v) );
-end
-
-function [funct, grad_funct] = initializeFunctionalAndGradientWithQuadraticMaxApprox...
-    (W, volumetricregulariser, grad_volumetricRegulariser, Wtransposed)
-Wwithv = W*v;
-funct = @(v) sum( (max(0, W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1) ) ).^2 ) + ...
-    volumetricregulariser(v);
-
-n = size(W,1);
-grad_funct = @(v) ( ( Wtransposed + ...
-    [-(v(4)/v(1))^2; -(v(5)/v(2))^2; -(v(6)/v(3))^2; 2*v(4)/v(1); 2*v(5)/v(2); 2*v(6)/v(3)] * ones(1,n) ) ...
-    * 2 * (max(0, W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1) ) ) ) + ...
-    grad_volumetricRegulariser(v);
 end
 
 function [volumetricregulariser, grad_volumetricRegulariser] = initializeVolumetricRegulariserFunctionalAndGradient...
