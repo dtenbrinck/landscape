@@ -87,14 +87,14 @@ function [ center, radii, axis, radii_ref, center_ref, radii_initial, center_ini
 
 [W, X, pca_transformation] = prepareCoordinateMatrixAndOrientationMatrix(X, includePCA);
 [radii_initial, center_initial, v_initial] = initializeEllipsoidParams(X);
-
-[volumetricregulariser, grad_volumetricRegulariser] = initializeVolumetricRegulariserFunctionalAndGradient(W, regularisationParams);
+Wtransposed = W';
+[volumetricregulariser, grad_volumetricRegulariser] = initializeVolumetricRegulariserFunctionalAndGradient(W, regularisationParams, Wtransposed);
 if ( strcmpi(maxDifferentiableApprox, 'sqr'))
     fprintf('Use quadratic approximation of non-diff. term.\n');
-    [funct, grad_funct] = initializeFunctionalAndGradientWithQuadraticMaxApprox( W, volumetricregulariser, grad_volumetricRegulariser); 
+    [funct, grad_funct] = initializeFunctionalAndGradientWithQuadraticMaxApprox( W, volumetricregulariser, grad_volumetricRegulariser, Wtransposed); 
 elseif ( strcmpi(maxDifferentiableApprox, 'log'))
     fprintf('Use logarithmic approximation of non-diff. term.\n');
-    [funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox (W, regularisationParams, volumetricregulariser, grad_volumetricRegulariser);
+    [funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox (W, regularisationParams, volumetricregulariser, grad_volumetricRegulariser, Wtransposed);
 else
    error('No or unknown type for approximation of max with differentiable function!') 
 end
@@ -183,7 +183,7 @@ function v = performGradientSteps(v, W, grad_funct, phi, phi_dash, method, funct
     p = -gradient;
     k = 0;
     TOL = 1e-5;
-    maxIteration = 5000;
+    maxIteration = 50;%00;
     n = size(W,1);
     if ( strcmpi(method, 'cg') )
         fprintf('Using conjugate gradient method...\n');
@@ -205,6 +205,7 @@ function v = performGradientSteps(v, W, grad_funct, phi, phi_dash, method, funct
         end
         v = v + alpha * p;
         energy = nextEnergy;
+        % TODO W*v
         nextEnergy = funct(v);
 %         fprintf('#####current energy: %f \n',nextEnergy);
         nextGradient = grad_funct(v);
@@ -368,13 +369,13 @@ function [radii, center] = getReferenceEllipsoidApproximation(funct, v0, grad_fu
     [radii, center] = getEllipsoidParams(v);
 end
 
-function [funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox( W, regularisationParams, volumetricregulariser, grad_volumetricRegulariser)
+function [funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox( W, regularisationParams, volumetricregulariser, grad_volumetricRegulariser, Wtransposed)
 funct = @(v) regularisationParams.mu0 * ( regularisationParams.gamma*sum(...
     log( 1 + exp( 1/regularisationParams.gamma * (W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) ) ) ) + ...
     volumetricregulariser(v) );
 
 n = size(W,1);
-grad_funct = @(v) regularisationParams.mu0 * ( ( W' + ...
+grad_funct = @(v) regularisationParams.mu0 * ( ( Wtransposed + ...
     [-(v(4)/v(1))^2; -(v(5)/v(2))^2; -(v(6)/v(3))^2; 2*v(4)/v(1); 2*v(5)/v(2); 2*v(6)/v(3)] * ones(1,n) ) * ...
     ( exp((1/regularisationParams.gamma) * (W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) ) ./ ...
     ( 1 + exp((1/regularisationParams.gamma) * (W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) )) ) + ...
@@ -382,20 +383,20 @@ grad_funct = @(v) regularisationParams.mu0 * ( ( W' + ...
 end
 
 function [funct, grad_funct] = initializeFunctionalAndGradientWithQuadraticMaxApprox...
-    (W, volumetricregulariser, grad_volumetricRegulariser)
-
+    (W, volumetricregulariser, grad_volumetricRegulariser, Wtransposed)
+Wwithv = W*v;
 funct = @(v) sum( (max(0, W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1) ) ).^2 ) + ...
     volumetricregulariser(v);
 
 n = size(W,1);
-grad_funct = @(v) ( ( W' + ...
+grad_funct = @(v) ( ( Wtransposed + ...
     [-(v(4)/v(1))^2; -(v(5)/v(2))^2; -(v(6)/v(3))^2; 2*v(4)/v(1); 2*v(5)/v(2); 2*v(6)/v(3)] * ones(1,n) ) ...
     * 2 * (max(0, W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1) ) ) ) + ...
     grad_volumetricRegulariser(v);
 end
 
 function [volumetricregulariser, grad_volumetricRegulariser] = initializeVolumetricRegulariserFunctionalAndGradient...
-    (W, regularisationParams)
+    (W, regularisationParams, Wtransposed)
     volumetricregulariser = @(v) ...
     regularisationParams.mu1 * ( (v(1) - v(2))^2 + (v(3) - v(2))^2 + (v(1) - v(3))^2 )+ ...
     regularisationParams.mu2 * ( 1/v(1) + 1/v(2) + 1/v(3) )  + ...
@@ -405,7 +406,7 @@ n = size(W,1);
 grad_volumetricRegulariser = @(v) ...
     regularisationParams.mu1 * [2*(2*v(1) - v(2) - v(3));  2*(2*v(2) - v(1) - v(3)); 2*(2*v(3) - v(1) - v(2)); 0; 0; 0] + ...
     regularisationParams.mu2 * [-1./v(1:3).^2; 0; 0 ; 0] + ...
-    regularisationParams.mu3 * (( W' + ...
+    regularisationParams.mu3 * (( Wtransposed + ...
     [-(v(4)/v(1))^2; -(v(5)/v(2))^2; -(v(6)/v(3))^2; 2*v(4)/v(1); 2*v(5)/v(2); 2*v(6)/v(3)] * ones(1,n) ) * ...
     2 * ( W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)));
 end
