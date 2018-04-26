@@ -79,8 +79,8 @@ indices = find(Xi > 0);
 % initialize container for center coordinates
 centCoords = zeros(3,numel(indices));
 % set return variables
-centCoords(1,:) = tmpy;
-centCoords(2,:) = tmpx;
+centCoords(1,:) = tmpx;
+centCoords(2,:) = tmpy;
 centCoords(3,:) = tmpz;
 nuclei = Xi;
 
