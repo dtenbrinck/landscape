@@ -1,7 +1,7 @@
 function p =  ParameterHeatmap()
 %% PARAMETERS PROCESSING SCRIPT
 % This file contains all parameters needed for the heatmap script with
-% discriptios of each parameter. 
+% discriptions of each parameter. 
 
 %% COMMON PARAMETER
 
@@ -35,6 +35,9 @@ p.numberOfRandom = 100;
 % !!! NEED A BETTER APPROACH !!! %
 % Default: 5 with gridSize = 256
 p.option.cellradius = 7;
+% cell radius for nuclei cells in DAPI channel
+% Default: 2 with gridSize = 256
+p.option.dapiCellradius = 1;
 
 % - Slider options - %
 % Will show the Slider 
