@@ -34,7 +34,7 @@ p.numberOfRandom = 100;
 % The cell will be cellradius*2 pixels big. 
 % !!! NEED A BETTER APPROACH !!! %
 % Default: 5 with gridSize = 256
-p.option.cellradius = 7;
+p.option.cellradius = 7; %7 for mCherry
 % cell radius for nuclei cells in DAPI channel
 % Default: 2 with gridSize = 256
 p.option.dapiCellradius = 1;
