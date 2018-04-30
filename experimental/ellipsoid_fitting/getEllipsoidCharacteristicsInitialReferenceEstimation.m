@@ -1,6 +1,6 @@
 %% estimate minimal ellipsoid fitting for data set
 function [ center, radii, axis, radii_ref, center_ref, radii_initial, center_initial ] ...
-    = getEllipsoidCharacteristicsInitialReferenceEstimation3...
+    = getEllipsoidCharacteristicsInitialReferenceEstimation...
     ( X, descentMethod, regularisationParams, includePCA)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Fit an ellispoid/sphere to a set of xyz data points:
@@ -80,6 +80,7 @@ function [ center, radii, axis, radii_ref, center_ref, radii_initial, center_ini
 % Date:
 % April, 2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 [W, X, pca_transformation] = prepareCoordinateMatrixAndOrientationMatrix(X, includePCA);
 [radii_initial, center_initial, v_initial] = initializeEllipsoidParams(X);
