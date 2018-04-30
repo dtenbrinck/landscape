@@ -94,6 +94,7 @@ energyFunctional = @(v) regularisationParams.mu0 * ( regularisationParams.gamma*
 tic % TODO remove stopwatch
 [radii, center] = approximateEllipsoidParamsWithDescentMethod(v_initial, W, Wtransposed, regularisationParams, descentMethod);
 toc
+tic
 [radii_ref, center_ref] = getReferenceEllipsoidApproximation(energyFunctional, v_initial);
 toc
 
@@ -358,7 +359,7 @@ function [radii, center] = getReferenceEllipsoidApproximation(funct, v0)
     [v, ~,~,output] = fminsearch(funct, v0, options);
     output.message
     output.iterations
-    fprintf('########## ref. energy \t %f \t \t norm(grad(f(v))): %f\n', funct(v));
+    fprintf('########## ref. energy \t %f \t \t \n', funct(v));
     [radii, center] = getEllipsoidParams(v);
 end
 
