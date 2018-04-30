@@ -159,8 +159,8 @@ function [radii, center] = approximateEllipsoidParamsWithDescentMethod(v0, W, fu
     try
         v = performGradientSteps(v0, W, funct, grad_funct, method);
         [radii, center] = getEllipsoidParams(v);
-        expArgument = prepareArgumentForExponentialTerm(W, v );
-        fprintf('########## est. energy \t %f \t \t norm(grad(f(v))): %f\n', funct(v, expArgument), norm(grad_funct(v, expArgument)));
+        Wv = W*v;
+        fprintf('########## est. energy \t %f \t \t norm(grad(f(v))): %f\n', funct(v, Wv), norm(grad_funct(v, Wv)));
     catch ERROR_MSG
         disp(ERROR_MSG);
         fprintf('Setting default output parameter.\n');
@@ -170,10 +170,9 @@ function [radii, center] = approximateEllipsoidParamsWithDescentMethod(v0, W, fu
 end
 
 function v = performGradientSteps(v, W, funct, grad_funct, method)    
-    expArgument = prepareArgumentForExponentialTerm(W, v );
-    energy = funct(v, expArgument);
+    Wv = W*v;    
     nextEnergy = 10^10;
-    gradient = grad_funct(v, expArgument);
+    gradient = grad_funct(v, Wv);
     % descent direction p
     p = -gradient;
     k = 0;
@@ -185,8 +184,7 @@ function v = performGradientSteps(v, W, funct, grad_funct, method)
     else
         fprintf('Using gradient descent method...\n');
     end
-    while ( k < maxIteration && norm(gradient) > TOL && ...
-            abs(energy-nextEnergy / energy ) > 1e-1  )
+    while ( k < maxIteration && norm(gradient) > TOL )
         % step length alpha
         alpha = computeSteplength(v, p, funct, grad_funct, W);
         % stopping criteria if relative change of consecutive iterates v is
@@ -199,11 +197,8 @@ function v = performGradientSteps(v, W, funct, grad_funct, method)
             break;
         end
         v = v + alpha * p;
-        energy = nextEnergy;
-        expArgument = prepareArgumentForExponentialTerm(W, v );
-        nextEnergy = funct(v, expArgument);
-%         fprintf('#####current energy: %f \n',nextEnergy);
-        nextGradient = grad_funct(v, expArgument);
+        Wv = W*v;
+        nextGradient = grad_funct(v, Wv);
         % restart every n'th cycle (p. 124 / 145)
         if ( strcmp(method, 'grad') || (mod(k,n) == 0 && k > 0) )
             beta = 0;
@@ -252,20 +247,19 @@ function alpha_star = computeSteplength(v, descentDirection, funct, grad_funct, 
         alpha_star = 0;
         return;
     end
-    v_temp_current= v + alpha_current * descentDirection;
-    expArgument_current = prepareArgumentForExponentialTerm(W, v_temp_current );
-    phi_0 = funct( v_temp_current, expArgument_current);
-    phi_dash_0 = descentDirection' * grad_funct(v_temp_current, expArgument_current);
-    phi_current = phi_0; 
-        
+    v_temp = v + alpha_current * descentDirection;
+    Wv = W * v_temp;
+    phi_0 = funct( v_temp, Wv);
+    phi_dash_0 = descentDirection' * grad_funct(v_temp, Wv);
+    phi_current = phi_0;
     i = 1;
     maxIteration = 30;
     increase_steplength = (alpha_limit - alpha_current ) / maxIteration;
     alpha_next = alpha_current +  increase_steplength; % initialize next alpha
-    while i <= maxIteration        
-        v_temp_next = v + alpha_next * descentDirection;
-        expArgument_next = prepareArgumentForExponentialTerm(W, v_temp_next );
-        phi_next = funct( v_temp_next, expArgument_next);
+    while i <= maxIteration
+        v_temp = v + alpha_next * descentDirection;
+        Wv = W * ( v_temp);
+        phi_next = funct( v_temp, Wv);
         % stopping criteria if we cannot attain lower function value after ten
         % trial step lengths (p. 62 / 83)
         if ( mod(i,10) == 0 && phi_0 <= phi_next )
@@ -281,7 +275,7 @@ function alpha_star = computeSteplength(v, descentDirection, funct, grad_funct, 
             return;
         end
         
-        phi_dash_next = descentDirection' * grad_funct( v_temp_next, expArgument_next);
+        phi_dash_next = descentDirection' * grad_funct(v_temp, Wv);
         if ( abs(phi_dash_next) <= -c2 * phi_dash_0 )
             alpha_star = alpha_next;
             return;
@@ -329,17 +323,17 @@ function alpha_star = zoom(alpha_lower, alpha_higher, ...
                return;
             end
         end
-        v_temp_j=v + alpha_j * descentDirection; 
-        expArgument_j = prepareArgumentForExponentialTerm(W, v_temp_j );
-        phi_alpha_j = funct( v_temp_j, expArgument_j);
+        v_temp_j = v + alpha_j * descentDirection;
+        Wvj = W*v_temp_j;
+        phi_alpha_j = funct( v_temp_j, Wvj);
         v_temp_lower = v + alpha_lower * descentDirection;
-        expArgument_lower = prepareArgumentForExponentialTerm(W, v_temp_lower );
-        phi_alpha_lower = funct( v_temp_lower, expArgument_lower);
+        Wvl = W*v_temp_lower;
+        phi_alpha_lower = funct( v_temp_lower, Wvl);
         if ( phi_alpha_j > phi_0 + c1 * alpha_j * phi_dash_0 || ...
                 phi_alpha_j >= phi_alpha_lower )
             alpha_higher = alpha_j;
         else
-            phi_dash_j = descentDirection' * grad_funct(v_temp_j, expArgument_j);
+            phi_dash_j = descentDirection' * grad_funct(v_temp_j, Wvj);
             if ( abs(phi_dash_j) <= -c2 * phi_dash_0 ) 
                 alpha_star = alpha_j;
                 return;
@@ -359,10 +353,6 @@ function alpha_star = zoom(alpha_lower, alpha_higher, ...
     end
 end
 
-function expArgument = prepareArgumentForExponentialTerm(W, v )
-    expArgument = W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1);
-end
-
 function [radii, center] = getReferenceEllipsoidApproximation(funct, v0, grad_funct)
     fprintf('Approximate ellipsoid with MATLAB reference method...\n');
 %     options = optimset('OutputFcn', @outfun);
@@ -376,22 +366,22 @@ function [radii, center] = getReferenceEllipsoidApproximation(funct, v0, grad_fu
 end
 
 function [funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox( W, regularisationParams, Wtransposed)
-funct = @(v, expArgument) regularisationParams.mu0 * ( regularisationParams.gamma*sum(...
-    log( 1 + exp( 1/regularisationParams.gamma * expArgument ) ) ) + ...
+funct = @(v, Wv) regularisationParams.mu0 * ( regularisationParams.gamma*sum(...
+    log( 1 + exp( 1/regularisationParams.gamma * (Wv + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) ) ) ) + ...
     ... % volumetric reguliser
     regularisationParams.mu1 * ( (v(1) - v(2))^2 + (v(3) - v(2))^2 + (v(1) - v(3))^2 )+ ...
     regularisationParams.mu2 * ( 1/v(1) + 1/v(2) + 1/v(3) )  + ...
-    regularisationParams.mu3 * sum(( expArgument).^2) );
+    regularisationParams.mu3 * sum(( Wv + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)).^2) );
 
 n = size(W,1);
-grad_funct = @(v, expArgument) regularisationParams.mu0 * ( ( Wtransposed + ...
+grad_funct = @(v, Wv) regularisationParams.mu0 * ( ( Wtransposed + ...
     [-(v(4)/v(1))^2; -(v(5)/v(2))^2; -(v(6)/v(3))^2; 2*v(4)/v(1); 2*v(5)/v(2); 2*v(6)/v(3)] ) * ...
-    ( exp((1/regularisationParams.gamma) * expArgument ) ./ ...
-    ( 1 + exp((1/regularisationParams.gamma) * expArgument )) ) + ...
+    ( exp((1/regularisationParams.gamma) * (Wv + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) ) ./ ...
+    ( 1 + exp((1/regularisationParams.gamma) * (Wv + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) )) ) + ...
     ... % volumetric reguliser
     regularisationParams.mu1 * [2*(2*v(1) - v(2) - v(3));  2*(2*v(2) - v(1) - v(3)); 2*(2*v(3) - v(1) - v(2)); 0; 0; 0] + ...
     regularisationParams.mu2 * [-1./v(1:3).^2; 0; 0 ; 0] + ...
     regularisationParams.mu3 * (( Wtransposed + ...
     [-(v(4)/v(1))^2; -(v(5)/v(2))^2; -(v(6)/v(3))^2; 2*v(4)/v(1); 2*v(5)/v(2); 2*v(6)/v(3)] ) * ...
-    2 * (expArgument)));
+    2 * ( Wv + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1))));
 end
