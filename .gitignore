@@ -10,3 +10,4 @@ results/
 commands.txt
 *.asv
 *.mat
+/archive
