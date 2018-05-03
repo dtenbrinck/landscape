@@ -81,7 +81,8 @@ function [ center, radii, axis, radii_ref, center_ref, radii_initial, center_ini
 % April, 2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
+% idx = randperm( size(X,1), ceil(0.1*size(X,1)));
+% X = X(idx,:); 
 [W, X, pca_transformation] = prepareCoordinateMatrixAndOrientationMatrix(X, includePCA);
 [radii_initial, center_initial, v_initial] = initializeEllipsoidParams(X);
 Wtransposed = W';
@@ -190,7 +191,7 @@ function v = performGradientSteps(v, W, funct, grad_funct, method)
         alpha = computeSteplength(v, p, funct, grad_funct, W);
         % stopping criteria if relative change of consecutive iterates v is
         % too small (p. 62 / 83)
-        if ( norm ( alpha * p ) / norm (v) < 10^-8 )
+        if ( norm ( alpha * p ) / norm (v) < 10^-8 ) %10^-10 )
             if ( k < 1 && alpha == 0)
                error('Line Search did not give a descent step length in first iteration step.\n')
             end

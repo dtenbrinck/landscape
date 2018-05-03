@@ -35,7 +35,7 @@ function plotSeveralEllipsoidEstimations(X, center_initial, radii_initial,...
     plotOneEllipsoidEstimation( center, radii, 'm', 'ellipsoid estimation', isPCAactive, axis);
     plotOneEllipsoidEstimation( center_ref, radii_ref, 'c','reference estimation', isPCAactive, axis);
 %     plotOneEllipsoidEstimation( center_initial, radii_initial, [0.9100    0.4100    0.1700] , 'initialization ellipsoid', isPCAactive, axis);
-    plotOldEllipsoidEstimation(X, 'g', 'old estimation');
+%     plotOldEllipsoidEstimation(X, 'g', 'old estimation');
     legend('Location', 'southoutside');
     title(titletext, 'Interpreter', 'none');
     view(90, 0);%(3);%
