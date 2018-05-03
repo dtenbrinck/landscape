@@ -1,26 +1,25 @@
 function estimateEllipsoidForDataSetAndPlotResults(X, descentMethod, regularisationParams, outputPath, isPCAactive, title)
     %fprintf('\n');
-    [center1, radii1, axis1, radii_ref1, center_ref1, radii_initial1, center_initial1] = getEllipsoidCharacteristicsInitialReferenceEstimation( X, descentMethod, regularisationParams, isPCAactive );
-     table( radii_initial1, radii1, radii_ref1)
-%     table( center_initial, center, center_ref, center1, center_ref1 )
-%     volumes = 4/3*pi*[ prod(radii_initial), prod(radii), prod(radii_ref), prod(radii1), prod(radii_ref1)]
+    [center, radii, axis, radii_ref, center_ref, radii_initial, center_initial] = getEllipsoidCharacteristicsInitialReferenceEstimation( X, descentMethod, regularisationParams, isPCAactive );
+    table( radii_initial, radii, radii_ref)
+    table( center_initial, center, center_ref )
 %       return;
     % plot ellipsoid fittings
-    %fprintf('Plotting results...\n');
+    fprintf('Plotting results...\n');
 
-%     figure;
-%     titletext = title;
-%     hold on;
-%     plotSeveralEllipsoidEstimations(X, center_initial1, radii_initial1,...
-%         center1, radii1, center_ref1, radii_ref1, titletext, isPCAactive, axis1);
-%     plotOrientationVectors( center1, axis1);
-%     descr = {['PCA = ' num2str(isPCAactive)]; 
-%         ['mu_1 = ' num2str(regularisationParams.mu1)]; 
-%         ['mu_2 = ' num2str(regularisationParams.mu2)]; 
-%         ['mu_3 = ' num2str(regularisationParams.mu3)]};
-%     yl = ylim; zl = zlim; zt = zticks;
-%     text(0,yl(1),zl(1)-2*(zt(2)-zt(1)),descr);
-%     print("results/" + outputPath + ".png",'-dpng');
+    figure;
+    titletext = title;
+    hold on;
+    plotSeveralEllipsoidEstimations(X, center_initial, radii_initial,...
+        center, radii, center_ref, radii_ref, titletext, isPCAactive, axis);
+    plotOrientationVectors( center, axis);
+    descr = {['PCA = ' num2str(isPCAactive)]; 
+        ['mu_1 = ' num2str(regularisationParams.mu1)]; 
+        ['mu_2 = ' num2str(regularisationParams.mu2)]; 
+        ['mu_3 = ' num2str(regularisationParams.mu3)]};
+    yl = ylim; zl = zlim; zt = zticks;
+    text(0,yl(1),zl(1)-2*(zt(2)-zt(1)),descr);
+    print("results/" + outputPath + ".png",'-dpng');
 end
 
 function plotOrientationVectors( center, axis)
@@ -35,8 +34,8 @@ function plotSeveralEllipsoidEstimations(X, center_initial, radii_initial,...
     scatter3(X(:,1),X(:,2), X(:,3),'b','.', 'DisplayName', 'input data', 'MarkerFaceAlpha',0.1);
     plotOneEllipsoidEstimation( center, radii, 'm', 'ellipsoid estimation', isPCAactive, axis);
     plotOneEllipsoidEstimation( center_ref, radii_ref, 'c','reference estimation', isPCAactive, axis);
-    plotOneEllipsoidEstimation( center_initial, radii_initial, 'g', 'initialization ellipsoid', isPCAactive, axis);
-%     plotOldEllipsoidEstimation(X, [0.9100    0.4100    0.1700], 'old estimation');
+%     plotOneEllipsoidEstimation( center_initial, radii_initial, [0.9100    0.4100    0.1700] , 'initialization ellipsoid', isPCAactive, axis);
+    plotOldEllipsoidEstimation(X, 'g', 'old estimation');
     legend('Location', 'southoutside');
     title(titletext, 'Interpreter', 'none');
     view(90, 0);%(3);%

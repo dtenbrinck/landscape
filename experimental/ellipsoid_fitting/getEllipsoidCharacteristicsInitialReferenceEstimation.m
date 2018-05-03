@@ -87,6 +87,7 @@ function [ center, radii, axis, radii_ref, center_ref, radii_initial, center_ini
 Wtransposed = W';
 
 [funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox (W, regularisationParams, Wtransposed);
+fprintf('########## elapsed time for embryo estimation:\n')
 tic % TODO remove stopwatch
 [radii, center] = approximateEllipsoidParamsWithDescentMethod(v_initial, W, funct, grad_funct, descentMethod);
 toc
@@ -172,7 +173,6 @@ end
 
 function v = performGradientSteps(v, W, funct, grad_funct, method)    
     Wv = W*v;    
-    nextEnergy = 10^10;
     gradient = grad_funct(v, Wv);
     % descent direction p
     p = -gradient;
@@ -181,9 +181,9 @@ function v = performGradientSteps(v, W, funct, grad_funct, method)
     maxIteration = 5000;
     n = size(W,1);
     if ( strcmpi(method, 'cg') )
-        fprintf('Using conjugate gradient method...\n');
+%         fprintf('Using conjugate gradient method...\n');
     else
-        fprintf('Using gradient descent method...\n');
+%         fprintf('Using gradient descent method...\n');
     end
     while ( k < maxIteration && norm(gradient) > TOL )
         % step length alpha
@@ -355,13 +355,13 @@ function alpha_star = zoom(alpha_lower, alpha_higher, ...
 end
 
 function [radii, center] = getReferenceEllipsoidApproximation(funct, v0, grad_funct)
-    fprintf('Approximate ellipsoid with MATLAB reference method...\n');
+%     fprintf('Approximate ellipsoid with MATLAB reference method...\n');
 %     options = optimset('OutputFcn', @outfun);
 %     other input params: 'PlotFcns', @optimplotfval, options, 'Display','notify', 
     options = optimset('TolX', 1e-8, 'TolFun', 1e-8);
     [v, ~,~,output] = fminsearch(funct, v0, options);
-    output.message
-    output.iterations
+%     output.message
+%     output.iterations
     fprintf('########## ref. energy \t %f \t \t\n', funct(v));
     [radii, center] = getEllipsoidParams(v);
 end
