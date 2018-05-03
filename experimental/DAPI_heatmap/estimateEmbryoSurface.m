@@ -1,11 +1,13 @@
-function [ ellipsoid ] = estimateEmbryoSurface2( nuclei_coord, resolution )
-Y = (nuclei_coord(1,:) * resolution(1))';
-X = (nuclei_coord(2,:) * resolution(2))';
+function [ ellipsoid ] = estimateEmbryoSurface( nuclei_coord, resolution )
+X = (nuclei_coord(1,:) * resolution(1))';
+Y = (nuclei_coord(2,:) * resolution(2))';
 Z = (nuclei_coord(3,:) * resolution(3))';
 
 % fit ellipsoid to sharp points in areas in focus
 [ellipsoid.center, ellipsoid.radii, ellipsoid.axes] = findMinimumEllipsoid([ X Y Z ]);
-	
+% old approx.:
+% [ ellipsoid.center, ellipsoid.radii, ellipsoid.axes, ellipsoid.v, ~] = estimateEllipsoid( [ X Y Z ], '' );
+
 % check axes orientation and flip if necessary
 orientation = diag(ellipsoid.axes);
 for i=1:3
