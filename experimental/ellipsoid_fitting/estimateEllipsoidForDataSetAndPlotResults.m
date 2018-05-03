@@ -1,8 +1,10 @@
-function estimateEllipsoidForDataSetAndPlotResults(X, descentMethod, regularisationParams, outputPath, isPCAactive, title)
+function estimateEllipsoidForDataSetAndPlotResults(X, descentMethod, regularisationParams, outputPath, isPCAactive, title, TOL_consecutiveIterates)
     %fprintf('\n');
-    [center, radii, axis, radii_ref, center_ref, radii_initial, center_initial] = getEllipsoidCharacteristicsInitialReferenceEstimation( X, descentMethod, regularisationParams, isPCAactive );
-    table( radii_initial, radii, radii_ref)
-    table( center_initial, center, center_ref )
+    [center, radii, axis, radii_ref, center_ref] = getEllipsoidCharacteristicsInitialReferenceEstimation( X, descentMethod, regularisationParams, isPCAactive, TOL_consecutiveIterates );
+    t1 = table( radii, radii_ref);
+    t2 = table( center, center_ref );
+    save("results/" + outputPath + "_radii", 't1');
+    save("results/" + outputPath + "_center", 't2');
 %       return;
     % plot ellipsoid fittings
     fprintf('Plotting results...\n');
@@ -10,7 +12,7 @@ function estimateEllipsoidForDataSetAndPlotResults(X, descentMethod, regularisat
     figure;
     titletext = title;
     hold on;
-    plotSeveralEllipsoidEstimations(X, center_initial, radii_initial,...
+    plotSeveralEllipsoidEstimations(X, ...
         center, radii, center_ref, radii_ref, titletext, isPCAactive, axis);
     plotOrientationVectors( center, axis);
     descr = {['PCA = ' num2str(isPCAactive)]; 
@@ -29,12 +31,11 @@ function plotOrientationVectors( center, axis)
     quiver3( center(1), center(2), center(3), axis(1,3), axis(2,3), axis(3,3), 'b', 'LineWidth', 2, 'Displayname','third axis');
 end
 
-function plotSeveralEllipsoidEstimations(X, center_initial, radii_initial,...
+function plotSeveralEllipsoidEstimations(X, ...
         center, radii, center_ref, radii_ref, titletext, isPCAactive, axis)
     scatter3(X(:,1),X(:,2), X(:,3),'b','.', 'DisplayName', 'input data', 'MarkerFaceAlpha',0.1);
     plotOneEllipsoidEstimation( center, radii, 'm', 'ellipsoid estimation', isPCAactive, axis);
     plotOneEllipsoidEstimation( center_ref, radii_ref, 'c','reference estimation', isPCAactive, axis);
-%     plotOneEllipsoidEstimation( center_initial, radii_initial, [0.9100    0.4100    0.1700] , 'initialization ellipsoid', isPCAactive, axis);
 %     plotOldEllipsoidEstimation(X, 'g', 'old estimation');
     legend('Location', 'southoutside');
     title(titletext, 'Interpreter', 'none');

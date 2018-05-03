@@ -1,7 +1,7 @@
 %% estimate minimal ellipsoid fitting for data set
-function [ center, radii, axis, radii_ref, center_ref, radii_initial, center_initial ] ...
+function [ center, radii, axis, radii_ref, center_ref ] ...
     = getEllipsoidCharacteristicsInitialReferenceEstimation...
-    ( X, descentMethod, regularisationParams, includePCA)
+    ( X, descentMethod, regularisationParams, includePCA, TOL_consecutiveIterates)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Fit an ellispoid/sphere to a set of xyz data points:
 %
@@ -84,13 +84,13 @@ function [ center, radii, axis, radii_ref, center_ref, radii_initial, center_ini
 % idx = randperm( size(X,1), ceil(0.1*size(X,1)));
 % X = X(idx,:); 
 [W, X, pca_transformation] = prepareCoordinateMatrixAndOrientationMatrix(X, includePCA);
-[radii_initial, center_initial, v_initial] = initializeEllipsoidParams(X);
+[v_initial] = initializeEllipsoidParams(X);
 Wtransposed = W';
 
 [funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox (W, regularisationParams, Wtransposed);
 fprintf('########## elapsed time for embryo estimation:\n')
 tic % TODO remove stopwatch
-[radii, center] = approximateEllipsoidParamsWithDescentMethod(v_initial, W, funct, grad_funct, descentMethod);
+[radii, center] = approximateEllipsoidParamsWithDescentMethod(v_initial, W, funct, grad_funct, descentMethod, TOL_consecutiveIterates);
 toc
 funct = @(v) regularisationParams.mu0 * ( regularisationParams.gamma*sum(...
     log( 1 + exp( 1/regularisationParams.gamma * (W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) ) ) ) + ...
@@ -105,12 +105,11 @@ toc
 % invert coordinate transformation caused by PCA back for center vectors
 center = pca_transformation \ center;
 center_ref = pca_transformation \ center_ref;
-center_initial = pca_transformation \ center_initial;
 
 axis=pca_transformation';
 end
 
-function [radii, center, v] = initializeEllipsoidParams(X)
+function [v] = initializeEllipsoidParams(X)
     if size( X, 2 ) ~= 3
     error( 'Input data must have three columns!' );
     else
@@ -158,9 +157,9 @@ function [W, X, pca_transformation] = prepareCoordinateMatrixAndOrientationMatri
         2 * z];  % ndatapoints x 6 ellipsoid parameters
 end
 
-function [radii, center] = approximateEllipsoidParamsWithDescentMethod(v0, W, funct, grad_funct, method)
+function [radii, center] = approximateEllipsoidParamsWithDescentMethod(v0, W, funct, grad_funct, method, TOL_consecutiveIterates)
     try
-        v = performGradientSteps(v0, W, funct, grad_funct, method);
+        v = performGradientSteps(v0, W, funct, grad_funct, method, TOL_consecutiveIterates);
         [radii, center] = getEllipsoidParams(v);
         Wv = W*v;
         fprintf('########## est. energy \t %f \t \t norm(grad(f(v))): %f\n', funct(v, Wv), norm(grad_funct(v, Wv)));
@@ -172,14 +171,14 @@ function [radii, center] = approximateEllipsoidParamsWithDescentMethod(v0, W, fu
     end
 end
 
-function v = performGradientSteps(v, W, funct, grad_funct, method)    
+function v = performGradientSteps(v, W, funct, grad_funct, method, TOL_consecutiveIterates)    
     Wv = W*v;    
     gradient = grad_funct(v, Wv);
     % descent direction p
     p = -gradient;
     k = 0;
     TOL = 1e-5;
-    maxIteration = 5000;
+    maxIteration = 8000;
     n = size(W,1);
     if ( strcmpi(method, 'cg') )
 %         fprintf('Using conjugate gradient method...\n');
@@ -191,7 +190,7 @@ function v = performGradientSteps(v, W, funct, grad_funct, method)
         alpha = computeSteplength(v, p, funct, grad_funct, W);
         % stopping criteria if relative change of consecutive iterates v is
         % too small (p. 62 / 83)
-        if ( norm ( alpha * p ) / norm (v) < 10^-8 ) %10^-10 )
+        if ( norm ( alpha * p ) / norm (v) < TOL_consecutiveIterates )
             if ( k < 1 && alpha == 0)
                error('Line Search did not give a descent step length in first iteration step.\n')
             end
