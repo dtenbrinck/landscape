@@ -1,6 +1,6 @@
 function [ ellipsoid ] = estimateEmbryoSurface( nuclei_coord, resolution )
-Y = (nuclei_coord(1,:) * resolution(1))';
-X = (nuclei_coord(2,:) * resolution(2))';
+X = (nuclei_coord(1,:) * resolution(1))';
+Y = (nuclei_coord(2,:) * resolution(2))';
 Z = (nuclei_coord(3,:) * resolution(3))';
 
 % fit ellipsoid to sharp points in areas in focus
