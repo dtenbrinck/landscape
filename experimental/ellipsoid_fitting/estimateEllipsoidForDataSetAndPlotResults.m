@@ -15,10 +15,11 @@ function estimateEllipsoidForDataSetAndPlotResults(X, descentMethod, regularisat
     plotSeveralEllipsoidEstimations(X, ...
         center, radii, center_ref, radii_ref, titletext, isPCAactive, axis);
     plotOrientationVectors( center, axis);
-    descr = {['PCA = ' num2str(isPCAactive)]; 
+    descr = {['mu_0 = ' num2str(regularisationParams.mu0)]; 
         ['mu_1 = ' num2str(regularisationParams.mu1)]; 
         ['mu_2 = ' num2str(regularisationParams.mu2)]; 
         ['mu_3 = ' num2str(regularisationParams.mu3)]};
+    ylim([-100 700]);zlim([-100 600]);
     yl = ylim; zl = zlim; zt = zticks;
     text(0,yl(1),zl(1)-2*(zt(2)-zt(1)),descr);
     print("results/" + outputPath + ".png",'-dpng');
