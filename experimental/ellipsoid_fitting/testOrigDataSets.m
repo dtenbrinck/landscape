@@ -17,7 +17,7 @@ function testOneDataSet(X, outputPathBase, i)
         "ellipsoid estimations - dataset " + num2str( i ), ...
         10^-8);
     % test reduced data set
-    fprintf("\n\n estimating embryo ellipsoid for *reduced* data set " + num2str(i) + "...\n");
+    fprintf("###### Estimating embryo ellipsoid for *reduced* data set " + num2str(i) + "...\n");
     percentage = 10;
     idx = randperm( size(X,1), ceil(percentage/100*size(X,1)));
     X = X(idx,:); 
@@ -33,5 +33,5 @@ function testDataSetWithRegularisationParams(mu0, mu1, mu2, mu3, X, outputPath, 
     regularisationParams.mu2 = mu2; 
     regularisationParams.mu3 = mu3;
     regularisationParams.gamma = 1; 
-    estimateEllipsoidForDataSetAndPlotResults(X, 'cg', regularisationParams, outputPath, 1 , title, TOL_consecutiveIterates);
+    estimateEllipsoidForDataSetAndPlotResults(X, 'cg', regularisationParams, outputPath, title, TOL_consecutiveIterates);
 end

@@ -1,7 +1,7 @@
 %% estimate minimal ellipsoid fitting for data set
 function [ center, radii, axis, radii_ref, center_ref ] ...
     = getEllipsoidCharacteristicsInitialReferenceEstimation...
-    ( X, descentMethod, regularisationParams, includePCA, TOL_consecutiveIterates)
+    ( X, descentMethod, regularisationParams, TOL_consecutiveIterates)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Fit an ellispoid/sphere to a set of xyz data points:
 %
@@ -83,24 +83,19 @@ function [ center, radii, axis, radii_ref, center_ref ] ...
 
 % idx = randperm( size(X,1), ceil(0.1*size(X,1)));
 % X = X(idx,:); 
-[W, X, pca_transformation] = prepareCoordinateMatrixAndOrientationMatrix(X, includePCA);
+[W, X, pca_transformation] = prepareCoordinateMatrixAndOrientationMatrix(X);
 [v_initial] = initializeEllipsoidParams(X);
 Wtransposed = W';
 
 [funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox (W, regularisationParams, Wtransposed);
-fprintf('########## elapsed time for embryo estimation:\n')
-tic % TODO remove stopwatch
 [radii, center] = approximateEllipsoidParamsWithDescentMethod(v_initial, W, funct, grad_funct, descentMethod, TOL_consecutiveIterates);
-toc
 funct = @(v) regularisationParams.mu0 * ( regularisationParams.gamma*sum(...
     log( 1 + exp( 1/regularisationParams.gamma * (W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) ) ) ) + ...
     ... % volumetric reguliser
     regularisationParams.mu1 * ( (v(1) - v(2))^2 + (v(3) - v(2))^2 + (v(1) - v(3))^2 )+ ...
     regularisationParams.mu2 * ( 1/v(1) + 1/v(2) + 1/v(3) )  + ...
     regularisationParams.mu3 * sum(( W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)).^2) );
-tic
 [radii_ref, center_ref] = getReferenceEllipsoidApproximation(funct, v_initial, grad_funct);
-toc
 
 % invert coordinate transformation caused by PCA back for center vectors
 center = pca_transformation \ center;
@@ -130,15 +125,12 @@ function [radii, center] = getEllipsoidParams(v)
     center = - v(4:6) ./ v(1:3);
 end
 
-function [W, X, pca_transformation] = prepareCoordinateMatrixAndOrientationMatrix(X, includePCA)
-    pca_transformation = eye(3);
+function [W, X, pca_transformation] = prepareCoordinateMatrixAndOrientationMatrix(X)
     if size( X, 2 ) ~= 3
         error( 'Input data must have three columns!' );
     else
-        if ( includePCA )
-            pca_transformation = (pca(X))';
-            X = (pca_transformation * X')';
-        end
+        pca_transformation = (pca(X))';
+        X = (pca_transformation * X')';
         x = X( :, 1 );
         y = X( :, 2 );
         z = X( :, 3 );
@@ -161,8 +153,8 @@ function [radii, center] = approximateEllipsoidParamsWithDescentMethod(v0, W, fu
     try
         v = performGradientSteps(v0, W, funct, grad_funct, method, TOL_consecutiveIterates);
         [radii, center] = getEllipsoidParams(v);
-        Wv = W*v;
-        fprintf('########## est. energy \t %e \t \t norm(grad(f(v))): %e\n', funct(v, Wv), norm(grad_funct(v, Wv)));
+%         Wv = W*v;
+%         fprintf('########## est. energy \t %e \t \t norm(grad(f(v))): %e\n', funct(v, Wv), norm(grad_funct(v, Wv)));
     catch ERROR_MSG
         disp(ERROR_MSG);
         fprintf('Setting default output parameter.\n');
@@ -180,12 +172,6 @@ function v = performGradientSteps(v, W, funct, grad_funct, method, TOL_consecuti
     TOL = 1e-5;
     maxIteration = 8000;
     n = size(W,1);
-    if ( strcmpi(method, 'cg') )
-%         fprintf('Using conjugate gradient method...\n');
-    else
-%         fprintf('Using gradient descent method...\n');
-    end
-%     figure;
     while ( k < maxIteration && norm(gradient) > TOL )
         % step length alpha
         alpha = computeSteplength(v, p, funct, grad_funct, W);
@@ -199,8 +185,7 @@ function v = performGradientSteps(v, W, funct, grad_funct, method, TOL_consecuti
             break;
         end
         v = v + alpha * p;
-        Wv = W*v;
-%         plot(k, funct(v, W*v), 'r*');hold on;   
+        Wv = W*v;  
         nextGradient = grad_funct(v, Wv);
         % restart every n'th cycle (p. 124 / 145)
         if ( strcmp(method, 'grad') || (mod(k,n) == 0 && k > 0) )
@@ -366,7 +351,7 @@ function [radii, center] = getReferenceEllipsoidApproximation(funct, v0, grad_fu
     [v, ~,~,output] = fminsearch(funct, v0, options);
 %     output.message
 %     output.iterations
-    fprintf('########## ref. energy \t %e \t \t\n', funct(v));
+%     fprintf('########## ref. energy \t %e \t \t\n', funct(v));
     [radii, center] = getEllipsoidParams(v);
 end
 
