@@ -162,7 +162,7 @@ function [radii, center] = approximateEllipsoidParamsWithDescentMethod(v0, W, fu
         v = performGradientSteps(v0, W, funct, grad_funct, method, TOL_consecutiveIterates);
         [radii, center] = getEllipsoidParams(v);
         Wv = W*v;
-        fprintf('########## est. energy \t %f \t \t norm(grad(f(v))): %f\n', funct(v, Wv), norm(grad_funct(v, Wv)));
+        fprintf('########## est. energy \t %e \t \t norm(grad(f(v))): %e\n', funct(v, Wv), norm(grad_funct(v, Wv)));
     catch ERROR_MSG
         disp(ERROR_MSG);
         fprintf('Setting default output parameter.\n');
@@ -185,6 +185,7 @@ function v = performGradientSteps(v, W, funct, grad_funct, method, TOL_consecuti
     else
 %         fprintf('Using gradient descent method...\n');
     end
+%     figure;
     while ( k < maxIteration && norm(gradient) > TOL )
         % step length alpha
         alpha = computeSteplength(v, p, funct, grad_funct, W);
@@ -194,11 +195,12 @@ function v = performGradientSteps(v, W, funct, grad_funct, method, TOL_consecuti
             if ( k < 1 && alpha == 0)
                error('Line Search did not give a descent step length in first iteration step.\n')
             end
-            fprintf ('Stopping gradient after %d iteration(s) due to too small relative change of consecutive iterates!\n', k);
+            fprintf ('Stopping gradient due to too small relative change of consecutive iterates!\n');
             break;
         end
         v = v + alpha * p;
         Wv = W*v;
+%         plot(k, funct(v, W*v), 'r*');hold on;   
         nextGradient = grad_funct(v, Wv);
         % restart every n'th cycle (p. 124 / 145)
         if ( strcmp(method, 'grad') || (mod(k,n) == 0 && k > 0) )
@@ -222,6 +224,8 @@ function v = performGradientSteps(v, W, funct, grad_funct, method, TOL_consecuti
     end
     if ( k >= maxIteration ) 
         fprintf ('Gradient descent method did not converge yet (max. iterations %d)! norm(gradient) = %e \n', maxIteration, norm(gradient));
+    else 
+        fprintf ('Stopped gradient after %d iteration(s). norm(gradient) = %e \n', k, norm(gradient));
     end
 end
 
@@ -314,11 +318,11 @@ function alpha_star = zoom(alpha_lower, alpha_higher, ...
         % use a bisection step
         alpha_j = (alpha_lower + alpha_higher) / 2;
         if ( iteration > 0 )
-            % safeguard procedure (p.58, 79): if alpha_next (alpha_i)
-            % is too close to alpha_current (alpha_i-1) or too much smaller
-            % than alpha_current (alpha_i-1), reset alpha_next:
-            if ( alpha_last - alpha_j < TOL || ...
-                    ( alpha_last - alpha_j ) / alpha_last < TOL || ...
+            % safeguard procedure (p.58, 79): if alpha_j (alpha_i)
+            % is too close to alpha_last (alpha_i-1) or too much smaller
+            % than alpha_last (alpha_i-1), reset alpha_j:
+            if ( abs(alpha_last - alpha_j) < TOL || ...
+                    abs(alpha_last - alpha_j ) / alpha_last < TOL || ...
                     abs(alpha_j ) < TOL )  % alpha_j shouldn't be too small
                alpha_star = alpha_last / 2; 
                return;
@@ -362,7 +366,7 @@ function [radii, center] = getReferenceEllipsoidApproximation(funct, v0, grad_fu
     [v, ~,~,output] = fminsearch(funct, v0, options);
 %     output.message
 %     output.iterations
-    fprintf('########## ref. energy \t %f \t \t\n', funct(v));
+    fprintf('########## ref. energy \t %e \t \t\n', funct(v));
     [radii, center] = getEllipsoidParams(v);
 end
 

@@ -2,7 +2,6 @@ function testOrigDataSets()
     close all; 
     load("datasets.mat");
     for i=1:3
-        fprintf("\n\n estimating embryo ellipsoids for data set " + num2str(i) + "...\n");
         X=datasets{i};
         outputPathBase = "Tests/ellipsoid_estimation_orig_data" + num2str(i);
         testOneDataSet(X, outputPathBase, i)  
@@ -11,12 +10,14 @@ function testOrigDataSets()
 end
 
 function testOneDataSet(X, outputPathBase, i)
+    fprintf("\n\n estimating embryo ellipsoid for *unreduced* data set " + num2str(i) + "...\n");
     % test unreduced data set
     testDataSetWithRegularisationParams(10^-8, 0, 0.02, 1, X, ...
         outputPathBase + "_unreduced", ...
         "ellipsoid estimations - dataset " + num2str( i ), ...
         10^-8);
     % test reduced data set
+    fprintf("\n\n estimating embryo ellipsoid for *reduced* data set " + num2str(i) + "...\n");
     percentage = 10;
     idx = randperm( size(X,1), ceil(percentage/100*size(X,1)));
     X = X(idx,:); 
