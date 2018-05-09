@@ -182,7 +182,7 @@ function v = performGradientSteps(v, W, funct, grad_funct, method)
             if ( k < 1 && alpha == 0)
                error('Line Search did not give a descent step length in first iteration step.\n')
             end
-            fprintf ('Stopping gradient due to too small relative change of consecutive iterates!\n');
+%             fprintf ('Stopping gradient due to too small relative change of consecutive iterates!\n');
             break;
         end
         v = v + alpha * p;
@@ -350,9 +350,10 @@ function [radii, center] = getReferenceEllipsoidApproximation(funct, v0, grad_fu
 %     options = optimset('OutputFcn', @outfun);
 %     other input params: 'PlotFcns', @optimplotfval, options, 'Display','notify', 
     options = optimset('TolX', 1e-8, 'TolFun', 1e-8);
+    tic;
     [v, ~,~,output] = fminsearch(funct, v0, options);
-%     output.message
-%     output.iterations
+    time = toc;
+    fprintf ('Matlab reference stopped after %d iteration(s) in %f seconds. \n', output.iterations, time);
 %     fprintf('########## ref. energy \t %e \t \t\n', funct(v));
     [radii, center] = getEllipsoidParams(v);
 end

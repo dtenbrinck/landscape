@@ -12,12 +12,17 @@ function estimateEllipsoidForDataSetAndPlotResults(X, ellipsoidFittingParams, ou
     plotSeveralEllipsoidEstimations(X, ...
         center, radii, center_ref, radii_ref, titletext, axis);
 %     plotOrientationVectors( center, axis);
-    descr = {['mu_0 = ' num2str(ellipsoidFittingParams.regularisationParams.mu0)]; 
-        ['mu_1 = ' num2str(ellipsoidFittingParams.regularisationParams.mu1)]; 
-        ['mu_2 = ' num2str(ellipsoidFittingParams.regularisationParams.mu2)]};
-     ylim([-100 700]);zlim([-100 600]);
-    yl = ylim; zl = zlim; zt = zticks;
-    text(0,yl(1),zl(1)-2*(zt(2)-zt(1)),descr);
+    descr = {['radii = [' num2str(radii(1)) ', ' num2str(radii(2)) ', ' num2str(radii(3)) ']']; 
+        ['center = [' num2str(center(1)) ', ' num2str(center(2)) ', ' ]; 
+        [num2str(center(3)) ']'];
+        [' '];
+        ['reference:'];
+        ['radii = [' num2str(radii_ref(1)) ', ' num2str(radii_ref(2)) ', ' num2str(radii_ref(3)) ']']; 
+        ['center = [' num2str(center_ref(1)) ', ' num2str(center_ref(2)) ','];
+        [num2str(center_ref(3)) ']'],};
+    ylim([-100 700]);zlim([-100 600]);
+    yl = ylim; zl = zlim;
+    text(0,yl(2)+5,(zl(2)-zl(1))/2,descr, 'Interpreter', 'none');
     print("results/" + outputPath + ".png",'-dpng');
 end
 
@@ -34,7 +39,7 @@ function plotSeveralEllipsoidEstimations(X, ...
     plotOneEllipsoidEstimation( center, radii, 'm', 'ellipsoid estimation', axis);
     plotOneEllipsoidEstimation( center_ref, radii_ref, 'c','reference estimation', axis);
 %     plotOldEllipsoidEstimation(X, 'g', 'old estimation');
-    legend('Location', 'southoutside');
+    legend('Location', 'southeastoutside');
     title(titletext, 'Interpreter', 'none');
     view(90, 0);%(3);%
 end
