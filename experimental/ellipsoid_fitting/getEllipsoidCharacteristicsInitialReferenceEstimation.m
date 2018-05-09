@@ -1,7 +1,7 @@
 %% estimate minimal ellipsoid fitting for data set
 function [ center, radii, axis, radii_ref, center_ref ] ...
     = getEllipsoidCharacteristicsInitialReferenceEstimation...
-    ( X, fittingParams, TOL_consecutiveIterates)
+    ( X, fittingParams)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Fit an ellispoid/sphere to a set of xyz data points:
 %
@@ -86,7 +86,7 @@ function [ center, radii, axis, radii_ref, center_ref ] ...
 Wtransposed = W';
 
 [funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox (W, fittingParams.regularisationParams, Wtransposed);
-[radii, center] = approximateEllipsoidParamsWithDescentMethod(v_initial, W, funct, grad_funct, fittingParams.descentMethod, TOL_consecutiveIterates);
+[radii, center] = approximateEllipsoidParamsWithDescentMethod(v_initial, W, funct, grad_funct, fittingParams.descentMethod);
 
 funct = @(v) fittingParams.regularisationParams.mu0 * ( fittingParams.regularisationParams.gamma*sum(...
     log( 1 + exp( 1/fittingParams.regularisationParams.gamma * (W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) ) ) ) + ...
@@ -148,9 +148,9 @@ function [W, X, pca_transformation] = prepareCoordinateMatrixAndOrientationMatri
         2 * z];  % ndatapoints x 6 ellipsoid parameters
 end
 
-function [radii, center] = approximateEllipsoidParamsWithDescentMethod(v0, W, funct, grad_funct, method, TOL_consecutiveIterates)
+function [radii, center] = approximateEllipsoidParamsWithDescentMethod(v0, W, funct, grad_funct, method)
     try
-        v = performGradientSteps(v0, W, funct, grad_funct, method, TOL_consecutiveIterates);
+        v = performGradientSteps(v0, W, funct, grad_funct, method);
         [radii, center] = getEllipsoidParams(v);
 %         Wv = W*v;
 %         fprintf('########## est. energy \t %e \t \t norm(grad(f(v))): %e\n', funct(v, Wv), norm(grad_funct(v, Wv)));
@@ -162,13 +162,15 @@ function [radii, center] = approximateEllipsoidParamsWithDescentMethod(v0, W, fu
     end
 end
 
-function v = performGradientSteps(v, W, funct, grad_funct, method, TOL_consecutiveIterates)    
+function v = performGradientSteps(v, W, funct, grad_funct, method)    
+    tic;
     Wv = W*v;    
     gradient = grad_funct(v, Wv);
     % descent direction p
     p = -gradient;
     k = 0;
     TOL = 1e-5;
+    TOL_consecutiveIterates = 1e-8;
     maxIteration = 8000;
     n = size(W,1);
     while ( k < maxIteration && norm(gradient) > TOL )
@@ -206,10 +208,11 @@ function v = performGradientSteps(v, W, funct, grad_funct, method, TOL_consecuti
         gradient = nextGradient;
         k = k+1;
     end
+    time = toc;
     if ( k >= maxIteration ) 
         fprintf ('Gradient descent method did not converge yet (max. iterations %d)! norm(gradient) = %e \n', maxIteration, norm(gradient));
     else 
-        fprintf ('Stopped gradient after %d iteration(s). norm(gradient) = %e \n', k, norm(gradient));
+        fprintf ('Stopped gradient after %d iteration(s) in %f seconds. norm(gradient) = %e \n', k, time, norm(gradient));
     end
 end
 

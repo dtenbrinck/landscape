@@ -5,18 +5,16 @@ function testOrigDataSets()
         X=datasets{i};
         outputPathBase = "Tests/ellipsoid_estimation_orig_data" + num2str(i);
         testOneDataSet(X, outputPathBase, i)  
-        return;
     end
 
 end
 
 function testOneDataSet(X, outputPathBase, i)
-    fprintf("\n\n###### Estimating embryo ellipsoid for *unreduced* data set " + num2str(i) + "...\n");
+    fprintf("\n###### Estimating embryo ellipsoid for *unreduced* data set " + num2str(i) + "...\n");
     % test unreduced data set
     testDataSetWithRegularisationParams(10^-8, 0.02, 1, X, ...
         outputPathBase + "_unreduced", ...
-        "ellipsoid estimations - dataset " + num2str( i ), ...
-        10^-8);
+        "ellipsoid estimations - dataset " + num2str( i ));
     % test reduced data set
     fprintf("###### Estimating embryo ellipsoid for *reduced* data set " + num2str(i) + "...\n");
     percentage = 10;
@@ -24,16 +22,15 @@ function testOneDataSet(X, outputPathBase, i)
     X = X(idx,:); 
     testDataSetWithRegularisationParams(10^-8, 0.002, 1, X, ...
         [outputPathBase + "_reduced"], ...
-        "ellipsoid estimations - " + percentage + "% of dataset " + num2str( i ), ...
-        10^-10);
+        "ellipsoid estimations - " + percentage + "% of dataset " + num2str( i ));
 end
 
-function testDataSetWithRegularisationParams(mu0, mu1, mu2, X, outputPath, title, TOL_consecutiveIterates)
+function testDataSetWithRegularisationParams(mu0, mu1, mu2, X, outputPath, title)
     regularisationParams.mu0 = mu0; 
     regularisationParams.mu1 = mu1;
     regularisationParams.mu2 = mu2;
     regularisationParams.gamma = 1; 
     ellipsoidFitting.regularisationParams = regularisationParams;
     ellipsoidFitting.descentMethod = 'cg';
-    estimateEllipsoidForDataSetAndPlotResults(X, ellipsoidFitting, outputPath, title, TOL_consecutiveIterates);
+    estimateEllipsoidForDataSetAndPlotResults(X, ellipsoidFitting, outputPath, title);
 end
