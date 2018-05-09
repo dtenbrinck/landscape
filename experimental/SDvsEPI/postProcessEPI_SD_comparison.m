@@ -128,7 +128,7 @@ function addEllipsoids(h, handles, gatheredDataEPI, gatheredDataSD, resolution, 
     x = resolution(1) * x1;
     y = resolution(2) * y1;
     z = resolution(3) * z1;
-    displayName=["estimated ellipsoid (EPI)", "estimated ellipsoid (SD)"];
+    displayName={'estimated ellipsoid (EPI)', 'estimated ellipsoid (SD)'};
     for i=1:2
         v = ellipsoid{i}.v;
         Ellipsoid = v(1) *x.*x +   v(2) * y.*y + v(3) * z.*z + ...
@@ -137,7 +137,7 @@ function addEllipsoids(h, handles, gatheredDataEPI, gatheredDataSD, resolution, 
         %hold(sp_processed, 'on');
         % draw estimates embryo surface
         p = patch(isosurface( x, y, -z, Ellipsoid, -1*v(10) ));
-        set( p, 'FaceAlpha', .15, 'FaceColor', color(i), 'EdgeColor', 'none', 'DisplayName', displayName(i) );
+        set( p, 'FaceAlpha', .15, 'FaceColor', color(i), 'EdgeColor', 'none', 'DisplayName', displayName{i} );
     end
     
     set(h, 'currentaxes', sp_registered);
