@@ -154,15 +154,15 @@ function handles = visualize_SD_and_EPI(f, gatheredDataEPI, gatheredDataSD, coun
     pos = [0.05 0.1 0.4 0.8];
     sp1 = subplot('Position', pos);
    
-    pgc_coord_EPI = gatheredDataEPI.processed.cellCoordinates .* resolution';
-    pgc_coord_SD = gatheredDataSD.processed.cellCoordinates .* resolution';
+    pgc_coord_EPI = gatheredDataEPI.processed.cellCoordinates .* (resolution'*ones(1,size(gatheredDataEPI.processed.cellCoordinates, 2)));
+    pgc_coord_SD = gatheredDataSD.processed.cellCoordinates .* (resolution'*ones(1,size(gatheredDataSD.processed.cellCoordinates, 2)));
     
     subplotPGC_coords(pgc_coord_EPI, pgc_coord_SD, sp1, color); 
     addLegends( gatheredDataEPI.filename,  gatheredDataSD.filename, counter);    
     title('Comparison of *processed* mCherry cells with EPI and SD microscopy', 'Interpreter', 'tex');
-    xlabel('µm');
-    ylabel('µm');
-    zlabel('µm');
+    xlabel('Âµm');
+    ylabel('Âµm');
+    zlabel('Âµm');
     xlim([0 resolution(1) * max(size(gatheredDataEPI.processed.mCherry, 2), size(gatheredDataSD.processed.mCherry, 2))]);
     ylim([0 resolution(2) * max(size(gatheredDataEPI.processed.mCherry, 1), size(gatheredDataSD.processed.mCherry, 1))]);
     zlim([-resolution(3) * max(size(gatheredDataEPI.processed.mCherry, 3), size(gatheredDataSD.processed.mCherry, 3)) 0]);
@@ -254,7 +254,7 @@ function [ p ] = initialization( root_dir )
     
     % set default search path for results
 %     resultsPath = 'D:\CiM\imaging-zebrafish\Mikroskopiedaten\SDvsEpi\10um_slices\Results_Biologists\10um_epi_sd_results';
-    resultsPath = '/media/piradmin/4TB/data/Landscape/Static/SDvsEpi/2017_10_13_ody_10hpf_SDvsEpi/10um_sclices/10um_sd_and_epi_sortedResults';
+    resultsPath = '/media/piradmin/4TB/data/Landscape/Static/SDvsEpi/2017_10_13_ody_10hpf_SDvsEpi/10um_slices/10um_sd_and_epi_sortedResults';
     if exist([resultsPath,'/ParameterProcessing.mat'],'file') == 2
         load([resultsPath,'/ParameterProcessing.mat']);
     else
