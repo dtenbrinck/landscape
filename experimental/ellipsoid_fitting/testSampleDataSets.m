@@ -3,9 +3,8 @@ function testSampleDataSets()
     X = firstDataSet();
     %fprintf('Expecting an ellipsoid with approx. radii=(1,1,1), center=(0,0,0)...\n'); 
     regularisationParams.mu0 = 1;
-    regularisationParams.mu1 = 0; 
-    regularisationParams.mu2 = 5; 
-    regularisationParams.mu3 = 1;
+    regularisationParams.mu1 = 5; 
+    regularisationParams.mu2 = 1;
     regularisationParams.gamma = 1; 
     title = 'ellipsoid_estimation_data_set1';
     estimateEllipsoidForDataSetAndPlotResults(X, 'grad', regularisationParams, title, title, 10^-10);
@@ -13,7 +12,7 @@ function testSampleDataSets()
     % second test data set
     X = secondDataSet();
     %fprintf('\n\nExpecting an ellipsoid with approx. radii=(4,2,1), center=(1,2,2)...\n'); 
-    regularisationParams.mu2 = 10; 
+    regularisationParams.mu1 = 10; 
     title = 'ellipsoid_estimation_data_set2';
     estimateEllipsoidForDataSetAndPlotResults(X, 'grad', regularisationParams, title, title, 10^-10);
     

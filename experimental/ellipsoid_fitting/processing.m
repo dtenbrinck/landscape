@@ -71,8 +71,7 @@ for experiment=1:numberOfExperiments
 
         % estimate embryo surface by fitting an ellipsoid
         if p.debug_level >= 1; disp('Estimating embryo surface...'); end
-        p.plotEllipsoid=1; % TODO put parameter in parameter file
-        ellipsoid = estimateEmbryoSurface(processedData.nucleiCoordinates, p.resolution, p.plotEllipsoid);
+        ellipsoid = estimateEmbryoSurface(processedData.nucleiCoordinates, p.resolution, p.ellipsoidFitting);
         
         % compute transformation which normalizes the estimated ellipsoid to a unit sphere
         if p.debug_level >= 1; disp('Compute transformation from optimal ellipsoid...'); end

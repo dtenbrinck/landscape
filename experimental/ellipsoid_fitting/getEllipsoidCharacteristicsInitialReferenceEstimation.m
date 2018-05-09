@@ -1,7 +1,7 @@
 %% estimate minimal ellipsoid fitting for data set
 function [ center, radii, axis, radii_ref, center_ref ] ...
     = getEllipsoidCharacteristicsInitialReferenceEstimation...
-    ( X, descentMethod, regularisationParams, TOL_consecutiveIterates)
+    ( X, fittingParams, TOL_consecutiveIterates)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Fit an ellispoid/sphere to a set of xyz data points:
 %
@@ -15,7 +15,7 @@ function [ center, radii, axis, radii_ref, center_ref ] ...
 %                     'grad' : gradient descent method
 %
 % * regularisationParams:
-%   mu1,mu2,mu3     - weights for volumetric terms
+%   mu1,mu2     - weights for volumetric terms
 % 	gamma           - parameter for smooth approximation with logarithm of 
 %                     kink in max(0,...) 
 %   mu0             - global scaling parameter
@@ -29,8 +29,8 @@ function [ center, radii, axis, radii_ref, center_ref ] ...
 % only allowing few data points to lie outside. 
 % Find minimizer v of the following energy functional f:
 % 
-%   argmin f(v) = argmin mu0 * [ energyPart(v) +  mu1 * equidistantRadii(v) 
-%                 + mu2 * smallRadii(v) + mu3 * surfaceDistances(v) ]
+%   argmin f(v) = argmin mu0 * [ energyPart(v) + 
+%                 mu1 * smallRadii(v) + mu2 * surfaceDistances(v) ]
 %       s.t. v_1, v_2, v_3 > 0
 %
 %   with:   v describing describing the ellipsoid algebraically ellipsoid(v) = 0: 
@@ -39,18 +39,16 @@ function [ center, radii, axis, radii_ref, center_ref ] ...
 %                   = < v, w> + v_4^2 / v_1 + v_5^2 / v_2 + v_6^2 / v_3 - 1 
 %               with w = (x^2, y^2, z^2, 2*x, 2*y, 2*z)
 %      
-%           equidistantRadii(v) = (v_1 - v_2)^2 + (v_2 - v_3)^2 + (v_1 - v_3)^2 
 %           smallRadii(v) = 1 / v_1 + 1 / v_2 + 1 / v_3 
 %           surfaceDistances(v) = sum of all data rows in X  of ( ellipsoid(v)^2 )
 %           energyPart(v) = sum of all data rows in X  of 
 %               ( max(0, ellipsoid(v)) )
 %
 %       differentiable approximation for energyPart(v):
-%       (maxDifferentiableApprox = 'log')
 %            = sum of all data rows in X gamma*(log(exp(0) + exp( 1/gamma * ellipsoid(v))) )
 %            = sum of all data rows in X gamma*(log( 1 + exp( 1/gamma * ellipsoid(v) )) )
 %
-%       regularisation parameter: mu1, mu2 with 0 <= mu2 <= 1
+%       regularisation parameter: mu1, mu2
 %            
 % and v initially derived from the implicit function describing 
 % an ellipsoid centered at center = (x_0; y_0; z_0)
@@ -87,14 +85,15 @@ function [ center, radii, axis, radii_ref, center_ref ] ...
 [v_initial] = initializeEllipsoidParams(X);
 Wtransposed = W';
 
-[funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox (W, regularisationParams, Wtransposed);
-[radii, center] = approximateEllipsoidParamsWithDescentMethod(v_initial, W, funct, grad_funct, descentMethod, TOL_consecutiveIterates);
-funct = @(v) regularisationParams.mu0 * ( regularisationParams.gamma*sum(...
-    log( 1 + exp( 1/regularisationParams.gamma * (W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) ) ) ) + ...
+[funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox (W, fittingParams.regularisationParams, Wtransposed);
+[radii, center] = approximateEllipsoidParamsWithDescentMethod(v_initial, W, funct, grad_funct, fittingParams.descentMethod, TOL_consecutiveIterates);
+
+funct = @(v) fittingParams.regularisationParams.mu0 * ( fittingParams.regularisationParams.gamma*sum(...
+    log( 1 + exp( 1/fittingParams.regularisationParams.gamma * (W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) ) ) ) + ...
     ... % volumetric reguliser
-    regularisationParams.mu1 * ( (v(1) - v(2))^2 + (v(3) - v(2))^2 + (v(1) - v(3))^2 )+ ...
-    regularisationParams.mu2 * ( 1/v(1) + 1/v(2) + 1/v(3) )  + ...
-    regularisationParams.mu3 * sum(( W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)).^2) );
+    fittingParams.regularisationParams.mu1 * ( 1/v(1) + 1/v(2) + 1/v(3) )  + ...
+    fittingParams.regularisationParams.mu2 * sum(( W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)).^2) );
+
 [radii_ref, center_ref] = getReferenceEllipsoidApproximation(funct, v_initial, grad_funct);
 
 % invert coordinate transformation caused by PCA back for center vectors
@@ -359,9 +358,8 @@ function [funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox( W, 
 funct = @(v, Wv) regularisationParams.mu0 * ( regularisationParams.gamma*sum(...
     log( 1 + exp( 1/regularisationParams.gamma * (Wv + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) ) ) ) + ...
     ... % volumetric reguliser
-    regularisationParams.mu1 * ( (v(1) - v(2))^2 + (v(3) - v(2))^2 + (v(1) - v(3))^2 )+ ...
-    regularisationParams.mu2 * ( 1/v(1) + 1/v(2) + 1/v(3) )  + ...
-    regularisationParams.mu3 * sum(( Wv + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)).^2) );
+    regularisationParams.mu1 * ( 1/v(1) + 1/v(2) + 1/v(3) )  + ...
+    regularisationParams.mu2 * sum(( Wv + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)).^2) );
 
 n = size(W,1);
 grad_funct = @(v, Wv) regularisationParams.mu0 * ( ( Wtransposed + ...
@@ -369,9 +367,8 @@ grad_funct = @(v, Wv) regularisationParams.mu0 * ( ( Wtransposed + ...
     ( exp((1/regularisationParams.gamma) * (Wv + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) ) ./ ...
     ( 1 + exp((1/regularisationParams.gamma) * (Wv + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) )) ) + ...
     ... % volumetric reguliser
-    regularisationParams.mu1 * [2*(2*v(1) - v(2) - v(3));  2*(2*v(2) - v(1) - v(3)); 2*(2*v(3) - v(1) - v(2)); 0; 0; 0] + ...
-    regularisationParams.mu2 * [-1./v(1:3).^2; 0; 0 ; 0] + ...
-    regularisationParams.mu3 * (( Wtransposed + ...
+    regularisationParams.mu1 * [-1./v(1:3).^2; 0; 0 ; 0] + ...
+    regularisationParams.mu2 * (( Wtransposed + ...
     [-(v(4)/v(1))^2; -(v(5)/v(2))^2; -(v(6)/v(3))^2; 2*v(4)/v(1); 2*v(5)/v(2); 2*v(6)/v(3)] ) * ...
     2 * ( Wv + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1))));
 end

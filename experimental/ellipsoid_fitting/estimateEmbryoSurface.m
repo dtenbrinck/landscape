@@ -1,21 +1,15 @@
-function [ ellipsoidEstimation ] = estimateEmbryoSurface( nuclei_coord, resolution, plotEllipsoidEstimation)
+function [ ellipsoidEstimation ] = estimateEmbryoSurface( nuclei_coord, resolution, ellipsoidFittingParams)
 X(:,1) = (nuclei_coord(1,:) * resolution(1))';
 X(:,2) = (nuclei_coord(2,:) * resolution(2))';
 X(:,3) = (nuclei_coord(3,:) * resolution(3))';
 
 % fit ellipsoid to sharp points in areas in focus
 % TODO add params to parameter file?!
-regularisationParams.mu0 = 10^-8;
-regularisationParams.mu1 = 0; 
-regularisationParams.mu2 = 0.002; 
-regularisationParams.mu3 = 1;
-regularisationParams.gamma = 1; 
-percentage = 10; % TODO add in parameter file?!
-idx = randperm( size(X,1), ceil(percentage/100*size(X,1)));
+idx = randperm( size(X,1), ceil(ellipsoidFittingParams.percentage/100*size(X,1)));
 X = X(idx,:);
 [ ellipsoidEstimation.center, ellipsoidEstimation.radii, ellipsoidEstimation.axes, ~,~] = ...
     getEllipsoidCharacteristicsInitialReferenceEstimation...
-    ( X, 'cg', regularisationParams, 10^-10 );
+    ( X, ellipsoidFittingParams, 10^-10 );
 
 % check axes orientation and flip if necessary
 orientation = diag(ellipsoidEstimation.axes);
@@ -25,7 +19,7 @@ for i=1:3
     end
 end
 
-if (  plotEllipsoidEstimation ) 
+if (  ellipsoidFittingParams.visualization ) 
    fprintf("Plotting resulting ellipsoid estimation...\n");
    if isreal(ellipsoidEstimation.center) && isreal(ellipsoidEstimation.radii)
     figure;
