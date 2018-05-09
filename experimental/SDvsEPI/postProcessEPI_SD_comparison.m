@@ -154,8 +154,8 @@ function handles = visualize_SD_and_EPI(f, gatheredDataEPI, gatheredDataSD, coun
     pos = [0.05 0.1 0.4 0.8];
     sp1 = subplot('Position', pos);
    
-    pgc_coord_EPI = resolution' .* gatheredDataEPI.processed.cellCoordinates;
-    pgc_coord_SD = resolution' .* gatheredDataSD.processed.cellCoordinates;
+    pgc_coord_EPI = gatheredDataEPI.processed.cellCoordinates .* resolution';
+    pgc_coord_SD = gatheredDataSD.processed.cellCoordinates .* resolution';
     
     subplotPGC_coords(pgc_coord_EPI, pgc_coord_SD, sp1, color); 
     addLegends( gatheredDataEPI.filename,  gatheredDataSD.filename, counter);    
