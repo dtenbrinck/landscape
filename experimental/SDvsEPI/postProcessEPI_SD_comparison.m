@@ -31,7 +31,7 @@ if numberOfResults == 0
     disp(p.resultsPath);
     return;
 else
-    disp([ num2str(numberOfResults) ' results found in folder for processing.']);
+    disp([ num2str(numberOfResults) ' results found in folder for visualization.']);
 end
 
 %% MAIN EVALUATION LOOP
@@ -50,6 +50,7 @@ while result < numberOfExperiments
     % load SD result data
     load([p.resultsPath,'/',fileNames{result + numberOfExperiments,1}])
     gatheredDataSD = gatheredData;
+    fprintf("Generating plots for " + gatheredDataSD.filename + " and " + gatheredDataEPI.filename + "...\n");
     color = ['m', 'c'];
     if find(contains(visualization, "3D_plots"))
         h1 = figure('units','normalized','outerposition',[0 0 1 0.7]);
@@ -76,11 +77,8 @@ while result < numberOfExperiments
         plot_GFP(f, gatheredDataEPI, gatheredDataSD);
         print([p.resultsPath '/pngs/MIPs_SD_EPI_GFP_exp' num2str(result+1) '_colorbar.png'],'-dpng');
     end
-    % display user output
-    fprintf(gatheredData.filename );
-    fprintf('\n');
 end
-%Sclose all;
+%close all;
 fprintf('\n');
 disp('All results visualized');
 end
