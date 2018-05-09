@@ -36,7 +36,7 @@ end
 
 %% MAIN EVALUATION LOOP
 
-visualization = ["3D_plot_ellipsoid"];%["3D_plots", "MIPs", "3D_plot_ellipsoid", "GFP"];
+visualization = '3D_plot_ellipsoid';%'3D_plots', 'MIPs', '3D_plot_ellipsoid', 'GFP';
 result = 0;
 numberOfExperiments = numberOfResults/2;
 
@@ -50,29 +50,29 @@ while result < numberOfExperiments
     % load SD result data
     load([p.resultsPath,'/',fileNames{result + numberOfExperiments,1}])
     gatheredDataSD = gatheredData;
-    fprintf("Generating plots for " + gatheredDataSD.filename + " and " + gatheredDataEPI.filename + "...\n");
+    fprintf(['Generating plots for ' gatheredDataSD.filename ' and ' gatheredDataEPI.filename '...\n']);
     color = ['m', 'c'];
-    if find(contains(visualization, "3D_plots"))
+    if strcmp(visualization,'3D_plots')
         h1 = figure('units','normalized','outerposition',[0 0 1 0.7]);
         visualize_SD_and_EPI(h1, gatheredDataEPI, gatheredDataSD, result, p.resolution, color);
         print([p.resultsPath '/pngs/comparison_SD_EPI_mcherryCells_exp' num2str(result+1) '.png'],'-dpng');
     end
     
-    if find(contains(visualization, "3D_plot_ellipsoid"))
+    if strcmp(visualization,'3D_plot_ellipsoid')
         h2 = figure('units','normalized','outerposition',[0 0 1 0.7]);
         handles = visualize_SD_and_EPI(h2, gatheredDataEPI, gatheredDataSD, result, p.resolution, color);
         addEllipsoids(h2, handles, gatheredDataEPI, gatheredDataSD, p.resolution, color);
         print([p.resultsPath '/pngs/SD_EPI_ellipsoid_mcherryCells_exp' num2str(result+1) '.png'],'-dpng');
     end
     
-    if find(contains(visualization, "MIPs"))
+    if strcmp(visualization,'MIPs')
         f = figure('units','normalized','outerposition',[0 0 0.7 1]); 
         MIPs_SD_and_EPI_mCherry (f, gatheredDataEPI, gatheredDataSD, result);
         print([p.resultsPath '/pngs/MIPs_SD_EPI_mcherryCells_exp' num2str(result+1) '.png'],'-dpng');
     %     print([p.resultsPath '/pngs/MIPs_SD_EPI_mcherryCells_exp' num2str(result+1) '_colorbar.png'],'-dpng');
     end
     
-    if find(contains(visualization, "GFP"))
+    if strcmp(visualization,'GFP')
         f = figure('units','normalized','outerposition',[0 0 0.7 0.7]);
         plot_GFP(f, gatheredDataEPI, gatheredDataSD);
         print([p.resultsPath '/pngs/MIPs_SD_EPI_GFP_exp' num2str(result+1) '_colorbar.png'],'-dpng');
