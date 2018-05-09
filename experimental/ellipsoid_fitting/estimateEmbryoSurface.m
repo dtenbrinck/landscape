@@ -9,7 +9,7 @@ idx = randperm( size(X,1), ceil(ellipsoidFittingParams.percentage/100*size(X,1))
 X = X(idx,:);
 [ ellipsoidEstimation.center, ellipsoidEstimation.radii, ellipsoidEstimation.axes, ~,~] = ...
     getEllipsoidCharacteristicsInitialReferenceEstimation...
-    ( X, ellipsoidFittingParams, 10^-10 );
+    ( X, ellipsoidFittingParams );
 
 % check axes orientation and flip if necessary
 orientation = diag(ellipsoidEstimation.axes);
