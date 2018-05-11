@@ -347,8 +347,6 @@ end
 
 function [radii, center] = getReferenceEllipsoidApproximation(funct, v0, grad_funct)
 %     fprintf('Approximate ellipsoid with MATLAB reference method...\n');
-%     options = optimset('OutputFcn', @outfun);
-%     other input params: 'PlotFcns', @optimplotfval, options, 'Display','notify', 
     options = optimset('TolX', 1e-8, 'TolFun', 1e-8);
     tic;
     [v, ~,~,output] = fminsearch(funct, v0, options);
