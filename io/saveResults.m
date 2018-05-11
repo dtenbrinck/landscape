@@ -60,7 +60,6 @@ gatheredData.registered.mCherryMIP = computeMIP(registeredData.mCherry);
 gatheredData.registered.landmarkMIP = computeMIP(registeredData.landmark);
 gatheredData.registered.cellsMIP = computeMIP(registeredData.cells);
 gatheredData.registered.cellCoordinates = registeredData.cellCoordinates;
-gatheredData.registered.nucleiCoordinates = single(registeredData.nucleiCoordinates); % TODO !!! non existent field
 if isfield(registeredData, 'nuclei') % check for backward compatibilty
     gatheredData.registered.nucleiMIP = computeMIP(registeredData.nuclei);
 end
