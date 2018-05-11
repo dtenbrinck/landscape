@@ -1,24 +1,28 @@
-function estimateEllipsoidForDataSetAndPlotResults(X, descentMethod, regularisationParams, outputPath, isPCAactive, title)
+function estimateEllipsoidForDataSetAndPlotResults(X, ellipsoidFittingParams, outputPath, title)
     %fprintf('\n');
-    [center, radii, axis, radii_ref, center_ref, radii_initial, center_initial] = getEllipsoidCharacteristicsInitialReferenceEstimation( X, descentMethod, regularisationParams, isPCAactive );
-    table( radii_initial, radii, radii_ref)
-    table( center_initial, center, center_ref )
-%       return;
-    % plot ellipsoid fittings
-    fprintf('Plotting results...\n');
+    [center, radii, axis, radii_ref, center_ref] = getEllipsoidCharacteristicsInitialReferenceEstimation( X, ellipsoidFittingParams );
+    t1 = table( radii, radii_ref);
+    t2 = table( center, center_ref );
+    save("results/" + outputPath + "_radii", 't1');
+    save("results/" + outputPath + "_center", 't2');
 
     figure;
     titletext = title;
     hold on;
-    plotSeveralEllipsoidEstimations(X, center_initial, radii_initial,...
-        center, radii, center_ref, radii_ref, titletext, isPCAactive, axis);
-    plotOrientationVectors( center, axis);
-    descr = {['PCA = ' num2str(isPCAactive)]; 
-        ['mu_1 = ' num2str(regularisationParams.mu1)]; 
-        ['mu_2 = ' num2str(regularisationParams.mu2)]; 
-        ['mu_3 = ' num2str(regularisationParams.mu3)]};
-    yl = ylim; zl = zlim; zt = zticks;
-    text(0,yl(1),zl(1)-2*(zt(2)-zt(1)),descr);
+    plotSeveralEllipsoidEstimations(X, ...
+        center, radii, center_ref, radii_ref, titletext, axis);
+%     plotOrientationVectors( center, axis);
+    descr = {['radii = [' num2str(radii(1)) ', ' num2str(radii(2)) ', ' num2str(radii(3)) ']']; 
+        ['center = [' num2str(center(1)) ', ' num2str(center(2)) ', ' ]; 
+        [num2str(center(3)) ']'];
+        [' '];
+        ['reference:'];
+        ['radii = [' num2str(radii_ref(1)) ', ' num2str(radii_ref(2)) ', ' num2str(radii_ref(3)) ']']; 
+        ['center = [' num2str(center_ref(1)) ', ' num2str(center_ref(2)) ','];
+        [num2str(center_ref(3)) ']'],};
+    ylim([-100 700]);zlim([-100 600]);
+    yl = ylim; zl = zlim;
+    text(0,yl(2)+5,(zl(2)-zl(1))/2,descr, 'Interpreter', 'none');
     print("results/" + outputPath + ".png",'-dpng');
 end
 
@@ -29,14 +33,13 @@ function plotOrientationVectors( center, axis)
     quiver3( center(1), center(2), center(3), axis(1,3), axis(2,3), axis(3,3), 'b', 'LineWidth', 2, 'Displayname','third axis');
 end
 
-function plotSeveralEllipsoidEstimations(X, center_initial, radii_initial,...
-        center, radii, center_ref, radii_ref, titletext, isPCAactive, axis)
+function plotSeveralEllipsoidEstimations(X, ...
+        center, radii, center_ref, radii_ref, titletext, axis)
     scatter3(X(:,1),X(:,2), X(:,3),'b','.', 'DisplayName', 'input data', 'MarkerFaceAlpha',0.1);
-    plotOneEllipsoidEstimation( center, radii, 'm', 'ellipsoid estimation', isPCAactive, axis);
-    plotOneEllipsoidEstimation( center_ref, radii_ref, 'c','reference estimation', isPCAactive, axis);
-%     plotOneEllipsoidEstimation( center_initial, radii_initial, [0.9100    0.4100    0.1700] , 'initialization ellipsoid', isPCAactive, axis);
-    plotOldEllipsoidEstimation(X, 'g', 'old estimation');
-    legend('Location', 'southoutside');
+    plotOneEllipsoidEstimation( center, radii, 'm', 'ellipsoid estimation', axis);
+    plotOneEllipsoidEstimation( center_ref, radii_ref, 'c','reference estimation', axis);
+%     plotOldEllipsoidEstimation(X, 'g', 'old estimation');
+    legend('Location', 'southeastoutside');
     title(titletext, 'Interpreter', 'none');
     view(90, 0);%(3);%
 end
@@ -49,16 +52,14 @@ function plotOldEllipsoidEstimation(X, color, displayname)
     table(radii)
 end
 
-function plotOneEllipsoidEstimation( center, radii, color, displayname, isPCAactive, axis)
+function plotOneEllipsoidEstimation( center, radii, color, displayname, axis)
     if isreal(center) && isreal(radii)
         n = 20;
         [x,y,z] = ellipsoid(0, 0, 0, radii(1), radii(2), radii(3), n-1);
-        if ( isPCAactive )
-            rotatedCoordinates = axis' * [reshape(x,1,n*n); reshape(y,1,n*n); reshape(z,1,n*n)];
-            x = reshape(rotatedCoordinates(1, : ), [n, n]);
-            y = reshape(rotatedCoordinates(2, : ), [n, n]);
-            z = reshape(rotatedCoordinates(3, : ), [n, n]);
-        end
+        rotatedCoordinates = axis' * [reshape(x,1,n*n); reshape(y,1,n*n); reshape(z,1,n*n)];
+        x = reshape(rotatedCoordinates(1, : ), [n, n]);
+        y = reshape(rotatedCoordinates(2, : ), [n, n]);
+        z = reshape(rotatedCoordinates(3, : ), [n, n]);
         x = x + center(1);
         y = y + center(2);
         z = z + center(3);
