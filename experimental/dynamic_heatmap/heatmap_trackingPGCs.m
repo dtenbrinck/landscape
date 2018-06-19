@@ -38,6 +38,7 @@ end
 
 % Load first data set
 load([p.resultsPathAccepted,'/',fileNames{1,1}]);
+% TODO load values for pgcs velocitys
 
 % Original data size (in mu)
 % origSize = gatheredData.processed.originalSize;
@@ -52,8 +53,8 @@ for result = 1:numberOfResults
     load([p.resultsPathAccepted,'/',fileNames{result,1}])
     
     % Get all cell center coordinates
-    heatMapDapi = heatMapDapi + gatheredData.registered.DapiMIP;
-    heatMapGFP = heatMapGFP + gatheredData.registered.GFPMIP;
+%     heatMapDapi = heatMapDapi + gatheredData.registered.DapiMIP;
+%     heatMapGFP = heatMapGFP + gatheredData.registered.GFPMIP;
     heatMapmCherry = heatMapmCherry + gatheredData.registered.mCherryMIP;
 end
 heatMapDapi = heatMapDapi ./ numberOfResults;
