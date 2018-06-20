@@ -4,7 +4,7 @@ function p =  ParameterProcessing()
 % discriptios of each parameter.        
   
 %% COMMON PARAMETER
-p.resolution = [1.29, 1.29, 10];
+p.resolution = [1.3, 1.3, 10];
 p.scale = 0.75;
 
 % Debug variables

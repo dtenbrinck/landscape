@@ -58,21 +58,21 @@ for experiment=1:numberOfExperiments
         end
         experimentData = experimentData.Data_1;
         
-%         % preprocess and rescale data
-%         if p.debug_level >= 1; disp('Preprocessing data...'); end
-%         processedData = preprocessData(experimentData, p);
-%         
-%         % segment data
-%         if p.debug_level >= 1; disp('Segmenting GFP channel...'); end
-%         processedData.landmark = segmentGFP(processedData.GFP, p.GFPseg, p.resolution);
-%                
-%         if p.debug_level >= 1; disp('Segmenting DAPI channel...'); end
-%         [processedData.nuclei, processedData.nucleiCoordinates] = segmentDAPI(processedData.Dapi, p.DAPIseg, p.resolution);
+        % preprocess and rescale data
+        if p.debug_level >= 1; disp('Preprocessing data...'); end
+        processedData = preprocessData(experimentData, p);
+        
+        % segment data
+        if p.debug_level >= 1; disp('Segmenting GFP channel...'); end
+        processedData.landmark = segmentGFP(processedData.GFP, p.GFPseg, p.resolution);
+               
+        if p.debug_level >= 1; disp('Segmenting DAPI channel...'); end
+        [processedData.nuclei, processedData.nucleiCoordinates] = segmentDAPI(processedData.Dapi, p.DAPIseg, p.resolution);
 
         % evaluate PGC velocities
         load("Lukasz\SD10_" + experiment + "_corrected_k6.mat");
         if p.debug_level >= 1; disp('Consider PGC velocities from tracking info...'); end
-        [processedData.cells, processedData.cellCoordinates] = evaluateVelocitiesFromTracking(tracks_PGC, p.scale);
+        [processedData.cellCoordinates] = evaluateVelocitiesFromTracking(tracks_PGC, p.scale);
  
         % estimate embryo surface by fitting an ellipsoid
         if p.debug_level >= 1; disp('Estimating embryo surface...'); end

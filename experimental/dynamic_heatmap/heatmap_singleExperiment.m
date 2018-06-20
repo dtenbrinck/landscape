@@ -10,6 +10,7 @@ addpath([root_dir '/parameter_setup/']);
 % load necessary variables
 p = initializeScript('heatmap', root_dir);
 
+
 %% GET FILES TO PROCESS
 
 % Get filenames of MAT files in selected folder
@@ -21,7 +22,6 @@ fileNames(strcmp(fileNames,'HeatmapAccumulator.mat')) = [];
 if p.random == 1
     fileNames = drawRandomNames(fileNames,p.numberOfRandom);
 end
-
 % Get number of experiments
 numberOfResults = numel(fileNames);
 
@@ -38,35 +38,23 @@ end
 
 % Load first data set
 load([p.resultsPathAccepted,'/',fileNames{1,1}]);
-% TODO load values for pgcs velocitys
 
 % Original data size (in mu)
 % origSize = gatheredData.processed.originalSize;
 
-%% COMPUTE AVERAGE MIPS FOR ALL CHANNELS
-heatMapDapi = zeros(p.gridSize, p.gridSize);
-heatMapGFP = zeros(p.gridSize, p.gridSize);
-heatMapmCherry = zeros(p.gridSize, p.gridSize);
+%% COMPUTE ACCUMULATOR
 
-for result = 1:numberOfResults
-    % Load result data
-    load([p.resultsPathAccepted,'/',fileNames{result,1}])
-    
-    % Get all cell center coordinates
-%     heatMapDapi = heatMapDapi + gatheredData.registered.DapiMIP;
-%     heatMapGFP = heatMapGFP + gatheredData.registered.GFPMIP;
-    heatMapmCherry = heatMapmCherry + gatheredData.registered.mCherryMIP;
-end
-heatMapDapi = heatMapDapi ./ numberOfResults;
-heatMapGFP = heatMapGFP ./ numberOfResults;
-heatMapmCherry = heatMapmCherry ./ numberOfResults;
+% -- Compute all valid cell coordinates from the processed and registered data -- %
+allCellCoords = getAllValidCellCoords(p.gridSize,fileNames,numberOfResults,p.tole,p.resultsPathAccepted);
+
+% -- Compute the Accumulator from the cell coordinates -- %
+accumulator = computeAccumulator(allCellCoords, p.gridSize);
+
 
 %% HANDLE HEATMAPS ( Computation, drawing and saving ) 
-%handleHeatmaps(heatMapDapi,0,numberOfResults,p,p.option);
 
-figure; imagesc(heatMapDapi); title('Average of registered DAPI channels');colormap('jet');
-figure; imagesc(heatMapGFP); title('Average of registered GFP channels');colormap('jet');
-figure; imagesc(heatMapmCherry); title('Average of registered mCherry channels');colormap('jet');
+handleHeatmaps(accumulator,size(allCellCoords,2),numberOfResults,p,p.option);
+
 
 %% USER OUTPUT
 
