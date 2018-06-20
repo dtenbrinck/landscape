@@ -7,34 +7,10 @@ addpath([root_dir '/parameter_setup/']);
 p = initializeScript('process');
 p.resolution = [1.1512, 1.1512, 5];   % 30 percent scale
 
-% % add path for parameter setup
-% addpath([root_dir '/AtlasProcessedData/ectoderm and mesoderm/']);
-% addpath([root_dir '/AtlasProcessedData/endoderm and mesoderm/']);
-% addpath([root_dir '/parameter_setup/']);
-% addpath([root_dir '/auxiliary/']);
-% addpath([root_dir '/fitting/']);
-% addpath([root_dir '/gui/']);
-% addpath([root_dir '/heatmaps/']);
-% addpath([root_dir '/io/']);
-% addpath([root_dir '/preprocessing/']);
-% addpath([root_dir '/registration/']);
-% addpath(genpath([root_dir '/segmentation/']));
-% addpath([root_dir '/visualization/']);
-
 % Select the registered data
 dname = uigetfile(p.dataPath,'Please select the registered data!'); % Select all files to see the data
 
-% % temp = load('AtlasProcessedData/ectoderm and mesoderm/d_1RegisteredData.mat');
-% temp = load('AtlasProcessedData/ectoderm and mesoderm/d_1RegisteredData.mat');
-% binaryLandmark = temp.registeredData.landmark;
-% binaryDapi = temp.registeredData.DapiSegm;
-% binaryMesoderm = temp.registeredData.mesodermSegm;
-% binaryEctoderm = temp.registeredData.ectodermSegm;
-
 load([p.dataPath '\' dname]);
-
-% v=flipdim(double(binaryLandmark>0),3);
-
 
 [X1, Y1, Z1] = sphere(50);
 X1 = 116 * X1;
@@ -43,21 +19,6 @@ Z1 = 116 * Z1;
 X1 = X1 + 128;
 Y1 = Y1 + 128;
 Z1 = Z1 + 128;
-% surf(X1, Y1, Z1,'FaceAlpha', .15, 'FaceColor', 'b', 'EdgeColor', 'none', 'DisplayName', 'unit sphere' );
-
-% %# visualize the volume
-% h = figure(1);
-% close(h);
-% h = figure(1);
-% p = patch( isosurface(v,0) );                 %# create isosurface patch
-% isonormals(v, p)                              %# compute and set normals
-% set(p, 'FaceColor','r', 'EdgeColor','none')   %# set surface props
-% % % % daspect([1 1 1])                              %# axes aspect ratio
-% daspect([1 1 0.15])                              %# axes aspect ratio
-% % view(-122,46), axis off, box off, grid off    %axis vis3d tight, box off, grid off    %# set axes props
-% view(-122,46), box on, grid on
-% camproj perspective                           %# use perspective projection
-% camlight, lighting phong, alpha(.75)
 
 % Dapi
 figure
