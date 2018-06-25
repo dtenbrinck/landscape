@@ -252,9 +252,11 @@ function [ p ] = initialization( root_dir )
     addpath(genpath([root_dir '/segmentation/']));
     addpath([root_dir '/visualization/']);
     
-    % set default search path for results
+sa    % set default search path for results
 %     resultsPath = 'D:\CiM\imaging-zebrafish\Mikroskopiedaten\SDvsEpi\10um_slices\Results_Biologists\10um_epi_sd_results';
-    resultsPath = '/media/piradmin/4TB/data/Landscape/Static/SDvsEpi/2017_10_13_ody_10hpf_SDvsEpi/10um_slices/10um_sd_and_epi_sortedResults';
+%     resultsPath = '/media/piradmin/4TB/data/Landscape/Static/SDvsEpi/2017_10_13_ody_10hpf_SDvsEpi/10um_slices/10um_sd_and_epi_sortedResults';
+    resultsPath = '/media/piradmin/4TB/data/Landscape/Static/SDvsEpi/comparison_pulled_results';
+
     if exist([resultsPath,'/ParameterProcessing.mat'],'file') == 2
         load([resultsPath,'/ParameterProcessing.mat']);
     else
