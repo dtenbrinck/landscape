@@ -1,4 +1,4 @@
-function [cellCoordinates] = evaluateVelocitiesFromTracking(tracks_PGC, scale)
+function [cellCoordinates, cellVelocities] = evaluateVelocitiesFromTracking(tracks_PGC, scale)
 
 % we calculate the mean velocities in the embryo domain by adding all
 % absolute velocities of each cell in the corresponding location in the
@@ -19,15 +19,16 @@ nextColumnIndexToInsert=0;
 for trackedCellNo = 1:numberOfCells
     cellsFrames = tracks_PGC{trackedCellNo, 1};
     numberOfTrackedFrames = size(cellsFrames,1);
-    cellCoordinates(:,nextColumnIndexToInsert+1:nextColumIndexToInsert...
-        +numberOfTrackedFrames) = cellsFrames(:,2:4)';
-    cellVelocities(1,nextColumnIndexToInsert+1:nextColumIndexToInsert...
-        +numberOfTrackedFrames) = abs(cellsFrames(:,9:11) - cellsFrames(:, 12:14)); 
-    % TODO calculate absolute value of corrected velocity... rowwise!
-    nextColumIndexToInsert = nextColumIndexToInsert + numberOfTrackedFrames;
+%     cellCoordinates(:,nextColumnIndexToInsert+1:nextColumnIndexToInsert...
+%         +numberOfTrackedFrames) = [round(scale*cellsFrames(:,2:3)); round(cellsFrames(:,4), -1)]';
+    cellCoordinates(:,nextColumnIndexToInsert+1:nextColumnIndexToInsert...
+        +numberOfTrackedFrames) = [scale*cellsFrames(:,2:3), cellsFrames(:,4)]';
+    cellVelocities(1,nextColumnIndexToInsert+1:nextColumnIndexToInsert...
+        +numberOfTrackedFrames) = vecnorm(cellsFrames(:,9:11) - cellsFrames(:, 12:14), 2, 2); 
+    nextColumnIndexToInsert = nextColumnIndexToInsert + numberOfTrackedFrames;
 end
 
-cellCoordinates=cellCoordinates(:,1:nextColumnIndexToInsert);
+%cellCoordinates=cellCoordinates(:,1:nextColumnIndexToInsert);
 % for trackedCellNo = 1:numberOfCells
 %     cellsFrames = tracks_PGC{trackedCellNo, 1};
 %     numberOfTrackedFrames = size(cellsFrames,1);

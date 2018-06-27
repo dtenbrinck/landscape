@@ -2,12 +2,12 @@ function [ registeredData ] = registerData( processedData, resolution, registrat
 
 % register processed data using cubic interpolation
 [registeredData.GFP, ~] = transformVoxelData(single(processedData.GFP), resolution, registrationMatrix, ellipsoid.center, samples_cube, 'cubic');
-[registeredData.mCherry, ~] = transformVoxelData(single(processedData.mCherry), resolution, registrationMatrix, ellipsoid.center, samples_cube, 'cubic');
+% [registeredData.mCherry, ~] = transformVoxelData(single(processedData.mCherry), resolution, registrationMatrix, ellipsoid.center, samples_cube, 'cubic');
 [registeredData.Dapi, ~] = transformVoxelData(single(processedData.Dapi), resolution, registrationMatrix, ellipsoid.center, samples_cube, 'cubic');
 
 % register segmentations using nearest neighbor interpolation
 [registeredData.landmark, ~] = transformVoxelData(single(processedData.landmark), resolution, registrationMatrix, ellipsoid.center, samples_cube, 'nearest');
-[registeredData.cells, ~] = transformVoxelData(single(processedData.cells), resolution, registrationMatrix, ellipsoid.center, samples_cube, 'nearest');
+% [registeredData.cells, ~] = transformVoxelData(single(processedData.cells), resolution, registrationMatrix, ellipsoid.center, samples_cube, 'nearest');
 if isfield(processedData, 'nuclei') % check for backward compatibilty
     [registeredData.nuclei, ~] = transformVoxelData(single(processedData.nuclei), resolution, registrationMatrix, ellipsoid.center, samples_cube, 'nearest');
 end
