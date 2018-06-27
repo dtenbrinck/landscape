@@ -10,3 +10,4 @@ results/
 commands.txt
 *.asv
 *.mat
+/experimental/ellipsoid_fitting/initializeScript.m

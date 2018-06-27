@@ -21,31 +21,5 @@ for result = 1:numberOfResults
     allCellCoords = horzcat(allCellCoords, gatheredData.registered.nucleiCoordinates);
 end
 
-return
-
-% -- 2. Step --%
-% Ignore all that are out of the domain
-allCellCoords(:,sum(abs(allCellCoords)>1)>=1) = [];
-
-% -- 3. Step --%
-% Compute norm of each column
-normOfCoordinates = sqrt(sum(allCellCoords.^2,1));
-
-% Ignore all coordinates outside the sphere with a tolerance tole
-allCellCoords(:,normOfCoordinates > 1+tole) = [];
-normOfCoordinates(:,normOfCoordinates > 1+tole) = [];
-
-% -- 4. Step --%
-% Normalize the coordinates that are too big but in tolerance
-allCellCoords(:,(normOfCoordinates < 1+tole) == (normOfCoordinates > 1)) ...
-    = allCellCoords(:,(normOfCoordinates < 1+tole) == (normOfCoordinates > 1))...
-    ./repmat(normOfCoordinates(:,(normOfCoordinates < 1+tole) == (normOfCoordinates > 1)),[3,1]);
-
-% -- 5. Step --%
-% Get rounded cell centroid coordinates
-allCellCoords = round(...
-    (allCellCoords + repmat([1;1;1], 1, size(allCellCoords,2)))...
-    * sizeAcc / 2 );
-allCellCoords(allCellCoords==0)=1;
 end
 
