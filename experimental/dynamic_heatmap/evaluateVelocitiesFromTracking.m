@@ -1,4 +1,4 @@
-function [cellCoordinates, cellVelocities] = evaluateVelocitiesFromTracking(tracks_PGC, scale)
+function [cellCoordinates, cellVelocities] = evaluateVelocitiesFromTracking(tracks_PGC, scale, resolution)
 
 % we calculate the mean velocities in the embryo domain by adding all
 % absolute velocities of each cell in the corresponding location in the
@@ -22,7 +22,7 @@ for trackedCellNo = 1:numberOfCells
 %     cellCoordinates(:,nextColumnIndexToInsert+1:nextColumnIndexToInsert...
 %         +numberOfTrackedFrames) = [round(scale*cellsFrames(:,2:3)); round(cellsFrames(:,4), -1)]';
     cellCoordinates(:,nextColumnIndexToInsert+1:nextColumnIndexToInsert...
-        +numberOfTrackedFrames) = [scale*cellsFrames(:,2:3), cellsFrames(:,4)]';
+        +numberOfTrackedFrames) = (cellsFrames(:,2:4) ./ repmat(resolution,size(cellsFrames,1),1))';
     cellVelocities(1,nextColumnIndexToInsert+1:nextColumnIndexToInsert...
         +numberOfTrackedFrames) = vecnorm(cellsFrames(:,9:11) - cellsFrames(:, 12:14), 2, 2); 
     nextColumnIndexToInsert = nextColumnIndexToInsert + numberOfTrackedFrames;

@@ -69,7 +69,7 @@ for experiment=1:numberOfExperiments
         % evaluate PGC velocities
         load("Lukasz\SD10_" + experiment + "_corrected_k6.mat");
         if p.debug_level >= 1; disp('Consider PGC velocities from tracking info...'); end
-        [processedData.cellCoordinates] = evaluateVelocitiesFromTracking(tracks_PGC, p.scale);
+        [processedData.cellCoordinates] = evaluateVelocitiesFromTracking(tracks_PGC, p.scale, p.resolution);
  
         % estimate embryo surface by fitting an ellipsoid
         if p.debug_level >= 1; disp('Estimating embryo surface...'); end
