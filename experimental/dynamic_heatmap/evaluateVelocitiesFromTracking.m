@@ -28,6 +28,8 @@ for trackedCellNo = 1:numberOfCells
     nextColumnIndexToInsert = nextColumnIndexToInsert + numberOfTrackedFrames;
 end
 
+cellCoordinates( :, all(~cellCoordinates,1) ) = [];
+cellVelocities( :, all(~cellVelocities,1) ) = [];
 %cellCoordinates=cellCoordinates(:,1:nextColumnIndexToInsert);
 % for trackedCellNo = 1:numberOfCells
 %     cellsFrames = tracks_PGC{trackedCellNo, 1};
