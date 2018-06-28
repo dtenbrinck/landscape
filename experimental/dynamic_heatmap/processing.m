@@ -35,7 +35,9 @@ p.resolution(1:2) = p.resolution(1:2) / p.scale;
 %% MAIN LOOP
 
 fprintf(['Processing dataset: (0,' num2str(numberOfExperiments) ')']); 
-    
+maxNumberOfTimeFrames=20;
+dynamicPGCdata{maxNumberOfTimeFrames} = []; 
+
 % process all existing data sequentially
 for experiment=1:numberOfExperiments
     
@@ -55,45 +57,50 @@ for experiment=1:numberOfExperiments
         end
         experimentData = experimentData.Data_1;
         
-        % preprocess and rescale data
-        if p.debug_level >= 1; disp('Preprocessing data...'); end
-        processedData = preprocessData(experimentData, p);
-        
-        % segment data
-        if p.debug_level >= 1; disp('Segmenting GFP channel...'); end
-        processedData.landmark = segmentGFP(processedData.GFP, p.GFPseg, p.resolution);
-               
-        if p.debug_level >= 1; disp('Segmenting DAPI channel...'); end
-        [processedData.nuclei, processedData.nucleiCoordinates] = segmentDAPI(processedData.Dapi, p.DAPIseg, p.resolution);
+        load("results\SD10_" + experiment + "_BFP_raw_results.mat");
+%         % preprocess and rescale data
+%         if p.debug_level >= 1; disp('Preprocessing data...'); end
+%         processedData = preprocessData(experimentData, p);
+%         
+%         % segment data
+%         if p.debug_level >= 1; disp('Segmenting GFP channel...'); end
+%         processedData.landmark = segmentGFP(processedData.GFP, p.GFPseg, p.resolution);
+%         
+%         if p.debug_level >= 1; disp('Segmenting DAPI channel...'); end
+%         [processedData.nuclei, processedData.nucleiCoordinates] = segmentDAPI(processedData.Dapi, p.DAPIseg, p.resolution);
 
         % evaluate PGC velocities
         load("Lukasz\SD10_" + experiment + "_corrected_k6.mat");
         if p.debug_level >= 1; disp('Consider PGC velocities from tracking info...'); end
-        [processedData.cellCoordinates] = evaluateVelocitiesFromTracking(tracks_PGC, p.scale, p.resolution);
+        [processedData.dynamic.cellCoordinates, ...
+            processedData.dynamic.cellVelocities, ...
+            processedData.dynamic.coordinatesPerTimeStepExp] ...
+            = evaluateVelocitiesFromTracking(tracks_PGC);
  
         % estimate embryo surface by fitting an ellipsoid
         if p.debug_level >= 1; disp('Estimating embryo surface...'); end
-        ellipsoid = estimateEmbryoSurface(processedData.nucleiCoordinates, p.resolution);
-        
-        % compute transformation which normalizes the estimated ellipsoid to a unit sphere
-        if p.debug_level >= 1; disp('Compute transformation from optimal ellipsoid...'); end
-        transformationMatrix = computeTransformationMatrix(ellipsoid);
-        
-        %%%%%%%%%%% VALIDITY CHECK FOR DEBUGGING
-        if p.debug_level >= 2
-            disp('Transform data for validity check...');
-            [ transformedData, transformedResolution ] = transformDataToSphere( processedData, p.resolution, transformationMatrix, ellipsoid, p.samples_cube );
-        end
-        
-        % project landmark onto unit sphere
-        if p.debug_level >= 1; disp('Projecting landmark onto embryo surface...'); end
-        [sphereCoordinates, landmarkCoordinates, landmarkOnSphere] = ...
-            projectLandmarkOnSphere(processedData.landmark, p.resolution, ellipsoid, p.samples_sphere);
-        
-        % estimate optimal rotation to register data to reference point with reference orientation
-        if p.debug_level >= 1; disp('Estimating transformation from projected landmark...'); end        
-        rotationMatrix = ...
-            registerLandmark(landmarkCoordinates, p.reg);
+%         ellipsoid = estimateEmbryoSurface(processedData.nucleiCoordinates, p.resolution);
+        ellipsoid = gatheredData.processed.ellipsoid;
+%         
+%         % compute transformation which normalizes the estimated ellipsoid to a unit sphere
+%         if p.debug_level >= 1; disp('Compute transformation from optimal ellipsoid...'); end
+%         transformationMatrix = computeTransformationMatrix(ellipsoid);
+%         
+%         %%%%%%%%%%% VALIDITY CHECK FOR DEBUGGING
+%         if p.debug_level >= 2
+%             disp('Transform data for validity check...');
+%             [ transformedData, transformedResolution ] = transformDataToSphere( processedData, p.resolution, transformationMatrix, ellipsoid, p.samples_cube );
+%         end
+%         
+%         % project landmark onto unit sphere
+%         if p.debug_level >= 1; disp('Projecting landmark onto embryo surface...'); end
+%         [sphereCoordinates, landmarkCoordinates, landmarkOnSphere] = ...
+%             projectLandmarkOnSphere(processedData.landmark, p.resolution, ellipsoid, p.samples_sphere);
+%         
+%         % estimate optimal rotation to register data to reference point with reference orientation
+%         if p.debug_level >= 1; disp('Estimating transformation from projected landmark...'); end        
+%         rotationMatrix = ...
+%             registerLandmark(landmarkCoordinates, p.reg);
         
         %%%%%%%%%%% VALIDITY CHECK FOR DEBUGGING
         if p.debug_level >= 2
@@ -108,14 +115,19 @@ for experiment=1:numberOfExperiments
         
 %        % DEBUG
 %        transformedCoordinates = rotationMatrix * landmarkCoordinates';
-        
+        %%%%%%%%%%%%%%todo rotation and transformation matrix laden!
         % compute registration transformation from original data space
-        transformation_registration = transformationMatrix * rotationMatrix';
+%         transformation_registration = transformationMatrix * rotationMatrix';
+        transformation_registration = gatheredData.registered.transformation_full;
         
         % register data
         if p.debug_level >= 1; disp('Registering data...'); end
         registeredData = registerData( processedData, p.resolution, transformation_registration, ellipsoid, p.samples_cube);
-                
+       
+        for timestep=1:maxNumberOfTimeFrames
+            dynamicPGCdata{timestep} = [dynamicPGCdata{timestep}, registeredData.dynamic.coordinatesPerTimeStepExp{timestep}];
+        end
+        
         % create filename to save results
         results_filename = [p.resultsPath '/' experimentData.filename '_results.mat'];
         
@@ -140,6 +152,8 @@ for experiment=1:numberOfExperiments
         
     end
 end
+
+save([p.resultsPath '/accepted/dynamicPGCdata_results.mat'],'dynamicPGCdata');
 
 % Save parameters
 save([p.resultsPath '/accepted/ParameterProcessing.mat'],'p');

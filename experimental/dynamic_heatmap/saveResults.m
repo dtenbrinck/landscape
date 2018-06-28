@@ -63,6 +63,11 @@ gatheredData.registered.cellCoordinates = registeredData.cellCoordinates;
 if isfield(registeredData, 'nuclei') % check for backward compatibilty
     gatheredData.registered.nucleiMIP = computeMIP(registeredData.nuclei);
 end
+
+if isfield(registeredData, 'dynamic') % check for backward compatibilty
+    gatheredData.registered.dynamic = registeredData.dynamic;
+end
+
 save(results_filename,'gatheredData');
 end
 
