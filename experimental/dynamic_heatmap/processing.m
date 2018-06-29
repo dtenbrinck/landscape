@@ -36,8 +36,8 @@ p.resolution(1:2) = p.resolution(1:2) / p.scale;
 
 fprintf(['Processing dataset: (0,' num2str(numberOfExperiments) ')']); 
 maxNumberOfTimeFrames=20;
-dynamicPGCdata{maxNumberOfTimeFrames} = []; 
-
+dynamicPGCdata.coords{maxNumberOfTimeFrames} = []; 
+numberOfFoundCellsPerTimeStep = zeros(1,maxNumberOfTimeFrames);
 % process all existing data sequentially
 for experiment=1:numberOfExperiments
     
@@ -125,7 +125,8 @@ for experiment=1:numberOfExperiments
         registeredData = registerData( processedData, p.resolution, transformation_registration, ellipsoid, p.samples_cube);
        
         for timestep=1:maxNumberOfTimeFrames
-            dynamicPGCdata{timestep} = [dynamicPGCdata{timestep}, registeredData.dynamic.coordinatesPerTimeStepExp{timestep}];
+            dynamicPGCdata.coords{timestep} = horzcat(dynamicPGCdata.coords{timestep}, registeredData.dynamic.coordinatesPerTimeStepExp{timestep});
+            numberOfFoundCellsPerTimeStep(1,timestep) = size(dynamicPGCdata.coords{timestep},2);
         end
         
         % create filename to save results
@@ -153,8 +154,8 @@ for experiment=1:numberOfExperiments
         
     end
 end
-
-save([p.resultsPath '/accepted/dynamic/dynamicPGCdata_results.mat'],'dynamicPGCdata');
+dynamicPGCdata.maxNumberCellsPerTimeStep = max(numberOfFoundCellsPerTimeStep);
+save([p.resultsPath '/dynamicPGCdata_results.mat'],'dynamicPGCdata');
 
 % Save parameters
 save([p.resultsPath '/accepted/ParameterProcessing.mat'],'p');

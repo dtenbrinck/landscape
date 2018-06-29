@@ -80,4 +80,10 @@ p.option.heatmaps.disp = 0;
 
 % Scale the heatmaps. Input can be: 'true','false','both'
 p.option.heatmaps.scaled = 'true';
+
+% Frame number if several frames for dynamic data should be saved
+p.option.frameNo = '';
+
+% calculation of axis scaling active: default value -1
+p.option.axisLimit = -1;
 end
