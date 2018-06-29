@@ -131,8 +131,9 @@ for experiment=1:numberOfExperiments
         % create filename to save results
         results_filename = [p.resultsPath '/' experimentData.filename '_results.mat'];
         
-        gatheredData = saveResults(experimentData, processedData, registeredData, ellipsoid, transformationMatrix, rotationMatrix, results_filename);
-        
+        %gatheredData = saveResults(experimentData, processedData, registeredData, ellipsoid, transformationMatrix, rotationMatrix, results_filename);
+        gatheredData.registered.dynamic = registeredData.dynamic;
+        save(results_filename,'gatheredData','-append')
         % visualize results if needed
         if p.visualization == 1
             visualizeResults_new(gatheredData);
@@ -153,7 +154,7 @@ for experiment=1:numberOfExperiments
     end
 end
 
-save([p.resultsPath '/accepted/dynamicPGCdata_results.mat'],'dynamicPGCdata');
+save([p.resultsPath '/accepted/dynamic/dynamicPGCdata_results.mat'],'dynamicPGCdata');
 
 % Save parameters
 save([p.resultsPath '/accepted/ParameterProcessing.mat'],'p');

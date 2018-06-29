@@ -29,14 +29,14 @@ if isfield(processedData, 'cellCoordinates')
     processedData.cellCoordinates(2,:) = processedData.cellCoordinates(2,:)*resolution(1);
     processedData.cellCoordinates(3,:) = processedData.cellCoordinates(3,:)*resolution(3);
     registeredData.cellCoordinates = transformCoordinates(processedData.cellCoordinates', ellipsoid.center, registrationMatrix^-1, [0; 0; 0]);
-end
-
-if isfield(processedData, 'dynamic')
-     % register dynamic cell coordinates accordingly
-%     processedData.dynamic.cellCoordinates(1,:) = processedData.dynamic.cellCoordinates(1,:)*resolution(2);
-%     processedData.dynamic.cellCoordinates(2,:) = processedData.dynamic.cellCoordinates(2,:)*resolution(1);
-%     processedData.dynamic.cellCoordinates(3,:) = processedData.dynamic.cellCoordinates(3,:)*resolution(3);
-    registeredData.dynamic.cellCoordinates = transformCoordinates(processedData.dynamic.cellCoordinates', ellipsoid.center, registrationMatrix^-1, [0; 0; 0]);
+elseif isfield(processedData, 'dynamic')
+    % register dynamic cell coordinates accordingly
+    % We save the cell coordinates also in
+    % gathered.registered.cellCoordinates to ensure that further
+    % evaluations on the cellCoordinates works well.
+    % Moreover, we do not scale with the resolution parameter as we did not
+    % scale the coordinates from the original data either.
+    registeredData.cellCoordinates = transformCoordinates(processedData.dynamic.cellCoordinates', ellipsoid.center, registrationMatrix^-1, [0; 0; 0]);
     numberOfFrames = numel(processedData.dynamic.coordinatesPerTimeStepExp);
     registeredData.dynamic.coordinatesPerTimeStepExp{numberOfFrames} = [];
     for timestep = 1:numberOfFrames
