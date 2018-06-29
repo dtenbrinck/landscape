@@ -7,7 +7,7 @@ function [  ] = handleHeatmaps( accumulator, numOfAllCells,numberOfResults, p, o
 % -- if heatmaps should be computed -- %
 
 if option.heatmaps.process == 1
-    fprintf('Computing heatmaps...');
+    fprintf('Computing heatmaps...\n');
     
     % -- Convolve over the points -- %
     convAcc = convolveAccumulator(accumulator,option.cellradius,2*option.cellradius+1);
@@ -38,7 +38,7 @@ if option.heatmaps.process == 1
         figs = [figure('Visible','off'),figure('Visible','off'),...
             figure('Visible','off'),figure('Visible','off')];
         if strcmp(option.heatmaps.scaled,'true')||strcmp(option.heatmaps.scaled,'both')
-            [f,pca] = creatStdFigure_scaled(numberOfResults,numOfAllCells,HMS,currentType, option.axisLimit);      
+            [f,pca] = creatStdFigure_scaled(option.frameNo,numOfAllCells,HMS,currentType, option.axisLimit);      
             figs(i+(2*(i-1))) = copyobj(f,0);
             %set(findobj(figs(i+(2*(i-1))).Children,'Tag','sp3'),'position',pca); % TODO: IS THIS REALLY NEEDED?
             set(figs(i+(2*(i-1))),'Visible',vis);
