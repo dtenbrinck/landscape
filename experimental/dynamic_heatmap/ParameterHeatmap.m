@@ -55,7 +55,7 @@ p.option.heatmaps.process = 1;
 % Types of heatmaps. Currently available 'MIP', 'SUM'.
 % Can handle multiple input.
 % Default: {'MIP','SUM'}
-p.option.heatmaps.types = {'SUM'};
+p.option.heatmaps.types = {'MIP','SUM'};
 
 % - Saving - %
 % Saves will be aved in results folder under "heatmaps"
