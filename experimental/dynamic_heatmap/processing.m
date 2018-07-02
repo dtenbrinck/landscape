@@ -134,6 +134,7 @@ for experiment=1:numberOfExperiments
         
         %gatheredData = saveResults(experimentData, processedData, registeredData, ellipsoid, transformationMatrix, rotationMatrix, results_filename);
         gatheredData.registered.dynamic = registeredData.dynamic;
+        gatheredData.processed.dynamic.cellVelocities = processedData.dynamic.cellVelocities;
         save(results_filename,'gatheredData','-append')
         % visualize results if needed
         if p.visualization == 1

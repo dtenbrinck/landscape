@@ -42,6 +42,10 @@ if isfield(processedData, 'nuclei') % check for backward compatibilty
     gatheredData.processed.nucleiMIP = computeMIP(processedData.nuclei);
 end
 
+if isfield(processedData, 'dynamic') % check for backward compatibilty
+    gatheredData.processed.dynamic.cellVelocities = processedData.dynamic.cellVelocities;
+end
+
 % important registered data
 gatheredData.registered.size = size(registeredData.Dapi);
 gatheredData.processed.ellipsoid = ellipsoid;
