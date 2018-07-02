@@ -37,7 +37,7 @@ gatheredData.processed.landmark = logical(processedData.landmark);
 gatheredData.processed.cells = (processedData.landmark);
 gatheredData.processed.landmarkMIP = computeMIP(processedData.landmark);
 % gatheredData.processed.cellsMIP = computeMIP(processedData.cells);
-gatheredData.processed.cellCoordinates = processedData.cellCoordinates;
+% gatheredData.processed.cellCoordinates = processedData.cellCoordinates;
 if isfield(processedData, 'nuclei') % check for backward compatibilty
     gatheredData.processed.nucleiMIP = computeMIP(processedData.nuclei);
 end
