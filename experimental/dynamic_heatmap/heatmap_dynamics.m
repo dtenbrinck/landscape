@@ -1,4 +1,12 @@
 function heatmap_dynamics()
+clear; clc; close all;
+
+% define root directory
+root_dir = fileparts(fileparts(pwd));
+
+% add path for parameter setup
+addpath(root_dir);
+
 %% GENERATE HEATMAPS 
 disp('Generating heatmaps using all cell coordinates over whole time interval...');
 heatmap_singleExperiment();
