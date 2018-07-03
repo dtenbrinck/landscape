@@ -20,7 +20,8 @@ p = initializeScript('processing_dynamic', root_dir);
 p.scale = 0.5;
 
 % adjust resolution according to scale parameter
-p.resolution(1:2) = p.resolution(1:2) / p.scale;
+% TODO: This has to be done in preprocessing not here!
+%p.resolution(1:2) = p.resolution(1:2) / p.scale;
 
 
 %% GET DATA METAINFORMATION
@@ -39,7 +40,7 @@ end
 %%% WE ASSUME THAT EACH DYNAMIC DATA SET IS IN IT'S OWN SUBDIRECTORY
 
 % initialize struct array to save dynamic information for all PGCs
-global_PGC_information = struct([]);
+results = struct([]);
 
 % loop over all subdirectories each containing one dynamic data set
 for i=1:numberSubdirs
@@ -101,7 +102,7 @@ for i=1:numberSubdirs
     end
       
     % compute registration transformation from original data space
-    transformation_registration = transformationMatrix * rotationMatrix';
+    registrationMatrix = transformationMatrix * rotationMatrix';
     
     % get list of *.mat files in directory
     fileNamesMAT = getMATfilenames(path_data);
@@ -129,13 +130,13 @@ for i=1:numberSubdirs
         % WE ASSUME: originalPositions(2,:) - originalPositions(1,:) = distance(1,:)
         
         % extract original position of PGC at time point t as (x,y,z) coordinates
-        originalPositions = PGC_tracks{j}(:,2:4);
+        PGC_information(j).originalPositions = transpose(PGC_tracks{j}(:,2:4));
         
         % transform PGC coordinates into reference system
-        PGC_information(j).registeredPositions = transformCoordinates(originalPositions, ellipsoid.center, transformation_registration^-1, [0; 0; 0]);
+        PGC_information(j).registeredPositions = transformCoordinates(PGC_information(j).originalPositions', ellipsoid.center, registrationMatrix^-1, [0; 0; 0]);
         
         % extract time interval between timepoints
-        deltaT = PGC_tracks{j}(:,5);
+        PGC_information(j).deltaT = transpose(PGC_tracks{j}(:,5));
         
         % extract traveled distance of PGC in mumeter as (x,y,z) vector
         distance = PGC_tracks{j}(:,6:8);
@@ -157,16 +158,20 @@ for i=1:numberSubdirs
     end
     
     % concatenate PGC information from this data set with global struct array
-    global_PGC_information = cat(2, global_PGC_information, PGC_information);
-        
-    % create filename to save results
-    results_filename = [p.resultsPath '/dynamic_features.mat'];
-    
-    % save collected dynamic features of all tracked PGCs and transformation matrix
-    save(results_filename,'global_PGC_information', 'transformation_registration');
-    
-    if p.debug_level >= 1; disp('Saved results successfully!'); end
+    results{i}.PGC_information = PGC_information;
+    results{i}.path = path_data;
+    results{i}.registrationMatrix = registrationMatrix;
+
 end
+
+%% SAVE DYNAMIC INFORMATION TO FILE
+% create filename to save results
+results_filename = [p.resultsPath '/dynamic_features.mat'];
+
+% save collected dynamic features of all tracked PGCs
+save(results_filename,'results');
+
+if p.debug_level >= 1; disp('Saved results successfully!'); end
 
 %% USER OUTPUT
 fprintf('\n');
