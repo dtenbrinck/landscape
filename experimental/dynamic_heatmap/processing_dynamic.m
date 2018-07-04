@@ -108,7 +108,8 @@ for i=1:numberSubdirs
     fileNamesMAT = getMATfilenames(path_data);
     
     % get index of *.mat file containing the substring 'corrected'
-    fileIndex = find(contains(fileNamesMAT, 'corrected'));
+    %fileIndex = find(contains(fileNamesMAT, 'corrected'));
+    fileIndex = find(~cellfun(@isempty,strfind(fileNamesMAT, 'corrected')));
     
     % load tracks of flow corrected PGC cells
     tmp = load([path_data '/' fileNamesMAT{fileIndex}]);

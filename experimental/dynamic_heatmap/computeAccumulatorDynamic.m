@@ -31,6 +31,7 @@ tolerance = 0.1;
 % Ignore all coordinates outside the sphere with a tolerance tole
 PGC_Coordinates(:,normOfCoordinates > 1+tolerance) = [];
 PGC_Velocities(:,normOfCoordinates > 1+tolerance) = [];
+PGC_TrackStraightness(:,normOfCoordinates > 1+tolerance) = [];
 normOfCoordinates(:,normOfCoordinates > 1+tolerance) = [];
 
 numberCells = size(PGC_Coordinates,2);
@@ -64,7 +65,7 @@ accumulatorSpeed = accumulatorSpeed ./ accumulatorPosition;
 % compute accumulator measuring the track straightness of PGCs
 values = [PGC_TrackStraightness'];
 accumulatorStraightness = reshape(...
-    accumarray([indPoints';gridSize*gridSize*gridSize],values),...
+    accumarray([indPoints';gridSize*gridSize*gridSize],[values;0]),...
     [gridSize,gridSize,gridSize]);
 accumulatorStraightness = accumulatorStraightness ./ accumulatorPosition;
 %accumulatorStraightness(isnan(accumulatorStraightness)) = 0;

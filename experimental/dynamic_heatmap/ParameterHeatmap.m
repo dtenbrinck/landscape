@@ -21,7 +21,7 @@ p.tole = 0.1;
 
 % Grid size of the accumulator: 
 % size(accumulator) = [gridSize,gridSize,gridSize];
-p.gridSize = 64;
+p.gridSize = 128;
 
 % Select a given number of random filnames
 p.random = 0;
