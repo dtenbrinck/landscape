@@ -39,7 +39,7 @@ maxNumberOfTimeFrames=20;
 dynamicPGCdata.coords{maxNumberOfTimeFrames} = []; 
 numberOfFoundCellsPerTimeStep = zeros(1,maxNumberOfTimeFrames);
 
-readOldResults = 0;
+readOldResults = 1;
 
 % process all existing data sequentially
 for experiment=1:numberOfExperiments
@@ -120,6 +120,7 @@ for experiment=1:numberOfExperiments
         
         % evaluate PGC velocities
         load("Lukasz\SD10_" + experiment + "_corrected_k6.mat");
+        load("Lukasz\SD10_" + experiment + "_validationTest.mat");
         if p.debug_level >= 1; disp('Consider PGC velocities from tracking info...'); end
         [processedData.dynamic.cellCoordinates, ...
             processedData.dynamic.cellVelocities, ...
@@ -138,10 +139,14 @@ for experiment=1:numberOfExperiments
         % create filename to save results
         results_filename = [p.resultsPath '/' experimentData.filename '_results.mat'];
         
-        %gatheredData = saveResults(experimentData, processedData, registeredData, ellipsoid, transformationMatrix, rotationMatrix, results_filename);
-        gatheredData.registered.dynamic = registeredData.dynamic;
-        gatheredData.processed.dynamic.cellVelocities = processedData.dynamic.cellVelocities;
-        save(results_filename,'gatheredData','-append')
+        if ( readOldResults > 0  )
+            gatheredData.registered.dynamic = registeredData.dynamic;
+            gatheredData.registered.cellCoordinates = registeredData.cellCoordinates;
+            gatheredData.processed.dynamic.cellVelocities = processedData.dynamic.cellVelocities;
+            save(results_filename,'gatheredData','-append');
+        else
+            gatheredData = saveResults(experimentData, processedData, registeredData, ellipsoid, transformationMatrix, rotationMatrix, results_filename);
+        end
         % visualize results if needed
         if p.visualization == 1
             visualizeResults_new(gatheredData);
