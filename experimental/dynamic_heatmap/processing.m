@@ -119,7 +119,7 @@ for experiment=1:numberOfExperiments
         end    
         
         % evaluate PGC velocities
-        load("Lukasz\SD10_" + experiment + "_corrected_k6.mat");
+%         load("Lukasz\SD10_" + experiment + "_corrected_k6.mat");
         load("Lukasz\SD10_" + experiment + "_validationTest.mat");
         if p.debug_level >= 1; disp('Consider PGC velocities from tracking info...'); end
         [processedData.dynamic.cellCoordinates, ...
