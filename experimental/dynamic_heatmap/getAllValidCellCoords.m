@@ -11,7 +11,7 @@ function [ allCellCoords, allCellVelocities] = getAllValidCellCoords(sizeAcc,fil
 % -- 0. Step --%
 % Initialize all coordinates of cell centers
 allCellCoords = double.empty(3,0);
-allCellVelocities = double.empty(3,0);
+allCellVelocities = double.empty(1,0);
 
 % -- 1. Step --%
 for result = 1:numberOfResults

@@ -76,7 +76,7 @@ p.option.heatmaps.saveHMmat = 1;
 p.option.heatmaps.saveAccumulator = 1;
 
 % Show the heatmaps figures. Doesn't need to be activated for the saving.
-p.option.heatmaps.disp = 0;
+p.option.heatmaps.disp = 1;
 
 % Scale the heatmaps. Input can be: 'true','false','both'
 p.option.heatmaps.scaled = 'true';
