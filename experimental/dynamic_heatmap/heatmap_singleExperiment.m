@@ -48,14 +48,18 @@ load([p.resultsPathAccepted,'/',fileNames{1,1}]);
 [ allCellCoords, allCellVelocities]  = getAllValidCellCoords(p.gridSize,fileNames,numberOfResults,p.tole,p.resultsPathAccepted);
 
 % -- Compute the Accumulator from the cell coordinates -- %
-accumulator = computeAccumulatorWithVelocities(allCellCoords, p.gridSize, allCellVelocities);
+accumulatorForVelocities = computeAccumulatorWithVelocities(allCellCoords, p.gridSize, allCellVelocities);
+accumulator = computeAccumulator(allCellCoords, p.gridSize);
 
 
-%% HANDLE HEATMAPS ( Computation, drawing and saving ) 
-
+%% HANDLE HEATMAPS ( Computation, drawing and saving )
+resultsPathBase = p.resultsPath;
+p.resultsPath = [resultsPathBase, '/velocities'];
+p.option.weight = 1/(2*p.option.cellradius +1 );
+handleHeatmaps(accumulatorForVelocities,size(allCellCoords,2),numberOfResults,p,p.option);
+option.weight = 1;
+p.resultsPath = [resultsPathBase, '/coordinates'];
 handleHeatmaps(accumulator,size(allCellCoords,2),numberOfResults,p,p.option);
-
-
 %% USER OUTPUT
 
 disp('All results in folder processed!');

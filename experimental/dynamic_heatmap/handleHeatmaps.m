@@ -11,9 +11,9 @@ if option.heatmaps.process == 1
     
     % -- Convolve over the points -- %
     convAcc = convolveAccumulator(accumulator,option.cellradius,2*option.cellradius+1);
-    
+
     % -- Compute heatmap heatmaps -- %
-    HMS = generateHeatmap(convAcc,option.heatmaps.types);
+    HMS = generateHeatmap(convAcc,option.heatmaps.types, option.weight);
     
     % Save heatmap structure HMS
     if option.heatmaps.saveHMmat == 1
