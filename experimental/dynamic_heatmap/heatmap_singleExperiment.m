@@ -54,12 +54,16 @@ accumulator = computeAccumulator(allCellCoords, p.gridSize);
 
 %% HANDLE HEATMAPS ( Computation, drawing and saving )
 resultsPathBase = p.resultsPath;
-p.resultsPath = [resultsPathBase, '/velocities'];
-p.option.weight = 1/(2*p.option.cellradius +1 );
-handleHeatmaps(accumulatorForVelocities,size(allCellCoords,2),numberOfResults,p,p.option);
-option.weight = 1;
+p.option.weight.convDim = 1;
+p.option.weight.convAcc = 1;
 p.resultsPath = [resultsPathBase, '/coordinates'];
-handleHeatmaps(accumulator,size(allCellCoords,2),numberOfResults,p,p.option);
+[convAccCoord] = handleHeatmaps(accumulator,size(allCellCoords,2),numberOfResults,p,p.option);
+
+p.resultsPath = [resultsPathBase, '/velocities'];
+convDim = 1/(2*p.option.cellradius +1);
+p.option.weight.convDim = convDim;
+p.option.weight.convAcc = convAccCoord;
+handleHeatmaps(accumulatorForVelocities,size(allCellCoords,2),numberOfResults,p,p.option);
 %% USER OUTPUT
 
 disp('All results in folder processed!');

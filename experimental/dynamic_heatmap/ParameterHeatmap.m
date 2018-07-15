@@ -55,7 +55,7 @@ p.option.heatmaps.process = 1;
 % Types of heatmaps. Currently available 'MIP', 'SUM'.
 % Can handle multiple input.
 % Default: {'MIP','SUM'}
-p.option.heatmaps.types = {'MIP','SUM', 'SUM_WEIGHTED'};
+p.option.heatmaps.types = {'MIP', 'SUM_WEIGHTED'};
 
 % - Saving - %
 % Saves will be aved in results folder under "heatmaps"
@@ -76,7 +76,7 @@ p.option.heatmaps.saveHMmat = 0;
 p.option.heatmaps.saveAccumulator = 0;
 
 % Show the heatmaps figures. Doesn't need to be activated for the saving.
-p.option.heatmaps.disp = 1;
+p.option.heatmaps.disp = 0;
 
 % Scale the heatmaps. Input can be: 'true','false','both'
 p.option.heatmaps.scaled = 'true';

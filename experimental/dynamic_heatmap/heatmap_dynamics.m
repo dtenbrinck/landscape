@@ -12,7 +12,7 @@ disp('Generating heatmaps using all cell coordinates over whole time interval...
 heatmap_singleExperiment();
 
 disp('Generate heatmaps per eacht time step...');
-generateHeatmapsPerTimeStep();
+% generateHeatmapsPerTimeStep();
 
 %% USER OUTPUT
 

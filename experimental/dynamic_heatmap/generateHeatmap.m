@@ -14,20 +14,21 @@ function [ heatmapStruct ] = generateHeatmap( accumulator, heatmaptypes , weight
 
 numOfStrings = size(heatmaptypes,2);
 heatmapStruct = struct;
+weight.convAcc(~weight.convAcc)=1;
+accumulator = accumulator ./ weight.convAcc; % weighted accumulator
 for i=1:numOfStrings
     if strcmp(heatmaptypes(i),'MIP')
         heatmapStruct.MIP.Top = max(accumulator,[],3);
         heatmapStruct.MIP.Head = reshape(max(accumulator,[],2),[size(accumulator,1),size(accumulator,3)]);
         heatmapStruct.MIP.Side = reshape(max(accumulator,[],1),[size(accumulator,2),size(accumulator,3)]);
-    elseif strcmp(heatmaptypes(i),'SUM') || strcmp(heatmaptypes(i),'SUM_WEIGHTED')
+    elseif strcmp(heatmaptypes(i),'SUM') 
         heatmapStruct.SUM.Top = sum(accumulator,3);
         heatmapStruct.SUM.Head = reshape(sum(accumulator,2),[size(accumulator,1),size(accumulator,3)]);
         heatmapStruct.SUM.Side = reshape(sum(accumulator,1),[size(accumulator,2),size(accumulator,3)]);
-        if strcmp(heatmaptypes(i),'SUM_WEIGHTED') && exist('weight','var')
-            heatmapStruct.SUM_WEIGHTED.Top = weight * heatmapStruct.SUM.Top;
-            heatmapStruct.SUM_WEIGHTED.Head = weight * heatmapStruct.SUM.Head;
-            heatmapStruct.SUM_WEIGHTED.Side = weight * heatmapStruct.SUM.Side;
-        end
+    elseif strcmp(heatmaptypes(i),'SUM_WEIGHTED') && exist('weight','var')
+        heatmapStruct.SUM_WEIGHTED.Top = weight.convDim * sum(accumulator,3);
+        heatmapStruct.SUM_WEIGHTED.Head = weight.convDim * reshape(sum(accumulator,2),[size(accumulator,1),size(accumulator,3)]);
+        heatmapStruct.SUM_WEIGHTED.Side = weight.convDim * reshape(sum(accumulator,1),[size(accumulator,2),size(accumulator,3)]);
     elseif strcmp(heatmaptypes(i),'PEAL')
         
     end 

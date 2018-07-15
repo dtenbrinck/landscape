@@ -1,4 +1,4 @@
-function [  ] = handleHeatmaps( accumulator, numOfAllCells,numberOfResults, p, option )
+function [ convAcc  ] = handleHeatmaps( accumulator, numOfAllCells,numberOfResults, p, option )
 % This function will handle the heatmaps. It will compute and show
 % different heatmaps depending on the given options in 'option'.
 
