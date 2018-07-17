@@ -54,7 +54,7 @@ accumulator = computeAccumulator(allCellCoords, p.gridSize);
 
 %% HANDLE HEATMAPS ( Computation, drawing and saving )
 resultsPathBase = p.resultsPath;
-p.option.weight.convDim = 1;
+p.option.weight.convDim = 1/(2*p.option.cellradius +1);
 p.option.weight.convAcc = 1;
 p.resultsPath = [resultsPathBase, '/coordinates'];
 [convAccCoord] = handleHeatmaps(accumulator,size(allCellCoords,2),numberOfResults,p,p.option);
