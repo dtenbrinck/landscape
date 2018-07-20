@@ -7,31 +7,21 @@ root_dir = fileparts(fileparts(pwd));
 % add path for parameter setup
 addpath(root_dir);
 
-%% GENERATE HEATMAPS 
-disp('Generating heatmaps using all cell coordinates over whole time interval...');
-heatmap_singleExperiment();
-
-disp('Generate heatmaps per eacht time step...');
-% generateHeatmapsPerTimeStep();
-
-%% USER OUTPUT
-
-disp('All results in folder processed!');
-end
-
-function generateHeatmapsPerTimeStep()
-%% INITIALIZATION
-clear; clc; close all;
-
-% define root directory
-root_dir = pwd;
-
 % add path for parameter setup
 addpath([root_dir '/parameter_setup/']);
 
 % load necessary variables
 p = initializeScript('heatmap', root_dir);
 
+% GENERATE HEATMAPS 
+plotHeatmapsAveragedOverInterval(p);
+% generateHeatmapsPerTimeStep(p);
+
+disp('All results in folder processed!');
+end
+
+function generateHeatmapsPerTimeStep( p)
+disp('Generate heatmaps per eacht time step...');
 
 %% GET FILES TO PROCESS
 
@@ -73,5 +63,46 @@ for timestep = 1: numberOfTimeSteps
     p.option.frameNo = sprintf(leadingZeros, timestep);
     handleHeatmaps(accumulator,size(allCellCoords,2),numberOfResults,p,p.option);
 end
+
+end
+
+function plotHeatmapsAveragedOverInterval( p)
+disp('Generating heatmaps using all cell coordinates over whole time interval...');
+
+% Get filenames of MAT files in selected folder
+fileNames = getMATfilenames(p.resultsPathAccepted);
+fileNames(strcmp(fileNames,'ParameterProcessing.mat')) = [];
+fileNames(strcmp(fileNames,'ParameterHeatmap.mat')) = [];
+fileNames(strcmp(fileNames,'HeatmapAccumulator.mat')) = [];
+
+if p.random == 1
+    fileNames = drawRandomNames(fileNames,p.numberOfRandom);
+end
+% Get number of experiments
+numberOfResults = numel(fileNames);
+
+% Check if any results have been found
+if numberOfResults == 0
+    disp('All results already processed or path to results folder wrong?');
+    disp(resultsPathAccepted);
+    return;
+else
+    disp([ num2str(numberOfResults) ' results found in folder for generating heat map.']);
+end
+
+% Load first data set
+load([p.resultsPathAccepted,'/',fileNames{1,1}]);
+
+%% COMPUTE ACCUMULATOR
+
+% -- Compute all valid cell coordinates from the processed and registered data -- %
+[ allCellCoords, allCellVelocities]  = getAllValidCellCoords(p.gridSize,fileNames,numberOfResults,p.tole,p.resultsPathAccepted);
+
+% -- Compute the accumulators from the cell coordinates and for the velocities -- %
+accumulatorForVelocities = computeAccumulatorWithVelocities(allCellCoords, p.gridSize, allCellVelocities);
+accumulator = computeAccumulator(allCellCoords, p.gridSize);
+
+%% GENERATE HEATMAPS
+createSlicesPlots(accumulatorForVelocities, accumulator, p.option);
 
 end

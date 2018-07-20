@@ -50,10 +50,6 @@ load([p.resultsPathAccepted,'/',fileNames{1,1}]);
 % -- Compute the Accumulator from the cell coordinates -- %
 accumulatorForVelocities = computeAccumulatorWithVelocities(allCellCoords, p.gridSize, allCellVelocities);
 accumulator = computeAccumulator(allCellCoords, p.gridSize);
-createSlicesPlots(accumulatorForVelocities, p.option);
-createSlicesPlots(accumulator, p.option);
-
-return;
 
 %% HANDLE HEATMAPS ( Computation, drawing and saving )
 resultsPathBase = p.resultsPath;
