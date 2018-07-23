@@ -103,6 +103,7 @@ accumulatorForVelocities = computeAccumulatorWithVelocities(allCellCoords, p.gri
 accumulator = computeAccumulator(allCellCoords, p.gridSize);
 
 %% GENERATE HEATMAPS
-createSlicesPlots(accumulatorForVelocities, accumulator, p.option);
+createSlicesPlots(accumulator, p.option, 'Positions of PGCs');
+createSlicesPlots(accumulatorForVelocities, p.option, 'Average velocities');
 
 end
