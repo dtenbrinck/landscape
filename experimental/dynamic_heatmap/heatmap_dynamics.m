@@ -90,11 +90,11 @@ else
     disp([ num2str(numberOfResults) ' results found in folder for generating heat map.']);
 end
 
-% Load first data set
+% Load first data set to get reference landmark
 load([p.resultsPathAccepted,'/',fileNames{1,1}]);
+referenceLandmark = gatheredData.registered.landmarkMIP;
 
 %% COMPUTE ACCUMULATOR
-
 % -- Compute all valid cell coordinates from the processed and registered data -- %
 [ allCellCoords, allCellVelocities]  = getAllValidCellCoords(p.gridSize,fileNames,numberOfResults,p.tole,p.resultsPathAccepted);
 
@@ -103,7 +103,7 @@ accumulatorForVelocities = computeAccumulatorWithVelocities(allCellCoords, p.gri
 accumulator = computeAccumulator(allCellCoords, p.gridSize);
 
 %% GENERATE HEATMAPS
-createSlicesPlots(accumulator, p.option, 'Positions of PGCs');
-createSlicesPlots(accumulatorForVelocities, p.option, 'Average velocities');
+createSlicesPlots(accumulator, p.option, 'Positions of PGCs', referenceLandmark);
+createSlicesPlots(accumulatorForVelocities, p.option, 'Average velocities', referenceLandmark);
 
 end
