@@ -1,14 +1,23 @@
-function createSlicesPlots(accumulator1, option, titleOfPlots,...
-    referenceLandmark)
+function convAcc = createSlicesPlots(accumulator1, option, titleOfPlots,...
+    referenceLandmark, weightingNormalizer, fig_filename )
     fprintf('Computing heatmaps...\n');
     
-    % -- Convolve over the velocities and points -- %
+    % Convolve over the velocities and points -- %
     convAcc = convolveAccumulator(accumulator1,option.cellradius,2*option.cellradius+1);
+    
+    % Normalize accumaltors
+    % -- normalization due to summation artefacts after convolution
+    convDim = 1/(2*option.cellradius +1);
+    convAcc = convDim * convAcc;
+    % -- normalization with, e.g., counted cells per voxel
+    weightingNormalizer(~weightingNormalizer)=1;
+    convAcc = convAcc ./ weightingNormalizer; 
+    
     [x_sphere,y_sphere,z_sphere] = sphere;
     
     numberOfSmallSubplots = 9;
     
-    figure('pos',[10 10 900 1100]);
+    f = figure('pos',[10 10 900 1100]);
     sp(1) = subplot(5,3,[1 2 3 4 5 6]);
     contourslice(convAcc(:,:,1:160), [],[], 0:10:160);
     title(titleOfPlots);
@@ -49,6 +58,9 @@ function createSlicesPlots(accumulator1, option, titleOfPlots,...
         colormap(sp(j), colorMapWithWhiteZero);
         caxis(sp(j), colorLimits);
     end
+    
+    % save figure
+    saveas(f, fig_filename, option.heatmaps.saveas{j});
 end
     
 function plotContourLines(V, titleOfPlot)
