@@ -104,7 +104,7 @@ accumulator = computeAccumulator(allCellCoords, p.gridSize);
 
 %% GENERATE HEATMAPS
 fig_filename_base = [p.resultsPath ,'/heatmaps/'];
-convAccPositions = createSlicesPlots(accumulator, p.option, 'Positions of PGCs', referenceLandmark, [fig_filename_base, 'PGCs_positions'], 1);
+convAccPositions = createSlicesPlots(accumulator, p.option, 'Number of PGCs', referenceLandmark, [fig_filename_base, 'PGCs_positions'], 1);
 createSlicesPlots(accumulatorForVelocities, p.option, 'Average velocities', referenceLandmark,[fig_filename_base, 'PGCs_average_velocities'], convAccPositions);
 
 end
