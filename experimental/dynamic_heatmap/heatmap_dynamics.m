@@ -92,7 +92,8 @@ end
 
 % Load first data set to get reference landmark
 load([p.resultsPathAccepted,'/',fileNames{1,1}]);
-referenceLandmark = gatheredData.registered.landmarkMIP;
+referenceLandmark.MIP = gatheredData.registered.landmarkMIP;
+referenceLandmark.coords = gatheredData.registered.landmark;
 
 %% COMPUTE ACCUMULATOR
 % -- Compute all valid cell coordinates from the processed and registered data -- %

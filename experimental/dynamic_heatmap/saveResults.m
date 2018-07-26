@@ -61,6 +61,7 @@ gatheredData.registered.DapiMIP = computeMIP(registeredData.Dapi);
 gatheredData.registered.GFPMIP = computeMIP(registeredData.GFP);
 % gatheredData.registered.mCherryMIP = computeMIP(registeredData.mCherry);
 
+gatheredData.registered.landmark = registeredData.landmark;
 gatheredData.registered.landmarkMIP = computeMIP(registeredData.landmark);
 % gatheredData.registered.cellsMIP = computeMIP(registeredData.cells);
 gatheredData.registered.cellCoordinates = registeredData.cellCoordinates;

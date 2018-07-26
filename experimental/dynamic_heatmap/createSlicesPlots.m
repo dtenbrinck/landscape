@@ -35,9 +35,15 @@ function convAcc = createSlicesPlots(accumulator, option, titleOfPlots,...
     hLabel = get(gca,'YLabel');
     set(hLabel, 'Position', get(hLabel, 'Position') + [0 50 -50], 'Units', 'pixels');
     
+    % plot reference unit sphere
     colorbar; view(-27.9, 78); hold on; 
     surf(128*x_sphere + 128, 128*y_sphere + 128, 128*z_sphere+ 128,...
     'FaceAlpha',0.1, 'FaceColor', [0.6 0.6 0.6], 'EdgeColor', 'none');
+    % plot reference landmark
+        indices = find(referenceLandmark.coords > 0);
+    [tmpy, tmpx, tmpz] = ind2sub(size(referenceLandmark.coords), indices);
+    scatter3(sp(1), tmpx, tmpy, tmpz, '.', 'MarkerEdgeColor', [0.7 0.7 0.7]);
+    
     xlabel(gca,'Head \leftarrow \rightarrow Tail','FontSize',13);
     ylabel(gca,'Right \leftarrow \rightarrow Left','FontSize',13);
     zlabel('Bottom \leftarrow \rightarrow Top','FontSize',13);
@@ -62,11 +68,14 @@ function convAcc = createSlicesPlots(accumulator, option, titleOfPlots,...
     colorMapWithWhiteZero = jet( numberOfColorBlocks );
     colorMapWithWhiteZero(1, :) = [1 1 1];
 
-    for j = 1:numberOfSmallSubplots+1
+    % add reference landmark and unify colormap
+    colormap(sp(1), colorMapWithWhiteZero);
+    caxis(sp(1), colorLimits);
+    for j = 2:numberOfSmallSubplots+1
         colormap(sp(j), colorMapWithWhiteZero);
         caxis(sp(j), colorLimits);
         hold(sp(j), 'on');
-        imagesc(sp(j), maxColormapValue*referenceLandmark, 'AlphaData', 0.1);
+        imagesc(sp(j), maxColormapValue*referenceLandmark.MIP, 'AlphaData', 0.1);
         hold(sp(j),'off');
     end
     

@@ -31,7 +31,8 @@ if strcmp(scriptType,'processing')
   p = ParameterProcessing();
   
   % Select data path
-  p.dataPath = 'D:\CiM\imaging-zebrafish\source_code\embryo_registration\experimental\dynamic_heatmap\35sets';
+%   p.dataPath = 'D:\CiM\imaging-zebrafish\source_code\embryo_registration\experimental\dynamic_heatmap\35sets';
+  p.dataPath = 'D:\CiM\imaging-zebrafish\source_code\embryo_registration\experimental\dynamic_heatmap\Lukasz';
   p.resultsPath = 'D:\CiM\imaging-zebrafish\source_code\embryo_registration\experimental\dynamic_heatmap\results';
  %%%%%%%%TODO temporarily use fix paths for data input and result files
 %   p.dataPath = uigetdir(dataPath,'Please select a folder with the data!');

@@ -113,7 +113,7 @@ for experiment=1:numberOfExperiments
             
             % DEBUG
             transformedCoordinates = rotationMatrix * landmarkCoordinates';
-            %%%%%%%%%%%%%todo rotation and transformation matrix laden!
+
             % compute registration transformation from original data space
             transformation_registration = transformationMatrix * rotationMatrix';
         end    
