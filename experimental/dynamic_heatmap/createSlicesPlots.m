@@ -1,5 +1,5 @@
 function convAcc = createSlicesPlots(accumulator, option, titleOfPlots,...
-    referenceLandmark, fig_filename, weightingNormalizer, sphere_center, sphere_radii)
+    referenceLandmark, fig_filename, weightingNormalizer )
     fprintf('Computing heatmaps...\n');
     gridSize = size(accumulator);
     zslices = [ 0:20:160];
@@ -15,6 +15,7 @@ function convAcc = createSlicesPlots(accumulator, option, titleOfPlots,...
     % replace 0 with 1 in normalizer to avoid deviding by 0!!
     weightingNormalizer(~weightingNormalizer)=1;
     convAccWeighted = convAccWeighted ./ weightingNormalizer; 
+    
     [x_sphere,y_sphere,z_sphere] = sphere;
   
     f = figure('pos',[10 10 600 1100]);
@@ -35,10 +36,8 @@ function convAcc = createSlicesPlots(accumulator, option, titleOfPlots,...
     set(hLabel, 'Position', get(hLabel, 'Position') + [0 50 -50], 'Units', 'pixels');
     
     % plot reference unit sphere
-    colorbar; view(-27.9, 78); hold on;
-    surf(sphere_radii(1)*x_sphere + sphere_center(1),...
-        sphere_radii(1)*y_sphere + sphere_center(2),...
-        sphere_radii(1)*z_sphere+ sphere_center(3),...
+    colorbar; view(-27.9, 78); hold on; 
+    surf(128*x_sphere + 128, 128*y_sphere + 128, 128*z_sphere+ 128,...
     'FaceAlpha',0.1, 'FaceColor', [0.6 0.6 0.6], 'EdgeColor', 'none');
     % plot reference landmark
         indices = find(referenceLandmark.coords > 0);

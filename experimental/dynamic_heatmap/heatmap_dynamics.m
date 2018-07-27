@@ -94,10 +94,6 @@ end
 load([p.resultsPathAccepted,'/',fileNames{1,1}]);
 referenceLandmark.MIP = gatheredData.registered.landmarkMIP;
 referenceLandmark.coords = gatheredData.registered.landmark;
-ellipsoidData = gatheredData.processed.ellipsoid;
-transformation = gatheredData.registered.transformation_full;
-sphere_center = gatheredData.registered.transformation_normalization * ellipsoidData.center; 
-sphere_radii = gatheredData.registered.transformation_rotation * ellipsoidData.radii;
 
 %% COMPUTE ACCUMULATOR
 % -- Compute all valid cell coordinates from the processed and registered data -- %
@@ -109,9 +105,7 @@ accumulator = computeAccumulator(allCellCoords, p.gridSize);
 
 %% GENERATE HEATMAPS
 fig_filename_base = [p.resultsPath ,'/heatmaps/'];
-convAccPositions = createSlicesPlots(accumulator, p.option, 'Number of PGCs', ...
-    referenceLandmark, [fig_filename_base, 'PGCs_positions'], 1, sphere_center, sphere_radii);
-createSlicesPlots(accumulatorForVelocities, p.option, 'Average velocities', ...
-    referenceLandmark,[fig_filename_base, 'PGCs_average_velocities'], convAccPositions, sphere_center, sphere_radii);
+convAccPositions = createSlicesPlots(accumulator, p.option, 'Number of PGCs', referenceLandmark, [fig_filename_base, 'PGCs_positions'], 1);
+createSlicesPlots(accumulatorForVelocities, p.option, 'Average velocities', referenceLandmark,[fig_filename_base, 'PGCs_average_velocities'], convAccPositions);
 
 end
