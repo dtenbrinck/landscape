@@ -15,8 +15,6 @@ function convAcc = createSlicesPlots(accumulator, option, titleOfPlots,...
     % replace 0 with 1 in normalizer to avoid deviding by 0!!
     weightingNormalizer(~weightingNormalizer)=1;
     convAccWeighted = convAccWeighted ./ weightingNormalizer; 
-    
-    [x_sphere,y_sphere,z_sphere] = sphere;
   
     f = figure('pos',[10 10 600 1100]);
     sp(1) = subplot(6,2,[1 2 3 4]);
@@ -27,27 +25,27 @@ function convAcc = createSlicesPlots(accumulator, option, titleOfPlots,...
     xlim([0 gridSize(1)]); ylim([0 gridSize(2)]); zlim([0, gridSize(3)]);
     
     % get same orientation as in microscopy and following heatmap subplots
+    colorbar; view(-30, 80); hold on;
     set(gca,'Zdir','reverse'); 
     set(gca,'Ydir','reverse');
     set(gca,'xtick',[],'ytick',[], 'ztick', []);
+    xlabel(gca,'Head \leftarrow \rightarrow Tail','FontSize',13);
+    ylabel(gca,'Right \leftarrow \rightarrow Left','FontSize',13);
+    zlabel('Bottom \leftarrow \rightarrow Top','FontSize',13);
     hLabel = get(gca,'XLabel');
-    set(hLabel, 'Position', get(hLabel, 'Position') + [50 0 -50], 'Units', 'pixels');
+    set(hLabel, 'Position', [130 280 260]);
     hLabel = get(gca,'YLabel');
-    set(hLabel, 'Position', get(hLabel, 'Position') + [0 50 -50], 'Units', 'pixels');
+    set(hLabel, 'Position', [-50 110 260]);  
     
-    % plot reference unit sphere
-    colorbar; view(-27.9, 78); hold on; 
+    % plot reference unit sphere 
+    [x_sphere,y_sphere,z_sphere] = sphere;
     surf(128*x_sphere + 128, 128*y_sphere + 128, 128*z_sphere+ 128,...
     'FaceAlpha',0.1, 'FaceColor', [0.6 0.6 0.6], 'EdgeColor', 'none');
     % plot reference landmark
         indices = find(referenceLandmark.coords > 0);
     [tmpy, tmpx, tmpz] = ind2sub(size(referenceLandmark.coords), indices);
     scatter3(sp(1), tmpx, tmpy, tmpz, '.', 'MarkerEdgeColor', [0.7 0.7 0.7]);
-    
-    xlabel(gca,'Head \leftarrow \rightarrow Tail','FontSize',13);
-    ylabel(gca,'Right \leftarrow \rightarrow Left','FontSize',13);
-    zlabel('Bottom \leftarrow \rightarrow Top','FontSize',13);
-    
+
     minColormapInterval = 1;
     zslices(1) = 1;    
     numberOfSmallSubplots = 8;
