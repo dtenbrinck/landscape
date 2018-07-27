@@ -32,19 +32,19 @@ if strcmp(scriptType,'processing')
   
   % Select data path
 %   p.dataPath = 'D:\CiM\imaging-zebrafish\source_code\embryo_registration\experimental\dynamic_heatmap\35sets';
-  p.dataPath = 'D:\CiM\imaging-zebrafish\source_code\embryo_registration\experimental\dynamic_heatmap\Lukasz';
-  p.resultsPath = 'D:\CiM\imaging-zebrafish\source_code\embryo_registration\experimental\dynamic_heatmap\results';
+%   p.dataPath = 'D:\CiM\imaging-zebrafish\source_code\embryo_registration\experimental\dynamic_heatmap\Lukasz';
+%   p.resultsPath = 'D:\CiM\imaging-zebrafish\source_code\embryo_registration\experimental\dynamic_heatmap\results';
  %%%%%%%%TODO temporarily use fix paths for data input and result files
-%   p.dataPath = uigetdir(dataPath,'Please select a folder with the data!');
-%   btn = questdlg('Do you want to use an existing results folder or create a new one?','New folder?','Create new','Use existing','Create new');
-%   if strcmp(btn,'Create new')
-%     p.resultsPath = uigetdir(resultsPath,'Please select a directory for the new folder!');
-%     answ = inputdlg('Enter a name for the new folder!');
-%     p.resultsPath = [p.resultsPath,'/',answ{1}];
-%     mkdir(p.resultsPath);
-%   else
-%     p.resultsPath = uigetdir(resultsPath,'Please select a folder for the results!');  
-  
+  p.dataPath = uigetdir(dataPath,'Please select a folder with the data!');
+  btn = questdlg('Do you want to use an existing results folder or create a new one?','New folder?','Create new','Use existing','Create new');
+  if strcmp(btn,'Create new')
+    p.resultsPath = uigetdir(resultsPath,'Please select a directory for the new folder!');
+    answ = inputdlg('Enter a name for the new folder!');
+    p.resultsPath = [p.resultsPath,'/',answ{1}];
+    mkdir(p.resultsPath);
+  else
+    p.resultsPath = uigetdir(resultsPath,'Please select a folder for the results!');  
+  end 
 elseif strcmp(scriptType,'evaluate')
   resultsPath = uigetdir(resultsPath,'Please select a results folder to evaluate!');
   checkDirectory(resultsPath);
