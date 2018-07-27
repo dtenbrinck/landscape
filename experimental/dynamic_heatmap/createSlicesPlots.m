@@ -2,7 +2,7 @@ function convAcc = createSlicesPlots(accumulator, option, titleOfPlots,...
     referenceLandmark, fig_filename, weightingNormalizer )
     fprintf('Computing heatmaps...\n');
     gridSize = size(accumulator);
-    zslices = [ 0:20:160];
+    zslices = 0:20:160;
     
     % Convolve over the velocities and points -- %
     convAcc = convolveAccumulator(accumulator,option.cellradius,2*option.cellradius+1);
@@ -21,6 +21,7 @@ function convAcc = createSlicesPlots(accumulator, option, titleOfPlots,...
     contourslice(convAccWeighted(:,:,1:160), [],[], zslices);
     colorLimits = caxis;
     maxColormapValue = colorLimits(2);
+    minColormapIntervalLength = min (1, abs(colorLimits(1)));
     title(titleOfPlots);
     xlim([0 gridSize(1)]); ylim([0 gridSize(2)]); zlim([0, gridSize(3)]);
     
@@ -46,7 +47,6 @@ function convAcc = createSlicesPlots(accumulator, option, titleOfPlots,...
     [tmpy, tmpx, tmpz] = ind2sub(size(referenceLandmark.coords), indices);
     scatter3(sp(1), tmpx, tmpy, tmpz, '.', 'MarkerEdgeColor', [0.7 0.7 0.7]);
 
-    minColormapInterval = 1;
     zslices(1) = 1;    
     numberOfSmallSubplots = 8;
     for i=1:numberOfSmallSubplots
@@ -56,8 +56,10 @@ function convAcc = createSlicesPlots(accumulator, option, titleOfPlots,...
             [num2str(zslices(i)) ' - ' num2str(zslices(i+1)) ' px Top \rightarrow Bottom']);
           
         % keep information for later colormap generation
-        minColormapIntervalLength = min( minColormapInterval,...
+        if (~isempty(heatmapData(heatmapData>0)))
+        minColormapIntervalLength = min( minColormapIntervalLength,...
             min(heatmapData(heatmapData>0) ) );
+        end
         colorLimits = caxis;
         maxColormapValue = max( maxColormapValue, colorLimits(2) );
     end
@@ -65,7 +67,7 @@ function convAcc = createSlicesPlots(accumulator, option, titleOfPlots,...
     numberOfColorBlocks = ceil(maxColormapValue / minColormapIntervalLength);
     colorMapWithWhiteZero = jet( numberOfColorBlocks );
     colorMapWithWhiteZero(1, :) = [1 1 1];
-
+    colorLimits = [0; maxColormapValue];
     % add reference landmark and unify colormap
     colormap(sp(1), colorMapWithWhiteZero);
     caxis(sp(1), colorLimits);
