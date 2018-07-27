@@ -2,7 +2,7 @@ function convAcc = createSlicesPlots(accumulator, option, titleOfPlots,...
     referenceLandmark, fig_filename, weightingNormalizer )
     fprintf('Computing heatmaps...\n');
     gridSize = size(accumulator);
-    zslices = 0:20:160;
+    
     
     % Convolve over the velocities and points -- %
     convAcc = convolveAccumulator(accumulator,option.cellradius,2*option.cellradius+1);
@@ -18,7 +18,10 @@ function convAcc = createSlicesPlots(accumulator, option, titleOfPlots,...
   
     f = figure('pos',[10 10 600 1100]);
     sp(1) = subplot(6,2,[1 2 3 4]);
-    contourslice(convAccWeighted(:,:,1:160), [],[], zslices);
+    % use cell radius +1 for contour slices thickness to avoid neglecting 
+    % some cells in this presentation
+    zslicesContourPlot = 0:(option.cellradius +1):160;
+    contourslice(convAccWeighted(:,:,1:160), [],[], zslicesContourPlot);
     colorLimits = caxis;
     maxColormapValue = colorLimits(2);
     minColormapIntervalLength = min (1, abs(colorLimits(1)));
@@ -47,7 +50,7 @@ function convAcc = createSlicesPlots(accumulator, option, titleOfPlots,...
     [tmpy, tmpx, tmpz] = ind2sub(size(referenceLandmark.coords), indices);
     scatter3(sp(1), tmpx, tmpy, tmpz, '.', 'MarkerEdgeColor', [0.7 0.7 0.7]);
 
-    zslices(1) = 1;    
+    zslices = 0:20:160; zslices(1) = 1;    
     numberOfSmallSubplots = 8;
     for i=1:numberOfSmallSubplots
         sp(i+1) = subplot(6,2, 4+i);
