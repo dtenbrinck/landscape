@@ -48,7 +48,7 @@ load([p.resultsPathAccepted,'/',fileNames{1,1}]);
 allCellCoords = getAllValidCellCoords(p.gridSize,fileNames,numberOfResults,p.tole,p.resultsPathAccepted);
 
 % -- Compute the Accumulator from the cell coordinates -- %
-accumulator = computeAccumulatorWithVelocities(allCellCoords, p.gridSize);
+accumulator = computeAccumulator(allCellCoords, p.gridSize);
 
 
 %% HANDLE HEATMAPS ( Computation, drawing and saving ) 
