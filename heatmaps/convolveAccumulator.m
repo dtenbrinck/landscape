@@ -5,7 +5,7 @@ function convAcc = convolveAccumulator(accumulator,radius,sizeGrid)
 %% MAIN CODE
 if radius>0
     [xx,yy,zz] = meshgrid(1:sizeGrid,1:sizeGrid,1:sizeGrid);
-    NHMat = ...
+    NHMat = ... % neighbourhood matrix / matrix for convolution kernel
         (sqrt((xx-radius-1).^2+(yy-radius-1).^2+(zz-radius-1).^2))<=radius;
     convAcc = convn(accumulator,NHMat,'same');
 elseif radius == 0
