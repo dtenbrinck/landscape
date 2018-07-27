@@ -30,17 +30,14 @@ for trackedCellNo = 1:numberOfCells
     
     cellCoordinates(:,nextColumnIndexToInsert+1:nextColumnIndexToInsert...
         +numberOfTrackedFrames) = (cellsFrames(:,positionPGC))';
-    
-    cellVelocities(1,nextColumnIndexToInsert+1:nextColumnIndexToInsert...
-        +numberOfTrackedFrames) = vecnorm(cellsFrames(:,velocityPGC) - cellsFrames(:, velocityNearestSomaticCell), 2, 2); 
-    
-    nextColumnIndexToInsert = nextColumnIndexToInsert + numberOfTrackedFrames;
-
+   
+    velocitiesMatrix = cellsFrames(:,velocityPGC) - cellsFrames(:, velocityNearestSomaticCell);
     for row = 1:numberOfTrackedFrames
         timestep = cellsFrames(row,1);
         coordinatesPerTimeStep{timestep} = [coordinatesPerTimeStep{timestep}, cellsFrames(row,positionPGC)'];
+        cellVelocities(1,nextColumnIndexToInsert+row) = norm(velocitiesMatrix(row,:));
     end
-    
+    nextColumnIndexToInsert = nextColumnIndexToInsert + numberOfTrackedFrames;
 end
 
 cellCoordinates( :, all(~cellCoordinates,1) ) = [];
