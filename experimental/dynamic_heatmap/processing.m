@@ -22,6 +22,7 @@ checkDirectory(p.resultsPath);
 
 % get filenames of STK files in selected folder
 fileNames = getSTKfilenames(p.dataPath);
+fileNamesCorrectedTracks = getMATtracks(p.dataPath);
 
 % extract only valid experiments with three data sets
 allValidExperiments = checkExperimentChannels(fileNames);
@@ -61,7 +62,7 @@ for experiment=1:numberOfExperiments
         experimentData = experimentData.Data_1;
 
         if ( readOldResults > 0 )
-            load("results\SD10_" + experiment + "_BFP_raw_results.mat");
+            load(['results\SD10_' , num2str( experiment ), '_BFP_raw_results.mat']);
             ellipsoid = gatheredData.processed.ellipsoid;
             transformation_registration = gatheredData.registered.transformation_full;
         else
@@ -119,7 +120,7 @@ for experiment=1:numberOfExperiments
         end    
         
         % evaluate PGC velocities
-        load("Lukasz\SD10_" + experiment + "_corrected_k6.mat");
+        load([p.dataPath,'/', fileNamesCorrectedTracks{experiment}]);
 %         load("Lukasz\SD10_" + experiment + "_validationTest.mat");
         if p.debug_level >= 1; disp('Consider PGC velocities from tracking info...'); end
         [processedData.dynamic.cellCoordinates, ...
