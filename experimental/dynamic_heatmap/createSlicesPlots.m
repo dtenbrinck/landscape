@@ -16,51 +16,31 @@ function convAcc = createSlicesPlots(accumulator, option, titleOfPlots,...
     weightingNormalizer(~weightingNormalizer)=1;
     convAccWeighted = convAccWeighted ./ weightingNormalizer; 
   
-    f = figure('pos',[10 10 600 1100]);
-    sp(1) = subplot(6,2,[1 2 3 4]);
-    % use cell radius +1 for contour slices thickness to avoid neglecting 
-    % some cells in this presentation
-    zslicesContourPlot = 0:(option.cellradius +1):160;
-    contourslice(convAccWeighted(:,:,1:160), [],[], zslicesContourPlot);
-    colorLimits = caxis;
-    maxColormapValue = colorLimits(2);
-    minColormapIntervalLength = min (1, abs(colorLimits(1)));
-    title(titleOfPlots);
-    xlim([0 gridSize(1)]); ylim([0 gridSize(2)]); zlim([0, gridSize(3)]);
-    
-    % get same orientation as in microscopy and following heatmap subplots
-    colorbar; view(-30, 80); hold on;
-    set(gca,'Zdir','reverse'); 
-    set(gca,'Ydir','reverse');
-    set(gca,'xtick',[],'ytick',[], 'ztick', []);
-    xlabel(gca,'Head \leftarrow \rightarrow Tail','FontSize',13);
-    ylabel(gca,'Right \leftarrow \rightarrow Left','FontSize',13);
-    zlabel('Bottom \leftarrow \rightarrow Top','FontSize',13);
-    hLabel = get(gca,'XLabel');
-    set(hLabel, 'Position', [130 280 260]);
-    hLabel = get(gca,'YLabel');
-    set(hLabel, 'Position', [-50 110 260]);  
-    
-    % plot reference unit sphere 
-    [x_sphere,y_sphere,z_sphere] = sphere;
-    surf(128*x_sphere + 128, 128*y_sphere + 128, 128*z_sphere+ 128,...
-    'FaceAlpha',0.1, 'FaceColor', [0.6 0.6 0.6], 'EdgeColor', 'none');
-    % plot reference landmark
-        indices = find(referenceLandmark.coords > 0);
-    [tmpy, tmpx, tmpz] = ind2sub(size(referenceLandmark.coords), indices);
-    scatter3(sp(1), tmpx, tmpy, tmpz, '.', 'MarkerEdgeColor', [0.7 0.7 0.7]);
+    f = figure('pos',[10 10 600 750], 'Name', titleOfPlots);
 
     zslices = 0:20:160; zslices(1) = 1;    
     numberOfSmallSubplots = 8;
+    maxColormapValue = 0;
+    minColormapIntervalLength = 1;
     for i=1:numberOfSmallSubplots
-        sp(i+1) = subplot(6,2, 4+i);
+        sp(i) = subplot(4,2,i);
+        % plot heatmap
         heatmapData = sum(convAccWeighted(:,:,zslices(i):zslices(i+1)),3);
         plotSingleHeatmap(heatmapData, ...
             [num2str(zslices(i)) ' - ' num2str(zslices(i+1)) ' px Top \rightarrow Bottom']);
-          
+        
+        landmarkSlicePart = sum(referenceLandmark.coords(:,:,zslices(i):zslices(i+1)),3);
+        hold (sp(i), 'on');
+        % plot reference landmark
+        indices = find(landmarkSlicePart > 0);
+        [tmpy, tmpx] = ind2sub(size(landmarkSlicePart), indices);
+        s =scatter(sp(i), tmpx, tmpy, 1, 'filled', 'MarkerEdgeColor', [0.7 0.7 0.7]);
+        alpha(s, 0.3);
+        contour ( sp(i), referenceLandmark.MIP > 0, 2, 'color', [0.4 0.4 0.4]);
+        hold(sp(i), 'off');  
         % keep information for later colormap generation
         if (~isempty(heatmapData(heatmapData>0)))
-        minColormapIntervalLength = min( minColormapIntervalLength,...
+            minColormapIntervalLength = min( minColormapIntervalLength,...
             min(heatmapData(heatmapData>0) ) );
         end
         colorLimits = caxis;
@@ -70,16 +50,21 @@ function convAcc = createSlicesPlots(accumulator, option, titleOfPlots,...
     numberOfColorBlocks = ceil(maxColormapValue / minColormapIntervalLength);
     colorMapWithWhiteZero = jet( numberOfColorBlocks );
     colorMapWithWhiteZero(1, :) = [1 1 1];
+    
+    % colormap from white to blue
+    cMin = [1 1 1];
+    cMax = [0 0 1];
+    cMap = zeros(numberOfColorBlocks,3);
+    for i = 1:numberOfColorBlocks
+        cMap(i,:) = cMin*(numberOfColorBlocks - i)/(numberOfColorBlocks - 1) + cMax*(i - 1)/(numberOfColorBlocks - 1);
+    end
+
     colorLimits = [0; maxColormapValue];
-    % add reference landmark and unify colormap
-    colormap(sp(1), colorMapWithWhiteZero);
-    caxis(sp(1), colorLimits);
-    for j = 2:numberOfSmallSubplots+1
-        colormap(sp(j), colorMapWithWhiteZero);
+    for j = 1:numberOfSmallSubplots
+        colormap(sp(j), colormap(cMap));
         caxis(sp(j), colorLimits);
-        hold(sp(j), 'on');
-        imagesc(sp(j), maxColormapValue*referenceLandmark.MIP, 'AlphaData', 0.1);
-        hold(sp(j),'off');
+        hcb = colorbar(sp(j));
+        hcb.Label.String = titleOfPlots;
     end
     
     % save figure
