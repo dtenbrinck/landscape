@@ -11,5 +11,5 @@ commands.txt
 *.asv
 *.mat
 /experimental/ellipsoid_fitting/initializeScript.m
-/experimental/dynamic_heatmap/Lukasz/*
-/experimental/dynamic_heatmap/35sets/*
+/experimental/dynamic_heatmap_Ramona/Lukasz/*
+/experimental/dynamic_heatmap_Ramona/35sets/*
