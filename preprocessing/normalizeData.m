@@ -16,10 +16,11 @@ if isstruct(data)
   GFP = normalized.GFP;
   normalized.GFP = ( GFP - min(GFP(:)) ) / ( max(GFP(:)) - min(GFP(:)) ) * maxi;
   
-  % normalize mCherry channel
-  mCherry = normalized.mCherry;
-  normalized.mCherry = ( mCherry - min(mCherry(:)) ) / ( max(mCherry(:)) - min(mCherry(:)) ) * maxi;
-  
+  if isfield(normalized,'mCherry')
+      % normalize mCherry channel
+      mCherry = normalized.mCherry;
+      normalized.mCherry = ( mCherry - min(mCherry(:)) ) / ( max(mCherry(:)) - min(mCherry(:)) ) * maxi;
+  end
 % otherwise we assume we normalize only one channel
 else
   
