@@ -66,24 +66,38 @@ elseif strcmp(scriptType,'evaluate')
     p = ParameterProcessing();
   end
   p.resultsPath = resultsPath;
-elseif strcmp(scriptType,'heatmap')
-  resultsPath = uigetdir(resultsPath,'Please select a results folder to generate heatmap!');
-  if exist([resultsPath,'/accepted/ParameterProcessing.mat'],'file') == 2
-    load([resultsPath,'/accepted/ParameterProcessing.mat']);
-  else
-    p = ParameterProcessing();
-  end
-  p.resultsPath = resultsPath;
-  p_heat = ParameterHeatmap();
-  merge = [fieldnames(p)', fieldnames(p_heat)';...
-    struct2cell(p)',struct2cell(p_heat)'];
-  p = struct(merge{:});
-  p.resultsPathAccepted = [p.resultsPath,'/accepted'];
-  save([p.resultsPath,'/accepted/ParameterHeatmap.mat'],'p_heat');
+elseif strcmp(scriptType,'static_heatmap')
+    resultsPath = uigetdir(resultsPath,'Please select a results folder to generate heatmap!');
+    if exist([resultsPath,'/accepted/ParameterProcessing.mat'],'file') == 2
+        load([resultsPath,'/accepted/ParameterProcessing.mat']);
+    else
+        p = ParameterProcessing();
+    end
+    p.resultsPath = resultsPath;
+    p_heat = ParameterHeatmap();
+    merge = [fieldnames(p)', fieldnames(p_heat)';...
+        struct2cell(p)',struct2cell(p_heat)'];
+    p = struct(merge{:});
+    p.resultsPathAccepted = [p.resultsPath,'/accepted'];
+    save([p.resultsPath,'/accepted/ParameterHeatmap.mat'],'p_heat');
+    
+    if ~exist([p.resultsPath,'/heatmaps'],'dir')
+        mkdir([p.resultsPath,'/heatmaps']);
+    end
   
-  if ~exist([p.resultsPath,'/heatmaps'],'dir')
-    mkdir([p.resultsPath,'/heatmaps']);
-  end
+elseif strcmp(scriptType,'dynamic_heatmap')
+    resultsPath = uigetdir(resultsPath,'Please select a results folder to generate heatmap!');
+    p.resultsPath = resultsPath;
+    p_heat = ParameterHeatmap();
+    merge = [fieldnames(p)', fieldnames(p_heat)';...
+        struct2cell(p)',struct2cell(p_heat)'];
+    p = struct(merge{:});
+    p.resultsPathAccepted = p.resultsPath;
+    save([p.resultsPath,'/ParameterHeatmap.mat'],'p_heat');
+    
+    if ~exist([p.resultsPath,'/heatmaps'],'dir')
+        mkdir([p.resultsPath,'/heatmaps']);
+    end
   
 elseif strcmp(scriptType,'heatmapComparison')
   
