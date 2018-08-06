@@ -48,7 +48,7 @@ referenceLandmark = computeReferenceLandmark(fileNames,numberOfResults, p.result
 
 %% COMPUTE ACCUMULATOR
 % -- Compute all valid cell coordinates from the processed and registered data -- %
-[ allCellCoords, allCellVelocities]  = getAllValidCellCoords(p.gridSize,fileNames,numberOfResults,p.tole,p.resultsPathAccepted);
+[ allCellCoords, allCellVelocities]  = getAllValidDynamicCellData(p.gridSize,fileNames,numberOfResults,p.tole,p.resultsPathAccepted);
 
 % -- Compute the accumulators from the cell coordinates and for the velocities -- %
 accumulatorForVelocities = computeAccumulatorWithVelocities(allCellCoords, p.gridSize, allCellVelocities);

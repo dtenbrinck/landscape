@@ -20,10 +20,10 @@ checkDirectory(p.resultsPath);
 
 % get filenames of STK files in selected folder
 fileNames = getStkOrTifFilenames(p.dataPath);
-fileNamesCorrectedTracks = getMATtracks(p.dataPath);
+fileNamesCorrectedTracks = getMATtracks_corrected(p.dataPath);
 
 % extract only valid experiments with three data sets
-allValidExperiments = checkExperimentChannels(fileNames);
+allValidExperiments = checkExperimentChannelsWithoutMCherry(fileNames);
 
 % get number of experiments
 numberOfExperiments = size(allValidExperiments,1);

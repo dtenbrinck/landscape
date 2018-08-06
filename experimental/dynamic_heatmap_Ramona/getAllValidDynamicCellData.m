@@ -1,4 +1,4 @@
-function [ allCellCoords, allCellVelocities] = getAllValidCellCoords(sizeAcc,fileNames,numberOfResults,tole,resultsPathAccepted)
+function [ allCellCoords, allCellSpeedValues] = getAllValidDynamicCellData(sizeAcc,fileNames,numberOfResults,tole,resultsPathAccepted)
 % This function computes the valid cell coordinates for the heatmap.
 % This will be done in multiple steps:
 % 1. load and gather all cell coordinates.
@@ -11,7 +11,7 @@ function [ allCellCoords, allCellVelocities] = getAllValidCellCoords(sizeAcc,fil
 % -- 0. Step --%
 % Initialize all coordinates of cell centers
 allCellCoords = double.empty(3,0);
-allCellVelocities = double.empty(1,0);
+allCellSpeedValues = double.empty(1,0);
 
 % -- 1. Step --%
 for result = 1:numberOfResults
@@ -20,14 +20,14 @@ for result = 1:numberOfResults
     
     % Get all cell center coordinates
     allCellCoords = horzcat(allCellCoords, gatheredData.registered.cellCoordinates);
-    allCellVelocities = horzcat(allCellVelocities, gatheredData.processed.dynamic.cellVelocities);
+    allCellSpeedValues = horzcat(allCellSpeedValues, gatheredData.processed.dynamic.cellVelocities);
 end
 
 % -- 2. Step --%
 % Ignore all that are out of the domain
 indices = find(sum(abs(allCellCoords)>1)>=1); 
 allCellCoords(:,indices) = [];
-allCellVelocities(:,indices) = [];
+allCellSpeedValues(:,indices) = [];
 
 % -- 3. Step --%
 % Compute norm of each column
@@ -36,7 +36,7 @@ normOfCoordinates = sqrt(sum(allCellCoords.^2,1));
 % Ignore all coordinates outside the sphere with a tolerance tole
 indices = find(normOfCoordinates > 1+tole); 
 allCellCoords(:,indices) = [];
-allCellVelocities(:,indices) = [];
+allCellSpeedValues(:,indices) = [];
 normOfCoordinates(:,indices) = [];
 
 % -- 4. Step --%
