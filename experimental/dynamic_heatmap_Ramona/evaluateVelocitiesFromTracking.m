@@ -1,4 +1,4 @@
-function [cellCoordinates, cellVelocities, coordinatesPerTimeStep] = evaluateVelocitiesFromTracking(tracks_PGC)
+function [cellCoordinates, cellVelocities] = evaluateVelocitiesFromTracking(tracks_PGC)
 
 % we calculate the mean velocities in the embryo domain by adding all
 % absolute velocities of each cell in the corresponding location in the
@@ -21,7 +21,6 @@ velocityPGC = 9:11;
 % allocate matrices for return values
 cellCoordinates = zeros(3,numberOfCells * maxNumberOfTimeframes);
 cellVelocities = zeros(1,numberOfCells * maxNumberOfTimeframes);
-coordinatesPerTimeStep{maxNumberOfTimeframes} = [];
 
 nextColumnIndexToInsert=0;
 for trackedCellNo = 1:numberOfCells
@@ -33,8 +32,6 @@ for trackedCellNo = 1:numberOfCells
    
     velocitiesMatrix = cellsFrames(:,velocityPGC) - cellsFrames(:, velocityNearestSomaticCell);
     for row = 1:numberOfTrackedFrames
-        timestep = cellsFrames(row,1);
-        coordinatesPerTimeStep{timestep} = [coordinatesPerTimeStep{timestep}, cellsFrames(row,positionPGC)'];
         cellVelocities(1,nextColumnIndexToInsert+row) = norm(velocitiesMatrix(row,:));
     end
     nextColumnIndexToInsert = nextColumnIndexToInsert + numberOfTrackedFrames;

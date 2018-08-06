@@ -37,13 +37,6 @@ elseif isfield(processedData, 'dynamic')
     % Moreover, we do not scale with the resolution parameter as we did not
     % scale the coordinates from the original data either.
     registeredData.cellCoordinates = transformCoordinates(processedData.dynamic.cellCoordinates', ellipsoid.center, registrationMatrix^-1, [0; 0; 0]);
-    numberOfFrames = numel(processedData.dynamic.coordinatesPerTimeStepExp);
-    registeredData.dynamic.coordinatesPerTimeStepExp{numberOfFrames} = [];
-    for timestep = 1:numberOfFrames
-        if (~isempty(processedData.dynamic.coordinatesPerTimeStepExp{timestep}))
-        registeredData.dynamic.coordinatesPerTimeStepExp{timestep} = transformCoordinates(processedData.dynamic.coordinatesPerTimeStepExp{timestep}', ellipsoid.center, registrationMatrix^-1, [0; 0; 0]);
-        end 
-    end
 end
 
 end

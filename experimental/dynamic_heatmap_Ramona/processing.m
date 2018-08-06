@@ -13,10 +13,8 @@ p = initializeScript('processing', root_dir);
 % manual set resolution parameter
 manRes = [0,0,0];
 
-
 %% PREPARE RESULTS DIRECTORY
 checkDirectory(p.resultsPath);
-
 
 %% LOAD DATA
 
@@ -36,10 +34,6 @@ p.resolution(1:2) = p.resolution(1:2) / p.scale;
 %% MAIN LOOP
 
 fprintf(['Processing dataset: (0,' num2str(numberOfExperiments) ')']); 
-maxNumberOfTimeFrames=20;
-dynamicPGCdata.coords{maxNumberOfTimeFrames} = []; 
-numberOfFoundCellsPerTimeStep = zeros(1,maxNumberOfTimeFrames);
-
 readOldResults = 0;
 
 % process all existing data sequentially
@@ -121,21 +115,14 @@ for experiment=1:numberOfExperiments
         
         % evaluate PGC velocities
         load([p.dataPath,'/', fileNamesCorrectedTracks{experiment}]);
-%         load("Lukasz\SD10_" + experiment + "_validationTest.mat");
         if p.debug_level >= 1; disp('Consider PGC velocities from tracking info...'); end
         [processedData.dynamic.cellCoordinates, ...
-            processedData.dynamic.cellVelocities, ...
-            processedData.dynamic.coordinatesPerTimeStepExp] ...
+            processedData.dynamic.cellVelocities] ...
             = evaluateVelocitiesFromTracking(tracks_PGC);
         
         % register data
         if p.debug_level >= 1; disp('Registering data...'); end
         registeredData = registerData( processedData, p.resolution, transformation_registration, ellipsoid, p.samples_cube);
-       
-        for timestep=1:maxNumberOfTimeFrames
-            dynamicPGCdata.coords{timestep} = horzcat(dynamicPGCdata.coords{timestep}, registeredData.dynamic.coordinatesPerTimeStepExp{timestep});
-            numberOfFoundCellsPerTimeStep(1,timestep) = size(dynamicPGCdata.coords{timestep},2);
-        end
         
         % create filename to save results
         results_filename = [p.resultsPath '/' experimentData.filename '_results.mat'];
@@ -167,8 +154,6 @@ for experiment=1:numberOfExperiments
         
     end
 end
-dynamicPGCdata.maxNumberCellsPerTimeStep = max(numberOfFoundCellsPerTimeStep);
-save([p.resultsPath '/dynamicPGCdata_results.mat'],'dynamicPGCdata');
 
 % Save parameters
 save([p.resultsPath '/accepted/ParameterProcessing.mat'],'p');
