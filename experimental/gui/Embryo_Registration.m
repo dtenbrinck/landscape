@@ -134,7 +134,7 @@ pathName = uigetdir(dataPath,'Please select a folder with the data!');
 handles.PathName = pathName;
 
 % get filenames of STK files in selected folder
-fileNames = getSTKfilenames( pathName );
+fileNames = getStkOrTifFilenames( pathName );
 
 % check if any stk files have been found in selected folder
 if size(fileNames,1) == 0
