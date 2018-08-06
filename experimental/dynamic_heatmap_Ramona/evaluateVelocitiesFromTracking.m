@@ -30,6 +30,8 @@ for trackedCellNo = 1:numberOfCells
     cellCoordinates(:,nextColumnIndexToInsert+1:nextColumnIndexToInsert...
         +numberOfTrackedFrames) = (cellsFrames(:,positionPGC))';
    
+    % compute net velocity by subtracting averaged somatic flow velocity of
+    % surrounding somatic cells
     velocitiesMatrix = cellsFrames(:,velocityPGC) - cellsFrames(:, velocityNearestSomaticCell);
     for row = 1:numberOfTrackedFrames
         cellVelocities(1,nextColumnIndexToInsert+row) = norm(velocitiesMatrix(row,:));
