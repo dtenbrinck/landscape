@@ -1,3 +1,6 @@
 remarks about duplicated files in this folder
 
 - ParameterProcessing needed because it includes information for embryo estimation which is currently not yet included on the main folder
+
+
+x_resolution not needed?!?! in rescale noch drin
