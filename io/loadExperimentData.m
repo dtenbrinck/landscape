@@ -34,11 +34,12 @@ for i=1:numOfData
       = single(reshape(cell2mat({TIFF(:).('data')}),TIFF(1).('height'),TIFF(1).('width'),size(TIFF,2)));
     
     % read mCherry data set from tiff file into struct
-    pathFile = [dataPathName,'/',char(experimentSets{i,3})];
-    TIFF = tiffread(pathFile);
-    data.(dataName).mCherry ...
-      = single(reshape(cell2mat({TIFF(:).('data')}),TIFF(1).('height'),TIFF(1).('width'),size(TIFF,2)));
-    
+    if isfield(data.(dataName) , 'mCherry')
+        pathFile = [dataPathName,'/',char(experimentSets{i,3})];
+        TIFF = tiffread(pathFile);
+        data.(dataName).mCherry ...
+          = single(reshape(cell2mat({TIFF(:).('data')}),TIFF(1).('height'),TIFF(1).('width'),size(TIFF,2)));
+    end
     
     % TODO: Check if all data sets have same size!
     
@@ -50,7 +51,7 @@ for i=1:numOfData
     warning(['Some error occured while reading the TIFF file!', ...
       '\n this file will be skipped!\n The error',...
       ' message was: ',ME.message]);
-    rmfield(data,dataName);
+    data = rmfield(data,dataName);
     continue;
   end
   if exist('waitbarHandle','var')
@@ -59,7 +60,6 @@ for i=1:numOfData
     drawnow;
   end
 end
-
 
 end
 
