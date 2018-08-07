@@ -12,3 +12,6 @@ root_dir = pwd;
 moreover:
 remove the "readoldresults" optionality from processing_dynamics
 it is only implemented to avoid long data processing from "static" data when the implementation for dynamic data should be tested anyway
+
+
+problem with getSTKfilenames.m

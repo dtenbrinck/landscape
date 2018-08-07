@@ -112,7 +112,7 @@ for experiment=1:numberOfExperiments
             processedData.dynamic.cellVelocities] ...
             = evaluateVelocitiesFromTracking(tracks_PGC);
         
-        %%% TODO implement like Daniel a SANITY CHECK: Check if velocity is distance / deltaT
+        %%% TODO sasser implement like Daniel a SANITY CHECK: Check if velocity is distance / deltaT
         
         % register data
         if p.debug_level >= 1; disp('Registering data...'); end
