@@ -14,14 +14,23 @@ if isstruct(data)
                             ceil(scale * size(data.Dapi,2)),...
                                          size(data.Dapi,3));
   resized_data.GFP      = resized_data.Dapi;
-  resized_data.mCherry  = resized_data.Dapi;
   
-  % Rescale data for higher processing speed using trilinear interpolation
+  % Include mCherry channel if needed
+  if isfield(data, 'mCherry')
+    % same initialization
+    resized_data.mCherry  = resized_data.Dapi;
+    % Rescale mCherry data for higher processing speed using trilinear interpolation
+    for i=1:size(data.Dapi,3)
+        resized_data.mCherry(:,:,i) = imresize(data.mCherry(:,:,i), scale, method);
+    end
+  end
+  
+  % Rescale Dapi and GFP data for higher processing speed using trilinear interpolation
   for i=1:size(data.Dapi,3)
     resized_data.Dapi(:,:,i)    = imresize(data.Dapi(:,:,i), scale, method);
     resized_data.GFP(:,:,i)     = imresize(data.GFP(:,:,i), scale, method);
-    resized_data.mCherry(:,:,i) = imresize(data.mCherry(:,:,i), scale, method);
   end
+
   
 else % otherwise rescale data directly
   

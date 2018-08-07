@@ -1,6 +1,7 @@
 function fileNames = getMATtracks_corrected( pathName )
 
-% get all stk files in selected folder
+% get all mat files in selected folder
+% only include the specific corrected dynamic data mat files
 files = strcat(pathName,'/*_corrected_k6.mat');
 listOfFiles = dir(files);
 
