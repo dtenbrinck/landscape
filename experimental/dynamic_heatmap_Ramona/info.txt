@@ -1,4 +1,14 @@
-remarks about duplicated files in this folder
+remarks on files in this folder
 
 - ParameterProcessing needed because it includes information for embryo estimation which is currently not yet included on the main folder
 
+heatmap_dynamics and processing_dynamic should be located directly in the main folder.
+Therefore we need to correct the rootdir in both files:
+replace: 
+root_dir = fileparts(fileparts(pwd));
+with: 
+root_dir = pwd;
+
+moreover:
+remove the "readoldresults" optionality from processing_dynamics
+it is only implemented to avoid long data processing from "static" data when the implementation for dynamic data should be tested anyway
