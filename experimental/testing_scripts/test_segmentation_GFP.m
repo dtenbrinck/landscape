@@ -12,7 +12,7 @@ if ~exist('all_data.mat','file')
   dataPathName = 'E:\Embryo_Registration\data\SargonYigit\Image Registration\10hpf_data\tilting_experiments';
   
   % get filenames of STK files in selected folder
-  fileNames = getStkOrTifFilenames(dataPathName);
+  fileNames = getSTKfilenames(dataPathName);
   
   % extract only valid experiments with three data sets
   experimentSets = checkExperimentChannels(fileNames);

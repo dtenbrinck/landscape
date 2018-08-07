@@ -21,7 +21,7 @@ checkDirectory(p.resultsPath);
 %% LOAD DATA
 
 % get filenames of STK files in selected folder
-fileNames = getStkOrTifFilenames(p.dataPath);
+fileNames = getSTKfilenames(p.dataPath);
 
 % extract only valid experiments with three data sets
 allValidExperiments = checkExperimentChannels(fileNames);

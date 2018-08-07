@@ -11,7 +11,7 @@ if ~exist('all_data.mat','file')
   dataPathName = '../data/tilting_adjustments_first_priority';
   
   % get filenames of STK files in selected folder
-  fileNames = getStkOrTifFilenames(dataPathName);
+  fileNames = getSTKfilenames(dataPathName);
   
   % extract only valid experiments with three data sets
   experimentSets = checkExperimentChannels(fileNames);

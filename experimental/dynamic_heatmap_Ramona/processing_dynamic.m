@@ -19,7 +19,7 @@ checkDirectory(p.resultsPath);
 %% LOAD DATA
 
 % get filenames of STK files in selected folder
-fileNames = getStkOrTifFilenames(p.dataPath);
+fileNamesTIF = getTIFfilenames(p.dataPath);
 fileNamesCorrectedTracks = getMATtracks_corrected(p.dataPath);
 
 % extract only valid experiments with three data sets
@@ -45,15 +45,10 @@ for experiment=1:numberOfExperiments
     try
         % get data of current experiment
         if p.debug_level >= 1; disp('Loading data...'); end
-        experimentData = loadExperimentData(allValidExperiments(experiment,:), p.dataPath,manRes);
-        if isfield(experimentData,'manualxRes')
-            manRes(1) = 1;
-            manRes(2) = experimentData.manualxRes;
-            manRes(3) = experimentData.manualyRes;
-            experimentData = rmfield(experimentData,'manualyRes');
-            experimentData = rmfield(experimentData,'manualxRes');
-        end
-        experimentData = experimentData.Data_1;
+        % get static reference data of current data set
+        if p.debug_level >= 1; disp('Loading data...'); end
+        BFP = loadStaticTIF([path_data '/' fileNamesTIF{1}]); % load BFP
+        GFP = loadStaticTIF([path_data '/' fileNamesTIF{2}]); % load GFP
 
         if ( readOldResults > 0 )
             load(['results\SD10_' , num2str( experiment ), '_BFP_raw_results.mat']);
