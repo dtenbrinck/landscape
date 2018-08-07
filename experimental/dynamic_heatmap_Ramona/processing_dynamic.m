@@ -112,6 +112,8 @@ for experiment=1:numberOfExperiments
             processedData.dynamic.cellVelocities] ...
             = evaluateVelocitiesFromTracking(tracks_PGC);
         
+        %%% TODO implement like Daniel a SANITY CHECK: Check if velocity is distance / deltaT
+        
         % register data
         if p.debug_level >= 1; disp('Registering data...'); end
         registeredData = registerData( processedData, p.resolution, transformation_registration, ellipsoid, p.samples_cube);
@@ -125,7 +127,7 @@ for experiment=1:numberOfExperiments
             gatheredData.processed.dynamic.cellVelocities = processedData.dynamic.cellVelocities;
             save(results_filename,'gatheredData','-append');
         else
-            gatheredData = saveResults(experimentData, processedData, registeredData, ellipsoid, transformationMatrix, rotationMatrix, results_filename);
+            gatheredData = saveResultsDynamics(experimentData, processedData, registeredData, ellipsoid, transformationMatrix, rotationMatrix, results_filename);
         end
         % visualize results if needed
         if p.visualization == 1
