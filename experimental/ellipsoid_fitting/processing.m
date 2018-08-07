@@ -10,10 +10,6 @@ addpath([root_dir '/parameter_setup/']);
 % load necessary variables
 p = initializeScript('processing', root_dir);
 
-% manual set resolution parameter
-manRes = [0,0,0];
-
-
 %% PREPARE RESULTS DIRECTORY
 checkDirectory(p.resultsPath);
 
@@ -45,14 +41,8 @@ for experiment=1:numberOfExperiments
     try
         % get data of current experiment
         if p.debug_level >= 1; disp('Loading data...'); end
-        experimentData = loadExperimentData(allValidExperiments(experiment,:), p.dataPath,manRes);
-        if isfield(experimentData,'manualxRes')
-            manRes(1) = 1;
-            manRes(2) = experimentData.manualxRes;
-            manRes(3) = experimentData.manualyRes;
-            experimentData = rmfield(experimentData,'manualyRes');
-            experimentData = rmfield(experimentData,'manualxRes');
-        end
+        experimentData = loadExperimentData(allValidExperiments(experiment,:), p.dataPath);
+
         experimentData = experimentData.Data_1;
         
         % preprocess and rescale data

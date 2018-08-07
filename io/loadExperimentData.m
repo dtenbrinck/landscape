@@ -1,10 +1,7 @@
-function [ data ] = loadExperimentData( experimentSets, dataPathName, manRes )
+function [ data ] = loadExperimentData( experimentSets, dataPathName )
 
 % initialize empty struct
 data = struct;
-manualset = manRes(1);
-manualxRes = manRes(2);
-manualyRes = manRes(3);
 % get amount of data to be processed
 numOfData = size(experimentSets,1);
 

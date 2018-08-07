@@ -13,9 +13,6 @@ addpath([root_dir '/parameter_setup/']);
 % load necessary variables
 p = initializeScript('processing_dynamic', root_dir);
 
-% manual set resolution parameter
-%manRes = [0,0,0];
-
 % set scale of x-y resolution
 p.scale = 0.5;
 

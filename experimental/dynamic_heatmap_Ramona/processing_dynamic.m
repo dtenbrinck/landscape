@@ -10,9 +10,6 @@ addpath([root_dir '/parameter_setup/']);
 % load necessary variables
 p = initializeScript('processing', root_dir);
 
-% manual set resolution parameter
-manRes = [0,0,0];
-
 %% PREPARE RESULTS DIRECTORY
 checkDirectory(p.resultsPath);
 
