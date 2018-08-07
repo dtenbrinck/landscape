@@ -20,7 +20,7 @@ fileNamesTIF = getTIFfilenames(p.dataPath);
 fileNamesCorrectedTracks = getMATtracks_corrected(p.dataPath);
 
 % extract only valid experiments with three data sets
-allValidExperiments = checkExperimentChannelsWithoutMCherry(fileNames);
+allValidExperiments = checkExperimentChannelsForDynamicData(fileNames);
 
 % get number of experiments
 numberOfExperiments = size(allValidExperiments,1);

@@ -1,4 +1,4 @@
-function experimentSets = checkExperimentChannelsWithoutMCherry( fileNames )
+function experimentSets = checkExperimentChannelsForDynamicData( fileNames )
 %CHECKEXPERIMENTCHANNELS Summary of this function goes here
 %   Detailed explanation goes here
 
