@@ -42,8 +42,6 @@ for experiment=1:numberOfExperiments
         % get data of current experiment
         if p.debug_level >= 1; disp('Loading data...'); end
         experimentData = loadExperimentData(allValidExperiments(experiment,:), p.dataPath);
-
-        experimentData = experimentData.Data_1;
         
         % preprocess and rescale data
         if p.debug_level >= 1; disp('Preprocessing data...'); end
