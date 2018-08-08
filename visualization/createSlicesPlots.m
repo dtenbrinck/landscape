@@ -34,7 +34,7 @@ function convAcc = createSlicesPlots(accumulator, option, titleOfPlots,...
         landmarkSlicePart = sum(referenceLandmark.coords(:,:,zslices(i):zslices(i+1)),3);
         indices = find(landmarkSlicePart > 0);
         [tmpy, tmpx] = ind2sub(size(landmarkSlicePart), indices);
-        s =scatter(sp(i), tmpx, tmpy, 15, 'MarkerEdgeColor', 'none', 'MarkerFaceColor', [0.7 0.7 0.7]);
+        s =scatter(sp(i), tmpx, tmpy, 5, 'MarkerEdgeColor', 'none', 'MarkerFaceColor', [0.7 0.7 0.7]);
         alpha(s, 0.1);
         contour ( sp(i), referenceLandmark.MIP > 0, 2, 'color', [0.4 0.4 0.4]);
         hold(sp(i), 'off');  
