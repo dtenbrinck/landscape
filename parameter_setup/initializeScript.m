@@ -26,7 +26,7 @@ else % in case the above folders don't exist take the current directory
   resultsPath = [root_dir '/results'];
 end
 
-if strcmp(scriptType,'processing')
+if strcmp(scriptType,'processing') || strcmp(scriptType,'processing_dynamic')
   % Load parameters from file
   p = ParameterProcessing();
   
@@ -42,8 +42,6 @@ if strcmp(scriptType,'processing')
   else
     p.resultsPath = uigetdir(resultsPath,'Please select a folder for the results!');
   end
-  
-  
 elseif strcmp(scriptType,'evaluate')
   resultsPath = uigetdir(resultsPath,'Please select a results folder to evaluate!');
   checkDirectory(resultsPath);

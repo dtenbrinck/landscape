@@ -10,7 +10,7 @@ function p =  ParameterHeatmap()
 % Size of the cells
 p.sizeCells = 20; %um
 % Size of the Pixel
-p.sizeOfPixel = 1.3; %um
+p.sizeOfPixel = 1.29; %um
 p.sizeCellsPixel = round(p.sizeCells/p.sizeOfPixel);
 
 % -- PROCSESSING OF THE CELLS -- %
@@ -21,7 +21,7 @@ p.tole = 0.1;
 
 % Grid size of the accumulator: 
 % size(accumulator) = [gridSize,gridSize,gridSize];
-p.gridSize = 256;
+p.gridSize = 128;
 
 % Select a given number of random filnames
 p.random = 0;
@@ -48,6 +48,16 @@ p.option.cropper = 0;
 
 % -- Options for the heatmap generation -- %
 
+% Define data type: 'dynamic' or 'static'
+p.option.heatmaps.datatype =  'dynamic';
+
+% Define if tracked segments that consist of longer time intervals should
+% be disregarded
+p.option.heatmaps.disregardLongTimeIntervals = true;
+
+% Define type of heatmap to be generated: 'speed', 'velocity', 'persistence'
+p.option.heatmaps.feature = 'speed';
+
 % Process standard heatmaps? 1: yes, 0: no
 % Every option beneath will be irrelevant if 0.
 p.option.heatmaps.process = 1;
@@ -55,7 +65,7 @@ p.option.heatmaps.process = 1;
 % Types of heatmaps. Currently available 'MIP', 'SUM'.
 % Can handle multiple input.
 % Default: {'MIP','SUM'}
-p.option.heatmaps.types = {'MIP', 'SUM_WEIGHTED'};
+p.option.heatmaps.types = {'MIP','SUM'};
 
 % - Saving - %
 % Saves will be aved in results folder under "heatmaps"
@@ -69,21 +79,15 @@ p.option.heatmaps.saveas = {'png'};
 
 % Save the heatmap structure with the matrices for the visualization in the
 % figures.
-p.option.heatmaps.saveHMmat = 0;
+p.option.heatmaps.saveHMmat = 1;
 
 % Save the accumulator matrix. This is the pure 3D matrix which stores the
 % number of cells at a voxel position
-p.option.heatmaps.saveAccumulator = 0;
+p.option.heatmaps.saveAccumulator = 1;
 
 % Show the heatmaps figures. Doesn't need to be activated for the saving.
 p.option.heatmaps.disp = 0;
 
 % Scale the heatmaps. Input can be: 'true','false','both'
-p.option.heatmaps.scaled = 'true';
-
-% Frame number if several frames for dynamic data should be saved
-p.option.frameNo = '';
-
-% calculation of axis scaling active: default value -1
-p.option.axisLimit = -1;
+p.option.heatmaps.scaled = 'both';
 end

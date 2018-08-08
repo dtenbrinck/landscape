@@ -26,25 +26,22 @@ else % in case the above folders don't exist take the current directory
   resultsPath = [root_dir '/results'];
 end
 
-if strcmp(scriptType,'processing')
+if strcmp(scriptType,'processing') || strcmp(scriptType,'processing_dynamic')
   % Load parameters from file
   p = ParameterProcessing();
   
   % Select data path
-%   p.dataPath = 'D:\CiM\imaging-zebrafish\source_code\embryo_registration\experimental\dynamic_heatmap\35sets';
-%   p.dataPath = 'D:\CiM\imaging-zebrafish\source_code\embryo_registration\experimental\dynamic_heatmap\Lukasz';
-%   p.resultsPath = 'D:\CiM\imaging-zebrafish\source_code\embryo_registration\experimental\dynamic_heatmap\results';
- %%%%%%%%TODO temporarily use fix paths for data input and result files
   p.dataPath = uigetdir(dataPath,'Please select a folder with the data!');
   btn = questdlg('Do you want to use an existing results folder or create a new one?','New folder?','Create new','Use existing','Create new');
+  
   if strcmp(btn,'Create new')
     p.resultsPath = uigetdir(resultsPath,'Please select a directory for the new folder!');
     answ = inputdlg('Enter a name for the new folder!');
     p.resultsPath = [p.resultsPath,'/',answ{1}];
     mkdir(p.resultsPath);
   else
-    p.resultsPath = uigetdir(resultsPath,'Please select a folder for the results!');  
-  end 
+    p.resultsPath = uigetdir(resultsPath,'Please select a folder for the results!');
+  end
 elseif strcmp(scriptType,'evaluate')
   resultsPath = uigetdir(resultsPath,'Please select a results folder to evaluate!');
   checkDirectory(resultsPath);
@@ -54,24 +51,38 @@ elseif strcmp(scriptType,'evaluate')
     p = ParameterProcessing();
   end
   p.resultsPath = resultsPath;
-elseif strcmp(scriptType,'heatmap')
-  resultsPath = uigetdir(resultsPath,'Please select a results folder to generate heatmap!');
-  if exist([resultsPath,'/accepted/ParameterProcessing.mat'],'file') == 2
-    load([resultsPath,'/accepted/ParameterProcessing.mat']);
-  else
-    p = ParameterProcessing();
-  end
-  p.resultsPath = resultsPath;
-  p_heat = ParameterHeatmap();
-  merge = [fieldnames(p)', fieldnames(p_heat)';...
-    struct2cell(p)',struct2cell(p_heat)'];
-  p = struct(merge{:});
-  p.resultsPathAccepted = [p.resultsPath,'/accepted'];
-  save([p.resultsPath,'/accepted/ParameterHeatmap.mat'],'p_heat');
+elseif strcmp(scriptType,'static_heatmap')
+    resultsPath = uigetdir(resultsPath,'Please select a results folder to generate heatmap!');
+    if exist([resultsPath,'/accepted/ParameterProcessing.mat'],'file') == 2
+        load([resultsPath,'/accepted/ParameterProcessing.mat']);
+    else
+        p = ParameterProcessing();
+    end
+    p.resultsPath = resultsPath;
+    p_heat = ParameterHeatmap();
+    merge = [fieldnames(p)', fieldnames(p_heat)';...
+        struct2cell(p)',struct2cell(p_heat)'];
+    p = struct(merge{:});
+    p.resultsPathAccepted = [p.resultsPath,'/accepted'];
+    save([p.resultsPath,'/accepted/ParameterHeatmap.mat'],'p_heat');
+    
+    if ~exist([p.resultsPath,'/heatmaps'],'dir')
+        mkdir([p.resultsPath,'/heatmaps']);
+    end
   
-  if ~exist([p.resultsPath,'/heatmaps'],'dir')
-    mkdir([p.resultsPath,'/heatmaps']);
-  end
+elseif strcmp(scriptType,'dynamic_heatmap')
+    resultsPath = uigetdir(resultsPath,'Please select a results folder to generate heatmap!');
+    p.resultsPath = resultsPath;
+    p_heat = ParameterHeatmap();
+    merge = [fieldnames(p)', fieldnames(p_heat)';...
+        struct2cell(p)',struct2cell(p_heat)'];
+    p = struct(merge{:});
+    p.resultsPathAccepted = p.resultsPath;
+    save([p.resultsPath,'/ParameterHeatmap.mat'],'p_heat');
+    
+    if ~exist([p.resultsPath,'/heatmaps'],'dir')
+        mkdir([p.resultsPath,'/heatmaps']);
+    end
   
 elseif strcmp(scriptType,'heatmapComparison')
   
