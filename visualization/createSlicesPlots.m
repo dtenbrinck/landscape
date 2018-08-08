@@ -34,9 +34,8 @@ function convAcc = createSlicesPlots(accumulator, option, titleOfPlots,...
         landmarkSlicePart = sum(referenceLandmark.coords(:,:,zslices(i):zslices(i+1)),3);
         indices = find(landmarkSlicePart > 0);
         [tmpy, tmpx] = ind2sub(size(landmarkSlicePart), indices);
-%         patch(sp(i), tmpx, tmpy, 'FaceColor', [0.7 0.7 0.7],'FaceAlpha',.3);
-        s =scatter(sp(i), tmpx, tmpy, 1, 'filled', 'MarkerEdgeColor', [0.7 0.7 0.7]);
-        alpha(s, 0.3);
+        s =scatter(sp(i), tmpx, tmpy, 5, 'MarkerEdgeColor', 'none', 'MarkerFaceColor', [0.7 0.7 0.7]);
+        alpha(s, 0.1);
         contour ( sp(i), referenceLandmark.MIP > 0, 2, 'color', [0.4 0.4 0.4]);
         hold(sp(i), 'off');  
         % keep information for later colormap generation
@@ -49,8 +48,6 @@ function convAcc = createSlicesPlots(accumulator, option, titleOfPlots,...
     end
     
     numberOfColorBlocks = ceil(maxColormapValue / minColormapIntervalLength);
-    colorMapWithWhiteZero = jet( numberOfColorBlocks );
-    colorMapWithWhiteZero(1, :) = [1 1 1];
     
     % colormap from white to blue
     cMin = [1 1 1];
