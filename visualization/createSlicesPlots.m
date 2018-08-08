@@ -29,11 +29,12 @@ function convAcc = createSlicesPlots(accumulator, option, titleOfPlots,...
         plotSingleHeatmap(heatmapData, ...
             [num2str(zslices(i)) ' - ' num2str(zslices(i+1)) ' px Top \rightarrow Bottom']);
         
-        landmarkSlicePart = sum(referenceLandmark.coords(:,:,zslices(i):zslices(i+1)),3);
         hold (sp(i), 'on');
         % plot reference landmark
+        landmarkSlicePart = sum(referenceLandmark.coords(:,:,zslices(i):zslices(i+1)),3);
         indices = find(landmarkSlicePart > 0);
         [tmpy, tmpx] = ind2sub(size(landmarkSlicePart), indices);
+%         patch(sp(i), tmpx, tmpy, 'FaceColor', [0.7 0.7 0.7],'FaceAlpha',.3);
         s =scatter(sp(i), tmpx, tmpy, 1, 'filled', 'MarkerEdgeColor', [0.7 0.7 0.7]);
         alpha(s, 0.3);
         contour ( sp(i), referenceLandmark.MIP > 0, 2, 'color', [0.4 0.4 0.4]);
