@@ -51,13 +51,21 @@ referenceLandmark = computeReferenceLandmark(fileNames,numberOfResults, p.result
 [ allCellCoords, allCellVelocities]  = getAllValidDynamicCellData(p.gridSize,fileNames,numberOfResults,p.tole,p.resultsPathAccepted);
 
 % -- Compute the accumulators from the cell coordinates and for the velocities -- %
-accumulatorForVelocities = computeAccumulatorWithVelocities(allCellCoords, p.gridSize, allCellVelocities);
+accumulatorForSpeedValues = computeAccumulatorWithVelocities(allCellCoords, p.gridSize, allCellVelocities);
 accumulator = computeAccumulator(allCellCoords, p.gridSize);
 
+% Save accumulators
+if p.option.heatmaps.saveAccumulator == 1
+    mat_name = [p.resultsPath ,'/heatmaps/','AccumulatorPGCpositions.mat'];
+    save(mat_name,'accumulator');
+    mat_name = [p.resultsPath ,'/heatmaps/','AccumulatorPGCspeed.mat'];
+    save(mat_name,'accumulatorForSpeedValues');
+end
+    
 %% GENERATE HEATMAPS
 fig_filename_base = [p.resultsPath ,'/heatmaps/'];
 convAccPositions = createSlicesPlots(accumulator, p.option, 'Number of PGCs', referenceLandmark, [fig_filename_base, 'PGCs_positions'], 1);
-createSlicesPlots(accumulatorForVelocities, p.option, 'Average speed [\mum / min]', referenceLandmark,[fig_filename_base, 'PGCs_average_velocities'], convAccPositions);
+createSlicesPlots(accumulatorForSpeedValues, p.option, 'Average speed [\mum / min]', referenceLandmark,[fig_filename_base, 'PGCs_average_velocities'], convAccPositions);
 
 end
 

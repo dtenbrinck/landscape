@@ -59,9 +59,6 @@ if isfield(registeredData, 'nuclei') % check for backward compatibilty
     gatheredData.registered.nucleiMIP = computeMIP(registeredData.nuclei);
 end
 
-
-gatheredData.registered.dynamic = registeredData.dynamic;
-
 save(results_filename,'gatheredData');
 end
 
