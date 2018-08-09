@@ -7,7 +7,7 @@ function [  ] = handleHeatmaps( accumulator, numOfAllCells,numberOfResults, p, o
 % -- if heatmaps should be computed -- %
 
 if option.heatmaps.process == 1
-    fprintf('Computing heatmaps...');
+    fprintf('Computing heatmaps...\n');
     
     % -- Convolve over the points -- %
     convAcc = convolveAccumulator(accumulator,option.cellradius,2*option.cellradius+1);
