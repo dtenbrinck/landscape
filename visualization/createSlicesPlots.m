@@ -66,8 +66,10 @@ function convAcc = createSlicesPlots(accumulator, option, titleOfPlots,...
         hcb.Label.String = titleOfPlots;
     end
     
-    % save figure
-    saveas(f, fig_filename, option.heatmaps.saveas{1});
+    if option.heatmaps.save == 1
+        % save figure
+        saveas(f, fig_filename, option.heatmaps.saveas{1});
+    end
 end
     
 function plotSingleHeatmap(data, titleOfPlot)
