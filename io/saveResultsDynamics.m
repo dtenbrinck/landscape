@@ -50,7 +50,6 @@ gatheredData.registered.transformation_full = transformationMatrix * rotationMat
 gatheredData.registered.DapiMIP = computeMIP(registeredData.Dapi);
 gatheredData.registered.GFPMIP = computeMIP(registeredData.GFP);
 
-gatheredData.registered.landmark = registeredData.landmark;
 gatheredData.registered.landmarkMIP = computeMIP(registeredData.landmark);
 
 % this includes now coordinates of the dynamic PGC information

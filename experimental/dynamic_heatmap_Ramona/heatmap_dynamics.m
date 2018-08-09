@@ -43,9 +43,6 @@ else
     disp([ num2str(numberOfResults) ' results found in folder for generating heat map.']);
 end
 
-load([p.resultsPathAccepted,'/',fileNames{1,1}]);
-referenceLandmark = computeReferenceLandmark(fileNames,numberOfResults, p.resultsPathAccepted);
-
 %% COMPUTE ACCUMULATOR
 % -- Compute all valid cell coordinates from the processed and registered data -- %
 [ allCellCoords, allCellVelocities]  = getAllValidDynamicCellData(p.gridSize,fileNames,numberOfResults,p.tole,p.resultsPathAccepted);
@@ -64,24 +61,8 @@ end
     
 %% GENERATE HEATMAPS
 fig_filename_base = [p.resultsPath ,'/heatmaps/'];
+referenceLandmark = computeReferenceLandmark(fileNames,numberOfResults, p);
 convAccPositions = createSlicesPlots(accumulator, p.option, 'Number of PGCs', referenceLandmark, [fig_filename_base, 'PGCs_positions'], 1);
 createSlicesPlots(accumulatorForSpeedValues, p.option, 'Average speed [\mum / min]', referenceLandmark,[fig_filename_base, 'PGCs_average_velocities'], convAccPositions);
 
-end
-
-function referenceLandmark = computeReferenceLandmark(fileNames,numberOfResults, resultsPathAccepted)
-fprintf('Computing refernce landmark ...\n');
-referenceLandmark.MIP = zeros(256,256);
-referenceLandmark.coords = zeros(256,256,256);
-
-for result = 1:numberOfResults
-    load([resultsPathAccepted,'/',fileNames{result,1}])
-    referenceLandmark.MIP = referenceLandmark.MIP + gatheredData.registered.landmarkMIP;
-    referenceLandmark.coords = referenceLandmark.coords + gatheredData.registered.landmark;
-end
-
-% normalization: only 0 or 1 in return values indicating where cells for
-% the landmark where found
-referenceLandmark.MIP = referenceLandmark.MIP > 0;
-referenceLandmark.coords = referenceLandmark.coords > 0;
 end

@@ -70,8 +70,7 @@ if option.heatmaps.process == 1
             end
         end
     end
-    
-    
+
 end
 
 % -- if slider should be shown --  %

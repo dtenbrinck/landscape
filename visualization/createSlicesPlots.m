@@ -11,7 +11,8 @@ function convAcc = createSlicesPlots(accumulator, option, titleOfPlots,...
     % -- normalization due to summation artefacts after convolution
     convDim = 1/(2*option.cellradius +1);
     convAccWeighted = convDim * convAcc;
-    % -- normalization with, e.g., counted cells per voxel
+    % -- normalization with a given factor or matrix
+    % e.g., counted cells per voxel when plotting speed values
     % replace 0 with 1 in normalizer to avoid deviding by 0!!
     weightingNormalizer(~weightingNormalizer)=1;
     convAccWeighted = convAccWeighted ./ weightingNormalizer; 
