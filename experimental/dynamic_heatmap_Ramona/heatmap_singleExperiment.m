@@ -55,6 +55,10 @@ accumulator = computeAccumulator(allCellCoords, p.gridSize);
 
 handleHeatmaps(accumulator,size(allCellCoords,2),numberOfResults,p,p.option);
 
+%% SLICE WISE PLOTS WITH PROJECTED REFERENCE LANDMARK
+fig_filename_base = [p.resultsPath ,'/heatmaps/'];
+referenceLandmark = computeReferenceLandmark(fileNames,numberOfResults, p);
+createSlicesPlots(accumulator, p.option, 'Number of PGCs', referenceLandmark, [fig_filename_base, 'PGCs_positions'], 1);
 
 %% USER OUTPUT
 
