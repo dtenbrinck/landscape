@@ -60,6 +60,9 @@ gatheredData.registered.mCherryMIP = computeMIP(registeredData.mCherry);
 gatheredData.registered.landmarkMIP = computeMIP(registeredData.landmark);
 gatheredData.registered.cellsMIP = computeMIP(registeredData.cells);
 gatheredData.registered.cellCoordinates = registeredData.cellCoordinates;
+if isfield(registeredData, 'nucleiCoordinates') % check for backward compatibilty
+    gatheredData.registered.nucleiCoordinates = single(registeredData.nucleiCoordinates); 
+end
 if isfield(registeredData, 'nuclei') % check for backward compatibilty
     gatheredData.registered.nucleiMIP = computeMIP(registeredData.nuclei);
 end
