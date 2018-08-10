@@ -1,6 +1,6 @@
 %% estimate minimal ellipsoid fitting for data set
-function [ center, radii, axis, radii_ref, center_ref ] ...
-    = getEllipsoidCharacteristicsInitialReferenceEstimation...
+function [ center, radii, axis ] ...
+    = getEllipsoidCharacteristicsEstimation...
     ( X, fittingParams)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Fit an ellispoid/sphere to a set of xyz data points:
@@ -10,11 +10,8 @@ function [ center, radii, axis, radii_ref, center_ref ] ...
 %
 % Parameters:
 % * X, [x y z]      - Cartesian data, n x 3 matrix or three n x 1 vectors
-% * picfilename     - name to save png with estimated ellipsoids
-% * descentMethod   - 'cg' : conjugate gradient method
-%                     'grad' : gradient descent method
-%
-% * regularisationParams:
+% * ellipsoidFitting.descentMethod = 'cg' or 'grad';
+% * fittingParams.regularisationParams:
 %   mu1,mu2     - weights for volumetric terms
 % 	gamma           - parameter for smooth approximation with logarithm of 
 %                     kink in max(0,...) 
@@ -23,7 +20,7 @@ function [ center, radii, axis, radii_ref, center_ref ] ...
 % Output:
 % * center    -  ellispoid center coordinates [x_0; y_0; z_0]
 % * radii     -  ellipsoid or other conic radii [a; b; c]
-% * evecs     -  the radii directions as columns of the 3x3 matrix
+% * axis     -  the radii directions as columns of the 3x3 matrix
 %
 % Solving Minimization Problem to find smallest ellipsoid fitting when
 % only allowing few data points to lie outside. 
@@ -88,17 +85,8 @@ Wtransposed = W';
 [funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox (W, fittingParams.regularisationParams, Wtransposed);
 [radii, center] = approximateEllipsoidParamsWithDescentMethod(v_initial, W, funct, grad_funct, fittingParams.descentMethod);
 
-funct = @(v) fittingParams.regularisationParams.mu0 * ( fittingParams.regularisationParams.gamma*sum(...
-    log( 1 + exp( 1/fittingParams.regularisationParams.gamma * (W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) ) ) ) + ...
-    ... % volumetric reguliser
-    fittingParams.regularisationParams.mu1 * ( 1/v(1) + 1/v(2) + 1/v(3) )  + ...
-    fittingParams.regularisationParams.mu2 * sum(( W*v + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)).^2) );
-
-[radii_ref, center_ref] = getReferenceEllipsoidApproximation(funct, v_initial, grad_funct);
-
 % invert coordinate transformation caused by PCA back for center vectors
 center = pca_transformation \ center;
-center_ref = pca_transformation \ center_ref;
 
 axis=pca_transformation';
 end
@@ -345,17 +333,6 @@ function alpha_star = zoom(alpha_lower, alpha_higher, ...
     end
 end
 
-function [radii, center] = getReferenceEllipsoidApproximation(funct, v0, grad_funct)
-%     fprintf('Approximate ellipsoid with MATLAB reference method...\n');
-    options = optimset('TolX', 1e-8, 'TolFun', 1e-8);
-    tic;
-    [v, ~,~,output] = fminsearch(funct, v0, options);
-    time = toc;
-    fprintf ('Matlab reference stopped after %d iteration(s) in %f seconds. \n', output.iterations, time);
-%     fprintf('########## ref. energy \t %e \t \t\n', funct(v));
-    [radii, center] = getEllipsoidParams(v);
-end
-
 function [funct, grad_funct] = initializeFunctionalAndGradientWithLogApprox( W, regularisationParams, Wtransposed)
 funct = @(v, Wv) regularisationParams.mu0 * ( regularisationParams.gamma*sum(...
     log( 1 + exp( 1/regularisationParams.gamma * (Wv + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) ) ) ) + ...
@@ -363,7 +340,6 @@ funct = @(v, Wv) regularisationParams.mu0 * ( regularisationParams.gamma*sum(...
     regularisationParams.mu1 * ( 1/v(1) + 1/v(2) + 1/v(3) )  + ...
     regularisationParams.mu2 * sum(( Wv + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)).^2) );
 
-n = size(W,1);
 grad_funct = @(v, Wv) regularisationParams.mu0 * ( ( Wtransposed + ...
     [-(v(4)/v(1))^2; -(v(5)/v(2))^2; -(v(6)/v(3))^2; 2*v(4)/v(1); 2*v(5)/v(2); 2*v(6)/v(3)] ) * ...
     ( exp((1/regularisationParams.gamma) * (Wv + (v(4)^2/v(1) + v(5)^2/v(2) + v(6)^2/v(3) - 1)) ) ./ ...

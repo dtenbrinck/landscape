@@ -10,5 +10,4 @@ results/
 commands.txt
 *.asv
 *.mat
-/experimental/ellipsoid_fitting/initializeScript.m
 /experimental/dynamic_heatmap_Ramona/inputData/*

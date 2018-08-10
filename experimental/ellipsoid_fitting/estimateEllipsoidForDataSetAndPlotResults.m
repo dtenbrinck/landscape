@@ -1,6 +1,7 @@
 function estimateEllipsoidForDataSetAndPlotResults(X, ellipsoidFittingParams, outputPath, title)
     %fprintf('\n');
-    [center, radii, axis, radii_ref, center_ref] = getEllipsoidCharacteristicsInitialReferenceEstimation( X, ellipsoidFittingParams );
+    [center, radii, axis] = getEllipsoidCharacteristicsEstimation( X, ellipsoidFittingParams );
+	[radii_ref, center_ref] = getEllipsoidCharacteristicsReference( X, ellipsoidFittingParams );
     t1 = table( radii, radii_ref);
     t2 = table( center, center_ref );
     save("results/" + outputPath + "_radii", 't1');
