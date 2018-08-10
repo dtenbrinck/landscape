@@ -50,6 +50,12 @@ elseif strcmp(p.handledChannel, 'mCherry')
 
     % -- Compute the Accumulator from the cell coordinates -- %
     accumulator = computeAccumulator(allCellCoords, p.gridSize);
+    
+    %% SLICE WISE PLOTS WITH PROJECTED REFERENCE LANDMARK
+    fig_filename_base = [p.resultsPath ,'/heatmaps/'];
+    referenceLandmark = computeReferenceLandmark(fileNames,numberOfResults, p);
+    createSlicesPlots(accumulator, p.option, 'Number of PGCs', referenceLandmark, [fig_filename_base, 'PGCs_positions'], 1);
+
 else
     fprintf('There is no correct channel selected to generate heatmaps!\n');
     return;
