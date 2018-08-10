@@ -1,5 +1,5 @@
 %% estimate minimal ellipsoid fitting for data set
-function [radii_ref, center_ref ] ...
+function [radii_ref, center_ref, axis ] ...
     = getEllipsoidCharacteristicsReference...
     ( X, fittingParams)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -78,7 +78,7 @@ function [radii_ref, center_ref ] ...
 
 % idx = randperm( size(X,1), ceil(0.1*size(X,1)));
 % X = X(idx,:); 
-[~, X, pca_transformation] = prepareCoordinateMatrixAndOrientationMatrix(X);
+[W, X, pca_transformation] = prepareCoordinateMatrixAndOrientationMatrix(X);
 [v_initial] = initializeEllipsoidParams(X);
 
 funct = @(v) fittingParams.regularisationParams.mu0 * ( fittingParams.regularisationParams.gamma*sum(...
@@ -91,6 +91,8 @@ funct = @(v) fittingParams.regularisationParams.mu0 * ( fittingParams.regularisa
 
 % invert coordinate transformation caused by PCA back for center vectors
 center_ref = pca_transformation \ center_ref;
+
+axis=pca_transformation';
 end
 
 function [v] = initializeEllipsoidParams(X)
