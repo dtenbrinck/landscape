@@ -1,4 +1,4 @@
-function [ registeredData ] = registerData( processedData, resolution, registrationMatrix, ellipsoid, samples_cube )
+function [ registeredData ] = registerData2( processedData, resolution, registrationMatrix, ellipsoid, samples_cube )
 
 % register processed data using cubic interpolation
 [registeredData.GFP, ~] = transformVoxelData(single(processedData.GFP), resolution, registrationMatrix, ellipsoid.center, samples_cube, 'cubic');

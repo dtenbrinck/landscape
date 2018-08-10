@@ -36,6 +36,15 @@ p.mCherryseg.cellSize = 50; %50. in pixel
 p.mCherryseg.method = 'k-means'; % 'k-means', 'k-means_local', 'CP'
 % -- LANDMARK PROJECTION -- %
 p.samples_sphere = 128;
+
+%% ELLIPSOIDAL FITTING
+p.ellipsoidFitting.percentage = 10;
+p.ellipsoidFitting.visualization = 0;
+p.ellipsoidFitting.regularisationParams.mu0 = 10^-8;
+p.ellipsoidFitting.regularisationParams.mu1 = 0.002; 
+p.ellipsoidFitting.regularisationParams.mu2 = 1;
+p.ellipsoidFitting.regularisationParams.gamma = 1; 
+p.ellipsoidFitting.descentMethod = 'cg'; % 'grad'
 %% REGISTRATION
 % -- REGISTRATION OF LANDMARK -- %
 p.reg.landmarkCharacteristic = 'middle';

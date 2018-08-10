@@ -39,5 +39,13 @@ elseif isfield(processedData, 'dynamic')
     registeredData.cellCoordinates = transformCoordinates(processedData.dynamic.cellCoordinates', ellipsoid.center, registrationMatrix^-1, [0; 0; 0]);
 end
 
+if isfield(processedData, 'nucleiCoordinates')
+    % register nuclei coordinates accordingly
+    processedData.nucleiCoordinates(1,:) = processedData.nucleiCoordinates(1,:)*resolution(2);
+    processedData.nucleiCoordinates(2,:) = processedData.nucleiCoordinates(2,:)*resolution(1);
+    processedData.nucleiCoordinates(3,:) = processedData.nucleiCoordinates(3,:)*resolution(3);
+    registeredData.nucleiCoordinates = transformCoordinates(processedData.nucleiCoordinates', ellipsoid.center, registrationMatrix^-1, [0; 0; 0]);
+end
+
 end
 

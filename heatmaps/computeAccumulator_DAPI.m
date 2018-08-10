@@ -1,4 +1,4 @@
-function [ accumulator ] = computeAccumulator( allCellCoords, gridSize )
+function [ accumulator ] = computeAccumulator_DAPI( allCellCoords, gridSize )
 %This function computes the accumulator for the heatmap 
 
 %% MAIN CODE

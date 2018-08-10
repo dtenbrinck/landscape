@@ -50,7 +50,7 @@ allCellCoords = getAllValidCellCoords_DAPI(p.gridSize,fileNames,numberOfResults,
 
 
 % -- Compute the Accumulator from the cell coordinates -- %
-accumulator = computeAccumulator(allCellCoords, p.gridSize);
+accumulator = computeAccumulator_DAPI(allCellCoords, p.gridSize);
 
 
 %% HANDLE HEATMAPS ( Computation, drawing and saving ) 

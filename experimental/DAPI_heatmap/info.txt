@@ -1,0 +1,9 @@
+estimateEmbryoSurface should be obsolete after merging ellipsoid_fitting branch or corresponding folder into develop branch
+
+registerData2
+saveResults2
+should be obsolete as well. Added changed lines in appropriate files in main folders. 
+Has to be checked if everything works still fine. ***********TODO***********
+
+other files already moved into corresponding folders on main folder level
+
