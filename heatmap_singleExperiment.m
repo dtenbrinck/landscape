@@ -52,7 +52,8 @@ accumulator = computeAccumulator(allCellCoords, p.gridSize);
 
 
 %% HANDLE HEATMAPS ( Computation, drawing and saving ) 
-
+type = 'mCherry';
+p.handledChannel = type;
 handleHeatmaps(accumulator,size(allCellCoords,2),numberOfResults,p,p.option);
 
 

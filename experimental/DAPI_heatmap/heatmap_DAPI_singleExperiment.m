@@ -60,6 +60,8 @@ if ( isfield(p.option, 'dapiCellradius') )
 else
     p.option.cellradius = 2; % use default size for dapi cell radius
 end
+type = 'DAPI';
+p.handledChannel = type;
 handleHeatmaps(accumulator,size(allCellCoords,2),numberOfResults,p,p.option);
 
 
