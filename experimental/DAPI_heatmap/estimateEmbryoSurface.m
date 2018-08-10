@@ -6,7 +6,7 @@ Z = (nuclei_coord(3,:) * resolution(3))';
 % fit ellipsoid to sharp points in areas in focus
 [ellipsoid.center, ellipsoid.radii, ellipsoid.axes] = findMinimumEllipsoid([ X Y Z ]);
 % old approx.:
-% [ ellipsoid.center, ellipsoid.radii, ellipsoid.axes, ellipsoid.v, ~] = estimateEllipsoid( [ X Y Z ], '' );
+% [ ellipsoid.center, ellipsoid.radii, ellipsoid.axes, ellipsoid.v, ~] = estimateEllipsoid_old( [ X Y Z ], '' );
 
 % check axes orientation and flip if necessary
 orientation = diag(ellipsoid.axes);

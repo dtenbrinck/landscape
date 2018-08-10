@@ -46,7 +46,7 @@ end
 
 function plotOldEllipsoidEstimation(X, color, displayname)
     %fprintf('Using least squares approximation to estimate another reference ellipsoid...\n');
-    [ center, radii, axes, ~, ~] = estimateEllipsoid( X, '' );
+    [ center, radii, axes, ~, ~] = estimateEllipsoid_old( X, '' );
     plotOneEllipsoidEstimation( center, radii, color, displayname, 1, axes);
     fprintf('old radii: \n');
     table(radii)
