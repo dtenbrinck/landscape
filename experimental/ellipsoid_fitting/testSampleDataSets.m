@@ -1,26 +1,28 @@
 function testSampleDataSets()
     close all;
     X = firstDataSet();
-    %fprintf('Expecting an ellipsoid with approx. radii=(1,1,1), center=(0,0,0)...\n'); 
+    fprintf('Expecting an ellipsoid with approx. radii=(1,1,1), center=(0,0,0)...\n'); 
     regularisationParams.mu0 = 1;
     regularisationParams.mu1 = 5; 
     regularisationParams.mu2 = 1;
     regularisationParams.gamma = 1; 
+    ellipsoidFitting.regularisationParams = regularisationParams;
+    ellipsoidFitting.descentMethod = 'cg'; %'grad';
     title = 'ellipsoid_estimation_data_set1';
-    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', regularisationParams, title, title, 10^-10);
+    estimateEllipsoidForDataSetAndPlotResults(X, ellipsoidFitting, title, title);
     
     % second test data set
     X = secondDataSet();
-    %fprintf('\n\nExpecting an ellipsoid with approx. radii=(4,2,1), center=(1,2,2)...\n'); 
-    regularisationParams.mu1 = 10; 
+    fprintf('\n\nExpecting an ellipsoid with approx. radii=(4,2,1), center=(1,2,2)...\n'); 
+    ellipsoidFitting.regularisationParams.mu1 = 10; 
     title = 'ellipsoid_estimation_data_set2';
-    estimateEllipsoidForDataSetAndPlotResults(X, 'grad', regularisationParams, title, title, 10^-10);
+    estimateEllipsoidForDataSetAndPlotResults(X, ellipsoidFitting, title, title);
     
     % Manipulate second data set by rotating it around the coordinate axis
     Y = thirdDataSet(X);
-    %fprintf('\n\nExpecting an ellipsoid like the one before but rotated around 45? in each direction...\n');
+    fprintf('\n\nExpecting an ellipsoid like the one before but rotated around 45? in each direction...\n');
     title = 'ellipsoid_estimation_data_set3';
-    estimateEllipsoidForDataSetAndPlotResults(Y, 'grad', regularisationParams, title, title, 10^-10);
+    estimateEllipsoidForDataSetAndPlotResults(X, ellipsoidFitting, title, title);
 end
 
 function X = firstDataSet()

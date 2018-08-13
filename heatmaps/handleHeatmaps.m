@@ -5,7 +5,6 @@ function [  ] = handleHeatmaps( accumulator, numOfAllCells,numberOfResults, p, o
 %% MAIN CODE
 
 % -- if heatmaps should be computed -- %
-
 if option.heatmaps.process == 1
     fprintf('Computing heatmaps...\n');
     
@@ -15,15 +14,23 @@ if option.heatmaps.process == 1
     % -- Compute heatmap heatmaps -- %
     HMS = generateHeatmap(convAcc,option.heatmaps.types);
     
+    % -- fix paths in case we are generating for special channel --%
+    heatmapsPath = [p.resultsPath ,'/heatmaps'];
+    if isfield(p,'handledChannel')
+        heatmapsPath= [heatmapsPath, '/', p.handledChannel];
+    end
+    if ~exist([heatmapsPath,'/'],'dir')
+        mkdir(heatmapsPath);
+    end
     % Save heatmap structure HMS
     if option.heatmaps.saveHMmat == 1
-        mat_name = [p.resultsPath ,'/heatmaps/','Heatmap_Structure.mat'];
+        mat_name = [heatmapsPath,'/','Heatmap_Structure.mat'];
         save(mat_name,'HMS');
     end
     
     % Save accumulator
     if option.heatmaps.saveAccumulator == 1
-        mat_name = [p.resultsPath ,'/heatmaps/','Accumulator.mat'];
+        mat_name = [heatmapsPath,'/','Accumulator.mat'];
         save(mat_name,'accumulator');
     end
     
@@ -44,11 +51,8 @@ if option.heatmaps.process == 1
             set(figs(i+(2*(i-1))),'Visible',vis);
             
             if option.heatmaps.save == 1
-                if ~exist([p.resultsPath '/heatmaps'],'dir')
-                    mkdir(p.resultsPath, 'heatmaps');
-                end
                 for j=1:size(option.heatmaps.saveas,2)
-                    fig_filename = [p.resultsPath ,'/heatmaps/',currentType,'_Heatmaps'];
+                    fig_filename = [heatmapsPath,'/',currentType,'_Heatmaps'];
                     saveas(f,fig_filename,option.heatmaps.saveas{j});
                 end
             end
@@ -60,11 +64,8 @@ if option.heatmaps.process == 1
             set(figs(i+1+(2*(i-1))),'Visible',vis);
             
             if option.heatmaps.save == 1
-                if ~exist([p.resultsPath '/heatmaps'],'dir')
-                    mkdir(p.resultsPath, 'heatmaps');
-                end
                 for j=1:size(option.heatmaps.saveas,2)
-                    fig_filename = [p.resultsPath ,'/heatmaps/',currentType,'_Heatmaps(unscaled)'];
+                    fig_filename = [heatmapsPath,'/',currentType,'_Heatmaps(unscaled)'];
                     saveas(f,fig_filename,option.heatmaps.saveas{j});
                 end
             end

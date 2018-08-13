@@ -29,7 +29,7 @@ p.resolution(1:2) = p.resolution(1:2) / p.scale;
 
 %% MAIN LOOP
 
-fprintf(['Processing dataset: (0,' num2str(numberOfExperiments) ')']); 
+fprintf('Processing dataset:'); 
     
 % process all existing data sequentially
 for experiment=1:numberOfExperiments

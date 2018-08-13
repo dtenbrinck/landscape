@@ -26,7 +26,7 @@ for j=0:log10(current_iteration-1 + ~(current_iteration-1))
 end
 
 % print new iteration counter
-fprintf('%d/%d)', current_iteration, max_iteration);
+fprintf('\n(%d/%d)', current_iteration, max_iteration);
 
 % allow short break to display the update
 pause(.0001);

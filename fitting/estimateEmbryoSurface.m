@@ -3,21 +3,29 @@ X(:,1) = (nuclei_coord(1,:) * resolution(1))';
 X(:,2) = (nuclei_coord(2,:) * resolution(2))';
 X(:,3) = (nuclei_coord(3,:) * resolution(3))';
 
-% fit ellipsoid to sharp points in areas in focus
+%% fit ellipsoid to sharp points in areas in focus
 idx = randperm( size(X,1), ceil(ellipsoidFittingParams.percentage/100*size(X,1)));
 X = X(idx,:);
-[ ellipsoidEstimation.center, ellipsoidEstimation.radii, ellipsoidEstimation.axes, ~,~] = ...
-    getEllipsoidCharacteristicsInitialReferenceEstimation...
+[ ellipsoidEstimation.center, ellipsoidEstimation.radii, ellipsoidEstimation.axes] = ...
+    getEllipsoidCharacteristicsEstimation...
     ( X, ellipsoidFittingParams );
 
-% check axes orientation and flip if necessary
-orientation = diag(ellipsoidEstimation.axes);
+%% check order of ellipsoids axes
+% largest absolute values should be on the diagonal
+orderedAxes = zeros(3,3);
+axes = ellipsoidEstimation.axes;
 for i=1:3
-    if orientation(i) < 0
-        ellipsoidEstimation.axes(:,i) = -ellipsoidEstimation.axes(:,i);
+    posLargestColumnElement = find(abs(axes(:,i)) == max(abs(axes(:,i))));
+    fprintf('Column %d should be in column %d\n', i, posLargestColumnElement);
+    orderedAxes(:, posLargestColumnElement) = axes(:,i);
+    %% check ellipsoid's axes orientation and flip if necessary
+    if (orderedAxes(posLargestColumnElement,posLargestColumnElement) < 0 )
+        orderedAxes(:, posLargestColumnElement) = -orderedAxes(:, posLargestColumnElement);
     end
 end
+ellipsoidEstimation.axes = orderedAxes;
 
+%% plot fitted ellipsoid
 if (  ellipsoidFittingParams.visualization ) 
    fprintf("Plotting resulting ellipsoid estimation...\n");
    if isreal(ellipsoidEstimation.center) && isreal(ellipsoidEstimation.radii)

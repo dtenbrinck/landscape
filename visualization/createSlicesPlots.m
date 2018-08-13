@@ -1,6 +1,6 @@
 function convAcc = createSlicesPlots(accumulator, option, titleOfPlots,...
     referenceLandmark, fig_filename, weightingNormalizer )
-    fprintf('Computing heatmaps...\n');
+    fprintf('Computing slice wise heatmaps...\n');
     gridSize = size(accumulator);
     
     
