@@ -23,8 +23,10 @@ end
 saveas(f, [parameter.resultsPath ,'/heatmaps/Landmarks'], parameter.option.heatmaps.saveas{1});% TODO delete this again
 % normalization: only 0 or 1 in return values indicating where cells for
 % the landmark where found
-referenceLandmark.MIP = referenceLandmark.MIP > 0;
-referenceLandmark.coords = referenceLandmark.coords > 0;
+referenceLandmark.MIP = ( referenceLandmark.MIP / numberOfResults ) ...
+    > parameter.referenceLandmark.percentage;
+referenceLandmark.coords = ( referenceLandmark.coords / numberOfResults ) ...
+    > parameter.referenceLandmark.percentage; 
 
 end
 

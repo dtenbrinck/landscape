@@ -80,4 +80,8 @@ p.option.heatmaps.disp = 0;
 
 % Scale the heatmaps. Input can be: 'true','false','both'
 p.option.heatmaps.scaled = 'both';
+
+% use an averaged amount of found landmark cells to be considered in the dynamic heatmaps
+% the value indicates the percentage of of found cells in this area considering the total number of results
+p.referenceLandmark.percentage = 0.5; 
 end
