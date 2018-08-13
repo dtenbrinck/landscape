@@ -11,14 +11,6 @@ for resultCounter = 1:numberOfResults
     referenceLandmark.MIP = referenceLandmark.MIP + ...
         gatheredData.registered.landmarkMIP;
     unregisteredLandmarkCoords = gatheredData.processed.landmark;
-    unregisteredLandmarkCoords(380, 200, 15) = 1;
-    unregisteredLandmarkCoords(380, 180, 15) = 1;
-    unregisteredLandmarkCoords(380, 200, 10) = 1;
-    unregisteredLandmarkCoords(360, 200, 15) = 1;
-    unregisteredLandmarkCoords(200, 300, 30) = 1;
-    unregisteredLandmarkCoords(190, 300, 29) = 1;
-    unregisteredLandmarkCoords(180, 310, 30) = 1;
-    unregisteredLandmarkCoords(200, 300, 28) = 1;
     registeredLandmarkCoords = transformVoxelData( ...
         single(unregisteredLandmarkCoords), parameter.resolution, ...
         gatheredData.registered.transformation_full, ...
