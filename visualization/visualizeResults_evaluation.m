@@ -4,18 +4,18 @@ function visualizeResults_evaluation(f,gatheredData)
 
 clf(f)
 % visualize original data
-subplot(3,3,1); imagesc((gatheredData.experiment.DapiMIP)); title('Original DAPI channel');
-subplot(3,3,2); imagesc((gatheredData.experiment.GFPMIP)); title('Original GFP channel');
-subplot(3,3,3); imagesc((gatheredData.experiment.mCherryMIP)); title('Original mCherry channel');
+subplot(3,3,1); imagesc((gatheredData.experiment.DapiMIP)); title('Original DAPI channel'); axis image;
+subplot(3,3,2); imagesc((gatheredData.experiment.GFPMIP)); title('Original GFP channel'); axis image;
+subplot(3,3,3); imagesc((gatheredData.experiment.mCherryMIP)); title('Original mCherry channel'); axis image;
 
 % visualize segmentation results in preprocessed data
-subplot(3,3,4); imagesc((gatheredData.processed.DapiMIP)); title('Segmentation in processed DAPI channel');
+subplot(3,3,4); imagesc((gatheredData.processed.DapiMIP)); title('Segmentation in processed DAPI channel'); axis image;
 if isfield(gatheredData.processed, 'nucleiMIP') % check for backward compatibilty
     hold on; contour((gatheredData.processed.nucleiMIP), [0.5 0.5], 'r', 'LineWidth', 2); hold off;
 end
-subplot(3,3,5); imagesc((gatheredData.processed.GFPMIP)); title('Segmentation in processed GFP channel');
+subplot(3,3,5); imagesc((gatheredData.processed.GFPMIP)); title('Segmentation in processed GFP channel'); axis image;
 hold on; contour((gatheredData.processed.landmarkMIP), [0.5 0.5], 'r', 'LineWidth', 2); hold off;
-subplot(3,3,6); imagesc((gatheredData.processed.mCherryMIP)); title('Segmentation in processed mCherry channel');
+subplot(3,3,6); imagesc((gatheredData.processed.mCherryMIP)); title('Segmentation in processed mCherry channel'); axis image;
 hold on; contour((gatheredData.processed.cellsMIP), [0.5 0.5], 'r', 'LineWidth', 2); hold off;
 
 % visualize segmentation results in registered data 
