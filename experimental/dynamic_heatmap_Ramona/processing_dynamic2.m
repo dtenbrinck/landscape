@@ -30,51 +30,54 @@ p.resolution(1:2) = p.resolution(1:2) / p.scale;
 
 if (p.resolution(3) == 10 )
     % special case: 10µm slices
-    numberOfSclices = 40;
+    numberOfSlices = 40;
 else
     % default case: 20µm slices
-    numberOfSclices = 20;
+    numberOfSlices = 20;
 end
 
 %% MAIN LOOP
 
-fprintf(['Processing dataset: (0,' num2str(numberOfExperiments) ')']); 
+fprintf('Processing datasets:'); 
 
 % process all existing data sequentially
-for experiment=1:numberOfExperiments
+for currentExpNo=1:numberOfExperiments
     
     % show remotecurrent experiment number
-    dispCounter(experiment, numberOfExperiments);
+    fprintf('\n(%d/%d)\n', currentExpNo, numberOfExperiments);
     
     try
         % get data of current experiment
         if p.debug_level >= 1; disp('Loading dynamic nuclei and landmark data...'); end
-        experimentDataWholeTimeInterval = loadExperimentData(allValidExperiments(experiment,:), p.dataPath);
+        experimentDataWholeTimeInterval = loadExperimentData(allValidExperiments(currentExpNo,:), p.dataPath);
  
         % determine number of timesteps
-        numberOfRecordedTimesteps = size(experimentDataWholeTimeInterval.Dapi, 3) / numberOfSclices; 
+        numberOfRecordedTimesteps = size(experimentDataWholeTimeInterval.Dapi, 3) / numberOfSlices; 
         numberOfPGCVelocityFrames = numberOfRecordedTimesteps-1;
         
         if p.debug_level >= 1; disp('Loading dynamic pgc data...'); end
-        load([p.dataPath,'/', fileNamesCorrectedTracks{experiment}]);
-        [processedData.dynamic.cellCoordinates, ...
-                    processedData.dynamic.cellVelocities] ...
-                    = evaluateVelocitiesFromTracking2(tracks_PGC, numberOfPGCVelocityFrames );
+        load([p.dataPath,'/', fileNamesCorrectedTracks{currentExpNo}]);
+        [dynamicCellCoordinatesWholeTimeInterval, ...
+                    dynamicCellVelocitiesWholeTimeInterval] ...
+                    = getDynamicPGCdataInTimestepStructure...
+                    (tracks_PGC, numberOfPGCVelocityFrames );
                 
         % TODO: ask wether to start at first or second slices block because
         % we get one more block than from dynamic and corrected pgc data
-        for ts = 1:numberOfPGCVelocityFrames % TODO: 2:numberOfTimesteps
-            fprintf('Processing time frame %d\n...', ts);
+        for timeframe = 1:numberOfPGCVelocityFrames % TODO: 2:numberOfTimesteps
+            fprintf('Processing time frame %d...\n', timeframe);
+            
             try
+
                 % include data for this timeframe
                 experimentData.Dapi = experimentDataWholeTimeInterval.Dapi(:,:,...
-                    numberOfSlices*(ts-1)+1 : numberOfSlices*ts);
+                    numberOfSlices*(timeframe-1)+1 : numberOfSlices*timeframe);
 
                 experimentData.GFP = experimentDataWholeTimeInterval.GFP(:,:,...
-                    numberOfSlices*(ts-1)+1 : numberOfSlices*ts);
+                    numberOfSlices*(timeframe-1)+1 : numberOfSlices*timeframe);
 
                 experimentData.filename = [experimentDataWholeTimeInterval.filename ...
-                    '_timeframe_' ts ];
+                    '_timeframe_' timeframe ];
                 
                 % preprocess and rescale data
                 if p.debug_level >= 1; disp('Preprocessing data...'); end
@@ -94,12 +97,6 @@ for experiment=1:numberOfExperiments
                 if p.debug_level >= 1; disp('Compute transformation from optimal ellipsoid...'); end
                 transformationMatrix = computeTransformationMatrix(ellipsoid);
 
-                %%%%%%%%%%% VALIDITY CHECK FOR DEBUGGING
-                if p.debug_level >= 2
-                    disp('Transform data for validity check...');
-                    [ transformedData, transformedResolution ] = transformDataToSphere( processedData, p.resolution, transformationMatrix, ellipsoid, p.samples_cube );
-                end
-
                 % project landmark onto unit sphere
                 if p.debug_level >= 1; disp('Projecting landmark onto embryo surface...'); end
                 [sphereCoordinates, landmarkCoordinates, landmarkOnSphere] = ...
@@ -115,9 +112,8 @@ for experiment=1:numberOfExperiments
 
                 % evaluate PGC velocities
                 if p.debug_level >= 1; disp('Consider PGC velocities from tracking info...'); end
-                [processedData.dynamic.cellCoordinates, ...
-                    processedData.dynamic.cellVelocities] ...
-                    = evaluateVelocitiesFromTracking(tracks_PGC);
+                processedData.dynamic.cellCoordinates = dynamicCellCoordinatesWholeTimeInterval{timeframe};
+                processedData.dynamic.cellVelocities = dynamicCellVelocitiesWholeTimeInterval{timeframe};
 
                 % register data
                 if p.debug_level >= 1; disp('Registering data...'); end
