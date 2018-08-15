@@ -1,3 +1,3 @@
-function saveErrorMsg(results_filename, errorMsg);
-    save(results_filename, errorMsg);
+function saveErrorMsg(results_filename, ERROR_MSG)
+    save(results_filename, 'ERROR_MSG');
 end
