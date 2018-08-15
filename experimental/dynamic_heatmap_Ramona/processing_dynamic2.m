@@ -69,16 +69,17 @@ parfor currentExpNo=1:numberOfExperiments
             fprintf('Processing time frame %d...\n', timeframe);
             
             try
-
+                
                 % include data for this timeframe
-                experimentData = struct([]); % empty initilization to avoid conflict in parfor loop
-                experimentData.Dapi = experimentDataWholeTimeInterval.Dapi(:,:,...
+                % empty initilization to avoid conflict in parfor loop
+                experimentData = struct('Dapi', {}, 'GFP', {}, 'filename', {});
+                experimentData(1).Dapi = experimentDataWholeTimeInterval.Dapi(:,:,...
                     numberOfSlices*(timeframe-1)+1 : numberOfSlices*timeframe);
 
-                experimentData.GFP = experimentDataWholeTimeInterval.GFP(:,:,...
+                experimentData(1).GFP = experimentDataWholeTimeInterval.GFP(:,:,...
                     numberOfSlices*(timeframe-1)+1 : numberOfSlices*timeframe);
 
-                experimentData.filename = [experimentDataWholeTimeInterval.filename ...
+                experimentData(1).filename = [experimentDataWholeTimeInterval.filename ...
                     '_timeframe_' num2str(timeframe) ];
                 
                 % preprocess and rescale data
