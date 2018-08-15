@@ -58,10 +58,12 @@ elseif strcmp(GFPseg_parameter.method, 'k-means')  % k-means clustering
     end
     
     % restrict segmentation to highest intensity voxels
-    MIP = computeMIP(data);
-    Xi2 = (Xi & data > 0.98*repmat(MIP,1,1,size(data,3)));
-    
-    Xi = Xi2;
+    if ( GFPseg_parameter.threshold > 0 )
+        fprintf('Cutting off blurry effects in GFP segmentation based on max. intensity values...\n');
+        MIP = computeMIP(data);
+        Xi2 = (Xi & data > GFPseg_parameter.threshold*repmat(MIP,1,1,size(data,3)));
+        Xi = Xi2;
+    end
 end
 
 % set output variable

@@ -4,8 +4,8 @@ function p =  ParameterProcessing()
 % discriptios of each parameter.        
   
 %% COMMON PARAMETER
-p.resolution = [0.32, 0.32, 5];
-p.scale = 1;
+p.resolution = [1.3, 1.3, 10];
+p.scale = 0.75;
 
 % Debug variables
 p.debug_level = 1; %1
@@ -25,6 +25,8 @@ p.DAPIseg.k = 3;
 p.GFPseg.k = 4; %4 
 p.GFPseg.morphSize = 5; %5
 p.GFPseg.method = 'k-means'; % 'k-means', 'CP'
+% threshold level (percentage) to cut off blurry effects for EPI data
+p.GFPseg.threshold = 0; % SD: 0, EPI: 0.98 e.g.
 % -- mCherry SEGMENTATION -- %
 % binarization step before actual (blob) segmentation is variable,
 % default: 'kittler'
