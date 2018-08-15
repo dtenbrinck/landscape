@@ -116,8 +116,6 @@ function [W, X, pca_transformation] = prepareCoordinateMatrixAndOrientationMatri
     if size( X, 2 ) ~= 3
         error( 'Input data must have three columns!' );
     else
-%         pca_transformation = (pca(X))'; % row-wise coeff. of principal components
-%         X = (pca_transformation * X')';
         pca_transformation = pca(X); % column-wise coeff. of principal components
         X = X * pca_transformation;
         x = X( :, 1 );

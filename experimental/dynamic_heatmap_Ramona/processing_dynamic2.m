@@ -41,7 +41,7 @@ end
 fprintf('Processing datasets:'); 
 
 % process all existing data sequentially
-for currentExpNo=1:numberOfExperiments
+parfor currentExpNo=1:numberOfExperiments
     
     % show remotecurrent experiment number
     fprintf('\n(%d/%d)\n', currentExpNo, numberOfExperiments);
@@ -56,7 +56,8 @@ for currentExpNo=1:numberOfExperiments
         numberOfPGCVelocityFrames = numberOfRecordedTimesteps-1;
         
         if p.debug_level >= 1; disp('Loading dynamic pgc data...'); end
-        load([p.dataPath,'/', fileNamesCorrectedTracks{currentExpNo}]);
+        loaded = load([p.dataPath,'/', fileNamesCorrectedTracks{currentExpNo}]);
+        tracks_PGC = loaded.tracks_PGC;
         [dynamicCellCoordinatesWholeTimeInterval, ...
                     dynamicCellVelocitiesWholeTimeInterval] ...
                     = getDynamicPGCdataInTimestepStructure...
@@ -70,6 +71,7 @@ for currentExpNo=1:numberOfExperiments
             try
 
                 % include data for this timeframe
+                experimentData = struct([]); % empty initilization to avoid conflict in parfor loop
                 experimentData.Dapi = experimentDataWholeTimeInterval.Dapi(:,:,...
                     numberOfSlices*(timeframe-1)+1 : numberOfSlices*timeframe);
 
@@ -77,7 +79,7 @@ for currentExpNo=1:numberOfExperiments
                     numberOfSlices*(timeframe-1)+1 : numberOfSlices*timeframe);
 
                 experimentData.filename = [experimentDataWholeTimeInterval.filename ...
-                    '_timeframe_' timeframe ];
+                    '_timeframe_' num2str(timeframe) ];
                 
                 % preprocess and rescale data
                 if p.debug_level >= 1; disp('Preprocessing data...'); end
@@ -137,7 +139,7 @@ for currentExpNo=1:numberOfExperiments
                 results_filename = [p.resultsPath '/bug/' experimentData.filename '_results.mat'];
 
                 % save results
-                save(results_filename, 'ERROR_MSG');
+                saveErrorMsg(results_filename, ERROR_MSG);
 
                 if p.debug_level >= 1; disp('Saved buggy dataset!'); end
 
@@ -149,7 +151,7 @@ for currentExpNo=1:numberOfExperiments
         results_filename = [p.resultsPath '/bug/' experimentDataWholeTimeInterval.filename '_results.mat'];
 
         % save results
-        save(results_filename, 'ERROR_MSG');
+        saveErrorMsg(results_filename, ERROR_MSG);
 
         if p.debug_level >= 1; disp('Saved buggy dataset!'); end
 
