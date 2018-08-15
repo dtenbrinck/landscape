@@ -57,6 +57,11 @@ elseif strcmp(GFPseg_parameter.method, 'k-means')  % k-means clustering
         Xi = imopen(Xi,strel('disk',morphSize));        
     end
     
+    % restrict segmentation to highest intensity voxels
+    MIP = computeMIP(data);
+    Xi2 = (Xi & data > 0.98*repmat(MIP,1,1,size(data,3)));
+    
+    Xi = Xi2;
 end
 
 % set output variable
