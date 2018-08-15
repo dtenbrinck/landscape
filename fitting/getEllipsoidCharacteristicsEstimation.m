@@ -86,9 +86,9 @@ Wtransposed = W';
 [radii, center] = approximateEllipsoidParamsWithDescentMethod(v_initial, W, funct, grad_funct, fittingParams.descentMethod);
 
 % invert coordinate transformation caused by PCA back for center vectors
-center = pca_transformation \ center;
+center = pca_transformation' \ center;
 
-axis=pca_transformation';
+axis=pca_transformation; % column-wise coeff. of principal components
 end
 
 function [v] = initializeEllipsoidParams(X)
@@ -116,8 +116,10 @@ function [W, X, pca_transformation] = prepareCoordinateMatrixAndOrientationMatri
     if size( X, 2 ) ~= 3
         error( 'Input data must have three columns!' );
     else
-        pca_transformation = (pca(X))';
-        X = (pca_transformation * X')';
+%         pca_transformation = (pca(X))'; % row-wise coeff. of principal components
+%         X = (pca_transformation * X')';
+        pca_transformation = pca(X); % column-wise coeff. of principal components
+        X = X * pca_transformation;
         x = X( :, 1 );
         y = X( :, 2 );
         z = X( :, 3 );

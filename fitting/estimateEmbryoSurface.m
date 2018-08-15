@@ -12,15 +12,30 @@ X = X(idx,:);
 
 %% check order of ellipsoids axes
 % largest absolute values should be on the diagonal
-orderedAxes = zeros(3,3);
 axes = ellipsoidEstimation.axes;
+orderedAxes = zeros(3,3);
+reducedColums = 1:3;
+reducedRows = 1:3;
+% put column with max. element in the column correspondig to the found row
+[r1, c1] = find(abs(axes) == max(max(abs(axes))));
+orderedAxes(:, r1) = axes(:, c1);
+% now only consider the remaining columns
+reducedColums( reducedColums == c1 ) = [];
+reducedRows( reducedRows == r1 ) = [];
+reducedAxes = axes(reducedRows, reducedColums);
+[r2, c2] = find(abs(reducedAxes) == max(max(abs(reducedAxes))));
+% put column with max. element in the column correspondig to the found row
+% considering only the remaining rows
+orderedAxes(:, reducedRows(r2)) = axes(:, reducedColums(c2));
+% find out last remaining column and put it in the still empty column
+% corresponding to the remaining row element
+reducedColums( reducedColums == reducedColums(c2) ) = [];
+reducedRows( reducedRows == reducedRows(r2) ) = [];
+orderedAxes(:, reducedRows) = axes(:, reducedColums);
 for i=1:3
-    posLargestColumnElement = find(abs(axes(:,i)) == max(abs(axes(:,i))));
-    fprintf('Column %d should be in column %d\n', i, posLargestColumnElement);
-    orderedAxes(:, posLargestColumnElement) = axes(:,i);
     %% check ellipsoid's axes orientation and flip if necessary
-    if (orderedAxes(posLargestColumnElement,posLargestColumnElement) < 0 )
-        orderedAxes(:, posLargestColumnElement) = -orderedAxes(:, posLargestColumnElement);
+    if (orderedAxes(i,i) < 0 )
+        orderedAxes(:, i) = -orderedAxes(:, i);
     end
 end
 ellipsoidEstimation.axes = orderedAxes;
