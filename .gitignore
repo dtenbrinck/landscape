@@ -11,3 +11,4 @@ commands.txt
 *.asv
 *.mat
 /experimental/dynamic_heatmap_Ramona/inputData/*
+/experimental/drosophila/drosophila/*.png

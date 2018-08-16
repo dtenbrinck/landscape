@@ -53,7 +53,9 @@ gatheredData.registered.GFPMIP = computeMIP(registeredData.GFP);
 gatheredData.registered.landmarkMIP = computeMIP(registeredData.landmark);
 
 % this includes now coordinates of the dynamic PGC information
-gatheredData.registered.cellCoordinates = registeredData.cellCoordinates;
+if isfield(registeredData, 'cellCoordinates')
+    gatheredData.registered.cellCoordinates = registeredData.cellCoordinates;
+end
 if isfield(registeredData, 'nuclei') % check for backward compatibilty
     gatheredData.registered.nucleiMIP = computeMIP(registeredData.nuclei);
 end

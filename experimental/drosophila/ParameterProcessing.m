@@ -41,10 +41,10 @@ p.samples_sphere = 128;
 
 %% ELLIPSOIDAL FITTING
 p.ellipsoidFitting.percentage = 10;
-p.ellipsoidFitting.visualization = 0;
-p.ellipsoidFitting.regularisationParams.mu0 = 10^-8;
-p.ellipsoidFitting.regularisationParams.mu1 = 0.002; 
-p.ellipsoidFitting.regularisationParams.mu2 = 1;
+p.ellipsoidFitting.visualization = 1;
+p.ellipsoidFitting.regularisationParams.mu0 = 10^-10;
+p.ellipsoidFitting.regularisationParams.mu1 = 0.02; 
+p.ellipsoidFitting.regularisationParams.mu2 = 0.5;
 p.ellipsoidFitting.regularisationParams.gamma = 1; 
 p.ellipsoidFitting.descentMethod = 'cg'; % 'grad'
 %% REGISTRATION
