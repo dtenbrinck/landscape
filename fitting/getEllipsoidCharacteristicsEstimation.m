@@ -12,7 +12,7 @@ function [ center, radii, axis ] ...
 % * X, [x y z]      - Cartesian data, n x 3 matrix or three n x 1 vectors
 % * ellipsoidFitting.descentMethod = 'cg' or 'grad';
 % * fittingParams.regularisationParams:
-%   mu1,mu2     - weights for volumetric terms
+%   mu1,mu2         - weights for volumetric terms
 % 	gamma           - parameter for smooth approximation with logarithm of 
 %                     kink in max(0,...) 
 %   mu0             - global scaling parameter
@@ -98,9 +98,9 @@ function [v] = initializeEllipsoidParams(X)
         x = X( :, 1 );
         y = X( :, 2 );
         z = X( :, 3 );
-        center=[mean(x); mean(y); min(z) + range(z) * 50/60];
-        radiiComponent = max(sqrt(sum((X-center') .* (X-center'), 2)));
-        radii=[radiiComponent; radiiComponent; radiiComponent];
+        center=[mean(x); mean(y); mean(z)]; 
+        distances = abs(X-center');
+        radii=[max(distances(:,1)); max(distances(:,2)); max(distances(:,3))];
         v=zeros(6,1);
         v(1:3) = (1./radii).^2;
         v(4:6) = - center .* v(1:3);
@@ -170,7 +170,7 @@ function v = performGradientSteps(v, W, funct, grad_funct, method)
             if ( k < 1 && alpha == 0)
                error('Line Search did not give a descent step length in first iteration step.\n')
             end
-%             fprintf ('Stopping gradient due to too small relative change of consecutive iterates!\n');
+            fprintf ('Stopping gradient descent due to too small relative change of consecutive iterates!\n');
             break;
         end
         v = v + alpha * p;
