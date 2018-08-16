@@ -32,7 +32,7 @@ p.resolution(1:2) = p.resolution(1:2) / p.scale;
 fprintf('Processing dataset:'); 
     
 % process all existing data sequentially
-for experiment=1:numberOfExperiments
+parfor experiment=1:numberOfExperiments
     
     % show remotecurrent experiment number
     dispCounter(experiment, numberOfExperiments);
@@ -119,7 +119,7 @@ for experiment=1:numberOfExperiments
         results_filename = [p.resultsPath '/bug/' experimentData.filename '_results.mat'];
         
         % save results
-        save(results_filename, 'ERROR_MSG');
+        saveErrorMsg(results_filename, ERROR_MSG);
         
         if p.debug_level >= 1; disp('Saved buggy dataset!'); end
         
