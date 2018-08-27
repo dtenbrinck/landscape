@@ -127,7 +127,7 @@ for experiment=1:numberOfExperiments
         results_filename = [p.resultsPath '/bug/' experimentData.filename '_results.mat'];
         
         % save results
-        save(results_filename, 'ERROR_MSG');
+        saveErrorMsg(results_filename, ERROR_MSG);
         
         if p.debug_level >= 1; disp('Saved buggy dataset!'); end
         
