@@ -8,7 +8,13 @@ function [ data ] = preprocessData( data, p )
 data = removeBackground(data,p.rmbg);
 
 % Resize data
-data = rescaleSlices(data, p.scale);
+if (p.scale ~= 1)
+    if (isfield(p, 'scaleAllDim') && p.scaleAllDim > 0) 
+        data = rescaleSlicesFull3d(data, p.scale);
+    else
+        data = rescaleSlices(data, p.scale);
+    end
+end
 
 % Normalize data
 data = normalizeData(data);
