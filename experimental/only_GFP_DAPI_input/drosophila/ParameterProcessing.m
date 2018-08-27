@@ -6,6 +6,7 @@ function p =  ParameterProcessing()
 %% COMMON PARAMETER
 p.resolution = [0.32, 0.32, 5];
 p.scale = 1;
+p.scaleAllDim = 1;
 
 % Debug variables
 p.debug_level = 1; %1

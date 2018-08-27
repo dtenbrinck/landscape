@@ -4,7 +4,7 @@ function p =  ParameterProcessing()
 % discriptios of each parameter.        
   
 %% COMMON PARAMETER
-p.resolution = [1.29, 1.29, 20];
+p.resolution = [1.3, 1.3, 10]; % zebrafish, partly, SD, dynamic
 p.scale = 0.75;
 p.scaleAllDim = 0;
 
@@ -27,7 +27,7 @@ p.GFPseg.k = 4; %4
 p.GFPseg.morphSize = 5; %5
 p.GFPseg.method = 'k-means'; % 'k-means', 'CP'
 % threshold level (percentage) to cut off blurry effects for EPI data
-p.GFPseg.threshold = 0.98; % SD: 0, EPI: 0.98 e.g.
+p.GFPseg.threshold = 0; % SD: 0, EPI: 0.98 e.g.
 % -- mCherry SEGMENTATION -- %
 % binarization step before actual (blob) segmentation is variable,
 % default: 'kittler'
@@ -42,7 +42,7 @@ p.samples_sphere = 128;
 
 %% ELLIPSOIDAL FITTING
 p.ellipsoidFitting.percentage = 10;
-p.ellipsoidFitting.visualization = 0;
+p.ellipsoidFitting.visualization = 1;
 p.ellipsoidFitting.regularisationParams.mu0 = 10^-8;
 p.ellipsoidFitting.regularisationParams.mu1 = 0.002; 
 p.ellipsoidFitting.regularisationParams.mu2 = 1;

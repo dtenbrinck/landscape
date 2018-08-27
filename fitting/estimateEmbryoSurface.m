@@ -30,6 +30,10 @@ if (  ellipsoidFittingParams.visualization )
     surf(x,y,z, 'FaceAlpha',0.15, 'FaceColor', 'm', 'EdgeColor', 'none', 'DisplayName', 'estimated ellipsoid');
     view(90, 0);
     axis equal;
+    axis off;
+    title(['radii: ', num2str(ellipsoidEstimation.radii(1)), ' \mum, \newline', ...
+        num2str(ellipsoidEstimation.radii(2)), ' \mum, \newline', ...
+        num2str(ellipsoidEstimation.radii(3)), ' \mum'], 'Interpreter', 'tex'); 
     legend('Location', 'southoutside');
     end
 end

@@ -20,7 +20,7 @@ fileNames = getTIFfilenames(p.dataPath);
 fileNamesCorrectedTracks = getMATtracks_corrected(p.dataPath);
 
 % extract only valid experiments with three data sets
-allValidExperiments = checkExperimentChannelsForDynamicData(fileNames);
+allValidExperiments = checkExperimentChannelsForBFPandGFPdata(fileNames);
 
 % get number of experiments
 numberOfExperiments = size(allValidExperiments,1);
@@ -127,7 +127,7 @@ for experiment=1:numberOfExperiments
         results_filename = [p.resultsPath '/bug/' experimentData.filename '_results.mat'];
         
         % save results
-        save(results_filename, 'ERROR_MSG');
+        saveErrorMsg(results_filename, ERROR_MSG);
         
         if p.debug_level >= 1; disp('Saved buggy dataset!'); end
         
