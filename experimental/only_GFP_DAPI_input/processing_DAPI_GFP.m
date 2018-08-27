@@ -26,8 +26,11 @@ allValidExperiments = checkExperimentChannelsForBFPandGFPdata(fileNames);
 numberOfExperiments = size(allValidExperiments,1);
 
 % adjust resolution according to scale parameter
-p.resolution(1:2) = p.resolution(1:2) / p.scale;
-
+if (isfield(p, 'scaleAllDim') && p.scaleAllDim > 0) 
+    p.resolution = p.resolution / p.scale;
+else
+    p.resolution(1:2) = p.resolution(1:2) / p.scale;
+end
 %% MAIN LOOP
 
 fprintf(['Processing dataset: (0,' num2str(numberOfExperiments) ')']); 

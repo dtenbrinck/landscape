@@ -4,8 +4,9 @@ function p =  ParameterProcessing()
 % discriptios of each parameter.        
   
 %% COMMON PARAMETER
-p.resolution = [0.32, 0.32, 5];
-p.scale = 1;
+p.resolution = [1.3, 1.3, 10]; % zebrafish, partly, SD data
+p.scale = 0.75;
+p.scaleAllDim = 0;
 
 % Debug variables
 p.debug_level = 1; %1
@@ -42,9 +43,9 @@ p.samples_sphere = 128;
 %% ELLIPSOIDAL FITTING
 p.ellipsoidFitting.percentage = 10;
 p.ellipsoidFitting.visualization = 1;
-p.ellipsoidFitting.regularisationParams.mu0 = 10^-10;
-p.ellipsoidFitting.regularisationParams.mu1 = 0.02; 
-p.ellipsoidFitting.regularisationParams.mu2 = 0.5;
+p.ellipsoidFitting.regularisationParams.mu0 = 10^-8;
+p.ellipsoidFitting.regularisationParams.mu1 = 0.002; 
+p.ellipsoidFitting.regularisationParams.mu2 = 1;
 p.ellipsoidFitting.regularisationParams.gamma = 1; 
 p.ellipsoidFitting.descentMethod = 'cg'; % 'grad'
 %% REGISTRATION
