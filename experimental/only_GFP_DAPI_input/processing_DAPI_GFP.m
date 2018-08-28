@@ -101,7 +101,7 @@ for experiment=1:numberOfExperiments
         
         % evaluate PGC velocities
         % TODO currently no mCherry data for the drosophila provided!!
-        fprintf('CURRENTLY THERE IS NO MCHRRY DATA FOR THE DROSOPHILA PROVIDED! \n');
+        fprintf('CURRENTLY THERE IS NO MCHRRY CHANNEL USED FOR THIS PROCESSING SCRIPT! \n');
         
         % register data
         if p.debug_level >= 1; disp('Registering data...'); end
