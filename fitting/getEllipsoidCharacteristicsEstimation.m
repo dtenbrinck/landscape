@@ -116,8 +116,17 @@ function [W, X, pca_transformation] = prepareCoordinateMatrixAndOrientationMatri
     if size( X, 2 ) ~= 3
         error( 'Input data must have three columns!' );
     else
-        pca_transformation = pca(X); % column-wise coeff. of principal components
-        X = X * pca_transformation;
+        [pca_transformation, X_transformedWithPCA] = pca(X, 'Centered',false); 
+        % pca_transformation = column-wise coeff. of principal components 
+        % X_transformedWithPCA = transformed coordinates of observations X
+        % input:('Centered', false) results in pca without centering
+        % columns of X by subtracting column means before applying pca 
+        % the following holds:
+        % X_transformedWithPCA = X * pca_transformation; 
+        % X = X_transformedWithPCA * pca_transformation';
+        % pca_transformation is a orthogonal matrix
+        
+        X = X_transformedWithPCA;
         x = X( :, 1 );
         y = X( :, 2 );
         z = X( :, 3 );
