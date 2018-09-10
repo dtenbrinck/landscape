@@ -61,7 +61,7 @@ for experiment=1:numberOfExperiments
 
         % estimate embryo surface by fitting an ellipsoid
         if p.debug_level >= 1; disp('Estimating embryo surface...'); end
-        ellipsoid = estimateEmbryoSurface(processedData.nucleiCoordinates, p.resolution, p.ellipsoidFitting, experiment);
+        ellipsoid = estimateEmbryoSurface(processedData.nucleiCoordinates, p.resolution, p.ellipsoidFitting);
         % compute transformation which normalizes the estimated ellipsoid to a unit sphere
         if p.debug_level >= 1; disp('Compute transformation from optimal ellipsoid...'); end
         transformationMatrix = computeTransformationMatrix(ellipsoid);
@@ -98,6 +98,9 @@ for experiment=1:numberOfExperiments
 
         % compute registration transformation from original data space
         transformation_registration = transformationMatrix * rotationMatrix';
+        
+        % plot rotated nuclei and estimated ellipsoid
+        plotEllipsoidAndNucleiAfterRotation (processedData.nucleiCoordinates, ellipsoid, experiment, rotationMatrix);
         
         % evaluate PGC velocities
         % TODO currently no mCherry data for the drosophila provided!!
