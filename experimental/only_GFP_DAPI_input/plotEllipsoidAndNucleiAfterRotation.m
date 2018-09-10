@@ -1,5 +1,5 @@
 function plotEllipsoidAndNucleiAfterRotation (nucleiOrigCoord, ellipsoidEstimation, expNumber, rotationMatrix)
-   nuclei = (rotationMatrix' * nucleiOrigCoord);
+   nuclei = (rotationMatrix' * nucleiOrigCoord)';
    fprintf("Plotting resulting ellipsoid estimation...\n");
    if isreal(ellipsoidEstimation.center) && isreal(ellipsoidEstimation.radii)
     figure;
@@ -23,6 +23,6 @@ function plotEllipsoidAndNucleiAfterRotation (nucleiOrigCoord, ellipsoidEstimati
         num2str(ellipsoidEstimation.radii(3)), ' \mum'], 'Interpreter', 'tex'); 
     legend('Location', 'southoutside');
    end
-    savefig(gcf, ['_' num2str(expNumber) '_estimated_ellipsoid.fig']);
+    savefig(gcf, ['_' num2str(expNumber) '_rotated_ellipsoid.fig']);
 
 end
