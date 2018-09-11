@@ -65,7 +65,7 @@ orderedRadii(reducedRows(r2)) = radii(reducedColums(c2));
 reducedColums( reducedColums == reducedColums(c2) ) = [];
 reducedRows( reducedRows == reducedRows(r2) ) = [];
 orderedAxes(:, reducedRows) = axes(:, reducedColums);
-orderedRadii(reducedRows) = radii(reducesColums);
+orderedRadii(reducedRows) = radii(reducedColums);
 for i=1:3
     %% check ellipsoid's axes orientation and flip if necessary
     if (orderedAxes(i,i) < 0 )
