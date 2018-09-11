@@ -100,7 +100,7 @@ for experiment=1:numberOfExperiments
         transformation_registration = transformationMatrix * rotationMatrix';
         
         % plot rotated nuclei and estimated ellipsoid
-        plotEllipsoidAndNucleiAfterRotation (processedData.nucleiCoordinates, ellipsoid, experiment, rotationMatrix);
+        plotEllipsoidAndNucleiAfterRotation (processedData.nucleiCoordinates, ellipsoid, experiment, rotationMatrix, p.resolution);
         
         % evaluate PGC velocities
         % TODO currently no mCherry data for the drosophila provided!!
