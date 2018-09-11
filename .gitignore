@@ -13,4 +13,4 @@ commands.txt
 /experimental/dynamic_heatmap_Ramona/inputData/*
 /experimental/only_GFP_DAPI_input/*/*/*.png
 /experimental/only_GFP_DAPI_input/*/*.png
-*_ellipsoid.fig
+*_ellipsoid*.fig
