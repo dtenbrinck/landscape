@@ -38,47 +38,47 @@ if (  ellipsoidFittingParams.visualization )
     end
 end
 
-%% check order of ellipsoids axes
-% largest absolute values should be on the diagonal
-% reorder radii accordingly
-orderedRadii = zeros(3,1);
-radii = ellipsoidEstimation.radii;
-axes = ellipsoidEstimation.axes;
-orderedAxes = zeros(3,3);
-reducedColums = 1:3;
-reducedRows = 1:3;
-% put column with max. element in the column corresponding to the found row
-[r1, c1] = find(abs(axes) == max(max(abs(axes))));
-orderedAxes(:, r1) = axes(:, c1);
-orderedRadii(r1) = radii(c1);
-% now only consider the remaining columns
-reducedColums( reducedColums == c1 ) = [];
-reducedRows( reducedRows == r1 ) = [];
-reducedAxes = axes(reducedRows, reducedColums);
-[r2, c2] = find(abs(reducedAxes) == max(max(abs(reducedAxes))));
-% put column with max. element in the column corresponding to the found row
-% considering only the remaining rows
-orderedAxes(:, reducedRows(r2)) = axes(:, reducedColums(c2));
-orderedRadii(reducedRows(r2)) = radii(reducedColums(c2));
-% find out last remaining column and put it in the still empty column
-% corresponding to the remaining row element
-reducedColums( reducedColums == reducedColums(c2) ) = [];
-reducedRows( reducedRows == reducedRows(r2) ) = [];
-orderedAxes(:, reducedRows) = axes(:, reducedColums);
-orderedRadii(reducedRows) = radii(reducedColums);
-for i=1:3
-    %% check ellipsoid's axes orientation and flip if necessary
-    if (orderedAxes(i,i) < 0 )
-        orderedAxes(:, i) = -orderedAxes(:, i);
-    end
-end
-ellipsoidEstimation.axes = orderedAxes;
-ellipsoidEstimation.radii = orderedRadii;
-
-%%%%% temp output
-axes
-orderedAxes
-radii
-orderedRadii
+% %% check order of ellipsoids axes
+% % largest absolute values should be on the diagonal
+% % reorder radii accordingly
+% orderedRadii = zeros(3,1);
+% radii = ellipsoidEstimation.radii;
+% axes = ellipsoidEstimation.axes;
+% orderedAxes = zeros(3,3);
+% reducedColums = 1:3;
+% reducedRows = 1:3;
+% % put column with max. element in the column corresponding to the found row
+% [r1, c1] = find(abs(axes) == max(max(abs(axes))));
+% orderedAxes(:, r1) = axes(:, c1);
+% orderedRadii(r1) = radii(c1);
+% % now only consider the remaining columns
+% reducedColums( reducedColums == c1 ) = [];
+% reducedRows( reducedRows == r1 ) = [];
+% reducedAxes = axes(reducedRows, reducedColums);
+% [r2, c2] = find(abs(reducedAxes) == max(max(abs(reducedAxes))));
+% % put column with max. element in the column corresponding to the found row
+% % considering only the remaining rows
+% orderedAxes(:, reducedRows(r2)) = axes(:, reducedColums(c2));
+% orderedRadii(reducedRows(r2)) = radii(reducedColums(c2));
+% % find out last remaining column and put it in the still empty column
+% % corresponding to the remaining row element
+% reducedColums( reducedColums == reducedColums(c2) ) = [];
+% reducedRows( reducedRows == reducedRows(r2) ) = [];
+% orderedAxes(:, reducedRows) = axes(:, reducedColums);
+% orderedRadii(reducedRows) = radii(reducedColums);
+% for i=1:3
+%     %% check ellipsoid's axes orientation and flip if necessary
+%     if (orderedAxes(i,i) < 0 )
+%         orderedAxes(:, i) = -orderedAxes(:, i);
+%     end
+% end
+% ellipsoidEstimation.axes = orderedAxes;
+% ellipsoidEstimation.radii = orderedRadii;
+% 
+% %%%%% temp output
+% axes
+% orderedAxes
+% radii
+% orderedRadii
 
 end
