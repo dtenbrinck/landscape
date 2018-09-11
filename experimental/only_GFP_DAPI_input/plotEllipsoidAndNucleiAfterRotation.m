@@ -72,5 +72,5 @@ function plotEllipsoidAndNucleiAfterRotation (nucleiOrigCoord, ellipsoidEstimati
     title(['scaled and rotated ellipsoid estimation'], 'Interpreter', 'tex'); 
     legend('Location', 'southoutside');
 
-    %savefig(gcf, ['_' num2str(expNumber) '_rotated_ellipsoid.fig']);
+    savefig(gcf, ['_' num2str(expNumber) '_rotated_ellipsoid.fig']);
 end
