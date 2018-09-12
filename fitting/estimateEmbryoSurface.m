@@ -73,8 +73,7 @@ for i=1:3
     end
 end
 ellipsoidEstimation.axes = orderedAxes;
-%ellipsoidEstimation.radii = orderedRadii; %%%%% DO NOT CHANGE ORDER OF
-%RADII
+ellipsoidEstimation.radiiOrderedForPlots = orderedRadii;
 
 %%%%% temp output
 axes
