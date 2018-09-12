@@ -2,9 +2,6 @@ function plotEllipsoidAndNucleiAfterRotation (nucleiOrigCoord, ellipsoidEstimati
     X(:,1) = (nucleiOrigCoord(1,:) * resolution(1))';
     X(:,2) = (nucleiOrigCoord(2,:) * resolution(2))';
     X(:,3) = (nucleiOrigCoord(3,:) * resolution(3))';
-    rng(0,'twister');
-    idx = randperm( size(X,1), ceil(10/100*size(X,1)));
-    X = X(idx,:);
 
     center = ellipsoidEstimation.center;
     axes = ellipsoidEstimation.axes;
@@ -35,7 +32,7 @@ function plotEllipsoidAndNucleiAfterRotation (nucleiOrigCoord, ellipsoidEstimati
     plotOrientationVectors( center, (rotationMatrix' * axes')', ellipsoidEstimation.radiiOrderedForPlots);
     title(['rotated ellipsoid estimation'], 'Interpreter', 'tex'); 
     
-    fprintf("Plotting resulting ellipsoid estimation after registration...\n");    
+    fprintf("Plotting resulting ellipsoid estimation after registration...\n"); 
     X(:,1) = ((nucleiOrigCoord(1,:) * resolution(1))' - ellipsoidEstimation.center(1) );
     X(:,2) = ((nucleiOrigCoord(2,:) * resolution(2))' - ellipsoidEstimation.center(2) );
     X(:,3) = ((nucleiOrigCoord(3,:) * resolution(3))' - ellipsoidEstimation.center(3) );
@@ -72,6 +69,7 @@ function [x,y,z] = reshapeXYZ(rotatedCoordinates, center, n)
 end
 
 function plotOrientationVectors( center, axis, radii)
+    radii = radii + 0.15*radii; % make arrows longer to make them visible
     quiver3( center(1), center(2), center(3), radii(1)*axis(1,1), radii(1)*axis(2,1), radii(1)*axis(3,1), 'k', 'LineWidth', 2, 'Displayname','first axis'); hold on;
     quiver3( center(1), center(2), center(3), radii(2)*axis(1,2), radii(2)*axis(2,2), radii(2)*axis(3,2), 'r', 'LineWidth', 2, 'Displayname','second axis');hold on;
     quiver3( center(1), center(2), center(3), radii(3)*axis(1,3), radii(3)*axis(2,3), radii(3)*axis(3,3), 'g', 'LineWidth', 2, 'Displayname','third axis');
