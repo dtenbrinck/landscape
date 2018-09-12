@@ -4,6 +4,7 @@ X(:,2) = (nuclei_coord(2,:) * resolution(2))';
 X(:,3) = (nuclei_coord(3,:) * resolution(3))';
 
 %% fit ellipsoid to sharp points in areas in focus
+rng(0,'twister');
 idx = randperm( size(X,1), ceil(ellipsoidFittingParams.percentage/100*size(X,1)));
 X = X(idx,:);
 
