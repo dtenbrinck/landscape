@@ -1,4 +1,4 @@
-%% INITIALIZATION
+%% INITIALIZATION 
 clear; clc; close all;
 
 % define root directory
