@@ -6,6 +6,7 @@ function p =  ParameterProcessing()
 %% COMMON PARAMETER
 p.resolution = [1.29, 1.29, 20];
 p.scale = 0.75;
+p.scaleAllDim = 0;
 
 % Debug variables
 p.debug_level = 1; %1
@@ -25,6 +26,8 @@ p.DAPIseg.k = 3;
 p.GFPseg.k = 4; %4 
 p.GFPseg.morphSize = 5; %5
 p.GFPseg.method = 'k-means'; % 'k-means', 'CP'
+% threshold level (percentage) to cut off blurry effects for EPI data
+p.GFPseg.threshold = 0; % SD: 0, EPI: 0.98 e.g.
 % -- mCherry SEGMENTATION -- %
 % binarization step before actual (blob) segmentation is variable,
 % default: 'kittler'
@@ -36,6 +39,15 @@ p.mCherryseg.cellSize = 50; %50. in pixel
 p.mCherryseg.method = 'k-means'; % 'k-means', 'k-means_local', 'CP'
 % -- LANDMARK PROJECTION -- %
 p.samples_sphere = 128;
+
+%% ELLIPSOIDAL FITTING
+p.ellipsoidFitting.percentage = 10;
+p.ellipsoidFitting.visualization = 0;
+p.ellipsoidFitting.regularisationParams.mu0 = 10^-8;
+p.ellipsoidFitting.regularisationParams.mu1 = 0.002; 
+p.ellipsoidFitting.regularisationParams.mu2 = 1;
+p.ellipsoidFitting.regularisationParams.gamma = 1; 
+p.ellipsoidFitting.descentMethod = 'cg'; % 'grad'
 %% REGISTRATION
 % -- REGISTRATION OF LANDMARK -- %
 p.reg.landmarkCharacteristic = 'middle';
