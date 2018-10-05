@@ -76,10 +76,4 @@ end
 ellipsoidEstimation.axes = orderedAxes;
 ellipsoidEstimation.radiiOrderedForPlots = orderedRadii;
 
-%%%%% temp output
-axes
-orderedAxes
-radii
-orderedRadii
-
 end
