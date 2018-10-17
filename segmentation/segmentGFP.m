@@ -53,8 +53,14 @@ elseif strcmp(GFPseg_parameter.method, 'k-means')  % k-means clustering
     if strcmp(type,'k-channel')
         Xi = floor(Xi / k);
     elseif strcmp(type,'morph')
-        Xi = Xi-2>0;
-        Xi = imopen(Xi,strel('disk',morphSize));        
+        Xi_temp = Xi-2>0;
+        % check if signal was too strong so that too many  (more than 10% 
+        % in Xi)elements are found with k-means when only cutting off 
+        % lowest two k-channels
+        if ( nnz(Xi_temp) > 0.1 * numel(Xi) )
+            Xi_temp = Xi-(k-1) > 0;
+        end
+        Xi = imopen(Xi_temp,strel('disk',morphSize));        
     end
     
     % restrict segmentation to highest intensity voxels
