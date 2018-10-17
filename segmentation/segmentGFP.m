@@ -54,10 +54,10 @@ elseif strcmp(GFPseg_parameter.method, 'k-means')  % k-means clustering
         Xi = floor(Xi / k);
     elseif strcmp(type,'morph')
         Xi_temp = Xi-2>0;
-        % check if signal was too strong so that too many  (more than 10% 
+        % check if signal was too strong so that too many  (more than 5% 
         % in Xi)elements are found with k-means when only cutting off 
         % lowest two k-channels
-        if ( nnz(Xi_temp) > 0.1 * numel(Xi) )
+        if ( nnz(Xi_temp) > 0.05 * numel(Xi) )
             Xi_temp = Xi-(k-1) > 0;
         end
         Xi = imopen(Xi_temp,strel('disk',morphSize));        
