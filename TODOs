@@ -20,3 +20,6 @@ We want to compare them. Therefore, we have to make sure we colour them so that 
 5. Segmentation of landmarks - Depending on our  experiments, (e.g. manipulations altering the environment of the embryo), we might face GFP landmarks that look different and might ask for a different segmentation/registration approach. This task should be kept in our mind for the future. 
 
 6. Registration of shortened GFP landmark datasets
+
+
+A short test message!
