@@ -32,7 +32,7 @@ p.resolution(1:2) = p.resolution(1:2) / p.scale;
 fprintf('Processing dataset:'); 
     
 % process all existing data sequentially
-parfor experiment=1:numberOfExperiments
+for experiment=1:numberOfExperiments
     
     % show remotecurrent experiment number
     dispCounter(experiment, numberOfExperiments);
