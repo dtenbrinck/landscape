@@ -25,6 +25,18 @@ options = optimoptions('fmincon','Display','off','Algorithm','sqp'); % 'StepTole
 % Compute the spherical regression
 [pstar,vstar] ...
         = sphericalRegression3D_daniel(regData,[0;0;-1],[1;0;0],options,visualize);
+ 
+ % Check if orientation of Great Circle is counter clockwise and change direction if needed 
+if pstar(3) < 0
+    if vstar(1) < 0 
+        vstar = -vstar;
+    end
+    else 
+        if vstar(1) > 0
+            vstar = -vstar;
+        end
+    end  
+        
 % Normalize vstar
 %vstar = vstar/norm(vstar);
 end
