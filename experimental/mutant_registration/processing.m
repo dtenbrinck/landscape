@@ -33,6 +33,10 @@ p.resolution(1:2) = p.resolution(1:2) / p.scale;
 fprintf(['Processing dataset: (0,' num2str(numberOfExperiments) ')']);
     
 % process all existing data sequentially
+delete(gcp('nocreate'));
+   if p.debug_level <= 1 && p.visualization == 0
+        parpool;
+   end
 parfor experiment=1:numberOfExperiments
     
     % show remotecurrent experiment number
@@ -79,7 +83,12 @@ parfor experiment=1:numberOfExperiments
         [sphereCoordinates, landmarkCoordinates, landmarkOnSphere] = ...
             projectLandmarkOnSphere(processedData.landmark, p.resolution, ellipsoid, p.samples_sphere);
         
-        
+         % project cells onto unit sphere 
+        if p.debug_level >= 3
+        disp('Projecting cells onto embryo surface...');
+        [sphereCoordinates2, cellsCoordinates, cellsOnSphere] = ...
+            projectLandmarkOnSphere(processedData.cells, p.resolution, ellipsoid, p.samples_sphere);
+        end
 
 
         %----------------------------------------------------------------------------------------------------------------------------
@@ -126,6 +135,12 @@ parfor experiment=1:numberOfExperiments
             % visualize projection on unit sphere
             visualizeProjectedLandmark(sphereCoordinates, landmarkOnSphere);
             visualizeProjectedLandmark(registered_sphere', landmarkOnSphere);
+            
+            %visualize projection of mCherry channel on unit sphere
+             if p.debug_level >= 3
+                visualizeProjectedLandmark(sphereCoordinates, cellsOnSphere);
+                visualizeProjectedLandmark(registered_sphere', cellsOnSphere);
+             end 
         end
         
         %--------------------------------------------------------------------------------------------------------------------------------------
