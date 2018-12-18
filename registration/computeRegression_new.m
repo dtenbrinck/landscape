@@ -31,12 +31,12 @@ if pstar(3) < 0
     if vstar(1) < 0 
         vstar = -vstar;
     end
-    else 
-        if vstar(1) > 0
-            vstar = -vstar;
-        end
-    end  
-        
+else 
+    if vstar(1) > 0
+        vstar = -vstar;
+    end
+end  
+     
 % Normalize vstar
 %vstar = vstar/norm(vstar);
 end

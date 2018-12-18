@@ -21,8 +21,8 @@ function [pnew,vnew] = getCharPos_daniel(p,v,coordinates,type,weightingRatio)
 
 %% PARAMETER
 %weightingRatio = 0.5; % For 0.5 it will pick the midpoint on the line, 
-                        % For <0.5 it will pick a point nearer to the tail
-                        % For >0.5 it will pick a point nearer to the head
+                        % For <0.5 it will pick a point nearer to the head
+                        % For >0.5 it will pick a point nearer to the tail
                         % 0.45 is a good ratio
 
 %% MAIN CODE %%
@@ -31,7 +31,7 @@ function [pnew,vnew] = getCharPos_daniel(p,v,coordinates,type,weightingRatio)
 G = geodesicFun(p,v);
 T = linspace(0,2*pi,700);
 rL = G(T);
-values = zeros(1,numel(T));
+values = zeros(1,numel(T)); % find positions on discrete geodesic circle with close landmark coordinates
 
 threshold = 0.1;
 
@@ -47,7 +47,7 @@ for t=1:numel(T)
     
 end
 
-cumulator = zeros(1,numel(T));
+cumulator = zeros(1,numel(T)); % count distance to last recognised geodesic point near landmark
 for t=1:2*numel(T)
    
     index = mod(t-1,numel(T))+1;
@@ -56,8 +56,9 @@ for t=1:2*numel(T)
    end
     
 end
-
-max_index = find(cumulator == max(cumulator(:)));
+% find index of point on geod. circle before nearest head points are found (in values)
+% this is expressed with the highest distance value in the 'cumulator' 
+max_index = find(cumulator == max(cumulator(:))); 
 
 begin_index = mod(max_index, numel(T)) + 1;
 
