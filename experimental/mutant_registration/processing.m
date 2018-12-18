@@ -37,7 +37,7 @@ delete(gcp('nocreate'));
    if p.debug_level <= 1 && p.visualization == 0
         parpool;
    end
-parfor experiment=1:numberOfExperiments
+for experiment=1:numberOfExperiments
     
     % show remotecurrent experiment number
     dispCounter(experiment, numberOfExperiments);
@@ -121,9 +121,9 @@ parfor experiment=1:numberOfExperiments
         
         %-------------------------------------------------------------------------------------------------------------------------------------
         %HEAD POSITION CALCULATION
-        %[pstar,vstar] = computeRegression_new(landmarkCoordinates','false');
-        %landmarkCharacteristic = p.reg.landmarkCharacteristic;
-        %disp([experiment, getCharPos_daniel(pstar,vstar,landmarkCoordinates',landmarkCharacteristic,0)])  
+%         [pstar,vstar] = computeRegression_new(landmarkCoordinates','false');
+%         landmarkCharacteristic = p.reg.landmarkCharacteristic;
+%         disp([experiment, getCharPos_daniel(pstar,vstar,landmarkCoordinates',landmarkCharacteristic,0)])  
         %-------------------------------------------------------------------------------------------------------------------------------------
         
         %%%%%%%%%%% VALIDITY CHECK FOR DEBUGGING

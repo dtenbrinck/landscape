@@ -10,7 +10,7 @@ p.scaleAllDim = 0;
 
 % Debug variables
 p.debug_level = 1; %1
-p.visualization = 0; %0
+p.visualization = 1; %0
 
 %% PREPROCESSING
 % -- BACKGROUND REMOVAL -- %
@@ -54,7 +54,7 @@ p.reg.landmarkCharacteristic = 'middle';
 p.reg.characteristicWeight = 0; % 0 = head, 1 = tail
 zwert = 0; %value for z (front - back) at the reference point, only works for points on the left half of the unit ball
 p.reg.reference_point = [-sqrt(1-zwert^2); 0; zwert]; 
-p.reg.reference_vector = [zwert/(-sqrt(1-zwert^2)); 0; -1];
+p.reg.reference_vector = [zwert/(-sqrt(1-zwert^2)); 0; -1]; % Is the third value 
 % - register data - %
 p.samples_cube = 256;
 end
