@@ -30,14 +30,28 @@ load([p.resultsPathAccepted,'/',fileNames{1,1}]);
 % Original data size (in mu)
 % origSize = gatheredData.processed.originalSize;
 
+%%% TODO: refactor code in this file to make pipeline more generic!
+
 %% COMPUTE ACCUMULATOR
 if strcmp(p.handledChannel, 'DAPI')
     % -- Compute all valid cell coordinates from the processed and registered data -- %
     allCellCoords = getAllValidCellCoords_DAPI(p.gridSize,fileNames,numberOfResults,p.tole,p.resultsPathAccepted);
+    
+    % --- Generate shells with valid cell coordinates per shell
+    shells = computeShells(allCellCoords, p.option.shellThickness, p.option.shellShiftWidth);
+    
+    % sanity check: for nonoverlapping shells the sum of all coordinates should stay constant
+    if p.option.shellShiftWidth == p.option.shellThickness
+        numberOfCells=0;
+        for i=1:size(shells,2)
+            numberOfCells = numberOfCells + size(shells{i},2);
+        end
+        assert(numberOfCells == size(allCellCoords,2));
+    end
 
     % -- Compute the Accumulator from the cell coordinates -- %
     accumulator = computeAccumulator_DAPI(allCellCoords, p.gridSize);
-
+    
     % make sure to use specific cell radius for dapi cells
     if ( isfield(p.option, 'dapiCellradius') )
         p.option.cellradius = p.option.dapiCellradius;

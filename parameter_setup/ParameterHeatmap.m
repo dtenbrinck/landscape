@@ -52,6 +52,13 @@ p.option.cropper = 0;
 % Every option beneath will be irrelevant if 0.
 p.option.heatmaps.process = 1;
 
+% Thickness of shells for mercator projection
+p.option.shellThickness = 0.1;
+
+% Shift width for shell computation
+% Note that shellShiftWidth = shellThickness means no overlap between heatmaps
+p.option.shellShiftWidth = 0.05;
+
 % Types of heatmaps. Currently available 'MIP', 'SUM'.
 % Can handle multiple input.
 % Default: {'MIP','SUM'}
