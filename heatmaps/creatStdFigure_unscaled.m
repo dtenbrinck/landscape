@@ -2,7 +2,7 @@ function [ stdFig ] = creatStdFigure_unscaled( numberOfResults, numOfAllCells,HM
 % Creates standard figure
 
 mycolormap = jet(256);
-stdFig = figure('units','normalized','outerposition',[0.25 0.25 0.65 0.65]);
+stdFig = figure('units','normalized','outerposition',[0.25 0.25 1 0.65]);
 set(stdFig,'Name',['Heatmaps ',currentType,' (unscaled)']);
 set(stdFig,'Visible','off');
 colormap(mycolormap);
