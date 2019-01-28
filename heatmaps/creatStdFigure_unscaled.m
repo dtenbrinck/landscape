@@ -56,7 +56,7 @@ imagesc(HMS.(currentType).Side2');
 set(sp5,'Tag','sp5');
 axis square
 ylabel(gca,'Bottom \leftarrow \rightarrow Top','FontSize',13);
-xlabel(gca,'Tail \leftarrow \rightarrow Head','FontSize',13);
+xlabel(gca,'Head \leftarrow \rightarrow Tail','FontSize',13);
 set(gca,'xtick',[],'ytick',[])
 pca = get(sp5,'position');
 colorbar;
