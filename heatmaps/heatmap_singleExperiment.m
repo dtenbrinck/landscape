@@ -32,11 +32,15 @@ load([p.resultsPathAccepted,'/',fileNames{1,1}]);
 
 %%% TODO: refactor code in this file to make pipeline more generic!
 
+% -- Compute all valid cell coordinates from the processed and registered data -- %
+allCellCoords = getAllValidCellCoords(p.gridSize,fileNames,numberOfResults,p.tole,p.resultsPathAccepted, p.handledChannel);
+
+% -- Compute the Accumulator from the cell coordinates -- %
+accumulator = computeAccumulator(allCellCoords, p.gridSize);
+
 %% COMPUTE ACCUMULATOR
 if strcmp(p.handledChannel, 'DAPI')
-    % -- Compute all valid cell coordinates from the processed and registered data -- %
-    allCellCoords = getAllValidCellCoords_DAPI(p.gridSize,fileNames,numberOfResults,p.tole,p.resultsPathAccepted);
-    
+
     % --- Generate shells with valid cell coordinates per shell
     shells = computeShells(allCellCoords, p.option.shellThickness, p.option.shellShiftWidth);
     
@@ -48,9 +52,6 @@ if strcmp(p.handledChannel, 'DAPI')
         end
         assert(numberOfCells == size(allCellCoords,2));
     end
-
-    % -- Compute the Accumulator from the cell coordinates -- %
-    accumulator = computeAccumulator_DAPI(allCellCoords, p.gridSize);
     
     % make sure to use specific cell radius for dapi cells
     if ( isfield(p.option, 'dapiCellradius') )
@@ -59,11 +60,6 @@ if strcmp(p.handledChannel, 'DAPI')
         p.option.cellradius = 2; % use default size for dapi cell radius
     end
 elseif strcmp(p.handledChannel, 'mCherry')
-    % -- Compute all valid cell coordinates from the processed and registered data -- %
-    allCellCoords = getAllValidCellCoords(p.gridSize,fileNames,numberOfResults,p.tole,p.resultsPathAccepted);
-
-    % -- Compute the Accumulator from the cell coordinates -- %
-    accumulator = computeAccumulator(allCellCoords, p.gridSize);
     
     %% SLICE WISE PLOTS WITH PROJECTED REFERENCE LANDMARK
     fig_filename_base = [p.resultsPath ,'/heatmaps/'];
