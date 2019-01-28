@@ -20,7 +20,6 @@ for i=1:numOfStrings
         heatmapStruct.MIP.Tail = heatmapStruct.MIP.Tail(end:-1:1,:);
         heatmapStruct.MIP.Side1 = reshape(max(accumulator(1:size(accumulator,1)/2,:,:),[],1),[size(accumulator,2),size(accumulator,3)]);
         heatmapStruct.MIP.Side2 = reshape(max(accumulator(size(accumulator,1)/2+1:end,:,:),[],1),[size(accumulator,2),size(accumulator,3)]);
-        heatmapStruct.MIP.Side2 = heatmapStruct.MIP.Side2(end:-1:1,:);
     elseif strcmp(heatmaptypes(i),'SUM')
         heatmapStruct.SUM.Top = sum(accumulator(:,:,1:size(accumulator,3)/2),3);
         heatmapStruct.SUM.Head = reshape(sum(accumulator(:,1:size(accumulator,2)/2,:),2),[size(accumulator,1),size(accumulator,3)]);
@@ -28,7 +27,6 @@ for i=1:numOfStrings
         heatmapStruct.SUM.Tail = heatmapStruct.SUM.Tail(end:-1:1,:);
         heatmapStruct.SUM.Side1 = reshape(sum(accumulator(1:size(accumulator,1)/2,:,:),1),[size(accumulator,2),size(accumulator,3)]);
         heatmapStruct.SUM.Side2 = reshape(sum(accumulator(size(accumulator,1)/2+1:end,:,:),1),[size(accumulator,2),size(accumulator,3)]);
-        heatmapStruct.SUM.Side2 = heatmapStruct.SUM.Side2(end:-1:1,:);
     elseif strcmp(heatmaptypes(i),'PEAL')
         
     end 
