@@ -50,7 +50,7 @@ load([p.resultsPathAccepted,'/',stackNames1{1,1}]);
 %% COMPUTE ACCUMULATOR
 
 % -- Compute all valid cell coordinates from the processed and registered data -- %
-allCellCoords = getAllValidCellCoords(p.gridSize,stackNames1,numberOfResults1,p.tole,p.resultsPathAccepted);
+allCellCoords = getAllValidCellCoords(p.gridSize,stackNames1,numberOfResults1,p.tole,p.resultsPathAccepted, 'mCherry');
 
 % -- Compute the Accumulator from the cell coordinates -- %
 accum1 = computeAccumulator(allCellCoords, p.gridSize);
@@ -66,7 +66,7 @@ load([p.resultsPathAccepted,'/',stackNames2{1,1}]);
 %% COMPUTE ACCUMULATOR
 
 % -- Compute all valid cell coordinates from the processed and registered data -- %
-allCellCoords = getAllValidCellCoords(p.gridSize,stackNames2,numberOfResults2,p.tole,p.resultsPathAccepted);
+allCellCoords = getAllValidCellCoords(p.gridSize,stackNames2,numberOfResults2,p.tole,p.resultsPathAccepted, 'mCherry');
 
 % -- Compute the Accumulator from the cell coordinates -- %
 accum2 = computeAccumulator(allCellCoords, p.gridSize);
