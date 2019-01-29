@@ -22,6 +22,7 @@ p.rmbg.mCherryDiskSize = 11; %11
 % -- DAPI SEGMENTATION -- %
 p.DAPIseg.method = 'k-means'; % 'Laplacian', 'CP'
 p.DAPIseg.k = 3;
+p.DAPIseg.minNucleusSize = 6; % min. nucleus size
 % -- GFP SEGMENTATION -- %
 p.GFPseg.k = 4; %4 
 p.GFPseg.morphSize = 5; %5
