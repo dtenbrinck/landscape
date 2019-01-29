@@ -38,20 +38,20 @@ allCellCoords = getAllValidCellCoords(p.gridSize,fileNames,numberOfResults,p.tol
 % -- Compute the Accumulator from the cell coordinates -- %
 accumulator = computeAccumulator(allCellCoords, p.gridSize);
 
+% --- Generate shells with valid cell coordinates per shell
+shells = computeShells(allCellCoords, p.option.shellThickness, p.option.shellShiftWidth, p.gridSize);
+
+% sanity check: for nonoverlapping shells the sum of all coordinates should stay constant
+if p.option.shellShiftWidth == p.option.shellThickness
+    numberOfCells=0;
+    for i=1:size(shells,2)
+        numberOfCells = numberOfCells + size(shells{i},2);
+    end
+    assert(numberOfCells == size(allCellCoords,2));
+end
+
 %% COMPUTE ACCUMULATOR
 if strcmp(p.handledChannel, 'DAPI')
-
-    % --- Generate shells with valid cell coordinates per shell
-    shells = computeShells(allCellCoords, p.option.shellThickness, p.option.shellShiftWidth);
-    
-    % sanity check: for nonoverlapping shells the sum of all coordinates should stay constant
-    if p.option.shellShiftWidth == p.option.shellThickness
-        numberOfCells=0;
-        for i=1:size(shells,2)
-            numberOfCells = numberOfCells + size(shells{i},2);
-        end
-        assert(numberOfCells == size(allCellCoords,2));
-    end
     
     % make sure to use specific cell radius for dapi cells
     if ( isfield(p.option, 'dapiCellradius') )
@@ -62,9 +62,9 @@ if strcmp(p.handledChannel, 'DAPI')
 elseif strcmp(p.handledChannel, 'mCherry')
     
     %% SLICE WISE PLOTS WITH PROJECTED REFERENCE LANDMARK
-    fig_filename_base = [p.resultsPath ,'/heatmaps/'];
-    referenceLandmark = computeReferenceLandmark(fileNames,numberOfResults, p);
-    createSlicesPlots(accumulator, p.option, 'Number of PGCs', referenceLandmark, [fig_filename_base, 'PGCs_positions'], 1);
+    %fig_filename_base = [p.resultsPath ,'/heatmaps/'];
+    %referenceLandmark = computeReferenceLandmark(fileNames,numberOfResults, p);
+    %createSlicesPlots(accumulator, p.option, 'Number of PGCs', referenceLandmark, [fig_filename_base, 'PGCs_positions'], 1);
 
 else
     fprintf('There is no correct channel selected to generate heatmaps!\n');
@@ -72,7 +72,7 @@ else
 end
 
 %% HANDLE HEATMAPS ( Computation, drawing and saving ) 
-handleHeatmaps(accumulator,size(allCellCoords,2),numberOfResults,p,p.option);
+handleHeatmaps(accumulator,shells,size(allCellCoords,2),numberOfResults,p,p.option);
 
 %% USER OUTPUT
 disp('All results in folder processed!');
