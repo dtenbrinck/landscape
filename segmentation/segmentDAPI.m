@@ -75,14 +75,14 @@ end
 
 % look for brightest pixel in gauﬂ smoothest original data
 smoothed = imgaussfilt3(data, [1,1, 0.1]);
-locMax = imregionalmax(smoothed);
+locMax = imregionalmax(smoothed, 26);
 % TODO reduce plateau areas to only one pixel?!
 
 % remove too small objects
 % neighbourhoodConnectivity = zeros(3,3,3);
 % neighbourhoodConnectivity(:,:,2) = ones(3,3);
 % brightRegions = bwareaopen(Xi, p.minNucleusSize, neighbourhoodConnectivity);
-brightRegions = bwareaopen(Xi, p.minNucleusSize);
+brightRegions = bwareaopen(Xi, p.minNucleusSize, 26);
 
 brightPixel3d = brightRegions & locMax;
 
@@ -141,4 +141,11 @@ nuclei = Xi;
 % imagesc(Xi(:,:,20))
 % hold on
 % plot(layer(1,:),layer(2,:),'r*')
+
+% % possible tuning options to improve the segmentation results:
+% % - connectivity parameter in bwareaopen and imregionalmax
+% % - imgaussfilt3: sigma vector
+% % - or imgaussfilt for 2D slice-wise images?
+% % - min. nucleus size in ParameterProcessing: p.DAPIseg.minNucleusSize 
+
 end
