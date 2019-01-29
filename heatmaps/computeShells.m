@@ -1,4 +1,12 @@
-function cellCoordsPerShell = computeShells(allCellCoords, shellThickness, shellShiftWidth)
+function cellCoordsPerShell = computeShells(allCellCoords, shellThickness, shellShiftWidth, gridSize)
+
+% compute origin
+accumCenter = ceil(gridSize/2);
+
+% center and normalize coordinates
+allCellCoords(2,:) = (allCellCoords(2,:) - accumCenter) / (accumCenter - 1);
+allCellCoords(1,:) = (allCellCoords(1,:) - accumCenter) / (accumCenter - 1);
+allCellCoords(3,:) = (allCellCoords(3,:) - accumCenter) / (accumCenter - 1);
 
 % get distance for each cell to origin
 distances = sqrt(sum(double(allCellCoords).^2,1));
