@@ -73,8 +73,21 @@ end
 %% GET CENTERS OF SEGMENTED REGIONS
 % -- WE ASSUME BRIGHTEST PIXEL TO BE THE CENTER
 
-indices = find(Xi > 0);
-[tmpy, tmpx, tmpz] = ind2sub(size(Xi), indices);
+% look for brightest pixel in gauß smoothest original data
+smoothed = imgaussfilt3(data, [1,1, 0.1]);
+locMax = imregionalmax(smoothed, 26);
+% TODO reduce plateau areas to only one pixel?!
+
+% remove too small objects
+% neighbourhoodConnectivity = zeros(3,3,3);
+% neighbourhoodConnectivity(:,:,2) = ones(3,3);
+% brightRegions = bwareaopen(Xi, p.minNucleusSize, neighbourhoodConnectivity);
+brightRegions = bwareaopen(Xi, p.minNucleusSize, 26);
+
+brightPixel3d = brightRegions & locMax;
+
+indices = find(brightPixel3d > 0);
+[tmpy, tmpx, tmpz] = ind2sub(size(brightPixel3d), indices);
 
 % initialize container for center coordinates
 centCoords = zeros(3,numel(indices));
@@ -83,5 +96,56 @@ centCoords(1,:) = tmpx;
 centCoords(2,:) = tmpy;
 centCoords(3,:) = tmpz;
 nuclei = Xi;
+
+%%%%%%% test visualizations around slice 20 %%%%%%%%%%%%
+% 
+% % the same cell should not be found in consecutive slices
+% % so the plotted pixel are not close together for slice 19 and 20
+% 
+% figure;
+% overlay2=imoverlay(brightPixel3d(:,:,19), brightPixel3d(:,:,20), 'r');
+% imagesc(overlay2)
+% 
+% % found center coordinates of slice 21
+% layer=centCoords(:,centCoords(3,:)==21);
+% figure;
+% subplot(1,2,1);
+% imagesc(data(:,:,20))
+% hold on
+% plot(layer(1,:),layer(2,:),'r*')
+% subplot(1,2,2);
+% imagesc(Xi(:,:,20))
+% hold on
+% plot(layer(1,:),layer(2,:),'r*')
+% 
+% % found center coordinates of slice 20
+% layer=centCoords(:,centCoords(3,:)==20);
+% figure;
+% subplot(1,2,1);
+% imagesc(data(:,:,20))
+% hold on
+% plot(layer(1,:),layer(2,:),'r*')
+% subplot(1,2,2);
+% imagesc(Xi(:,:,20))
+% hold on
+% plot(layer(1,:),layer(2,:),'r*')
+% 
+% % found center coordinates of slice 19
+% layer=centCoords(:,centCoords(3,:)== 19);
+% figure;
+% subplot(1,2,1);
+% imagesc(data(:,:,20))
+% hold on
+% plot(layer(1,:),layer(2,:),'r*')
+% subplot(1,2,2);
+% imagesc(Xi(:,:,20))
+% hold on
+% plot(layer(1,:),layer(2,:),'r*')
+
+% % possible tuning options to improve the segmentation results:
+% % - connectivity parameter in bwareaopen and imregionalmax
+% % - imgaussfilt3: sigma vector
+% % - or imgaussfilt for 2D slice-wise images?
+% % - min. nucleus size in ParameterProcessing: p.DAPIseg.minNucleusSize 
 
 end
