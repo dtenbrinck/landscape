@@ -1,4 +1,4 @@
-function [  ] = handleHeatmaps( accumulator, numOfAllCells,numberOfResults, p, option )
+function [  ] = handleHeatmaps( accumulator,shells,numOfAllCells,numberOfResults, p, option )
 % This function will handle the heatmaps. It will compute and show
 % different heatmaps depending on the given options in 'option'.
 
@@ -10,6 +10,9 @@ if option.heatmaps.process == 1
     
     % -- Convolve over the points -- %
     convAcc = convolveAccumulator(accumulator,option.cellradius,2*option.cellradius+1);
+    
+    % -- Compute mercator projections -- %
+    mercatorProjections = computeMercatorProjections(shells, option.shellHeatmapResolution); 
     
     % -- Compute heatmap heatmaps -- %
     HMS = generateHeatmap(convAcc,option.heatmaps.types);
@@ -87,4 +90,23 @@ if option.cropper == 1
     disp('Cropper');
     gui_cropRegion(accumulator,HMS.MIP.Top,200);
 end
+
+
+% -- Determine maximum value in all heatmaps for easier comparison -- %
+maxi = -1;
+for j=1:size(mercatorProjections,3)
+    projection = mercatorProjections(:,:,j);
+    tmp_max = max(projection(:));
+    if maxi < tmp_max
+        maxi = tmp_max;
+    end
+end
+
+% -- Save shell heatmaps -- %
+f = figure;
+for j=1:size(mercatorProjections,3)
+    imagesc(mercatorProjections(:,:,j),[0 maxi]);
+    saveas(f,[heatmapsPath '/shellHeatmap_' num2str(j) '.png'],'png');
+end
+
 end

@@ -21,7 +21,7 @@ p.tole = 0.1;
 
 % Grid size of the accumulator: 
 % size(accumulator) = [gridSize,gridSize,gridSize];
-p.gridSize = 256;
+p.gridSize = 33;
 
 % Select a given number of random filnames
 p.random = 0;
@@ -57,7 +57,10 @@ p.option.shellThickness = 0.1;
 
 % Shift width for shell computation
 % Note that shellShiftWidth = shellThickness means no overlap between heatmaps
-p.option.shellShiftWidth = 0.05;
+p.option.shellShiftWidth = 0.1;
+
+% Resolution for the shell heatmap in pixels
+p.option.shellHeatmapResolution = [180, 180];
 
 % Types of heatmaps. Currently available 'MIP', 'SUM'.
 % Can handle multiple input.
