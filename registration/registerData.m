@@ -23,6 +23,13 @@ if isfield(processedData, 'nuclei') % check for backward compatibilty
     [registeredData.nuclei, ~] = transformVoxelData(single(processedData.nuclei), resolution, registrationMatrix, ellipsoid.center, samples_cube, 'nearest');
 end
 
+if isfield(processedData, 'landmarkCentCoords') %%PIA
+    % register landmark coordinates accordingly
+    processedData.landmarkCentCoords(1,:) = processedData.landmarkCentCoords(1,:)*resolution(2);
+    processedData.landmarkCentCoords(2,:) = processedData.landmarkCentCoords(2,:)*resolution(1);
+    processedData.landmarkCentCoords(3,:) = processedData.landmarkCentCoords(3,:)*resolution(3);
+    registeredData.landmarkCentCoords = transformCoordinates(processedData.landmarkCentCoords', ellipsoid.center, registrationMatrix^-1, [0; 0; 0]);
+
 if isfield(processedData, 'cellCoordinates')
     % register cell coordinates accordingly
     processedData.cellCoordinates(1,:) = processedData.cellCoordinates(1,:)*resolution(2);
