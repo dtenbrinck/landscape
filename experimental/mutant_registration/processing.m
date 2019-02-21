@@ -53,7 +53,7 @@ for experiment=1:numberOfExperiments
         
         % segment data
         if p.debug_level >= 1; disp('Segmenting GFP channel...'); end
-        processedData.landmark = segmentGFP(processedData.GFP, p.GFPseg, p.resolution);   %old method
+        [processedData.landmark, processedData.landmarkCentCoords] = segmentGFP(processedData.GFP, p.GFPseg, p.resolution);   %old method
         %processedData.landmark = segmentMutantGFP(processedData.GFP);   %new method
         
         if p.debug_level >= 1; disp('Segmenting mCherry channel...'); end
