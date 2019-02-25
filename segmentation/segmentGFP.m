@@ -1,4 +1,4 @@
-function landmark = segmentGFP( data, GFPseg_parameter, resolution )
+function [landmark, centCoords] = segmentGFP( data, GFPseg_parameter, resolution )
 
 % specify segmentation algorithm
 % TODO: Set via GUI!
