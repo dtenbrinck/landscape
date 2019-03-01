@@ -22,6 +22,7 @@ p.rmbg.mCherryDiskSize = 11; %11
 % -- DAPI SEGMENTATION -- %
 p.DAPIseg.method = 'k-means'; % 'Laplacian', 'CP'
 p.DAPIseg.k = 3;
+p.DAPIseg.minNucleusSize = 6; % min. nucleus size
 % -- GFP SEGMENTATION -- %
 p.GFPseg.k = 4; %4 
 p.GFPseg.morphSize = 5; %5
@@ -43,8 +44,8 @@ p.samples_sphere = 128;
 %% ELLIPSOIDAL FITTING
 p.ellipsoidFitting.percentage = 10;
 p.ellipsoidFitting.visualization = 0;
-p.ellipsoidFitting.regularisationParams.mu0 = 10^-8;
-p.ellipsoidFitting.regularisationParams.mu1 = 0.002; 
+p.ellipsoidFitting.regularisationParams.mu0 = 10^-7;
+p.ellipsoidFitting.regularisationParams.mu1 = 2*10^-4; 
 p.ellipsoidFitting.regularisationParams.mu2 = 1;
 p.ellipsoidFitting.regularisationParams.gamma = 1; 
 p.ellipsoidFitting.descentMethod = 'cg'; % 'grad'

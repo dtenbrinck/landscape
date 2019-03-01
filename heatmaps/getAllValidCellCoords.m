@@ -1,4 +1,4 @@
-function [ allCellCoords ] = getAllValidCellCoords(sizeAcc,fileNames,numberOfResults,tole,resultsPathAccepted)
+function [ allCellCoords ] = getAllValidCellCoords(sizeAcc,fileNames,numberOfResults,tole,resultsPathAccepted, handledChannel)
 % This function computes the valid cell coordinates for the heatmap.
 % This will be done in multiple steps:
 % 1. load and gather all cell coordinates.
@@ -13,12 +13,22 @@ function [ allCellCoords ] = getAllValidCellCoords(sizeAcc,fileNames,numberOfRes
 allCellCoords = double.empty(3,0);
 
 % -- 1. Step --%
-for result = 1:numberOfResults
-    % Load result data
-    load([resultsPathAccepted,'/',fileNames{result,1}])
-    
-    % Get all cell center coordinates
-    allCellCoords = horzcat(allCellCoords, gatheredData.registered.cellCoordinates);
+if ( strcmp(handledChannel, 'mCherry') )
+    for result = 1:numberOfResults
+        % Load result data
+        load([resultsPathAccepted,'/',fileNames{result,1}])
+
+        % Get all cell center coordinates
+        allCellCoords = horzcat(allCellCoords, gatheredData.registered.cellCoordinates);
+    end
+elseif (strcmp(handledChannel, 'DAPI') )
+    for result = 1:numberOfResults
+        % Load result data
+        load([resultsPathAccepted,'/',fileNames{result,1}])
+
+        % Get all cell center coordinates
+        allCellCoords = horzcat(allCellCoords, gatheredData.registered.nucleiCoordinates);
+    end
 end
 
 % -- 2. Step --%
@@ -33,11 +43,13 @@ normOfCoordinates = sqrt(sum(allCellCoords.^2,1));
 allCellCoords(:,normOfCoordinates > 1+tole) = [];
 normOfCoordinates(:,normOfCoordinates > 1+tole) = [];
 
-% -- 4. Step --%
+% -- 4. Step --% only for mCherry channel
 % Normalize the coordinates that are too big but in tolerance
-allCellCoords(:,(normOfCoordinates < 1+tole) == (normOfCoordinates > 1)) ...
-    = allCellCoords(:,(normOfCoordinates < 1+tole) == (normOfCoordinates > 1))...
-    ./repmat(normOfCoordinates(:,(normOfCoordinates < 1+tole) == (normOfCoordinates > 1)),[3,1]);
+if ( strcmp(handledChannel, 'mCherry') )
+    allCellCoords(:,(normOfCoordinates < 1+tole) == (normOfCoordinates > 1)) ...
+        = allCellCoords(:,(normOfCoordinates < 1+tole) == (normOfCoordinates > 1))...
+        ./repmat(normOfCoordinates(:,(normOfCoordinates < 1+tole) == (normOfCoordinates > 1)),[3,1]);
+end
 
 % -- 5. Step --%
 % Get rounded cell centroid coordinates

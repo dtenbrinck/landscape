@@ -33,10 +33,10 @@ p.resolution(1:2) = p.resolution(1:2) / p.scale;
 fprintf(['Processing dataset: (0,' num2str(numberOfExperiments) ')']);
     
 % process all existing data sequentially
-delete(gcp('nocreate'));
-   if p.debug_level <= 1 && p.visualization == 0
-        parpool;
-   end
+% delete(gcp('nocreate'));
+%    if p.debug_level <= 1 && p.visualization == 0
+%         parpool;
+%    end
 for experiment=1:numberOfExperiments
     
     % show remotecurrent experiment number
@@ -89,42 +89,11 @@ for experiment=1:numberOfExperiments
         [sphereCoordinates2, cellsCoordinates, cellsOnSphere] = ...
             projectLandmarkOnSphere(processedData.cells, p.resolution, ellipsoid, p.samples_sphere);
         end
-
-
-        %----------------------------------------------------------------------------------------------------------------------------
-        %CENTER OF MASS
-        %disp('Calculating center of mass...');
-        %centerOfMass = centerOfMass_NaPiJa(landmarkCoordinates')
-        %----------------------------------------------------------------------------------------------------------------------------
-        
-        %----------------------------------------------------------------------------------------------------------------------------
-        %CONVERT CENTER OF MASS TO CHARACTERISTICWEIGHT
-        %[pstar,vstar] = computeRegression_new(landmarkCoordinates','false');
-        %landmarkCharacteristic = p.reg.landmarkCharacteristic;
-        %head_point = getCharPos_daniel(pstar,vstar,landmarkCoordinates',landmarkCharacteristic,0);
-        %tail_point = getCharPos_daniel(pstar,vstar,landmarkCoordinates',landmarkCharacteristic,1);
-        %ratio = sphericalDistancePoints(head_point, centerOfMass)/sphericalDistancePoints(head_point, tail_point)
-        %--------------------------------------------------------------------------------------------------------------------------------
-        
-        %----------------------------------------------------------------------------------------------------------------------------
-        %USE NEW RATIO
-        %p.reg.characteristicWeight = ratio
-        %----------------------------------------------------------------------------------------------------------------------------
-        
-        
-        
         
         % estimate optimal rotation to register data to reference point with reference orientation
         if p.debug_level >= 1; disp('Estimating transformation from projected landmark...'); end        
         rotationMatrix = ...
             registerLandmark(landmarkCoordinates, p.reg);
-        
-        %-------------------------------------------------------------------------------------------------------------------------------------
-        %HEAD POSITION CALCULATION
-%         [pstar,vstar] = computeRegression_new(landmarkCoordinates','false');
-%         landmarkCharacteristic = p.reg.landmarkCharacteristic;
-%         disp([experiment, getCharPos_daniel(pstar,vstar,landmarkCoordinates',landmarkCharacteristic,0)])  
-        %-------------------------------------------------------------------------------------------------------------------------------------
         
         %%%%%%%%%%% VALIDITY CHECK FOR DEBUGGING
         if p.debug_level >= 2
@@ -142,17 +111,9 @@ for experiment=1:numberOfExperiments
                 visualizeProjectedLandmark(registered_sphere', cellsOnSphere);
              end 
         end
-        
-        %--------------------------------------------------------------------------------------------------------------------------------------
-        %SPHERE VISUALIZATION
-        %registered_sphere = ...
-        %    transformCoordinates(sphereCoordinates, [0 0 0]', rotationMatrix, [0 0 0]');
-        %visualizeProjectedLandmark(sphereCoordinates, landmarkOnSphere);
-        %visualizeProjectedLandmark(registered_sphere', landmarkOnSphere);
-        %--------------------------------------------------------------------------------------------------------------------------------------
-        
-%        % DEBUG
-%        transformedCoordinates = rotationMatrix * landmarkCoordinates';
+       
+%       % DEBUG
+%       transformedCoordinates = rotationMatrix * landmarkCoordinates';
         
         % compute registration transformation from original data space
         transformation_registration = transformationMatrix * rotationMatrix';
