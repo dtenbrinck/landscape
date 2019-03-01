@@ -74,7 +74,7 @@ end
 % -- WE ASSUME BRIGHTEST PIXEL TO BE THE CENTER
 
 % look for brightest pixel in gauß smoothest original data
-#former sigma value: [1,1,0.1]. If problems occur, try resetting it to this
+%former sigma value: [1,1,0.1]. If problems occur, try resetting it to this
 smoothed = imgaussfilt3(data, 0.1);
 
 locMax = imregionalmax(smoothed, 26);
