@@ -73,8 +73,10 @@ end
 %% GET CENTERS OF SEGMENTED REGIONS
 % -- WE ASSUME BRIGHTEST PIXEL TO BE THE CENTER
 
-% look for brightest pixel in gauﬂ smoothest original data
-smoothed = imgaussfilt3(data, [1,1, 0.1]);
+% look for brightest pixel in gau√ü smoothest original data
+#former sigma value: [1,1,0.1]. If problems occur, try resetting it to this
+smoothed = imgaussfilt3(data, 0.1);
+
 locMax = imregionalmax(smoothed, 26);
 % TODO reduce plateau areas to only one pixel?!
 
