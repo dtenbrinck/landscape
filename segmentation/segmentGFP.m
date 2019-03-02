@@ -1,4 +1,4 @@
-function landmark = segmentGFP( data, GFPseg_parameter, resolution )
+function [landmark, centCoords] = segmentGFP( data, GFPseg_parameter, resolution )
 
 % specify segmentation algorithm
 % TODO: Set via GUI!
@@ -74,6 +74,19 @@ end
 
 % set output variable
 landmark = double(Xi);
+
+%% GET CENTERS OF SEGMENTED REGIONS
+% -- WE ASSUME BRIGHTEST PIXEL TO BE THE CENTER
+
+indices = find(landmark > 0);
+[tmpy, tmpx, tmpz] = ind2sub(size(landmark), indices);
+
+% initialize container for center coordinates
+centCoords = zeros(3,numel(indices));
+% set return variables
+centCoords(1,:) = tmpx;
+centCoords(2,:) = tmpy;
+centCoords(3,:) = tmpz;
 
 end
 
