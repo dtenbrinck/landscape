@@ -33,9 +33,9 @@ p.resolution(1:2) = p.resolution(1:2) / p.scale;
 fprintf(['Processing dataset: (0,' num2str(numberOfExperiments) ')']);
     
 % process all existing data in parallel
-if p.debug_level <= 1 && p.visualization == 0
-    parpool;
-end
+%     if p.debug_level <= 1 && p.visualization == 0
+%         parpool;
+%     end
 parfor experiment=1:numberOfExperiments
     
     % show remotecurrent experiment number
