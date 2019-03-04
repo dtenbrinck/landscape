@@ -32,12 +32,11 @@ p.resolution(1:2) = p.resolution(1:2) / p.scale;
 
 fprintf(['Processing dataset: (0,' num2str(numberOfExperiments) ')']);
     
-% process all existing data sequentially
-% delete(gcp('nocreate'));
-%    if p.debug_level <= 1 && p.visualization == 0
-%         parpool;
-%    end
-for experiment=1:numberOfExperiments
+% process all existing data in parallel
+if p.debug_level <= 1 && p.visualization == 0
+    parpool;
+end
+parfor experiment=1:numberOfExperiments
     
     % show remotecurrent experiment number
     dispCounter(experiment, numberOfExperiments);
