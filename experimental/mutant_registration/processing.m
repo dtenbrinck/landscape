@@ -123,7 +123,7 @@ for experiment=1:numberOfExperiments
                 
         % create filename to save results
 
-        results_filename = [p.resultsPath '\' experimentData.filename '_results.mat'];
+        results_filename = [p.resultsPath '/' experimentData.filename '_results.mat'];
         
         gatheredData = saveResults(experimentData, processedData, registeredData, ellipsoid, transformationMatrix, rotationMatrix, results_filename);
         
@@ -149,7 +149,7 @@ for experiment=1:numberOfExperiments
         results_filename = [p.resultsPath '/bug/' experimentData.filename '_results.mat'];
         
         % save results
-        save(results_filename, 'ERROR_MSG');
+        saveErrorMsg(results_filename, ERROR_MSG);
         
         if p.debug_level >= 1; disp('Saved buggy dataset!'); end
         
