@@ -52,7 +52,7 @@ parfor experiment=1:numberOfExperiments
         
         % segment data
         if p.debug_level >= 1; disp('Segmenting GFP channel...'); end
-        processedData.landmark = segmentGFP(processedData.GFP, p.GFPseg, p.resolution);
+        [processedData.landmark, processedData.landmarkCentCoords] = segmentGFP(processedData.GFP, p.GFPseg, p.resolution);
         
         if p.debug_level >= 1; disp('Segmenting mCherry channel...'); end
         [processedData.cells, processedData.cellCoordinates] = blobSegmentCells(processedData.mCherry, p.mCherryseg);
