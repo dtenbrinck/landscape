@@ -98,8 +98,10 @@ function [v] = initializeEllipsoidParams(X)
         x = X( :, 1 );
         y = X( :, 2 );
         z = X( :, 3 );
-        center=[mean(x); mean(y); mean(z)]; 
-        distances = abs(X-center');
+        center=[mean(x); mean(y); mean(z)];
+        for i=1:size(X,1)
+            distances = abs(X(i,:)-center');
+        end;
         radii=[max(distances(:,1)); max(distances(:,2)); max(distances(:,3))];
         v=zeros(6,1);
         v(1:3) = (1./radii).^2;
