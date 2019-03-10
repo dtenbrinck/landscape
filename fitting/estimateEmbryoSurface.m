@@ -14,7 +14,7 @@ X = X(idx,:);
 
 %% plot fitted ellipsoid
 if (  ellipsoidFittingParams.visualization ) 
-   fprintf("Plotting resulting ellipsoid estimation...\n");
+   fprintf('Plotting resulting ellipsoid estimation...\n');
    if isreal(ellipsoidEstimation.center) && isreal(ellipsoidEstimation.radii)
     figure;
     hold on;
