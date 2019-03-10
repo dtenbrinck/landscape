@@ -100,7 +100,7 @@ function [v] = initializeEllipsoidParams(X)
         z = X( :, 3 );
         center=[mean(x); mean(y); mean(z)];
         for i=1:size(X,1)
-            distances = abs(X(i,:)-center');
+            distances(i,:) = abs(X(i,:)-center');
         end;
         radii=[max(distances(:,1)); max(distances(:,2)); max(distances(:,3))];
         v=zeros(6,1);
