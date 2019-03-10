@@ -46,27 +46,27 @@ if strcmp(p.handledChannel, 'DAPI')
     end
 elseif strcmp(p.handledChannel, 'mCherry')
     % -- Compute all valid cell coordinates from the processed and registered data -- %
-    allCellCoords = getAllValidCellCoords_shells(p.gridSize,fileNames,numberOfResults,p.tole,p.resultsPathAccepted);
+    [allCellCoords_under, allCellCoords_in, allCellCoords_over] = getAllValidCellCoords_shells(p.gridSize,fileNames,numberOfResults,p.tole,p.resultsPathAccepted);
     
     % -- Compute the Accumulator from the cell coordinates -- %
-    accumulator = computeAccumulator(allCellCoords, p.gridSize);
-    
-    % -- Define shell with landmark inside
-    %shell = getLandmarkShell(allCellCoords, p.option.shellThickness, p.option.shellShiftWidth);
+    accumulator_under = computeAccumulator(allCellCoords_in, p.gridSize);
+    accumulator_in = computeAccumulator(allCellCoords_in, p.gridSize);
+    accumulator_over = computeAccumulator(allCellCoords_over, p.gridSize);
     
     %% SLICE WISE PLOTS WITH PROJECTED REFERENCE LANDMARK
-    fig_filename_base = [p.resultsPath ,'/heatmaps/'];
-    referenceLandmark = computeReferenceLandmark(fileNames,numberOfResults, p);
-    createSlicesPlots(accumulator, p.option, 'Number of PGCs', referenceLandmark, [fig_filename_base, 'PGCs_positions'], 1);
+    %fig_filename_base = [p.resultsPath ,'/heatmaps/'];
+    %referenceLandmark = computeReferenceLandmark(fileNames,numberOfResults, p);
+    %createSlicesPlots(accumulator, p.option, 'Number of PGCs', referenceLandmark, [fig_filename_base, 'PGCs_positions'], 1);
 
 else
     fprintf('There is no correct channel selected to generate heatmaps!\n');
     return;
 end
 
-%% HANDLE HEATMAPS ( Computation, drawing and saving ) 
-handleHeatmaps(accumulator,size(allCellCoords,2),numberOfResults,p,p.option);
-
+%% HANDLE HEATMAPS ( Computation, drawing and saving )
+%handleHeatmaps(accumulator_under,size(allCellCoords_under,2),numberOfResults,p,p.option);
+handleHeatmaps(accumulator_in,size(allCellCoords_in,2),numberOfResults,p,p.option);
+%handleHeatmaps(accumulator_over,size(allCellCoords_over,2),numberOfResults,p,p.option);
 %% USER OUTPUT
 disp('All results in folder processed!');
 
