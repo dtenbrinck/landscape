@@ -294,7 +294,7 @@ function alpha_star = zoom(alpha_lower, alpha_higher, ...
     % use algorithm 3.6 to zoom in to appropriate step length
     iteration = 0;
     maxIteration = 30;
-    TOL = 1e-8;
+    TOL = 1e-9;
     while iteration < maxIteration
         if ( abs(alpha_lower-alpha_higher) < TOL)
            fprintf('Zoom interval after %d zoom iterations too small to zoom in further.\n', iteration);
