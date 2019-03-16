@@ -1,4 +1,4 @@
-function [ ellipsoidEstimation ] = estimateEmbryoSurface_modified( nuclei_coord, resolution, ellipsoidFittingParams, result_path)
+function [ ellipsoidEstimation ] = estimateEmbryoSurface( nuclei_coord, resolution, ellipsoidFittingParams, result_path)
 X(:,1) = (nuclei_coord(1,:) * resolution(1))';
 X(:,2) = (nuclei_coord(2,:) * resolution(2))';
 X(:,3) = (nuclei_coord(3,:) * resolution(3))';
@@ -15,7 +15,7 @@ X = X(idx,:);
 if (  ellipsoidFittingParams.visualization ) 
    fprintf('Plotting resulting ellipsoid estimation...\n');
    if isreal(ellipsoidEstimation.center) && isreal(ellipsoidEstimation.radii)
-    figure;
+    fig = figure();
     hold on;
     scatter3(X(:,1),X(:,2), X(:,3),'b','.', 'DisplayName', 'input data', 'MarkerFaceAlpha',0.1);
     n = 20;
@@ -37,10 +37,10 @@ if (  ellipsoidFittingParams.visualization )
     legend('Location', 'southoutside');
    end
    if max_iterations_reached
-       result_path = [result_path '_max_iterations'];
+       result_path = [result_path '_max_iterations_'];
    end
-   savefig(result_path)
-   close()
+   savefig(fig, result_path)
+   close(fig)
 end
 
 %% check order of ellipsoids axes
