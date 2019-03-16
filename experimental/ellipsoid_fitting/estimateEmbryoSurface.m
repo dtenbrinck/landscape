@@ -9,8 +9,7 @@ idx = randperm( size(X,1), ceil(ellipsoidFittingParams.percentage/100*size(X,1))
 X = X(idx,:);
 
 [ ellipsoidEstimation.center, ellipsoidEstimation.radii, ellipsoidEstimation.axes, max_iterations_reached] = ...
-    getEllipsoidCharacteristicsEstimation_modified...
-    ( X, ellipsoidFittingParams );
+    getEllipsoidCharacteristicsEstimation( X, ellipsoidFittingParams );
 
 %% plot fitted ellipsoid
 if (  ellipsoidFittingParams.visualization ) 
@@ -39,9 +38,9 @@ if (  ellipsoidFittingParams.visualization )
    end
    if max_iterations_reached
        result_path = [result_path '_max_iterations'];
-   end;
-    savefig(result_path)
-    close()
+   end
+   savefig(result_path)
+   close()
 end
 
 %% check order of ellipsoids axes

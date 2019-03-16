@@ -59,7 +59,7 @@ for experiment=1:numberOfExperiments
 
         % estimate embryo surface by fitting an ellipsoid
         if p.debug_level >= 1; disp('Estimating embryo surface...'); end
-        ellipsoid = estimateEmbryoSurface_modified(processedData.nucleiCoordinates, p.resolution, p.ellipsoidFitting, [p.resultsPath '/' experimentData.filename '_figure']);
+        ellipsoid = estimateEmbryoSurface(processedData.nucleiCoordinates, p.resolution, p.ellipsoidFitting, [p.resultsPath '/' experimentData.filename '_figure']);
         
         % compute transformation which normalizes the estimated ellipsoid to a unit sphere
         if p.debug_level >= 1; disp('Compute transformation from optimal ellipsoid...'); end
