@@ -43,7 +43,7 @@ p.samples_sphere = 128;
 
 %% ELLIPSOIDAL FITTING
 p.ellipsoidFitting.percentage = 100; % 10 percent for old dapi segmentation
-p.ellipsoidFitting.visualization = 0;
+p.ellipsoidFitting.visualization = 1;
 p.ellipsoidFitting.regularisationParams.mu0 = 10^-7; %10^8 for old dapi segmentation
 p.ellipsoidFitting.regularisationParams.mu1 = 2*10^-4; % 0.002 for old dapi segmentation
 p.ellipsoidFitting.regularisationParams.mu2 = 1;
