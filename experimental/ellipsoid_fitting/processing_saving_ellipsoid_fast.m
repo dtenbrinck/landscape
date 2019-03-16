@@ -47,12 +47,14 @@ for experiment=1:numberOfExperiments
         if p.debug_level >= 1; disp('Preprocessing data...'); end
         processedData = preprocessData(experimentData, p);
         
+        %{
         % segment data
         if p.debug_level >= 1; disp('Segmenting GFP channel...'); end
         [processedData.landmark, processedData.landmarkCentCoords] = segmentGFP(processedData.GFP, p.GFPseg, p.resolution);
         
         if p.debug_level >= 1; disp('Segmenting mCherry channel...'); end
         [processedData.cells, processedData.cellCoordinates] = blobSegmentCells(processedData.mCherry, p.mCherryseg);
+        %}
         
         if p.debug_level >= 1; disp('Segmenting DAPI channel...'); end
         [processedData.nuclei, processedData.nucleiCoordinates] = segmentDAPI(processedData.Dapi, p.DAPIseg, p.resolution);
