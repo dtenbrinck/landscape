@@ -41,10 +41,10 @@ p.mCherryseg.method = 'k-means'; % 'k-means', 'k-means_local', 'CP'
 p.samples_sphere = 128;
 
 %% ELLIPSOIDAL FITTING
-p.ellipsoidFitting.percentage = 10;
+p.ellipsoidFitting.percentage = 100;
 p.ellipsoidFitting.visualization = 0;
-p.ellipsoidFitting.regularisationParams.mu0 = 10^-8;
-p.ellipsoidFitting.regularisationParams.mu1 = 0.002; 
+p.ellipsoidFitting.regularisationParams.mu0 = 10^-7;
+p.ellipsoidFitting.regularisationParams.mu1 = 2*10^-4; 
 p.ellipsoidFitting.regularisationParams.mu2 = 1;
 p.ellipsoidFitting.regularisationParams.gamma = 1; 
 p.ellipsoidFitting.descentMethod = 'cg'; % 'grad'
