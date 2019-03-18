@@ -33,7 +33,7 @@ fprintf('Processing dataset:');
     
 % process all existing data sequentially
 
-for experiment=1:numberOfExperiments
+parfor experiment=1:numberOfExperiments
     
     % show remotecurrent experiment number
     dispCounter(experiment, numberOfExperiments);
