@@ -1,6 +1,7 @@
 function [ stdFig, pca] = creatStdFigure_scaled( numberOfResults, numOfAllCells,HMS, currentType)
 % Creates standard figure
 
+% TODO: Side does not exist any more!
 climMax = max([max(HMS.(currentType).Top(:)),max(HMS.(currentType).Head(:)),...
     max(HMS.(currentType).Side(:))]);
 
