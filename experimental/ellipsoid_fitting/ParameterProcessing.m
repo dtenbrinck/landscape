@@ -42,20 +42,19 @@ p.mCherryseg.method = 'k-means'; % 'k-means', 'k-means_local', 'CP'
 p.samples_sphere = 128;
 
 %% ELLIPSOIDAL FITTING
-p.ellipsoidFitting.percentage = 100;
-p.ellipsoidFitting.visualization = 0;
-p.ellipsoidFitting.regularisationParams.mu0 = 10^-7;
-p.ellipsoidFitting.regularisationParams.mu1 = 2*10^-4; 
+p.ellipsoidFitting.percentage = 100; % 10 percent for old dapi segmentation
+p.ellipsoidFitting.visualization = 1;
+p.ellipsoidFitting.regularisationParams.mu0 = 10^-7; %10^8 for old dapi segmentation
+p.ellipsoidFitting.regularisationParams.mu1 = 2*10^-4; % 0.002 for old dapi segmentation
 p.ellipsoidFitting.regularisationParams.mu2 = 1;
 p.ellipsoidFitting.regularisationParams.gamma = 1; 
 p.ellipsoidFitting.descentMethod = 'cg'; % 'grad'
 %% REGISTRATION
 % -- REGISTRATION OF LANDMARK -- %
 p.reg.landmarkCharacteristic = 'middle';
-p.reg.characteristicWeight = 0; % 0 = head, 1 = tail
-zwert = 0; %value for z (front - back) at the reference point, only works for points on the left half of the unit ball
-p.reg.reference_point = [-sqrt(1-zwert^2); 0; zwert]; 
-p.reg.reference_vector = [zwert/(-sqrt(1-zwert^2)); 0; -1]; % Is the third value 
+p.reg.characteristicWeight = 0.5; %0,5
+p.reg.reference_point = [0; 0; -1];
+p.reg.reference_vector = [1; 0; 0];
 % - register data - %
 p.samples_cube = 256;
 end

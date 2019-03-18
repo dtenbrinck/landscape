@@ -29,6 +29,7 @@ if isfield(processedData, 'landmarkCentCoords') %%PIA
     processedData.landmarkCentCoords(2,:) = processedData.landmarkCentCoords(2,:)*resolution(1);
     processedData.landmarkCentCoords(3,:) = processedData.landmarkCentCoords(3,:)*resolution(3);
     registeredData.landmarkCentCoords = transformCoordinates(processedData.landmarkCentCoords', ellipsoid.center, registrationMatrix^-1, [0; 0; 0]);
+end
 
 if isfield(processedData, 'cellCoordinates')
     % register cell coordinates accordingly
