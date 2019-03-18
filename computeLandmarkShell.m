@@ -73,7 +73,7 @@ for result = 1:numberOfResults
     end
     
     %compute all shells containing landmark coordinates depending on thickness and shift width
-    shells = computeShells_Pia_alt(landmarkCoords,0.0608, 0.01216); 
+    shells = computeShells_Pia(landmarkCoords,0.0608, 0.01216); 
     %shells = computeShells_Pia_alt(landmarkCoords, p2.option.shellThickness, p2.option.shellSHiftWidth);
      
     %get amount of landmark cells per shell
