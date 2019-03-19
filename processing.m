@@ -15,7 +15,7 @@ checkDirectory(p.resultsPath);
 
 %% LOAD DATA
 
-% get filenames of STK files in selected folder
+% get filenames of STK / TIF files in selected folder
 fileNames = getSTKfilenames(p.dataPath);
 
 % extract only valid experiments with three data sets
@@ -31,7 +31,7 @@ p.resolution(1:2) = p.resolution(1:2) / p.scale;
 
 fprintf('Processing dataset:'); 
     
-% process all existing data sequentially
+% process all existing data in parallel
 delete(gcp('nocreate'));
    if p.debug_level <= 1 && p.visualization == 0
         parpool;
@@ -79,6 +79,13 @@ parfor experiment=1:numberOfExperiments
         [sphereCoordinates, landmarkCoordinates, landmarkOnSphere] = ...
             projectLandmarkOnSphere(processedData.landmark, p.resolution, ellipsoid, p.samples_sphere);
         
+        % project cells onto unit sphere 
+        if p.debug_level >= 3
+        disp('Projecting cells onto embryo surface...');
+        [sphereCoordinates2, cellsCoordinates, cellsOnSphere] = ...
+            projectLandmarkOnSphere(processedData.cells, p.resolution, ellipsoid, p.samples_sphere);
+        end
+        
         % estimate optimal rotation to register data to reference point with reference orientation
         if p.debug_level >= 1; disp('Estimating transformation from projected landmark...'); end        
         rotationMatrix = ...
@@ -93,10 +100,16 @@ parfor experiment=1:numberOfExperiments
             % visualize projection on unit sphere
             visualizeProjectedLandmark(sphereCoordinates, landmarkOnSphere);
             visualizeProjectedLandmark(registered_sphere', landmarkOnSphere);
+            
+            %visualize projection of mCherry channel on unit sphere
+            if p.debug_level >= 3
+                visualizeProjectedLandmark(sphereCoordinates, cellsOnSphere);
+                visualizeProjectedLandmark(registered_sphere', cellsOnSphere);
+            end 
         end
-        
-%        % DEBUG
-%        transformedCoordinates = rotationMatrix * landmarkCoordinates';
+       
+%       % DEBUG
+%       transformedCoordinates = rotationMatrix * landmarkCoordinates';
         
         % compute registration transformation from original data space
         transformation_registration = transformationMatrix * rotationMatrix';
@@ -115,9 +128,17 @@ parfor experiment=1:numberOfExperiments
             visualizeResults_new(gatheredData);
         end
         
+        %-------------------------------------------------------------------------------------------------------
+        %ADDITIONAL VISUALIZATION
+        %slideShow(gatheredData.processed.GFPMIP, [])
+        %-------------------------------------------------------------------------------------------------------
+        
+        
         if p.debug_level >= 1; disp('Saved results successfully!'); end
         
     catch ERROR_MSG  %% ONLY EXECUTED WHEN ERRORS HAPPENING
+        
+        disp(ERROR_MSG)
         
         % create filename to save results
         results_filename = [p.resultsPath '/bug/' experimentData.filename '_results.mat'];
@@ -128,6 +149,7 @@ parfor experiment=1:numberOfExperiments
         if p.debug_level >= 1; disp('Saved buggy dataset!'); end
         
     end
+    
 end
 
 % Save parameters
@@ -135,4 +157,4 @@ save([p.resultsPath '/accepted/ParameterProcessing.mat'],'p');
 %% USER OUTPUT
 fprintf('\n');
 disp('All data sets in folder processed!');
-clear all;
+%clear all;
