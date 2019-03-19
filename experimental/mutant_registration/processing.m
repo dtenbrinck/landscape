@@ -52,17 +52,14 @@ for experiment=1:numberOfExperiments
         
         % segment data
         if p.debug_level >= 1; disp('Segmenting GFP channel...'); end
-        [processedData.landmark, processedData.landmarkCentCoords] = segmentGFP(processedData.GFP, p.GFPseg, p.resolution);   %old method
-        %processedData.landmark = segmentMutantGFP(processedData.GFP);   %new method
+        [processedData.landmark, processedData.landmarkCentCoords] = segmentGFP(processedData.GFP, p.GFPseg, p.resolution);
         
         if p.debug_level >= 1; disp('Segmenting mCherry channel...'); end
-        [processedData.cells, processedData.cellCoordinates] = blobSegmentCells(processedData.mCherry, p.mCherryseg);   %old method
-        %[processedData.cells, processedData.cellCoordinates] = segmentMutantmCherry(processedData.mCherry);  %new method
-        
+        [processedData.cells, processedData.cellCoordinates] = blobSegmentCells(processedData.mCherry, p.mCherryseg);
+                
         if p.debug_level >= 1; disp('Segmenting DAPI channel...'); end
-        [processedData.nuclei, processedData.nucleiCoordinates] = segmentDAPI(processedData.Dapi, p.DAPIseg, p.resolution); %old method
-        %[processedData.nuclei, processedData.nucleiCoordinates] = segmentMutantDapi(processedData.Dapi); %new method
-
+        [processedData.nuclei, processedData.nucleiCoordinates] = segmentDAPI(processedData.Dapi, p.DAPIseg, p.resolution);
+        
         % estimate embryo surface by fitting an ellipsoid
         if p.debug_level >= 1; disp('Estimating embryo surface...'); end
         ellipsoid = estimateEmbryoSurface(processedData.nucleiCoordinates, p.resolution, p.ellipsoidFitting);
@@ -128,7 +125,6 @@ for experiment=1:numberOfExperiments
         gatheredData = saveResults(experimentData, processedData, registeredData, ellipsoid, transformationMatrix, rotationMatrix, results_filename);
         
         % visualize results if needed
-        %p.visualization = 1
         if p.visualization == 1
             visualizeResults_new(gatheredData);
         end
