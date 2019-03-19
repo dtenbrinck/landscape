@@ -1,12 +1,5 @@
-function cellCoordsPerShell = computeShells(allCellCoords, shellThickness, shellShiftWidth, gridSize)
-
-% compute origin
-accumCenter = ceil(gridSize/2);
-
-% center and normalize coordinates
-allCellCoords(2,:) = (allCellCoords(2,:) - accumCenter) / (accumCenter - 1);
-allCellCoords(1,:) = (allCellCoords(1,:) - accumCenter) / (accumCenter - 1);
-allCellCoords(3,:) = (allCellCoords(3,:) - accumCenter) / (accumCenter - 1);
+% we assume that allCellCoords contains coordinates in the reference coordinate system
+function [cellCoordsPerShell, max_distance] = computeShells(allCellCoords, shellThickness, shellShiftWidth)
 
 % get distance for each cell to origin
 distances = sqrt(sum(double(allCellCoords).^2,1));

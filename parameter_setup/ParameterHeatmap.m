@@ -53,11 +53,11 @@ p.option.cropper = 0;
 p.option.heatmaps.process = 1;
 
 % Thickness of shells for mercator projection
-p.option.shellThickness = 0.1;
+p.option.shellThickness = 0.0608;
 
 % Shift width for shell computation
 % Note that shellShiftWidth = shellThickness means no overlap between heatmaps
-p.option.shellShiftWidth = 0.1;
+p.option.shellShiftWidth = 1/4 * p.option.shellThickness;
 
 % Resolution for the shell heatmap in pixels
 p.option.shellHeatmapResolution = [180, 180];
