@@ -33,13 +33,18 @@ load([p.resultsPathAccepted,'/',fileNames{1,1}]);
 %%% TODO: refactor code in this file to make pipeline more generic!
 
 % -- Compute all valid cell coordinates from the processed and registered data -- %
-allCellCoords = getAllValidCellCoords(p.gridSize,fileNames,numberOfResults,p.tole,p.resultsPathAccepted, p.handledChannel);
+[allCellCoordsGrid, allCellCoords] = getAllValidCellCoords(p.gridSize,fileNames,numberOfResults,p.tole,p.resultsPathAccepted, p.handledChannel);
 
 % -- Compute the Accumulator from the cell coordinates -- %
-accumulator = computeAccumulator(allCellCoords, p.gridSize);
+accumulator = computeAccumulator(allCellCoordsGrid, p.gridSize);
 
 % --- Generate shells with valid cell coordinates per shell
-shells = computeShells(allCellCoords, p.option.shellThickness, p.option.shellShiftWidth, p.gridSize);
+[landmarkShell, aboveLandmark, belowLandmark] = computeLandmarkShell(allCellCoords, p, fileNames, numberOfResults);
+
+shells = cell(0,1);
+shells{1} = aboveLandmark;
+shells{2} = landmarkShell;
+shells{3} = belowLandmark;
 
 % sanity check: for nonoverlapping shells the sum of all coordinates should stay constant
 if p.option.shellShiftWidth == p.option.shellThickness
