@@ -37,7 +37,7 @@ p.numberOfRandom = 100;
 p.option.cellradius = 7; %7 for mCherry
 % cell radius for nuclei cells in DAPI channel
 % Default: 2 with gridSize = 256
-p.option.dapiCellradius = 1;
+%p.option.dapiCellradius = 1;
 
 % - Slider options - %
 % Will show the Slider 
@@ -60,7 +60,7 @@ p.option.shellThickness = 0.0608;
 p.option.shellShiftWidth = 1/4 * p.option.shellThickness;
 
 % Resolution for the shell heatmap in pixels
-p.option.shellHeatmapResolution = [180, 180];
+p.option.shellHeatmapResolution = [90, 90];
 
 % Types of heatmaps. Currently available 'MIP', 'SUM'.
 % Can handle multiple input.

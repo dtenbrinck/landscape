@@ -33,6 +33,7 @@ load([p.resultsPathAccepted,'/',fileNames{1,1}]);
 %%% TODO: refactor code in this file to make pipeline more generic!
 
 % -- Compute all valid cell coordinates from the processed and registered data -- %
+% currently DAPI and mCherry are supported
 [allCellCoordsGrid, allCellCoords] = getAllValidCellCoords(p.gridSize,fileNames,numberOfResults,p.tole,p.resultsPathAccepted, p.handledChannel);
 
 % -- Compute the Accumulator from the cell coordinates -- %
@@ -45,6 +46,7 @@ shells = cell(0,1);
 shells{1} = aboveLandmark;
 shells{2} = landmarkShell;
 shells{3} = belowLandmark;
+shells{4} = getShell(allCellCoords,0,Inf);
 
 % sanity check: for nonoverlapping shells the sum of all coordinates should stay constant
 if p.option.shellShiftWidth == p.option.shellThickness
@@ -55,26 +57,27 @@ if p.option.shellShiftWidth == p.option.shellThickness
     assert(numberOfCells == size(allCellCoords,2));
 end
 
-%% COMPUTE ACCUMULATOR
-if strcmp(p.handledChannel, 'DAPI')
-    
-    % make sure to use specific cell radius for dapi cells
-    if ( isfield(p.option, 'dapiCellradius') )
-        p.option.cellradius = p.option.dapiCellradius;
-    else
-        p.option.cellradius = 2; % use default size for dapi cell radius
-    end
-elseif strcmp(p.handledChannel, 'mCherry')
-    
-    %% SLICE WISE PLOTS WITH PROJECTED REFERENCE LANDMARK
-    %fig_filename_base = [p.resultsPath ,'/heatmaps/'];
-    %referenceLandmark = computeReferenceLandmark(fileNames,numberOfResults, p);
-    %createSlicesPlots(accumulator, p.option, 'Number of PGCs', referenceLandmark, [fig_filename_base, 'PGCs_positions'], 1);
 
-else
-    fprintf('There is no correct channel selected to generate heatmaps!\n');
-    return;
-end
+% %% COMPUTE ACCUMULATOR
+% if strcmp(p.handledChannel, 'DAPI')
+%     
+%     % make sure to use specific cell radius for dapi cells
+%     if ( isfield(p.option, 'dapiCellradius') )
+%        % p.option.cellradius = p.option.dapiCellradius;
+%     else
+%        % p.option.cellradius = 2; % use default size for dapi cell radius
+%     end
+% elseif strcmp(p.handledChannel, 'mCherry')
+%     
+%     %% SLICE WISE PLOTS WITH PROJECTED REFERENCE LANDMARK
+%     %fig_filename_base = [p.resultsPath ,'/heatmaps/'];
+%     %referenceLandmark = computeReferenceLandmark(fileNames,numberOfResults, p);
+%     %createSlicesPlots(accumulator, p.option, 'Number of PGCs', referenceLandmark, [fig_filename_base, 'PGCs_positions'], 1);
+% 
+% else
+%     fprintf('There is no correct channel selected to generate heatmaps!\n');
+%     return;
+% end
 
 %% HANDLE HEATMAPS ( Computation, drawing and saving ) 
 handleHeatmaps(accumulator,shells,size(allCellCoords,2),numberOfResults,p,p.option);
