@@ -29,6 +29,14 @@ elseif (strcmp(handledChannel, 'DAPI') )
         % Get all cell center coordinates
         allCellCoords = horzcat(allCellCoords, gatheredData.registered.nucleiCoordinates);
     end
+elseif (strcmp(handledChannel, 'GFP') )
+    for result = 1:numberOfResults
+        % Load result data
+        load([resultsPathAccepted,'/',fileNames{result,1}])
+
+        % Get all cell center coordinates
+        allCellCoords = horzcat(allCellCoords, gatheredData.registered.landmarkCentCoords);
+    end
 end
 
 % -- 2. Step --%
