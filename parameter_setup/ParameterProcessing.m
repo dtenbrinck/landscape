@@ -52,9 +52,10 @@ p.ellipsoidFitting.descentMethod = 'cg'; % 'grad'
 %% REGISTRATION
 % -- REGISTRATION OF LANDMARK -- %
 p.reg.landmarkCharacteristic = 'middle';
-p.reg.characteristicWeight = 0.5; %0,5
-p.reg.reference_point = [0; 0; -1];
-p.reg.reference_vector = [1; 0; 0];
+p.reg.characteristicWeight = 0; % 0 = head, 1 = tail
+zwert = 0; %value for z (front - back) at the reference point, only works for points on the left half of the unit ball
+p.reg.reference_point = [-sqrt(1-zwert^2); 0; zwert]; 
+p.reg.reference_vector = [zwert/(-sqrt(1-zwert^2)); 0; -1]; % Is the third value 
 % - register data - %
 p.samples_cube = 256;
 end
