@@ -1,3 +1,4 @@
+% TODO: Should be renamed due to name conflict!
 function [ heatmapStruct ] = generateHeatmap( accumulator, heatmaptypes )
 % This function will generate a struct with heatmaps in it. The heatmaps
 % will be defined by 'heatmaptypes'. heatmaptypes contains strings of the
