@@ -7,6 +7,7 @@ function [  ] = handleHeatmaps( accumulators,shells,numberOfResults, p )
 option = p.option;
 
 channels = ["GFP", "DAPI", "mCherry"];
+mercatorProjections = cell(1,3);
 
 % -- if heatmaps should be computed -- %
 fprintf('Computing heatmaps...\n');
@@ -22,9 +23,9 @@ for j=1:3
     %convAcc = convolveAccumulator(accumulator,option.cellradius,2*option.cellradius+1);
     
     % -- Compute mercator projections -- %
-    mercatorProjections = computeMercatorProjections(currentShells, option.shellHeatmapResolution);
+    mercatorProjections{j} = computeMercatorProjections(currentShells, option.shellHeatmapResolution);
     
-    % -- Compute heatmap heatmaps -- %
+    % -- Compute heatmaps -- %
     HMS = generateHeatmap(currentAccumulator,option.heatmaps.types);
     
     % -- fix paths in case we are generating for special channel --%
@@ -61,9 +62,9 @@ for j=1:3
             set(figs(i+(2*(i-1))),'Visible',vis);
             
             if option.heatmaps.save == 1
-                for j=1:size(option.heatmaps.saveas,2)
+                for k=1:size(option.heatmaps.saveas,2)
                     fig_filename = strcat(heatmapsPath,"/",currentType,"_Heatmaps");
-                    saveas(f,fig_filename,option.heatmaps.saveas{j});
+                    saveas(f,fig_filename,option.heatmaps.saveas{k});
                 end
             end
         end
@@ -74,9 +75,9 @@ for j=1:3
             set(figs(i+1+(2*(i-1))),'Visible',vis);
             
             if option.heatmaps.save == 1
-                for j=1:size(option.heatmaps.saveas,2)
+                for k=1:size(option.heatmaps.saveas,2)
                     fig_filename = strcat(heatmapsPath,"/",currentType,"_Heatmaps(unscaled)");
-                    saveas(f,fig_filename,option.heatmaps.saveas{j});
+                    saveas(f,fig_filename,option.heatmaps.saveas{k});
                 end
             end
         end
@@ -99,8 +100,8 @@ for j=1:3
     
     % -- Determine maximum value in all heatmaps for easier comparison -- %
     maxi = -1;
-    for i=1:size(mercatorProjections,3)
-        projection = mercatorProjections(:,:,i);
+    for i=1:size(mercatorProjections{j},3)
+        projection = mercatorProjections{j}(:,:,i);
         tmp_max = max(projection(:));
         if maxi < tmp_max
             maxi = tmp_max;
@@ -109,11 +110,41 @@ for j=1:3
     
     % -- Save shell heatmaps -- %
     f = figure;
-    for i=1:size(mercatorProjections,3)
-        imagesc(mercatorProjections(:,:,i),[0 maxi]);
+    for i=1:size(mercatorProjections{j},3)
+        imagesc(mercatorProjections{j}(:,:,i),[0 maxi]);
         saveas(f,strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".png"),'png');
     end
     
+end
+
+
+%% create combined heatmaps
+
+% PGCs + landmark
+% -- Determine maximum value in all heatmaps for easier comparison -- %
+heatmapsPath = strcat(p.resultsPath, "/heatmaps/PGC+landmark");
+if ~exist(strcat(heatmapsPath,"/"),'dir')
+        mkdir(heatmapsPath);
+end
+f = figure;
+for i=1:size(mercatorProjections{3},3)
+    fuse = imfuse(mercatorProjections{3}(:,:,i), mercatorProjections{1}(:,:,i));
+    imagesc(fuse);
+    saveas(f,strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".png"),'png');
+end
+
+
+% nuclei + landmark
+% -- Determine maximum value in all heatmaps for easier comparison -- %
+heatmapsPath = strcat(p.resultsPath, "/heatmaps/nuclei+landmark");
+if ~exist(strcat(heatmapsPath,"/"),'dir')
+        mkdir(heatmapsPath);
+end
+f = figure;
+for i=1:size(mercatorProjections{2},3)
+    fuse = imfuse(mercatorProjections{2}(:,:,i), mercatorProjections{1}(:,:,i));
+    imagesc(fuse);
+    saveas(f,strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".png"),'png');
 end
 
 end
