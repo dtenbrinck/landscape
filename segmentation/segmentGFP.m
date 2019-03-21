@@ -4,6 +4,7 @@ function [landmark, centCoords] = segmentGFP( data, GFPseg_parameter, resolution
 % TODO: Set via GUI!
 % GFPseg_parameter.method = 'k-means';
 type = 'morph';
+debug = 0; %TODO: make dependent on a general debug variable, e.g., p.debug
 
 if strcmp(GFPseg_parameter.method, 'CP') % Chambolle-Pock and thresholding
     
@@ -45,35 +46,85 @@ if strcmp(GFPseg_parameter.method, 'CP') % Chambolle-Pock and thresholding
     
 elseif strcmp(GFPseg_parameter.method, 'k-means')  % k-means clustering
     
+    % extract processing parameters
+    downsampling_factor = GFPseg_parameter.downsampling_factor;
+    size_opening = GFPseg_parameter.size_opening;
+    size_closing = GFPseg_parameter.size_closing;
+    intensity_threshold = GFPseg_parameter.threshold;
+    minNumberVoxels = GFPseg_parameter.minNumberVoxels;
+    
+    % determine dimensions of downsampled data
+    [dim_y_red, dim_x_red] = size(imresize(data(:,:,1),downsampling_factor));
+    
+    % initialize container for downsampled data
+    data_downsampled = zeros(dim_y_red, dim_x_red, size(data,3));
+    
+    % downsample slice-wise (we keep z-dimension fixed)
+    for i = 1:size(data,3)
+        data_downsampled(:,:,i) = imresize(data(:,:,i),downsampling_factor);
+    end
+    
     % segment GFP using k-means clustering
     k = GFPseg_parameter.k;
-    morphSize = GFPseg_parameter.morphSize;
-    Xi = k_means_clustering(data, k, 'real');
+    
+    % perform k-means clustering on downsampled data
+    Xi_red = k_means_clustering(data_downsampled, k, 'real');
+        
+    % upsample clustering result to full data size
+    Xi = zeros(size(data));
+    for i = 1:size(data,3)
+        Xi(:,:,i) = imresize(Xi_red(:,:,i),1/downsampling_factor, 'nearest');
+    end
     
     if strcmp(type,'k-channel')
         Xi = floor(Xi / k);
-    elseif strcmp(type,'morph')
+    elseif strcmp(type,'morph')        
+        % only use two highest labels of k-means clustering
         Xi_temp = Xi-2>0;
-        % check if signal was too strong so that too many  (more than 5% 
-        % in Xi)elements are found with k-means when only cutting off 
+        % check if signal was too strong so that too many  (more than 5%
+        % in Xi)elements are found with k-means when only cutting off
         % lowest two k-channels
         if ( nnz(Xi_temp) > 0.05 * numel(Xi) )
             Xi_temp = Xi-(k-1) > 0;
         end
-        Xi = imopen(Xi_temp,strel('disk',morphSize));        
+        
+        % perform morphlogical operations, i.e., opening and closing
+        Xi = imopen(Xi_temp,strel('disk',size_opening));
+        Xi = imclose(Xi,strel('disk',size_closing));
+        
+    end
+    
+    % get rid of outliers via connected components
+    CC = bwconncomp(Xi);
+    %  check for component with most voxels (assuming this is the landmark)
+    for i = 1:CC.NumObjects
+        currentNumberVoxels = numel(CC.PixelIdxList{i});
+        % if connected component has not enough voxels we consider it as
+        % outlier and remove it from the segmentation
+        if currentNumberVoxels < minNumberVoxels 
+            Xi(CC.PixelIdxList{i}) = 0;
+        end
     end
     
     % restrict segmentation to highest intensity voxels
+    % depending on the setting of the threshold this will thin the landmark significantly
     if ( GFPseg_parameter.threshold > 0 )
         fprintf('Cutting off blurry effects in GFP segmentation based on max. intensity values...\n');
         MIP = computeMIP(data);
-        Xi2 = (Xi & data > GFPseg_parameter.threshold*repmat(MIP,1,1,size(data,3)));
-        Xi = Xi2;
+        Xi_thinned = (Xi & (data > intensity_threshold*repmat(MIP,1,1,size(data,3))));
     end
 end
 
+% DEBUGGING
+if debug >= 1
+    figure;
+    subplot(1,2,1); isosurface(Xi, 0.5); view(0,0);
+    subplot(1,2,2); isosurface(Xi_thinned, 0.5); view(0,0);
+    figure; imagesc(computeMIP(data)); hold on; contour(computeMIP(Xi_thinned),[0.5, 0.5], 'r'); hold off
+end
+
 % set output variable
-landmark = double(Xi);
+landmark = single(Xi_thinned);
 
 %% GET CENTERS OF SEGMENTED REGIONS
 % -- WE ASSUME BRIGHTEST PIXEL TO BE THE CENTER
