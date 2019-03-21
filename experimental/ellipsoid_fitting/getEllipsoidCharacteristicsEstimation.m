@@ -232,7 +232,7 @@ function alpha_star = computeSteplength(v, descentDirection, funct, grad_funct, 
     if (descentDirection(3) < 0 ) 
         alpha_limit = min(alpha_limit, -v(3)/descentDirection(3));
     end
-    TOL = 1e-8;
+    TOL = 1e-9;
     if ( alpha_limit < TOL)
         fprintf('Stopping line search since maximal steplength smaller than %e.\n', TOL);
         alpha_star = 0;
@@ -294,7 +294,7 @@ function alpha_star = zoom(alpha_lower, alpha_higher, ...
     % use algorithm 3.6 to zoom in to appropriate step length
     iteration = 0;
     maxIteration = 30;
-    TOL = 1e-9;
+    TOL = 1e-12;
     while iteration < maxIteration
         if ( abs(alpha_lower-alpha_higher) < TOL)
            fprintf('Zoom interval after %d zoom iterations too small to zoom in further.\n', iteration);
