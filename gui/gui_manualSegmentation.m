@@ -91,56 +91,18 @@ end
 
 box_handle = msgbox('New cells are being registered. Please wait a few seconds!','Please wait!');
 
-segmentation = getappdata(figHandle,'segmentation');
-modifiedData.processed.cellsMIP = segmentation;
+segmentation_2D = getappdata(figHandle,'segmentation');
+modifiedData.processed.cellsMIP = segmentation_2D;
 
-full_segmentation = repmat(modifiedData.processed.cellsMIP,...
-                          [1 1 size(modifiedData.processed.mCherry,3)]);
-
-cc = bwconncomp(full_segmentation);
-
-cells = zeros(size(full_segmentation));
-
-% remove too small items
-% Centroid for all cells
-j = 1;
-for i = 1:cc.NumObjects
-    pixelList = cc.PixelIdxList{i};
-    if length(pixelList) > 50
-        cellObjects{j} = pixelList;
-        j = j+1;
-    end
-end
-
-for j=1:length(cellObjects)
-    currentCell = zeros(size(modifiedData.processed.mCherry));
-    currentCell(cellObjects{j}) = 1;
-    currentCell = currentCell .* single(modifiedData.processed.mCherry);
-    
-    maxSlice = 2;
-    maxValue = -1;
-    for slice = 2:size(modifiedData.processed.mCherry,3)-1
-        if max(max(currentCell(:,:,slice))) > maxValue
-            maxSlice = slice;
-            maxValue = max(max(currentCell(:,:,slice)));
-        end
-    end
-    
-    sliceMask = zeros(size(modifiedData.processed.mCherry));
-    sliceMask(:,:,maxSlice) = 1;
-    
-    currentCell = currentCell .* sliceMask;
-    cells(currentCell > 0) = 1;
-end
-
+segmentation_3D = extend2dTo3dSegmentation(segmentation_2D,modifiedData.processed.mCherry);
 
 % Centroids of the cells
 
-cc = bwconncomp(cells);
+cc = bwconncomp(segmentation_3D);
 S = regionprops(cc,'centroid');
 centCoords = round(reshape([S.Centroid],[3,numel([S.Centroid])/3]));
 
-modifiedData.processed.cells = cells;
+modifiedData.processed.cells = segmentation_3D;
 modifiedData.processed.cellCoordinates = centCoords;
 
 registeredData = registerData( modifiedData.processed, p.resolution, modifiedData.registered.transformation_full, modifiedData.processed.ellipsoid, p.samples_cube);
