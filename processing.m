@@ -33,10 +33,10 @@ fprintf('Processing dataset:');
     
 % process all existing data in parallel
 delete(gcp('nocreate'));
-   if p.debug_level <= 1 && p.visualization == 0
-        parpool;
-   end
-parfor experiment=1:numberOfExperiments
+%   if p.debug_level <= 1 && p.visualization == 0
+%        parpool;
+%   end
+for experiment=1:numberOfExperiments
     
     % show remotecurrent experiment number
     dispCounter(experiment, numberOfExperiments);
@@ -52,13 +52,16 @@ parfor experiment=1:numberOfExperiments
         
         % segment data
         if p.debug_level >= 1; disp('Segmenting GFP channel...'); end
-        [processedData.landmark, processedData.landmarkCentCoords] = segmentGFP(processedData.GFP, p.GFPseg, p.resolution);
-        
-        if p.debug_level >= 1; disp('Segmenting mCherry channel...'); end
-        [processedData.cells, processedData.cellCoordinates] = blobSegmentCells(processedData.mCherry, p.mCherryseg);
+        [processedData.landmark, processedData.landmarkCentCoords] =...
+            segmentGFP(processedData.GFP, p.GFPseg, p.resolution);
         
         if p.debug_level >= 1; disp('Segmenting DAPI channel...'); end
-        [processedData.nuclei, processedData.nucleiCoordinates] = segmentDAPI(processedData.Dapi, p.DAPIseg, p.resolution);
+        [processedData.nuclei, processedData.nucleiCoordinates, processedData.embryoShape] =...
+            segmentDAPI(processedData.Dapi, p.DAPIseg, p.resolution);
+        
+        if p.debug_level >= 1; disp('Segmenting mCherry channel...'); end
+        [processedData.cells, processedData.cellCoordinates] =...
+            blobSegmentCells(processedData.mCherry, p.mCherryseg, processedData.embryoShape);     
 
         % estimate embryo surface by fitting an ellipsoid
         if p.debug_level >= 1; disp('Estimating embryo surface...'); end

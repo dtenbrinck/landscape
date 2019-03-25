@@ -30,7 +30,7 @@ args.pixelsBeneath = zeros(size(polarImage));
 args.sumPixelsBeneath = zeros(size(polarImage));
 args.pointer = zeros(size(polarImage));
 
-waitbarHandle = waitbar(0,'Segmenting image...');
+%waitbarHandle = waitbar(0,'Segmenting image...');
 
 %%% initializing first column
 for i=1:size(polarImage,1)-1-delta
@@ -53,7 +53,7 @@ end
 % columnwise dynamic programming
 for j=2:size(costs,2)
     
-    waitbar(j / size(costs,2), waitbarHandle);
+    %waitbar(j / size(costs,2), waitbarHandle);
     
     args.columnIndex = j;
     
@@ -131,7 +131,7 @@ for j=2:size(costs,2)
     end
 end
 
-close(waitbarHandle);
+%close(waitbarHandle);
 
 %%% sweep from last column through the cost matrix with path of least costs
 if strcmp(method, 'Sobel')

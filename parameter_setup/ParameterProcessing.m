@@ -40,7 +40,7 @@ p.GFPseg.threshold = 0.75; % SD: 0, EPI: 0.98 e.g.
 p.mCherryseg.binarization = 'k-means'; % 'k-means', 'kittler'
 p.mCherryseg.k = 3; %3
 p.mCherryseg.cellSize = 50; %50. in pixel
-p.mCherryseg.method = 'k-means'; % 'k-means', 'k-means_local', 'CP'
+%p.mCherryseg.method = 'k-means'; % 'k-means', 'k-means_local', 'CP'
 % -- LANDMARK PROJECTION -- %
 p.samples_sphere = 128;
 
