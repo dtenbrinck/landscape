@@ -37,7 +37,7 @@ p.numberOfRandom = 100;
 p.option.cellradius = 7; %7 for mCherry
 % cell radius for nuclei cells in DAPI channel
 % Default: 2 with gridSize = 256
-p.option.dapiCellradius = 1;
+%p.option.dapiCellradius = 1;
 
 % - Slider options - %
 % Will show the Slider 
@@ -48,19 +48,15 @@ p.option.cropper = 0;
 
 % -- Options for the heatmap generation -- %
 
-% Process standard heatmaps? 1: yes, 0: no
-% Every option beneath will be irrelevant if 0.
-p.option.heatmaps.process = 1;
-
 % Thickness of shells for mercator projection
-p.option.shellThickness = 0.1;
+p.option.shellThickness = 0.1;%0.0608;
 
 % Shift width for shell computation
 % Note that shellShiftWidth = shellThickness means no overlap between heatmaps
-p.option.shellShiftWidth = 0.1;
+p.option.shellShiftWidth = 1/4 * p.option.shellThickness;
 
 % Resolution for the shell heatmap in pixels
-p.option.shellHeatmapResolution = [180, 180];
+p.option.shellHeatmapResolution = [90, 90];
 
 % Types of heatmaps. Currently available 'MIP', 'SUM'.
 % Can handle multiple input.

@@ -40,7 +40,7 @@ imagesc(u,[minData maxData])
 
 % set figure properties accordingly
 set(gcf, 'Color', 'w'); set(gca, 'XTickLabel', ''); set(gca, 'YTickLabel', '');
-axis image; colormap(gray);
+axis image; colormap(jet);
 
 % draw segmentation contours in red and green into image
 hold on;

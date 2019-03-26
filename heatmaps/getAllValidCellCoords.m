@@ -1,4 +1,4 @@
-function [ allCellCoords ] = getAllValidCellCoords(sizeAcc,fileNames,numberOfResults,tole,resultsPathAccepted, handledChannel)
+function [ allCellCoordsGrid, allCellCoords ] = getAllValidCellCoords(sizeAcc,fileNames,numberOfResults,tole,resultsPathAccepted, handledChannel)
 % This function computes the valid cell coordinates for the heatmap.
 % This will be done in multiple steps:
 % 1. load and gather all cell coordinates.
@@ -29,6 +29,14 @@ elseif (strcmp(handledChannel, 'DAPI') )
         % Get all cell center coordinates
         allCellCoords = horzcat(allCellCoords, gatheredData.registered.nucleiCoordinates);
     end
+elseif (strcmp(handledChannel, 'GFP') )
+    for result = 1:numberOfResults
+        % Load result data
+        load([resultsPathAccepted,'/',fileNames{result,1}])
+
+        % Get all cell center coordinates
+        allCellCoords = horzcat(allCellCoords, gatheredData.registered.landmarkCentCoords);
+    end
 end
 
 % -- 2. Step --%
@@ -45,17 +53,17 @@ normOfCoordinates(:,normOfCoordinates > 1+tole) = [];
 
 % -- 4. Step --% only for mCherry channel
 % Normalize the coordinates that are too big but in tolerance
-if ( strcmp(handledChannel, 'mCherry') )
-    allCellCoords(:,(normOfCoordinates < 1+tole) == (normOfCoordinates > 1)) ...
-        = allCellCoords(:,(normOfCoordinates < 1+tole) == (normOfCoordinates > 1))...
-        ./repmat(normOfCoordinates(:,(normOfCoordinates < 1+tole) == (normOfCoordinates > 1)),[3,1]);
-end
+% if ( strcmp(handledChannel, 'mCherry') )
+%     allCellCoordsGrid(:,(normOfCoordinates < 1+tole) == (normOfCoordinates > 1)) ...
+%         = allCellCoordsGrid(:,(normOfCoordinates < 1+tole) == (normOfCoordinates > 1))...
+%         ./repmat(normOfCoordinates(:,(normOfCoordinates < 1+tole) == (normOfCoordinates > 1)),[3,1]);
+% end
 
 % -- 5. Step --%
 % Get rounded cell centroid coordinates
-allCellCoords = round(...
+allCellCoordsGrid = round(...
     (allCellCoords + repmat([1;1;1], 1, size(allCellCoords,2)))...
     * sizeAcc / 2 );
-allCellCoords(allCellCoords==0)=1;
+allCellCoordsGrid(allCellCoordsGrid==0)=1;
 end
 
