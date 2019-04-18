@@ -2,9 +2,6 @@ function [cells, centCoords] = blobSegmentCells( data, p, embryoShape )
 
 % Segmentation of the cells with blob segmentation
 
-% Preallocation
-X = zeros(size(data));
-
 % Check that user has the Image Processing Toolbox installed.
 hasIPT = license('test', 'image_toolbox');
 if ~hasIPT
@@ -21,7 +18,17 @@ if isfield(p, 'binarization') && strcmp('k-means', p.binarization)
     % use k-means removing background and some noise
     % to get a binary image (only 0's and 1's) of class "logical."
     Xi = k_means_clustering(computeMIP(data), p.k, 'real');
-    binaryImage = extend2dTo3dSegmentation(Xi >= 2, data);
+    if ( sum(Xi(:) >= p.k-1) / sum(embryoShape(:)) ) > 0.1
+        if (sum(Xi(:) >= p.k) / sum(embryoShape(:)) ) > 0.1
+            Xi = k_means_clustering(computeMIP(data), p.k+1, 'real');
+            label = p.k+1;
+        else
+            label = p.k;
+        end
+    else
+        label = p.k-1;
+    end
+    binaryImage = extend2dTo3dSegmentation(Xi >= label, data);
     %segmentation_count = sum(Xi(:) >= ceil(p.k/2));
     %if segmentation_count/numel(Xi) > 0.015
     %    binaryImage = Xi >= ceil(p.k/2);
@@ -36,7 +43,7 @@ else
     for i = 1 : size(data,3)
         thresholdValue = kittler_thresholding(data(:,:,i), ones(size(data)));
         binaryImage(:,:,i) = data(:,:,i) > thresholdValue;
-    end 
+    end
 end
 
 % filter segmentation using mask for embryo
@@ -51,7 +58,7 @@ S = regionprops(CC,'centroid');
 centCoords = round(cat(1,S(:).Centroid));
 
 % DEBUG
-%figure; imagesc(computeMIP(data)); hold on; plot(centCoords(:,1), centCoords(:,2), 'r*'); hold off;
+%figure(4); imagesc(computeMIP(data)); hold on; plot(centCoords(:,1), centCoords(:,2), 'r*'); hold off;
 
 % Filter centCoords via kd-tree (resolution dependent)
 
@@ -67,22 +74,22 @@ roi = cell(CC.NumObjects,1);
 segmentation_2D = zeros(size(data,1), size(data,2));
 
 for i=1:CC.NumObjects
-   roi{i} = computeMIP(data(...
-       max(1,centCoords(i,2)-bbLimit):min(size(data,1),centCoords(i,2)+bbLimit),...
-       max(1,centCoords(i,1)-bbLimit):min(size(data,2),centCoords(i,1)+bbLimit),...
-       :));
-   options.numberRadii = max(size(roi{i}));
-   segmented_roi{i} = segmentCell(roi{i},options);
-   segmentation_2D(...
-       max(1,centCoords(i,2)-bbLimit):min(size(data,1),centCoords(i,2)+bbLimit),...
-       max(1,centCoords(i,1)-bbLimit):min(size(data,2),centCoords(i,1)+bbLimit)) = ...
-       segmentation_2D(...
-       max(1,centCoords(i,2)-bbLimit):min(size(data,1),centCoords(i,2)+bbLimit),...
-       max(1,centCoords(i,1)-bbLimit):min(size(data,2),centCoords(i,1)+bbLimit))...
-   | segmented_roi{i};
+    roi{i} = computeMIP(data(...
+        max(1,centCoords(i,2)-bbLimit):min(size(data,1),centCoords(i,2)+bbLimit),...
+        max(1,centCoords(i,1)-bbLimit):min(size(data,2),centCoords(i,1)+bbLimit),...
+        :));
+    options.numberRadii = max(size(roi{i}));
+    segmented_roi{i} = segmentCell(roi{i},options);
+    segmentation_2D(...
+        max(1,centCoords(i,2)-bbLimit):min(size(data,1),centCoords(i,2)+bbLimit),...
+        max(1,centCoords(i,1)-bbLimit):min(size(data,2),centCoords(i,1)+bbLimit)) = ...
+        segmentation_2D(...
+        max(1,centCoords(i,2)-bbLimit):min(size(data,1),centCoords(i,2)+bbLimit),...
+        max(1,centCoords(i,1)-bbLimit):min(size(data,2),centCoords(i,1)+bbLimit))...
+        | segmented_roi{i};
     % DEBUG
     %figure(1); imagesc(roi{i}); hold on; contour(segmented_roi{i}, [0.5, 0.5], 'r'); hold off;
-    %figure(2); imagesc(computeMIP(data)); hold on; plot(centCoords(:,1), centCoords(:,2), 'r*'); plot(centCoords(i,1), centCoords(i,2), 'g*'); hold off; 
+    %figure(2); imagesc(computeMIP(data)); hold on; plot(centCoords(:,1), centCoords(:,2), 'r*'); plot(centCoords(i,1), centCoords(i,2), 'g*'); hold off;
     %pause(1);
 end
 
@@ -108,7 +115,7 @@ cells = extend2dTo3dSegmentation(segmentation_2D, data);
 % for i = 1 : size(data,3)
 %     labeledImage(:,:,i) = bwlabel(binaryImage(:,:,i), 8);
 % end
-% 
+%
 % meanIntensityFactor = 0.5;
 % minimalAreaSize = 20;
 % for j = 1 : size(data,3)    % Loop over all layers.
@@ -123,14 +130,14 @@ cells = extend2dTo3dSegmentation(segmentation_2D, data);
 %     % Extract only those blobs that meet our criteria, and
 %     % eliminate those blobs that don't meet our criteria.
 %     keeperBlobsImage = ismember(labeledImage(:,:,j), keeperIndexes);
-%     
+%
 %     % Now use the keeper blobs as a mask on the original image.
 %     maskedImageDime = data(:,:,j); % Simply a copy at first.
 %     maskedImageDime(~keeperBlobsImage) = 0;  % Set all non-keeper pixels to zero.
-%     
-%     X(:,:,j) = maskedImageDime;  
+%
+%     X(:,:,j) = maskedImageDime;
 % end
-% 
+%
 % % Identify the layers of the cells
 % cc = bwconncomp(X);
 % cells = zeros(size(data));
@@ -142,12 +149,12 @@ cells = extend2dTo3dSegmentation(segmentation_2D, data);
 %         j = j + 1;
 %     end
 % end
-% 
+%
 % for j=1:length(cellObjects)
 %     currentCell = zeros(size(data));
 %     currentCell(cellObjects{j}) = 1;
 %     currentCell = currentCell .* data;
-%     
+%
 %     maxSlice = 2;
 %     maxValue = -1;
 %     for slice = 2:size(data,3)-1
@@ -156,10 +163,10 @@ cells = extend2dTo3dSegmentation(segmentation_2D, data);
 %             maxValue = max(max(currentCell(:,:,slice)));
 %         end
 %     end
-%     
+%
 %     sliceMask = zeros(size(data));
 %     sliceMask(:,:,maxSlice) = 1;
-%     
+%
 %     currentCell = currentCell .* sliceMask;
 %     cells(currentCell > 0) = 1;
 % end
