@@ -3,7 +3,6 @@ function [landmark, centCoords] = segmentGFP( data, GFPseg_parameter, resolution
 % specify segmentation algorithm
 % TODO: Set via GUI!
 % GFPseg_parameter.method = 'k-means';
-type = 'morph';
 debug = 0; %TODO: make dependent on a general debug variable, e.g., p.debug
 
 if strcmp(GFPseg_parameter.method, 'CP') % Chambolle-Pock and thresholding
@@ -67,32 +66,49 @@ elseif strcmp(GFPseg_parameter.method, 'k-means')  % k-means clustering
     % segment GFP using k-means clustering
     k = GFPseg_parameter.k;
     
-    % perform k-means clustering on downsampled data
-    Xi_red = k_means_clustering(data_downsampled, k, 'real');
-        
-    % upsample clustering result to full data size
-    Xi = zeros(size(data));
-    for i = 1:size(data,3)
-        Xi(:,:,i) = imresize(Xi_red(:,:,i),1/downsampling_factor, 'nearest');
-    end
+    % initialize Xi and Xi_temp
+    Xi = ones(size(data)); Xi_temp = Xi;
     
-    if strcmp(type,'k-channel')
-        Xi = floor(Xi / k);
-    elseif strcmp(type,'morph')        
-        % only use two highest labels of k-means clustering
-        Xi_temp = Xi-2>0;
-        % check if signal was too strong so that too many  (more than 5%
-        % in Xi)elements are found with k-means when only cutting off
-        % lowest two k-channels
-        if ( nnz(Xi_temp) > 0.05 * numel(Xi) )
-            Xi_temp = Xi-(k-1) > 0;
+    % some datasets need a higher k parameter to resolve the different
+    % intensity values near the landmark, so we perform k-means again
+    while (nnz(Xi_temp) >= 0.01 * numel(Xi) && k < 8)
+        
+        % perform k-means clustering on downsampled data
+        Xi_red = k_means_clustering(data_downsampled, k, 'real');
+                
+        % upsample clustering result to full data size
+        Xi = zeros(size(data));
+        for i = 1:size(data,3)
+            Xi(:,:,i) = imresize(Xi_red(:,:,i),1/downsampling_factor, 'nearest');
         end
         
-        % perform morphlogical operations, i.e., opening and closing
-        Xi = imopen(Xi_temp,strel('disk',size_opening));
-        Xi = imclose(Xi,strel('disk',size_closing));
+        % only use two highest labels of k-means clustering
+        %Xi_temp = Xi-2>0;
         
+        % check if signal was too strong so that too many  (more than 1%
+        % in Xi)elements are found with k-means when only cutting off
+        % lowest two k-channels
+        %if ( nnz(Xi_temp) > 0.01 * numel(Xi) )
+        %    Xi_temp = Xi-(k-1) > 0;
+        %end
+        % upsample clustering result to full data size
+        Xi = zeros(size(data));
+        for i = 1:size(data,3)
+            Xi(:,:,i) = imresize(Xi_red(:,:,i),1/downsampling_factor, 'nearest');
+        end
+        
+        Xi_temp = Xi-k+2>0;
+        
+        k = k+1;
     end
+    
+    % perform morphlogical operations, i.e., opening and closing
+    Xi = imopen(Xi_temp,strel('disk',size_opening));
+    Xi = imclose(Xi,strel('disk',size_closing));
+    
+       
+    % DEBUG
+    %figure; imagesc(computeMIP(data)); hold on; contour(computeMIP(Xi), [0.5 0.5], 'r'); hold off
     
     % get rid of outliers via connected components
     CC = bwconncomp(Xi);
@@ -101,7 +117,7 @@ elseif strcmp(GFPseg_parameter.method, 'k-means')  % k-means clustering
         currentNumberVoxels = numel(CC.PixelIdxList{i});
         % if connected component has not enough voxels we consider it as
         % outlier and remove it from the segmentation
-        if currentNumberVoxels < minNumberVoxels 
+        if currentNumberVoxels < minNumberVoxels
             Xi(CC.PixelIdxList{i}) = 0;
         end
     end
