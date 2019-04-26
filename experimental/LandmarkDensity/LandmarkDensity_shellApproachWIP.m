@@ -15,9 +15,10 @@ landmarkCharacteristic = 0;
 weight = 0;
 reference_point = [-1; 0; 0]; 
 reference_vector = [0; 0; -1];
-min_radius = 0;
-max_radius = 1;
-teta  = pi/2; %*90 degrees
+%min_radius = 0.74464;
+%max_radius = 0.80544;
+teta  = 1*0.174533; % x*10 degrees
+slices = 20; 
 
 %% GET FILES TO PROCESS
 
@@ -44,7 +45,11 @@ end
 
 %% MAIN CODE
 
+amountOfNucleis = zeros(slices,1);
+radii = computeLandmarkShell(p, fileNames, numberOfResults);
+
 for result = 1:numberOfResults
+    
     %Load result data
     load([p.resultsPathAccepted,'/',fileNames{result,1}])
     
@@ -53,6 +58,9 @@ for result = 1:numberOfResults
     [sphereCoordinates, landmarkCoordinates, landmarkOnSphere] = ...
             projectLandmarkOnSphere(landmarkPosition, p.resolution, gatheredData.processed.ellipsoid, p.samples_sphere); 
     [pstar,vstar] = computeRegression_new(landmarkCoordinates','false');
+    
+    %for debugging
+    %visualizeProjectedLandmark(sphereCoordinates, landmarkOnSphere);
     
     % Tilt refpstar onto the specified position
     [pstar,vstar] = getCharPos_daniel(pstar,vstar,landmarkCoordinates',landmarkCharacteristic,weight);
@@ -74,7 +82,6 @@ for result = 1:numberOfResults
    
     %get points on surface that define equally large slices of landmark (from head to tail). We
     %will later calculate the cell density in each of the slices
-    slices = 10; %PARAMETER
     pointsOnSurface = zeros(slices,3);
     for i = 0:slices
     [pstar,vstar] = getCharPos_daniel(pstar,vstar,transformedCoordinates,landmarkCharacteristic,i* 1/slices);
@@ -82,18 +89,13 @@ for result = 1:numberOfResults
     vstar = vstar/norm(vstar);
     pointsOnSurface(i+1,:) = pstar; 
     end
-    pointsOnSurface(:,[2 3])= pointsOnSurface(:,[3 2]); %change order of coordinates, we need this for using spherical coordinates later
-    
-    %calculate intersections between landmark-shell and sttraight line between
-    %pointsOnSurface and center (DO WE NEED THIS?)
-    %for i = 1:slices+1
-    %intersections_min(i,:) = min_radius*pointsOnSurface(i,:);
-    %intersections_max(i,:) = max_radius*pointsOnSurface(i,:);
-    %end 
-   
+  
     nucleiCoords = gatheredData.registered.nucleiCoordinates;
     nucleiCoords = nucleiCoords';
-    nucleiCoords(:,[2 3])= nucleiCoords(:,[3 2]); %change order of coordinates, we need this for using spherical coordinates later
+    
+    %TEST
+    %nucleiCoords = gatheredData.registered.landmarkCentCoords; %eigentlich landmark Coords
+    %nucleiCoords = nucleiCoords'; 
     
     %calculate [azimuth/phi, elevation/teta, radius] of pointsOnSurface (spherical
     %coordinates)
@@ -107,25 +109,89 @@ for result = 1:numberOfResults
     end
     
     %calculate amount of nucleis inside slices and landmark area defined by
-    %[azimuth/phi, elevation/teta, radius]
-    
-    amountofNucleis = zeros(slices,1);
-    for i = 1: size(nucleiCoords,1)
-        for slice = 1:slices
+    %[azimuth/phi, elevation/teta, radius] 
+    %TODO: FIX PROBLEMS ON BORDERS OF EDGES
+    min_radius = radii(2, result);
+    max_radius = radii(1, result);
+    area = double.empty(0,3);
+    for slice = 1:slices
+        for i = 1: size(nucleiCoords,1)
             %check boundaries for azimuth, elevation, radius
-            if  nucleiCoords(i,1) <= 0 && pointsOnSurface(slice,1) <= 0
-                if abs(nucleiCoords(i,1)) < abs(pointsOnSurface(slice,1)) && abs(nucleiCoords(i,1)) >= abs(pointsOnSurface(slice+1,1)) && nucleiCoords(i,2) >= pi/2-teta && nucleiCoords(i,2) <= pi/2+teta && nucleiCoords(i,3) >= min_radius && nucleiCoords(i,2) <= min_radius
+           if abs(nucleiCoords(i,1)) <= pi/2 
+               if abs(nucleiCoords(i,2)) > abs(pointsOnSurface(slice+1,2)) && abs(nucleiCoords(i,2)) <= abs(pointsOnSurface(slice,2)) && abs(nucleiCoords(i,1)) <= teta && nucleiCoords(i,3)>= min_radius && nucleiCoords(i,3) <= max_radius  
                     amountOfNucleis(slice) = amountOfNucleis(slice) +1;
-                end
-            elseif nucleiCoords(i,1) > 0 && pointsOnSurface(slice,1) > 0
-                if abs(nucleiCoords(i,1)) > abs(pointsOnSurface(slice,1)) && abs(nucleiCoords(slice,1)) <= abs(pointsOnSurface(slice+1,1)) && nucleiCoords(i,2) >= pi/2-teta && nucleiCoords(i,2) <= pi/2+teta && nucleiCoords(i,3)>= min_radius && nucleiCoords(i,2) <= min_radius  
+                    [nucleiCoords(i,1), nucleiCoords(i,2), nucleiCoords(i,3)] = sph2cart(nucleiCoords(i,1),nucleiCoords(i,2),nucleiCoords(i,3));
+                    area = vertcat(area, nucleiCoords(i,:));
+               end 
+            end  
+           % if abs(nucleiCoords(i,1)) <= pi/2 && nucleiCoords(i,2) >= 0
+             %  if abs(nucleiCoords(i,2)) > abs(pointsOnSurface(slice,2)) && abs(nucleiCoords(i,2)) < abs(pointsOnSurface(slice+1,2)) && abs(nucleiCoords(i,1)) <= teta && nucleiCoords(i,3)>= min_radius && nucleiCoords(i,3) <= max_radius  
+                %    amountOfNucleis(slice) = amountOfNucleis(slice) +1;
+                   % [nucleiCoords(i,1), nucleiCoords(i,2), nucleiCoords(i,3)] = sph2cart(nucleiCoords(i,1),nucleiCoords(i,2),nucleiCoords(i,3));
+                  %  area = vertcat(area, nucleiCoords(i,:));
+              % end
+            %end  
+            if   abs(nucleiCoords(i,1)) > pi/2 
+                if abs(nucleiCoords(i,2)) <= abs(pointsOnSurface(slice +1,2)) && abs(nucleiCoords(i,2)) > (pointsOnSurface(slice,2)) && abs(nucleiCoords(i,1)) >= pi-teta && nucleiCoords(i,3)>= min_radius && nucleiCoords(i,3) <= max_radius 
                     amountOfNucleis(slice) = amountOfNucleis(slice) +1;
+                    [nucleiCoords(i,1), nucleiCoords(i,2), nucleiCoords(i,3)] = sph2cart(nucleiCoords(i,1),nucleiCoords(i,2),nucleiCoords(i,3));
+                    area = vertcat(area, nucleiCoords(i,:));
                 end
-            end
+            end   
+                   
         end
+    
+    %for debugging:   
+    if result < 2
+    x = pointsOnSurface;
+    for i = 1:size(pointsOnSurface,1)
+    [x(i,1),x(i,2),x(i,3)]= sph2cart(x(i,1),x(i,2),x(i,3)); 
     end
-   
+    landmarkCoords = gatheredData.registered.landmarkCentCoords;
+    landmarkCoords = landmarkCoords';
+    figure;
+    scatter3(sphereCoordinates(:,1),sphereCoordinates(:,2),sphereCoordinates(:,3), 1,'*');
+    hold on
+    scatter3(landmarkCoords(:,1),landmarkCoords(:,2),landmarkCoords(:,3), 100,'*');
+    hold on
+    scatter3(area(:,1),area(:,2),area(:,3), 100,'*');
+    hold on 
+    scatter3(x(:,1),x(:,2),x(:,3), 100)
+    view(0,90);
+    drawnow
+    hold off
+    end
+    
+    end
+       
 end
 
+plotting = 1;
+if plotting == 1
+% plot results
+amountHeadside=0; %will have amount of cells in head mesoderm (first 55% of landmark)
+amountTailside=0; %will have amount of cells in notochord (last 45% of landmark) 
+for i = 1:11
+    amountHeadside = amountHeadside + amountOfNucleis(i);
+end 
 
+for i = 11:20
+    amountTailside = amountTailside + amountOfNucleis(i);
+end 
 
+amountTotal = amountHeadside + amountTailside;
+
+amountOfNucleis = 1/amountTotal * amountOfNucleis;
+figure
+plot(amountOfNucleis);
+
+figure
+x = [ 0 5 10 15 20 25 30 35 40 45 50 55 60 65 70 75 80 85 90 95];
+bar(x,amountOfNucleis');
+
+amountHeadside = amountHeadside * 50/45 *1/amountTotal;
+amountTailside = amountTailside *50/55 *1/amountTotal;
+c = categorical({'head mesoderm (0-45%)','notochord (45-100%)',});
+figure
+bar(c,[amountHeadside,amountTailside]);
+end
