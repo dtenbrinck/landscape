@@ -60,7 +60,7 @@ elseif strcmp(GFPseg_parameter.method, 'k-means')  % k-means clustering
     
     % downsample slice-wise (we keep z-dimension fixed)
     for i = 1:size(data,3)
-        data_downsampled(:,:,i) = imresize(data(:,:,i),downsampling_factor);
+        data_downsampled(:,:,i) = imresize(data(:,:,i), [dim_y_red, dim_x_red]);
     end
     
     % segment GFP using k-means clustering
@@ -79,7 +79,7 @@ elseif strcmp(GFPseg_parameter.method, 'k-means')  % k-means clustering
         % upsample clustering result to full data size
         Xi = zeros(size(data));
         for i = 1:size(data,3)
-            Xi(:,:,i) = imresize(Xi_red(:,:,i),1/downsampling_factor, 'nearest');
+            Xi(:,:,i) = imresize(Xi_red(:,:,i),size(data(:,:,1)), 'nearest');
         end
         
         % only use two highest labels of k-means clustering
@@ -94,7 +94,7 @@ elseif strcmp(GFPseg_parameter.method, 'k-means')  % k-means clustering
         % upsample clustering result to full data size
         Xi = zeros(size(data));
         for i = 1:size(data,3)
-            Xi(:,:,i) = imresize(Xi_red(:,:,i),1/downsampling_factor, 'nearest');
+            Xi(:,:,i) = imresize(Xi_red(:,:,i),size(data(:,:,1)), 'nearest');
         end
         
         Xi_temp = Xi-k+2>0;
