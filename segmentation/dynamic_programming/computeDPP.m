@@ -102,6 +102,9 @@ for j=2:size(costs,2)
         else
             index = find(tmp == min(tmp(:)));
         end
+        
+        % take second entry in case there are several good ones
+        index = index(ceil(size(index,2)/2));
                
         if index == 1
             pointer(i,j) = i-1;
