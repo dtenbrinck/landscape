@@ -2,7 +2,7 @@
 clear; clc; close all;
 
 % load necessary variables
-root_dir = pwd;
+root_dir = fileparts(fileeparts(pwd));
 addpath([root_dir '/parameter_setup/']);
 p = initializeScript('process');
 p.resolution = [1.1512, 1.1512, 5];   % 30 percent scale
