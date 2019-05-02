@@ -9,21 +9,36 @@ option = p.option;
 channels = ["GFP", "DAPI", "mCherry"];
 mercatorProjections = cell(1,3);
 
+if option.heatmaps.saveAccumulator == 1
+    save([p.resultsPath '/AllAccumulators.mat'],'accumulators','shells');
+end
+    
+
 % -- if heatmaps should be computed -- %
 fprintf('Computing heatmaps...\n');
 
 % iterate over all three channels
 for j=1:3
     
-    currentAccumulator = accumulators{j};
-    currentShells = shells{j};
+    % extract information for current channel
+    switch j
+        case 1
+            currentAccumulator = accumulators.GFP;
+            currentShell = shells.GFP;
+        case 2
+            currentAccumulator = accumulators.DAPI;
+            currentShell = shells.DAPI;
+        case 3
+            currentAccumulator = accumulators.mCherry;
+            currentShell = shells.mCherry;
+    end
     
     % -- Convolve over the points -- %
     % TODO: Different settings per channel
     %convAcc = convolveAccumulator(accumulator,option.cellradius,2*option.cellradius+1);
     
     % -- Compute mercator projections -- %
-    mercatorProjections{j} = computeMercatorProjections(currentShells, option.shellHeatmapResolution);
+    mercatorProjections{j} = computeMercatorProjections(currentShell, option.shellHeatmapResolution);
     
     % -- Compute heatmaps -- %
     HMS = generateHeatmap(currentAccumulator,option.heatmaps.types);
