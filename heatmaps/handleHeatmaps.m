@@ -10,7 +10,7 @@ channels = ["GFP", "DAPI", "mCherry"];
 mercatorProjections = cell(1,3);
 
 if option.heatmaps.saveAccumulator == 1
-    save([p.resultsPath '/AllAccumulators.mat'],'accumulators','shells');
+    save([p.resultsPath '/AllAccumulators.mat'],'accumulators','shells','numberOfResults');
 end
     
 
@@ -112,6 +112,17 @@ for j=1:3
         gui_cropRegion(currentAccumulator,HMS.MIP.Top,200);
     end
     
+    % CONVOLUTION
+    sigma = 0.5;
+    gaussian = fspecial('gaussian', [17 17], sigma);
+    %gaussian = gaussian(9,:);
+    %gaussian = gaussian./(sum(gaussian(:)));
+    for i=1:size(mercatorProjections{j},3)
+         mercatorProjections{j}(:,:,i) = imfilter(mercatorProjections{j}(:,:,i),gaussian,'replicate');
+         
+         % normalize for relative measures
+         mercatorProjections{j}(:,:,i) = mercatorProjections{j}(:,:,i) ./ sum(sum(mercatorProjections{j}(:,:,4)));
+    end
     
     % -- Determine maximum value in all heatmaps for easier comparison -- %
     maxi = -1;
@@ -125,8 +136,9 @@ for j=1:3
     
     % -- Save shell heatmaps -- %
     f = figure;
+    
     for i=1:size(mercatorProjections{j},3)
-        imagesc(mercatorProjections{j}(:,:,i),[0 maxi]);
+        imagesc(mercatorProjections{j}(:,:,i),[0 maxi]); axis image; colorbar;
         saveas(f,strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".png"),'png');
     end
     
