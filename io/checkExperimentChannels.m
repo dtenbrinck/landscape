@@ -60,5 +60,9 @@ end
 % delete empty cells
 experimentSets = reshape(experimentSets(~cellfun('isempty',experimentSets)),[],3);
 
+% Warning message if no experiments could be found
+if isempty(experimentSets)
+    error('No valid experiment data could be found in chosen directory. Make sure you name the files containing strings like ''GFP'', ''DAPI'', or ''mCherry''.');
 end
 
+end
