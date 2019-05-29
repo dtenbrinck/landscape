@@ -8,9 +8,11 @@ p = initializeScript('processing', root_dir);
 p.resolution = [1.1512, 1.1512, 5];   % 30 percent scale
 
 % Select the registered data
-dname = uigetfile(p.dataPath,'Please select the registered data!'); % Select all files to see the data
+dname = uigetfile(p.dataPath,'Please select the intersection data!'); % Select all files to see the data
+dname_2 = uigetfile(p.dataPath,'Please select the accumulator data!');
 
 load([p.dataPath '\' dname]);
+load([p.dataPath '\' dname_2]);
 
 [X1, Y1, Z1] = sphere(50);
 X1 = 116 * X1;
@@ -19,6 +21,11 @@ Z1 = 116 * Z1;
 X1 = X1 + 128;
 Y1 = Y1 + 128;
 Z1 = Z1 + 128;
+
+registeredData.DapiSegm = intersection_registration_threshold.Dapi;
+registeredData.landmark = intersection_registration_threshold.landmark;
+registeredData.mesodermSegm = intersection_registration_threshold.mesoderm;
+registeredData.ectoendoSegm = intersection_registration_threshold.ectoderm;
 
 % Dapi
 figure
@@ -125,6 +132,62 @@ hold off
 savefig([p.resultsPath '\' dname(1) '_' dname(3) '_' dname(5:6) '_ectoderm_endoderm_3D_Plot.fig'])
 
 
+registeredData.ectoendoSegm = intersection_registration_threshold.endoderm;
+
+% Ectoderm/Endoderm plot
+figure
+data = registeredData.ectoendoSegm;
+data = smooth3(data,'box',1);
+patch(isocaps(data,.5),...
+   'FaceColor','interp','EdgeColor','none');
+p1 = patch(isosurface(data,.5),...
+   'FaceColor','g','EdgeColor','none');
+alpha(0.3);
+isonormals(data,p1);
+view(3); 
+set(gca,'ZDir','reverse'); 
+xlabel('x');
+ylabel('y');
+zlabel('z');
+axis vis3d tight
+camlight left
+colormap('jet');
+lighting gouraud
+title([dname(1) '\_' dname(3) '\_' dname(5:6) '\_ registered data 3D ectoderm/endoderm plot']);
+axis equal
+hold on
+surf(X1, Y1, Z1,'FaceAlpha', .15, 'FaceColor', 'b', 'EdgeColor', 'none', 'DisplayName', 'unit sphere' );
+hold off
+savefig([p.resultsPath '\' dname(1) '_' dname(3) '_' dname(5:6) '_ectoderm_endoderm_3D_Plot.fig'])
+
+
+% accumulator plot
+registeredData.ectoendoSegm = accumulator(1:256,1:256,1:256);
+
+figure
+data = registeredData.ectoendoSegm;
+data = smooth3(data,'box',1);
+patch(isocaps(data,.5),...
+   'FaceColor','interp','EdgeColor','none');
+p1 = patch(isosurface(data,.5),...
+   'FaceColor','g','EdgeColor','none');
+alpha(0.3);
+isonormals(data,p1);
+view(3); 
+set(gca,'ZDir','reverse'); 
+xlabel('x');
+ylabel('y');
+zlabel('z');
+axis vis3d tight
+camlight left
+colormap('jet');
+lighting gouraud
+title([dname(1) '\_' dname(3) '\_' dname(5:6) '\_ registered data 3D ectoderm/endoderm plot']);
+axis equal
+hold on
+surf(X1, Y1, Z1,'FaceAlpha', .15, 'FaceColor', 'b', 'EdgeColor', 'none', 'DisplayName', 'unit sphere' );
+hold off
+savefig([p.resultsPath '\' dname(1) '_' dname(3) '_' dname(5:6) '_ectoderm_endoderm_3D_Plot.fig'])
 % title(['All data plot' dname(1) '\_' dname(3:17)]);
 % legend('Landmark','Dapi','Ectoderm','Mesoderm')
 % hold off
