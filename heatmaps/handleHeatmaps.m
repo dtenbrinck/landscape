@@ -113,7 +113,7 @@ for j=1:3
     end
     
     % CONVOLUTION
-    sigma = 0.5;
+    sigma = 0.5; %default 0.5
     gaussian = fspecial('gaussian', [17 17], sigma);
     %gaussian = gaussian(9,:);
     %gaussian = gaussian./(sum(gaussian(:)));
@@ -125,21 +125,33 @@ for j=1:3
     end
     
     % -- Determine maximum value in all heatmaps for easier comparison -- %
+    % HERE YOU CAN SET THE MAXIMUM VALUE MANUALLY BASED ON THE MAXIMUM
+    % NUMBER OF CELLS IN ALL SHELLS (COMPARISON WITH OTHER EXPERIMENTS)
+    
+    % maxi = 4.32e-04
+    
+    %%%%% THIS CAN BE COMMENTED OUT AFTERWARDS!
     maxi = -1;
-    for i=1:size(mercatorProjections{j},3)
+    for i=1:size(mercatorProjections{j},3)-1
         projection = mercatorProjections{j}(:,:,i);
         tmp_max = max(projection(:));
         if maxi < tmp_max
             maxi = tmp_max;
         end
     end
+    disp(['Maximum cell density in channel ' channels(j) ' channel for this experiment is: ' num2str(maxi)]);
+    %%%%% UNTIL HERE!
     
     % -- Save shell heatmaps -- %
     f = figure;
+    set(f,'color','none');
+    f.PaperUnits = 'inches';
+    f.PaperPosition = [0 0 6 6];
     
     for i=1:size(mercatorProjections{j},3)
-        imagesc(mercatorProjections{j}(:,:,i),[0 maxi]); axis image; colorbar;
+        imagesc(mercatorProjections{j}(:,:,i),[0 maxi]); axis image; colorbar; axis off; colormap parula;
         saveas(f,strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".png"),'png');
+        savefig(strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".fig"))
     end
     
 end
