@@ -11,7 +11,7 @@ p.scaleAllDim = 0;
 % Debug variables
 p.debug_level = 1; %1
 p.visualization = 0; %0
-p.proofOfPrinciple = 1; %0 
+p.proofOfPrinciple = 0; %0 
 
 %% PREPROCESSING
 % -- BACKGROUND REMOVAL -- %
@@ -57,7 +57,7 @@ p.ellipsoidFitting.descentMethod = 'cg'; % 'grad'
 % -- REGISTRATION OF LANDMARK -- %
 p.reg.landmarkCharacteristic = 'middle';
 p.reg.characteristicWeight = 0; % 0 = head, 1 = tail
-zwert = -0.2; %value for z (front = -1 to back = 1. Default is left = 0) for the reference point, only works for points on the left half of the unit ball. 
+zwert = 0; %value for z (front = -1 to back = 1. Default is left = 0) for the reference point, only works for points on the left half of the unit ball. 
 p.reg.reference_point = [-sqrt(1-zwert^2); 0; zwert]; 
 if zwert < 0
     p.reg.reference_vector = [-1; 0; -sqrt(1-zwert^2)/zwert];
