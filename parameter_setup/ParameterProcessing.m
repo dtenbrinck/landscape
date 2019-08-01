@@ -9,8 +9,9 @@ p.scale = 0.75;
 p.scaleAllDim = 0;
 
 % Debug variables
-p.debug_level = 2; %1
-p.visualization = 1; %0
+p.debug_level = 1; %1
+p.visualization = 0; %0
+p.proofOfPrinciple = 1; %0
 
 %% PREPROCESSING
 % -- BACKGROUND REMOVAL -- %
