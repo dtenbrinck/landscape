@@ -49,13 +49,13 @@ end
 
 % transform resolution of experiment Data
 %if isfield(processedData, 'GFP')
-    [GFP_ProofOfPriciple, ~] = transformVoxelData(experimentData,single(processedData.GFP), resolution, transformationMatrix, ellipsoid_center, ellipsoid_radii, samples, 'cubic');
+    [GFP_ProofOfPriciple, ~] = transformVoxelData(single(processedData.GFP), resolution, transformationMatrix, ellipsoid_center, samples, 'cubic');
 %end
 %if isfield(processedData, 'mCherry')
-    [mCherry_ProofOfPriciple, ~] = transformVoxelData(experimentData, single(processedData.mCherry), resolution, transformationMatrix, ellipsoid_center, ellipsoid_radii, samples, 'cubic');
+    [mCherry_ProofOfPriciple, ~] = transformVoxelData(single(processedData.mCherry), resolution, transformationMatrix, ellipsoid_center, samples, 'cubic');
 %end
 %if isfield(processedData, 'Dapi')
-    [Dapi_ProofOfPriciple, ~] = transformVoxelData(experimentData, single(processedData.Dapi), resolution, transformationMatrix, ellipsoid_center, ellipsoid_radii, samples, 'cubic');
+    [Dapi_ProofOfPriciple, ~] = transformVoxelData(single(processedData.Dapi), resolution, transformationMatrix, ellipsoid_center, samples, 'cubic');
 %end
 
 %scale colormap to [0,1
