@@ -4,13 +4,13 @@ function p =  ParameterProcessing()
 % discriptios of each parameter.        
   
 %% COMMON PARAMETER
-p.resolution = [1.29, 1.29, 10];
+p.resolution = [1.29, 1.29, 20];
 p.scale = 0.75;
 p.scaleAllDim = 0;
 
 % Debug variables
-p.debug_level = 1; %1
-p.visualization = 0; %0
+p.debug_level = 2; %1
+p.visualization = 1; %0
 
 %% PREPROCESSING
 % -- BACKGROUND REMOVAL -- %
@@ -25,7 +25,7 @@ p.DAPIseg.k = 3;
 p.DAPIseg.minNucleusSize = 6; % min. nucleus size
 % -- GFP SEGMENTATION -- %
 p.GFPseg.k = 4; %4 
-p.GFPseg.size_opening = 5; %5
+p.GFPseg.size_opening = 5; %5Manual
 p.GFPseg.size_closing = 30;
 p.GFPseg.method = 'k-means'; % 'k-means', 'CP'
 p.GFPseg.downsampling_factor = 0.2;
@@ -46,16 +46,16 @@ p.samples_sphere = 128;
 
 %% ELLIPSOIDAL FITTING
 p.ellipsoidFitting.percentage = 100; % 10 percent for old dapi segmentation
-p.ellipsoidFitting.visualization = 0;
-p.ellipsoidFitting.regularisationParams.mu0 = 10^-7; %10^8 for old dapi segmentation
-p.ellipsoidFitting.regularisationParams.mu1 = 2*10^-4; % 0.002 for old dapi segmentation
-p.ellipsoidFitting.regularisationParams.mu2 = 1;
+p.ellipsoidFitting.visualization = 1;
+p.ellipsoidFitting.regularisationParams.mu0 = 10^-9; %10^8 for old dapi segmentation %now 10^-7
+p.ellipsoidFitting.regularisationParams.mu1 = 2*10^-3   ; %2*10⁻4 old % 0.002 for old dapi segmentation  %now1*10^-4
+p.ellipsoidFitting.regularisationParams.mu2 = 1; %1
 p.ellipsoidFitting.regularisationParams.gamma = 1; 
 p.ellipsoidFitting.descentMethod = 'cg'; % 'grad'
 %% REGISTRATION
 % -- REGISTRATION OF LANDMARK -- %
 p.reg.landmarkCharacteristic = 'middle';
-p.reg.characteristicWeight = 0; % 0 = head, 1 = tail
+p.reg.characteristicWeight = 0.5; % 0 = head, 1 = tail
 zwert = 0; %value for z (front - back) at the reference point, only works for points on the left half of the unit ball
 p.reg.reference_point = [-sqrt(1-zwert^2); 0; zwert]; 
 p.reg.reference_vector = [zwert/(-sqrt(1-zwert^2)); 0; -1]; % Is the third value 

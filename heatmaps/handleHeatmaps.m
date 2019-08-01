@@ -128,18 +128,18 @@ for j=1:3
     % HERE YOU CAN SET THE MAXIMUM VALUE MANUALLY BASED ON THE MAXIMUM
     % NUMBER OF CELLS IN ALL SHELLS (COMPARISON WITH OTHER EXPERIMENTS)
     
-    % maxi = 4.32e-04
+    maxi = 0.001774
     
     %%%%% THIS CAN BE COMMENTED OUT AFTERWARDS!
-    maxi = -1;
-    for i=1:size(mercatorProjections{j},3)-1
-        projection = mercatorProjections{j}(:,:,i);
-        tmp_max = max(projection(:));
-        if maxi < tmp_max
-            maxi = tmp_max;
-        end
-    end
-    disp(['Maximum cell density in channel ' channels(j) ' channel for this experiment is: ' num2str(maxi)]);
+%     maxi = -1;
+%     for i=1:size(mercatorProjections{j},3)-1
+%         projection = mercatorProjections{j}(:,:,i);
+%         tmp_max = max(projection(:));
+%         if maxi < tmp_max
+%             maxi = tmp_max;
+%         end
+%     end
+%     disp(['Maximum cell density in channel ' channels(j) ' channel for this experiment is: ' num2str(maxi)]);
     %%%%% UNTIL HERE!
     
     % -- Save shell heatmaps -- %
