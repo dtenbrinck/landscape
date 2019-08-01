@@ -3,18 +3,34 @@ function transformation = registerLandmark( landmarkCoordinates, reg_parameter)
 %   Detailed explanation goes here
 
 reference_point = reg_parameter.reference_point;
-reference_vector = reg_parameter.reference_vector;
+reference_vector = reg_parameter.reference_vector;   
 landmarkCharacteristic = reg_parameter.landmarkCharacteristic;
 weight = reg_parameter.characteristicWeight;
+
 % Compute regression
 
 [pstar,vstar] = computeRegression_new(landmarkCoordinates','false');
-
 
 % Tilt refpstar onto the specified position
 [pstar,vstar] = getCharPos_daniel(pstar,vstar,landmarkCoordinates',landmarkCharacteristic,weight);
 pstar = pstar/norm(pstar);
 vstar = vstar/norm(vstar);
+
+% change reference point and refernce vector to z-value of head positions
+% if needed for proofOfPrinciple
+%if p.proofOfPrinciple > 1
+%zwert = pstar(3);
+%reference_point = [-sqrt(1-zwert^2); 0; zwert]; 
+%if zwert < 0  
+    %reference_vector = [-1; 0; -sqrt(1-zwert^2)/zwert];
+    %reference_vector = reference_vector * 1/norm(p.reg.reference_vector); 
+%elseif zwert > 0  
+    %reference_vector = [1; 0; sqrt(1-zwert^2)/zwert];
+    %reference_vector = reference_vector * 1/norm(p.reg.reference_vector); 
+    %reference_point = [-1; 0; 0]; 
+    %reference_vector = [0; 0; -1]; 
+%end
+%end
 
 % visualization for debugging
 %visualizeRegression( landmarkCoordinates, pstar, vstar, reference_point, reference_vector ) 

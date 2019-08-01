@@ -1,17 +1,17 @@
 function p =  ParameterProcessing()
 %% PARAMETERS PROCESSING SCRIPT
-% This file contains all parameters needed for the preocessing script with
+% This file contains all parameters needed for the processing script with
 % discriptios of each parameter.        
   
 %% COMMON PARAMETER
-p.resolution = [1.29, 1.29, 20];
+p.resolution = [1.29, 1.29, 10];
 p.scale = 0.75;
 p.scaleAllDim = 0;
 
 % Debug variables
 p.debug_level = 1; %1
 p.visualization = 0; %0
-p.proofOfPrinciple = 1; %0
+p.proofOfPrinciple = 1; %0 
 
 %% PREPROCESSING
 % -- BACKGROUND REMOVAL -- %
@@ -56,10 +56,18 @@ p.ellipsoidFitting.descentMethod = 'cg'; % 'grad'
 %% REGISTRATION
 % -- REGISTRATION OF LANDMARK -- %
 p.reg.landmarkCharacteristic = 'middle';
-p.reg.characteristicWeight = 0.5; % 0 = head, 1 = tail
-zwert = 0; %value for z (front - back) at the reference point, only works for points on the left half of the unit ball
+p.reg.characteristicWeight = 0; % 0 = head, 1 = tail
+zwert = -0.2; %value for z (front = -1 to back = 1. Default is left = 0) for the reference point, only works for points on the left half of the unit ball. 
 p.reg.reference_point = [-sqrt(1-zwert^2); 0; zwert]; 
-p.reg.reference_vector = [zwert/(-sqrt(1-zwert^2)); 0; -1]; % Is the third value 
+if zwert < 0
+    p.reg.reference_vector = [-1; 0; -sqrt(1-zwert^2)/zwert];
+    p.reg.reference_vector = p.reg.reference_vector * 1/norm(p.reg.reference_vector); 
+elseif zwert >0
+    p.reg.reference_vector = [1; 0; sqrt(1-zwert^2)/zwert];
+    p.reg.reference_vector = p.reg.reference_vector * 1/norm(p.reg.reference_vector);
+else    
+    p.reg.reference_vector = [0; 0; -1]; 
+end
 % - register data - %
 p.samples_cube = 256;
 end

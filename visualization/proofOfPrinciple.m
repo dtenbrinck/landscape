@@ -58,7 +58,7 @@ end
     [Dapi_ProofOfPriciple, ~] = transformVoxelData(single(processedData.Dapi), resolution, transformationMatrix, ellipsoid_center, samples, 'cubic');
 %end
 
-%scale colormap to [0,1
+%scale colormap to [0,1]
 GFP_ProofOfPriciple = double(GFP_ProofOfPriciple);
 maxValue = max(GFP_ProofOfPriciple(:));
 minValue = min(GFP_ProofOfPriciple(:));

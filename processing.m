@@ -132,7 +132,7 @@ parfor experiment=1:numberOfExperiments
         end
         
         %save proof of principle if needed 
-        if p.proofOfPrinciple == 1
+        if p.proofOfPrinciple >= 1
             results_filename = [p.resultsPath '/' experimentData.filename];
             proofOfPrinciple(results_filename, registeredData, experimentData, processedData, p.resolution, transformationMatrix, ellipsoid.center, p.samples_cube);
         end
