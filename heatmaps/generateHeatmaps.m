@@ -88,16 +88,16 @@ mCherry_shells{4} = getShell(PGC_coords_unitsphere,0,Inf);
 
 %%
 
-shells = cell(0,1);
-shells{1} = GFP_shells;
-shells{2} = DAPI_shells;
-shells{3} = mCherry_shells;
+shells = struct;
+shells.GFP = GFP_shells;
+shells.DAPI = DAPI_shells;
+shells.mCherry = mCherry_shells;
 
 
-accumulators = cell(0,1);
-accumulators{1} = GFP_accumulator;
-accumulators{2} = DAPI_accumulator;
-accumulators{3} = mCherry_accumulator;
+accumulators = struct;
+accumulators.GFP = GFP_accumulator;
+accumulators.DAPI = DAPI_accumulator;
+accumulators.mCherry = mCherry_accumulator;
 
 % sanity check: for nonoverlapping shells the sum of all coordinates should stay constant
 % if p.option.shellShiftWidth == p.option.shellThickness
