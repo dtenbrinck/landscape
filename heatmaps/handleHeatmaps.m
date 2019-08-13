@@ -22,7 +22,7 @@ for j=1:3
     
     % extract information for current channel
     switch j
-        case 1
+        case 1  
             currentAccumulator = accumulators.GFP;
             currentShell = shells.GFP;
         case 2
@@ -121,14 +121,18 @@ for j=1:3
          mercatorProjections{j}(:,:,i) = imfilter(mercatorProjections{j}(:,:,i),gaussian,'replicate');
          
          % normalize for relative measures
-         mercatorProjections{j}(:,:,i) = mercatorProjections{j}(:,:,i) ./ sum(sum(mercatorProjections{j}(:,:,4)));
+         mercatorProjections{j}(:,:,i) = mercatorProjections{j}(:,:,i) ./ sum(currentAccumulator(:));
     end
     
     % -- Determine maximum value in all heatmaps for easier comparison -- %
     % HERE YOU CAN SET THE MAXIMUM VALUE MANUALLY BASED ON THE MAXIMUM
     % NUMBER OF CELLS IN ALL SHELLS (COMPARISON WITH OTHER EXPERIMENTS)
     
-    %maxi = 0.001774;
+    %maxi{1} = 0.001774;
+    %maxi{2} = 0.001774;
+    %maxi{3} = 0.001774;
+    
+    %maxi = maxi{j};
     
     %%%%% THIS CAN BE COMMENTED OUT AFTERWARDS!
     maxi = -1;
