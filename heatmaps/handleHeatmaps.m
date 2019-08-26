@@ -132,7 +132,7 @@ for j=1:3
     %maxi{2} = 0.001774;
     %maxi{3} = 0.001774;
     
-    %maxi = maxi{j};
+    %maxi = 0.0015517;%maxi{j};
     
     %%%%% THIS CAN BE COMMENTED OUT AFTERWARDS!
     maxi = -1;

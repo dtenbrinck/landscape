@@ -66,7 +66,7 @@ parfor experiment=1:numberOfExperiments
         % estimate embryo surface by fitting an ellipsoid
         if p.debug_level >= 1; disp('Estimating embryo surface...'); end
         ellipsoid = estimateEmbryoSurface(processedData.nucleiCoordinates, p.resolution, p.ellipsoidFitting);
-        
+        %{
         % compute transformation which normalizes the estimated ellipsoid to a unit sphere
         if p.debug_level >= 1; disp('Compute transformation from optimal ellipsoid...'); end
         transformationMatrix = computeTransformationMatrix(ellipsoid);
@@ -120,11 +120,14 @@ parfor experiment=1:numberOfExperiments
         % register data
         if p.debug_level >= 1; disp('Registering data...'); end
         registeredData = registerData( processedData, p.resolution, transformation_registration, ellipsoid, p.samples_cube);
-                
+        %}
+        
+        transformationMatrix = eye(3);
+        rotationMatrix = eye(3);
         % create filename to save results
         results_filename = [p.resultsPath '/' experimentData.filename '_results.mat'];
-   
-        gatheredData = saveResults(experimentData, processedData, registeredData, ellipsoid, transformationMatrix, rotationMatrix, results_filename);
+        
+        gatheredData = saveResults(experimentData, processedData, processedData, ellipsoid, transformationMatrix, rotationMatrix, results_filename);
         
         % visualize results if needed
         if p.visualization == 1
@@ -134,9 +137,7 @@ parfor experiment=1:numberOfExperiments
         %save proof of principle if needed 
         if p.proofOfPrinciple >= 1
             results_filename = [p.resultsPath '/' experimentData.filename];
-            
-            rotationMatrix = transformationMatrix./repmat(ellipsoid.radii,[1,3]);
-            proofOfPrinciple(results_filename, registeredData, experimentData, processedData, p.resolution, inv(rotationMatrix)*transformationMatrix, ellipsoid.center, p.samples_cube);
+            proofOfPrinciple(results_filename, registeredData, experimentData, processedData, p.resolution, transformationMatrix, ellipsoid.center, p.samples_cube);
         end
         %-------------------------------------------------------------------------------------------------------
         %ADDITIONAL VISUALIZATION

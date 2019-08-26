@@ -20,6 +20,7 @@ if ( strcmp(handledChannel, 'mCherry') )
 
         % Get all cell center coordinates
         allCellCoords = horzcat(allCellCoords, gatheredData.registered.cellCoordinates);
+        %allCellCoords = horzcat(allCellCoords, transformCoordinates(gatheredData.registered.cellCoordinates', [0,0,0]', inv(gatheredData.registered.transformation_full), [0,0,0]'));
     end
 elseif (strcmp(handledChannel, 'DAPI') )
     for result = 1:numberOfResults
@@ -28,6 +29,7 @@ elseif (strcmp(handledChannel, 'DAPI') )
 
         % Get all cell center coordinates
         allCellCoords = horzcat(allCellCoords, gatheredData.registered.nucleiCoordinates);
+        %allCellCoords = horzcat(allCellCoords, transformCoordinates(gatheredData.registered.nucleiCoordinates', [0,0,0]', inv(gatheredData.registered.transformation_full), [0,0,0]'));
     end
 elseif (strcmp(handledChannel, 'GFP') )
     for result = 1:numberOfResults
@@ -36,6 +38,7 @@ elseif (strcmp(handledChannel, 'GFP') )
 
         % Get all cell center coordinates
         allCellCoords = horzcat(allCellCoords, gatheredData.registered.landmarkCentCoords);
+        %allCellCoords = horzcat(allCellCoords, transformCoordinates(gatheredData.registered.landmarkCentCoords', [0,0,0]', inv(gatheredData.registered.transformation_full), [0,0,0]'));
     end
 end
 

@@ -4,14 +4,14 @@ function p =  ParameterProcessing()
 % discriptios of each parameter.        
   
 %% COMMON PARAMETER
-p.resolution = [1.29, 1.29, 10];
+p.resolution = [1.29, 1.29, 10]; %1.29,1.29,10 default settings for SD
 p.scale = 0.75;
 p.scaleAllDim = 0;
 
 % Debug variables
 p.debug_level = 1; %1
 p.visualization = 0; %0
-p.proofOfPrinciple = 0; %0 
+p.proofOfPrinciple = 1; %0 
 
 %% PREPROCESSING
 % -- BACKGROUND REMOVAL -- %
