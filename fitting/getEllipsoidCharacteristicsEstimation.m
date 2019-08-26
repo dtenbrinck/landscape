@@ -116,6 +116,8 @@ function [W, X, pca_transformation] = prepareCoordinateMatrixAndOrientationMatri
     if size( X, 2 ) ~= 3
         error( 'Input data must have three columns!' );
     else
+        species = 'Zebrafish'; %Zebrafish or Drosophila
+        if strcmp(species, 'Zebrafish')
         [pca_transformation, X_transformedWithPCA] = pca(X, 'Centered',false); 
         % pca_transformation = column-wise coeff. of principal components 
         % X_transformedWithPCA = transformed coordinates of observations X
@@ -125,8 +127,11 @@ function [W, X, pca_transformation] = prepareCoordinateMatrixAndOrientationMatri
         % X_transformedWithPCA = X * pca_transformation; 
         % X = X_transformedWithPCA * pca_transformation';
         % pca_transformation is a orthogonal matrix
-        
         X = X_transformedWithPCA;
+        elseif strcmp(species, 'Drosophila')
+        pca_transformation = pca(X); %column-wise coeff. of principal components 
+        X = X * pca_transformation;
+        end
         x = X( :, 1 );
         y = X( :, 2 );
         z = X( :, 3 );
