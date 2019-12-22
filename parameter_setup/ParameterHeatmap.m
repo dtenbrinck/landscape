@@ -28,6 +28,13 @@ p.random = 0;
 
 % Select number of random filenames and process them
 p.numberOfRandom = 100;
+
+% Choose if generated shell heatmaps should have equal size
+% If set to "false" this will fall back to the default mode in which we
+% compute a landmark shell heatmap and two shell heatmaps for all data
+% above and below the landmark, respectively.
+p.equalSizedShells = false;
+
 %% OPTIONS FOR THE HEATMAP HANDLER -- %
 % The cellradius in pixels in the sampled p.gridSize space.
 % So this needs to be changed to depending on gridSize.
