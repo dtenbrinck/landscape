@@ -1,17 +1,7 @@
-%% INITIALIZATION
-clear; clc; close all;
+function processing_gui(p)
 
-% define root directory
-root_dir = pwd;
-
-% add path for parameter setup
-addpath([root_dir '/parameter_setup/']);
-
-% load necessary variables
-p = initializeScript('processing', root_dir);
-
-%% PREPARE RESULTS DIRECTORY
 checkDirectory(p.resultsPath);
+
 
 %% LOAD DATA
 
@@ -195,3 +185,4 @@ save([p.resultsPath '/accepted/ParameterProcessing.mat'],'p');
 fprintf('\n');
 disp('All data sets in folder processed!');
 %clear all;
+end

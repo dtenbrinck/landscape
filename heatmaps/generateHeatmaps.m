@@ -33,10 +33,9 @@ load([p.resultsPathAccepted,'/',fileNames{1,1}]);
 %%% TODO: refactor code in this file to make pipeline more generic!
 
 % -- Compute all valid cell coordinates from the processed and registered data -- %
+[PGC_coords_grid, PGC_coords_unitsphere] = getAllValidCellCoords(p.gridSize,fileNames,numberOfResults,p.tole,p.resultsPathAccepted, 'mCherry');
 [landmark_coords_grid, landmark_coords_unitsphere] = getAllValidCellCoords(p.gridSize,fileNames,numberOfResults,p.tole,p.resultsPathAccepted, 'GFP');
 [nuclei_coords_grid, nuclei_coords_unitsphere] = getAllValidCellCoords(p.gridSize,fileNames,numberOfResults,p.tole,p.resultsPathAccepted, 'DAPI');
-[PGC_coords_grid, PGC_coords_unitsphere] = getAllValidCellCoords(p.gridSize,fileNames,numberOfResults,p.tole,p.resultsPathAccepted, 'mCherry');
-
 
 %DEBUG;
 %lm = landmark_coords_unitsphere;

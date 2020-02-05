@@ -296,7 +296,7 @@ function alpha_star = zoom(alpha_lower, alpha_higher, ...
     v, descentDirection, funct, grad_funct, phi_0, phi_dash_0, c1, c2, W)
     % use algorithm 3.6 to zoom in to appropriate step length
     iteration = 0;
-    maxIteration = 30;
+    maxIteration = 50; %30
     TOL = 1e-12;
     while iteration < maxIteration
         if ( abs(alpha_lower-alpha_higher) < TOL)

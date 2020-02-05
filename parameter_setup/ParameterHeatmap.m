@@ -10,14 +10,14 @@ function p =  ParameterHeatmap()
 % Size of the cells
 p.sizeCells = 20; %um
 % Size of the Pixel
-p.sizeOfPixel = 1.29; %um
+p.sizeOfPixel = 1.29; %um 1.29 Zebrafish
 p.sizeCellsPixel = round(p.sizeCells/p.sizeOfPixel);
 
 % -- PROCSESSING OF THE CELLS -- %
 % Tolerance for the cell to be outside of the sphere. Cells with norm
 % bigger than 1 but smaller than 1+tole will be normalized.
 % Default: 0.1
-p.tole = 0.1;
+p.tole = 0.5;
 
 % Grid size of the accumulator: 
 % size(accumulator) = [gridSize,gridSize,gridSize];
@@ -41,7 +41,7 @@ p.equalSizedShells = false;
 % The cell will be cellradius*2 pixels big. 
 % !!! NEED A BETTER APPROACH !!! %
 % Default: 5 with gridSize = 256
-p.option.cellradius = 7; %7 for mCherry
+p.option.cellradius = 7;  %for mCherry, Zebrafish:7  Dros:3
 % cell radius for nuclei cells in DAPI channel
 % Default: 2 with gridSize = 256
 %p.option.dapiCellradius = 1;
@@ -63,7 +63,7 @@ p.option.shellThickness = 0.1;%0.0608;
 p.option.shellShiftWidth = 1/4 * p.option.shellThickness;
 
 % Resolution for the shell heatmap in pixels
-p.option.shellHeatmapResolution = [90, 90]; %256,256 default
+p.option.shellHeatmapResolution = [90, 90]; %(old:256,256 default) Zebrafish: 90,90, Dros 90,180
 
 % Types of heatmaps. Currently available 'MIP', 'SUM'.
 % Can handle multiple input.
