@@ -34,7 +34,7 @@ gatheredData.processed.GFPMIP = computeMIP(processedData.GFP);
 gatheredData.processed.mCherryMIP = computeMIP(processedData.mCherry);
 
 gatheredData.processed.landmark = logical(processedData.landmark);
-gatheredData.processed.cells = (processedData.landmark);
+gatheredData.processed.cells = (processedData.cells);
 gatheredData.processed.landmarkMIP = computeMIP(processedData.landmark);
 gatheredData.processed.cellsMIP = computeMIP(processedData.cells);
 gatheredData.processed.cellCoordinates = processedData.cellCoordinates;
