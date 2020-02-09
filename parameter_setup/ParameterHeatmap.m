@@ -33,7 +33,11 @@ p.numberOfRandom = 100;
 % If set to "false" this will fall back to the default mode in which we
 % compute a landmark shell heatmap and two shell heatmaps for all data
 % above and below the landmark, respectively.
-p.equalSizedShells = false;
+p.equalSizedShells = true;
+
+
+% Choose if profile lines should be extracted for the DAPI channel
+p.extractProfileLines = true;
 
 %% OPTIONS FOR THE HEATMAP HANDLER -- %
 % The cellradius in pixels in the sampled p.gridSize space.
@@ -60,7 +64,7 @@ p.option.shellThickness = 0.1;%0.0608;
 
 % Shift width for shell computation
 % Note that shellShiftWidth = shellThickness means no overlap between heatmaps
-p.option.shellShiftWidth = 1/4 * p.option.shellThickness;
+p.option.shellShiftWidth = p.option.shellThickness;
 
 % Resolution for the shell heatmap in pixels
 p.option.shellHeatmapResolution = [90, 90]; %256,256 default

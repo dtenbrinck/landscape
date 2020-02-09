@@ -56,6 +56,10 @@ mCherry_accumulator = computeAccumulator(PGC_coords_grid, p.gridSize);
 % --- Generate shells with valid cell coordinates per shell
 [minRadius, maxRadius] = computeLandmarkShell(p, fileNames, numberOfResults);
 
+% TESTING for thicker shells
+%minRadius = minRadius - 0.0;
+%maxRadius = maxRadius + 0.0;
+
 if p.equalSizedShells == true
     %% NEW APPROACH: SHELLS WITH EQUAL SIZE
     

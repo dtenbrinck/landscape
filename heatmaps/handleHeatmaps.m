@@ -12,7 +12,14 @@ mercatorProjections = cell(1,3);
 if option.heatmaps.saveAccumulator == 1
     save([p.resultsPath '/AllAccumulators.mat'],'accumulators','shells','numberOfResults');
 end
-    
+   
+% create directory for profile lines if it does not exist
+if p.extractProfileLines
+    profileLinesPath = strcat(p.resultsPath, "/heatmaps/profileLines");
+    if ~exist(strcat(profileLinesPath,"/"),'dir')
+        mkdir(profileLinesPath);
+    end
+end
 
 % -- if heatmaps should be computed -- %
 fprintf('Computing heatmaps...\n');
@@ -39,6 +46,19 @@ for j=1:3
     
     % -- Compute mercator projections -- %
     mercatorProjections{j} = computeMercatorProjections(currentShell, option.shellHeatmapResolution);
+    
+    % -- Extract plot lines -- %
+    if j == 2 && p.extractProfileLines % we assume that the second channel is DAPI!
+         %figure; imagesc(mercatorProjections{1}(:,:,5))
+        %hold on; xline(28,'r'); xline(38,'r'); xline(48,'r'); hold off; %
+        %for resolution = 90!
+        profileLines = extractProfileLines(mercatorProjections{j});
+        
+        % save profile lines as csv files
+        for shell=1:size(profileLines,3)
+            writematrix(profileLines(:,:,shell),strcat(profileLinesPath,"/","shell_",num2str(shell),".csv"));
+        end
+    end
     
     % -- Compute heatmaps -- %
     HMS = generateHeatmap(currentAccumulator,option.heatmaps.types);
