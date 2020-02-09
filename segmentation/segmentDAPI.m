@@ -88,6 +88,9 @@ brightRegions = bwareaopen(Xi, p.minNucleusSize, 26);
 
 brightPixel3d = brightRegions & locMax;
 
+% For Dros_18 Delete later
+%brightPixel3d(:,:,size(brightPixel3d,3))=0;
+
 indices = find(brightPixel3d > 0);
 [tmpy, tmpx, tmpz] = ind2sub(size(brightPixel3d), indices);
 
