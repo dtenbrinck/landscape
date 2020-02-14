@@ -56,7 +56,8 @@ for j=1:3
         
         % save profile lines as csv files
         for shell=1:size(profileLines,3)
-            writematrix(profileLines(:,:,shell),strcat(profileLinesPath,"/","shell_",num2str(shell),".csv"));
+            %writematrix(profileLines(:,:,shell),strcat(profileLinesPath,"/","shell_",num2str(shell),".csv"));
+            csvwrite(strcat(profileLinesPath,"/","shell_",num2str(shell),".csv"),profileLines(:,:,shell)) ;
         end
     end
     
