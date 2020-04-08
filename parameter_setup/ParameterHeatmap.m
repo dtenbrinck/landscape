@@ -10,31 +10,42 @@ function p =  ParameterHeatmap()
 % Size of the cells
 p.sizeCells = 20; %um
 % Size of the Pixel
-p.sizeOfPixel = 1.29; %um
+p.sizeOfPixel = 1.29; %um 1.29 Zebrafish
 p.sizeCellsPixel = round(p.sizeCells/p.sizeOfPixel);
 
 % -- PROCSESSING OF THE CELLS -- %
 % Tolerance for the cell to be outside of the sphere. Cells with norm
 % bigger than 1 but smaller than 1+tole will be normalized.
 % Default: 0.1
-p.tole = 0.1;
+p.tole = 0.5;
 
 % Grid size of the accumulator: 
 % size(accumulator) = [gridSize,gridSize,gridSize];
-p.gridSize = 33;
+p.gridSize = 255;
 
 % Select a given number of random filnames
 p.random = 0;
 
 % Select number of random filenames and process them
 p.numberOfRandom = 100;
+
+% Choose if generated shell heatmaps should have equal size
+% If set to "false" this will fall back to the default mode in which we
+% compute a landmark shell heatmap and two shell heatmaps for all data
+% above and below the landmark, respectively.
+p.equalSizedShells = true;
+
+
+% Choose if profile lines should be extracted for the DAPI channel
+p.extractProfileLines = true;
+
 %% OPTIONS FOR THE HEATMAP HANDLER -- %
 % The cellradius in pixels in the sampled p.gridSize space.
 % So this needs to be changed to depending on gridSize.
 % The cell will be cellradius*2 pixels big. 
 % !!! NEED A BETTER APPROACH !!! %
 % Default: 5 with gridSize = 256
-p.option.cellradius = 7; %7 for mCherry
+p.option.cellradius = 7;  %for mCherry, Zebrafish:7  Dros:3
 % cell radius for nuclei cells in DAPI channel
 % Default: 2 with gridSize = 256
 %p.option.dapiCellradius = 1;
@@ -53,10 +64,10 @@ p.option.shellThickness = 0.1;%0.0608;
 
 % Shift width for shell computation
 % Note that shellShiftWidth = shellThickness means no overlap between heatmaps
-p.option.shellShiftWidth = 1/4 * p.option.shellThickness;
+p.option.shellShiftWidth = p.option.shellThickness;
 
 % Resolution for the shell heatmap in pixels
-p.option.shellHeatmapResolution = [90, 90];
+p.option.shellHeatmapResolution = [90, 90]; %(old:256,256 default) Zebrafish: 90,90, Dros 90,180
 
 % Types of heatmaps. Currently available 'MIP', 'SUM'.
 % Can handle multiple input.

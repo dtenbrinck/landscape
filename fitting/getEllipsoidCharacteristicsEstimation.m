@@ -116,6 +116,8 @@ function [W, X, pca_transformation] = prepareCoordinateMatrixAndOrientationMatri
     if size( X, 2 ) ~= 3
         error( 'Input data must have three columns!' );
     else
+        species = 'Zebrafish'; %Zebrafish or Drosophila
+        if strcmp(species, 'Zebrafish')
         [pca_transformation, X_transformedWithPCA] = pca(X, 'Centered',false); 
         % pca_transformation = column-wise coeff. of principal components 
         % X_transformedWithPCA = transformed coordinates of observations X
@@ -125,8 +127,11 @@ function [W, X, pca_transformation] = prepareCoordinateMatrixAndOrientationMatri
         % X_transformedWithPCA = X * pca_transformation; 
         % X = X_transformedWithPCA * pca_transformation';
         % pca_transformation is a orthogonal matrix
-        
         X = X_transformedWithPCA;
+        elseif strcmp(species, 'Drosophila')
+        pca_transformation = pca(X); %column-wise coeff. of principal components 
+        X = X * pca_transformation;
+        end
         x = X( :, 1 );
         y = X( :, 2 );
         z = X( :, 3 );
@@ -291,7 +296,7 @@ function alpha_star = zoom(alpha_lower, alpha_higher, ...
     v, descentDirection, funct, grad_funct, phi_0, phi_dash_0, c1, c2, W)
     % use algorithm 3.6 to zoom in to appropriate step length
     iteration = 0;
-    maxIteration = 30;
+    maxIteration = 50; %30
     TOL = 1e-12;
     while iteration < maxIteration
         if ( abs(alpha_lower-alpha_higher) < TOL)

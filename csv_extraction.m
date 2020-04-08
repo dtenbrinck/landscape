@@ -32,11 +32,18 @@ p.resolution(1:2) = p.resolution(1:2) / p.scale;
 fprintf('Processing dataset:'); 
     
 % process all existing data in parallel
-delete(gcp('nocreate'));
-if p.debug_level <= 1 && p.visualization == 0
-       parpool;
-end
-%par
+%delete(gcp('nocreate'));
+%if p.debug_level <= 1 && p.visualization == 0
+%       parpool;
+%end
+
+filename = [];
+radius = [];
+axes1 = [];
+axes2 = [];
+axes3 = [];
+radOrdered = [];
+
 for experiment=1:numberOfExperiments
     
     % show remotecurrent experiment number
@@ -49,51 +56,32 @@ for experiment=1:numberOfExperiments
         
         % preprocess and rescale data
         if p.debug_level >= 1; disp('Preprocessing data...'); end
-        %Zebrafish:
         processedData = preprocessData(experimentData, p);
-        %Drosophila Heatmap (the following is needed if the datasets do not  have the same sizes.Maybe put this into function preprocessData?):
-        %processedData_originalsize = preprocessData(experimentData, p); 
-        
-        
-        %for Drosophila Heatmap, delete later
-        %processedData.filename = processedData_originalsize.filename;
-        %processedData.Dapi = zeros(675, 1350, size(processedData_originalsize.Dapi, 3)); 
-        %processedData.GFP = zeros(675, 1350, size(processedData_originalsize.Dapi, 3));
-        %processedData.mCherry = zeros(675, 1350, size(processedData_originalsize.Dapi, 3));
-        %for i = 1:size(processedData.Dapi, 3)  
-           %processedData.Dapi(1:size(processedData_originalsize.Dapi,1),1:size(processedData_originalsize.Dapi,2),i) = processedData_originalsize.Dapi(:,:,i);
-        %end
-        
-        %for i = 1:size(processedData.Dapi, 3)  
-           %processedData.GFP(1:size(processedData_originalsize.Dapi,1),1:size(processedData_originalsize.Dapi,2),i) = processedData_originalsize.GFP(:,:,i);
-        %end
-        
-        %for i = 1:size(processedData.Dapi, 3)  
-           %processedData.mCherry(1:size(processedData_originalsize.Dapi,1),1:size(processedData_originalsize.Dapi,2),i) = processedData_originalsize.mCherry(:,:,i);
-        %end
         
         % segment data
-        if p.debug_level >= 1; disp('Segmenting GFP channel...'); end
-        [processedData.landmark, processedData.landmarkCentCoords] =...
-            segmentGFP(processedData.GFP, p.GFPseg, p.resolution);
+        %if p.debug_level >= 1; disp('Segmenting GFP channel...'); end
+        %[processedData.landmark, processedData.landmarkCentCoords] =...
+        %    segmentGFP(processedData.GFP, p.GFPseg, p.resolution);
         
         if p.debug_level >= 1; disp('Segmenting DAPI channel...'); end
         [processedData.nuclei, processedData.nucleiCoordinates, processedData.embryoShape] =...
             segmentDAPI(processedData.Dapi, p.DAPIseg, p.resolution);
         
-        if p.debug_level >= 1; disp('Segmenting mCherry channel...'); end
-        if strcmp(p.mappingtype, 'Cells') %segment mCherry channel depending on selected mappingtype
-        [processedData.cells, processedData.cellCoordinates] =...
-            blobSegmentCells(processedData.mCherry, p.mCherryseg, processedData.embryoShape); 
-        else
-        [processedData.cells, processedData.cellCoordinates] =...
-            segmentGFP(processedData.mCherry, p.GFPseg, p.resolution);
-        end
+        %if p.debug_level >= 1; disp('Segmenting mCherry channel...'); end
+        %[processedData.cells, processedData.cellCoordinates] =...
+        %    blobSegmentCells(processedData.mCherry, p.mCherryseg, processedData.embryoShape);     
 
         % estimate embryo surface by fitting an ellipsoid
         if p.debug_level >= 1; disp('Estimating embryo surface...'); end
         ellipsoid = estimateEmbryoSurface(processedData.nucleiCoordinates, p.resolution, p.ellipsoidFitting);
         
+        filename = [filename; experimentData.filename];
+        radius = [radius; ellipsoid.radii'];
+        axes1 = [axes1; ellipsoid.axes(1,:)];
+        axes2 = [axes2; ellipsoid.axes(2,:)];
+        axes3 = [axes3; ellipsoid.axes(3,:)];
+        radOrdered = [radOrdered; ellipsoid.radiiOrderedForPlots'];
+        %{
         % compute transformation which normalizes the estimated ellipsoid to a unit sphere
         if p.debug_level >= 1; disp('Compute transformation from optimal ellipsoid...'); end
         transformationMatrix = computeTransformationMatrix(ellipsoid);
@@ -150,7 +138,7 @@ for experiment=1:numberOfExperiments
                 
         % create filename to save results
         results_filename = [p.resultsPath '/' experimentData.filename '_results.mat'];
-   
+        
         gatheredData = saveResults(experimentData, processedData, registeredData, ellipsoid, transformationMatrix, rotationMatrix, results_filename);
         
         % visualize results if needed
@@ -158,13 +146,6 @@ for experiment=1:numberOfExperiments
             visualizeResults_new(gatheredData);
         end
         
-        %save proof of principle if needed 
-        if p.proofOfPrinciple >= 1
-            results_filename = [p.resultsPath '/' experimentData.filename];
-            
-            rotationMatrix = transformationMatrix./repmat(ellipsoid.radii,[1,3]);
-            proofOfPrinciple(results_filename, registeredData, experimentData, processedData, p.resolution, inv(rotationMatrix)*transformationMatrix, ellipsoid.center, p.samples_cube);
-        end
         %-------------------------------------------------------------------------------------------------------
         %ADDITIONAL VISUALIZATION
         %slideShow(gatheredData.processed.GFPMIP, [])
@@ -172,8 +153,8 @@ for experiment=1:numberOfExperiments
         
         
         if p.debug_level >= 1; disp('Saved results successfully!'); end
-        
-        catch ERROR_MSG  %% ONLY EXECUTED WHEN ERRORS HAPPENING
+        %}
+    catch ERROR_MSG  %% ONLY EXECUTED WHEN ERRORS HAPPENING
         
         disp(ERROR_MSG)
         
@@ -188,6 +169,9 @@ for experiment=1:numberOfExperiments
     end
     
 end
+
+csvTable = table(filename, radius, axes1, axes2, axes3, radOrdered);
+writetable(csvTable, [p.resultsPath '/ellipsoidData.csv'])
 
 % Save parameters
 save([p.resultsPath '/accepted/ParameterProcessing.mat'],'p');

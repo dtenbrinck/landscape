@@ -4,10 +4,11 @@ function [ accumulator ] = computeAccumulator( allCellCoords, gridSize )
 %% MAIN CODE
 
 % Rewrite the cell coordinates into linear indexing
-indPoints = sub2ind([gridSize,gridSize,gridSize]...
-    ,allCellCoords(2,:),allCellCoords(1,:),allCellCoords(3,:));
+ratio = 1; % Zebrafish:1 Dros:2
+indPoints = sub2ind([gridSize,ratio*gridSize,gridSize]...
+    ,allCellCoords(2,:),ratio*allCellCoords(1,:),allCellCoords(3,:));
 
-accumulator = reshape(accumarray([indPoints';gridSize*gridSize*gridSize],[ones(size(indPoints'));0]),[gridSize,gridSize,gridSize]);
+accumulator = reshape(accumarray([indPoints';ratio*gridSize*gridSize*gridSize],[ones(size(indPoints'));0]),[gridSize,ratio*gridSize,gridSize]);
 
 
 

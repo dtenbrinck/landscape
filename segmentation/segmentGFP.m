@@ -142,6 +142,71 @@ end
 % set output variable
 landmark = single(Xi_thinned);
 
+%For proof of principle, delete later
+%3
+%landmark(1:270,:,:) = 0;
+%landmark(390:end ,:,:) = 0;
+%landmark(:,1:150,:) = 0;
+%9
+%landmark(1:300,:,:) = 0;
+%landmark(400:end,:,:) = 0;
+%10
+%landmark(1:215,:,:) = 0;
+%landmark(350:end,:,:) = 0;
+%11
+%landmark(1:290,:,:) = 0;
+%landmark(380:end,:,:) = 0;
+%18
+%landmark(1:230,:,:) = 0;
+%landmark(345:end ,:,:) = 0;
+%landmark(:,1:246,:) = 0;
+%landmark(:,790:end,:) = 0;
+%20
+%landmark(1:200,:,:) = 0;
+%landmark(345:end ,:,:) = 0;
+%landmark(:,1:286,:) = 0;
+%21
+%landmark(378:end ,:,:) = 0;
+%landmark(:,1:254,:) = 0;
+%22
+%landmark(1:270,:,:) = 0;
+%landmark(397:end ,:,:) = 0;
+%landmark(:,1:249,:) = 0;
+%25
+%landmark(1:250,:,:) = 0;
+%landmark(395:end,:,:) = 0;
+%landmark(:,1:206,:) = 0;
+
+%26
+%landmark(1:260,:,:) = 0;
+%landmark(345:end,:,:) = 0;
+%landmark(:,1:160,:) = 0;
+
+%30
+%landmark(1:250,:,:) = 0;
+%landmark(340:end,:,:) = 0;
+%landmark(:,1:180,:) = 0;
+%36
+%landmark(1:250,:,:) = 0;
+%landmark(390:end,:,:) = 0;
+%39 and 40
+%landmark(1:290,:,:) = 0;
+%landmark(400:end,:,:) = 0;
+%45
+%landmark(1:280,:,:) = 0;
+%landmark(390:end,:,:) = 0;
+%landmark(:,1:250,:) = 0;
+%landmark(:,800:end,:) = 0;
+%46
+%landmark(1:240,:,:) = 0;
+%landmark(350:end,:,:) = 0;
+%48
+%landmark(1:220,:,:) = 0;
+%landmark(310:end,:,:) = 0;
+%49
+%landmark(1:240,:,:) = 0;
+%landmark(350:end,:,:) = 0;
+
 %% GET CENTERS OF SEGMENTED REGIONS
 % -- WE ASSUME BRIGHTEST PIXEL TO BE THE CENTER
 

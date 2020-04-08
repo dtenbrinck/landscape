@@ -12,7 +12,14 @@ mercatorProjections = cell(1,3);
 if option.heatmaps.saveAccumulator == 1
     save([p.resultsPath '/AllAccumulators.mat'],'accumulators','shells','numberOfResults');
 end
-    
+   
+% create directory for profile lines if it does not exist
+if p.extractProfileLines
+    profileLinesPath = strcat(p.resultsPath, "/heatmaps/profileLines");
+    if ~exist(strcat(profileLinesPath,"/"),'dir')
+        mkdir(profileLinesPath);
+    end
+end
 
 % -- if heatmaps should be computed -- %
 fprintf('Computing heatmaps...\n');
@@ -22,7 +29,7 @@ for j=1:3
     
     % extract information for current channel
     switch j
-        case 1
+        case 1  
             currentAccumulator = accumulators.GFP;
             currentShell = shells.GFP;
         case 2
@@ -39,6 +46,20 @@ for j=1:3
     
     % -- Compute mercator projections -- %
     mercatorProjections{j} = computeMercatorProjections(currentShell, option.shellHeatmapResolution);
+    
+    % -- Extract plot lines -- %
+    if j == 2 && p.extractProfileLines % we assume that the second channel is DAPI!
+         %figure; imagesc(mercatorProjections{1}(:,:,5))
+        %hold on; xline(28,'r'); xline(38,'r'); xline(48,'r'); hold off; %
+        %for resolution = 90!
+        profileLines = extractProfileLines(mercatorProjections{j});
+        
+        % save profile lines as csv files
+        for shell=1:size(profileLines,3)
+            %writematrix(profileLines(:,:,shell),strcat(profileLinesPath,"/","shell_",num2str(shell),".csv"));
+            csvwrite(strcat(profileLinesPath,"/","shell_",num2str(shell),".csv"),profileLines(:,:,shell)) ;
+        end
+    end
     
     % -- Compute heatmaps -- %
     HMS = generateHeatmap(currentAccumulator,option.heatmaps.types);
@@ -121,14 +142,18 @@ for j=1:3
          mercatorProjections{j}(:,:,i) = imfilter(mercatorProjections{j}(:,:,i),gaussian,'replicate');
          
          % normalize for relative measures
-         mercatorProjections{j}(:,:,i) = mercatorProjections{j}(:,:,i) ./ sum(sum(mercatorProjections{j}(:,:,4)));
+         mercatorProjections{j}(:,:,i) = mercatorProjections{j}(:,:,i) ./ sum(currentAccumulator(:));
     end
     
     % -- Determine maximum value in all heatmaps for easier comparison -- %
     % HERE YOU CAN SET THE MAXIMUM VALUE MANUALLY BASED ON THE MAXIMUM
     % NUMBER OF CELLS IN ALL SHELLS (COMPARISON WITH OTHER EXPERIMENTS)
     
-    % maxi = 4.32e-04
+    %maxi{1} = 0.001774;
+    %maxi{2} = 0.001774;
+    %maxi{3} = 0.001774;
+    
+    %maxi = 0.0052194;%maxi{j};
     
     %%%%% THIS CAN BE COMMENTED OUT AFTERWARDS!
     maxi = -1;

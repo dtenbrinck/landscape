@@ -36,8 +36,7 @@ delete(gcp('nocreate'));
 if p.debug_level <= 1 && p.visualization == 0
        parpool;
 end
-%par
-for experiment=1:numberOfExperiments
+parfor experiment=1:numberOfExperiments
     
     % show remotecurrent experiment number
     dispCounter(experiment, numberOfExperiments);
@@ -49,28 +48,7 @@ for experiment=1:numberOfExperiments
         
         % preprocess and rescale data
         if p.debug_level >= 1; disp('Preprocessing data...'); end
-        %Zebrafish:
         processedData = preprocessData(experimentData, p);
-        %Drosophila Heatmap (the following is needed if the datasets do not  have the same sizes.Maybe put this into function preprocessData?):
-        %processedData_originalsize = preprocessData(experimentData, p); 
-        
-        
-        %for Drosophila Heatmap, delete later
-        %processedData.filename = processedData_originalsize.filename;
-        %processedData.Dapi = zeros(675, 1350, size(processedData_originalsize.Dapi, 3)); 
-        %processedData.GFP = zeros(675, 1350, size(processedData_originalsize.Dapi, 3));
-        %processedData.mCherry = zeros(675, 1350, size(processedData_originalsize.Dapi, 3));
-        %for i = 1:size(processedData.Dapi, 3)  
-           %processedData.Dapi(1:size(processedData_originalsize.Dapi,1),1:size(processedData_originalsize.Dapi,2),i) = processedData_originalsize.Dapi(:,:,i);
-        %end
-        
-        %for i = 1:size(processedData.Dapi, 3)  
-           %processedData.GFP(1:size(processedData_originalsize.Dapi,1),1:size(processedData_originalsize.Dapi,2),i) = processedData_originalsize.GFP(:,:,i);
-        %end
-        
-        %for i = 1:size(processedData.Dapi, 3)  
-           %processedData.mCherry(1:size(processedData_originalsize.Dapi,1),1:size(processedData_originalsize.Dapi,2),i) = processedData_originalsize.mCherry(:,:,i);
-        %end
         
         % segment data
         if p.debug_level >= 1; disp('Segmenting GFP channel...'); end
@@ -82,18 +60,13 @@ for experiment=1:numberOfExperiments
             segmentDAPI(processedData.Dapi, p.DAPIseg, p.resolution);
         
         if p.debug_level >= 1; disp('Segmenting mCherry channel...'); end
-        if strcmp(p.mappingtype, 'Cells') %segment mCherry channel depending on selected mappingtype
         [processedData.cells, processedData.cellCoordinates] =...
-            blobSegmentCells(processedData.mCherry, p.mCherryseg, processedData.embryoShape); 
-        else
-        [processedData.cells, processedData.cellCoordinates] =...
-            segmentGFP(processedData.mCherry, p.GFPseg, p.resolution);
-        end
+            blobSegmentCells(processedData.mCherry, p.mCherryseg, processedData.embryoShape);     
 
         % estimate embryo surface by fitting an ellipsoid
         if p.debug_level >= 1; disp('Estimating embryo surface...'); end
         ellipsoid = estimateEmbryoSurface(processedData.nucleiCoordinates, p.resolution, p.ellipsoidFitting);
-        
+        %{
         % compute transformation which normalizes the estimated ellipsoid to a unit sphere
         if p.debug_level >= 1; disp('Compute transformation from optimal ellipsoid...'); end
         transformationMatrix = computeTransformationMatrix(ellipsoid);
@@ -147,11 +120,14 @@ for experiment=1:numberOfExperiments
         % register data
         if p.debug_level >= 1; disp('Registering data...'); end
         registeredData = registerData( processedData, p.resolution, transformation_registration, ellipsoid, p.samples_cube);
-                
+        %}
+        
+        transformationMatrix = eye(3);
+        rotationMatrix = eye(3);
         % create filename to save results
         results_filename = [p.resultsPath '/' experimentData.filename '_results.mat'];
-   
-        gatheredData = saveResults(experimentData, processedData, registeredData, ellipsoid, transformationMatrix, rotationMatrix, results_filename);
+        
+        gatheredData = saveResults(experimentData, processedData, processedData, ellipsoid, transformationMatrix, rotationMatrix, results_filename);
         
         % visualize results if needed
         if p.visualization == 1
@@ -161,9 +137,7 @@ for experiment=1:numberOfExperiments
         %save proof of principle if needed 
         if p.proofOfPrinciple >= 1
             results_filename = [p.resultsPath '/' experimentData.filename];
-            
-            rotationMatrix = transformationMatrix./repmat(ellipsoid.radii,[1,3]);
-            proofOfPrinciple(results_filename, registeredData, experimentData, processedData, p.resolution, inv(rotationMatrix)*transformationMatrix, ellipsoid.center, p.samples_cube);
+            proofOfPrinciple(results_filename, registeredData, experimentData, processedData, p.resolution, transformationMatrix, ellipsoid.center, p.samples_cube);
         end
         %-------------------------------------------------------------------------------------------------------
         %ADDITIONAL VISUALIZATION
@@ -173,7 +147,7 @@ for experiment=1:numberOfExperiments
         
         if p.debug_level >= 1; disp('Saved results successfully!'); end
         
-        catch ERROR_MSG  %% ONLY EXECUTED WHEN ERRORS HAPPENING
+    catch ERROR_MSG  %% ONLY EXECUTED WHEN ERRORS HAPPENING
         
         disp(ERROR_MSG)
         

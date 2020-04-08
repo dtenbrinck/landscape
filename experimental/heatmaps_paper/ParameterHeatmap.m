@@ -56,7 +56,7 @@ p.option.shellThickness = 0.1;%0.0608;
 p.option.shellShiftWidth = 1/4 * p.option.shellThickness;
 
 % Resolution for the shell heatmap in pixels
-p.option.shellHeatmapResolution = [360,360];
+p.option.shellHeatmapResolution = [90,90];
 
 % Types of heatmaps. Currently available 'MIP', 'SUM'.
 % Can handle multiple input.

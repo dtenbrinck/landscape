@@ -1,12 +1,22 @@
-function modifiedData = gui_manualSegmentation( data, p )
+function modifiedData = gui_manualSegmentation( data, p, type )
+
+% allow only two arguments for backward compatibility
+if nargin == 2
+    type = 'cells';
+end   
 
 modifiedData = data;
 
-
 % TODO: check if exists!
-mip = computeMIP(single(data.processed.mCherry));
-
-segmentation = data.processed.cellsMIP;
+if strcmp(type, 'cells')
+    mip = computeMIP(single(data.processed.mCherry));
+    segmentation = data.processed.cellsMIP;
+elseif strcmp(type, 'tissue')
+    mip = computeMIP(single(data.processed.GFP));
+    segmentation = data.processed.landmarkMIP;
+else
+    error('This should never happen!');
+end
 
 minData = min(mip(:));
 maxData = max(mip(:));
@@ -50,7 +60,7 @@ addlistener(threshold_slider,'Value','PreSet',@(a,b) update_editField(b,threshol
 
 %figure(h);
 %ih = drawSegmentation(im, im2);
-text(size(mip,2) / 2, -30, 'Select center point of cell!', 'HorizontalAlignment','center', 'BackgroundColor',[.7 .9 .7]);
+text(size(mip,2) / 2, -30, 'Select center point for segmentation region! You can revert your last chance by hitting either "Delete" or "Backspace".', 'HorizontalAlignment','center', 'BackgroundColor',[.7 .9 .7]);
 axesHandle  = get(imageHandle,'Parent');
 set(get(axesHandle,'children'),'HitTest','off')
 set(axesHandle,'ButtonDownFcn',{@start_manual_segmentation,axesHandle,mip,contour_handle})
@@ -89,27 +99,50 @@ if ~ishandle(figHandle)
   return;
 end
 
-box_handle = msgbox('New cells are being registered. Please wait a few seconds!','Please wait!');
+% TODO: Morphological filtering for small holes
+
+box_handle = msgbox('New segmentation is being registered. Please wait a few seconds!','Please wait!');
 
 segmentation_2D = getappdata(figHandle,'segmentation');
-modifiedData.processed.cellsMIP = segmentation_2D;
 
-segmentation_3D = extend2dTo3dSegmentation(segmentation_2D,modifiedData.processed.mCherry);
+if strcmp(type, 'cells')
+    modifiedData.processed.cellsMIP = segmentation_2D;
+    segmentation_3D = extend2dTo3dSegmentation(segmentation_2D,modifiedData.processed.mCherry);
+    
+elseif strcmp(type, 'tissue')
+    modifiedData.processed.landmarkMIP = segmentation_2D;
+    %segmentation_3D = extend2dTo3dSegmentation(segmentation_2D,modifiedData.processed.GFP);
+    
+    MIP = computeMIP(modifiedData.processed.GFP);
+    segmentation_3D = repmat(segmentation_2D,1,1,size(modifiedData.processed.GFP,3)) & (modifiedData.processed.GFP > 0.9*repmat(MIP,1,1,size(modifiedData.processed.GFP,3)));
+    segmentation_3D = imopen(segmentation_3D,strel('disk',1));
+    segmentation_3D = imclose(segmentation_3D,strel('disk',10));
+    
+end    
 
-% Centroids of the cells
 
-cc = bwconncomp(segmentation_3D);
-S = regionprops(cc,'centroid');
-centCoords = round(reshape([S.Centroid],[3,numel([S.Centroid])/3]));
 
-modifiedData.processed.cells = segmentation_3D;
-modifiedData.processed.cellCoordinates = centCoords;
+
+if strcmp(type, 'cells')
+    % Centroids of the cells
+    cc = bwconncomp(segmentation_3D);
+    S = regionprops(cc,'centroid');
+    centCoords = round(reshape([S.Centroid],[3,numel([S.Centroid])/3]));
+
+    modifiedData.processed.cells = segmentation_3D;
+    modifiedData.processed.cellCoordinates = centCoords;
+elseif strcmp(type, 'tissue')
+    modifiedData.processed.landmark = segmentation_3D; 
+end 
 
 registeredData = registerData( modifiedData.processed, p.resolution, modifiedData.registered.transformation_full, modifiedData.processed.ellipsoid, p.samples_cube);
+%registeredData = registerData( data.processed, p.resolution, modifiedData.registered.transformation_full, modifiedData.processed.ellipsoid, p.samples_cube);
           
 modifiedData.registered.cellCoordinates = registeredData.cellCoordinates;
 modifiedData.registered.cells = registeredData.cells;
+modifiedData.registered.cellsMIP = computeMIP(registeredData.cells);
 modifiedData.registered.landmark = registeredData.landmark;
+modifiedData.registered.landmarkMIP = computeMIP(registeredData.landmark);
 modifiedData.registered.Dapi = registeredData.Dapi;
 modifiedData.registered.GFP = registeredData.GFP;
 modifiedData.registered.mCherry = registeredData.mCherry;
@@ -328,7 +361,7 @@ function capture_keystroke(figHandle, contour_handle, event)
 
 if strcmp(event.Key,'delete') || strcmp(event.Key,'backspace')
   segmentation = getappdata(figHandle, 'segmentation');
-  set(contour_handle, 'ZData', segmentation);
+  set(contour_handle, 'ZData', single(segmentation));
   setappdata(figHandle, 'new_segmentation', []);
 end
 
