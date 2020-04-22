@@ -6,7 +6,7 @@ function [  ] = handleHeatmaps( accumulators,shells,numberOfResults, p )
 
 option = p.option;
 
-channels = ["GFP", "DAPI", "mCherry"];
+channels = ["Landmark", "Nuclei", "CellsOfInterest"];
 mercatorProjections = cell(1,3);
 
 if option.heatmaps.saveAccumulator == 1
@@ -62,7 +62,8 @@ for j=1:3
     end
     
     % -- Compute heatmaps -- %
-    HMS = generateHeatmap(currentAccumulator,option.heatmaps.types);
+    %DISABLED FOR DEMO
+    %HMS = generateHeatmap(currentAccumulator,option.heatmaps.types);
     
     % -- fix paths in case we are generating for special channel --%
     heatmapsPath = strcat(p.resultsPath, "/heatmaps/", channels(j));
@@ -70,17 +71,17 @@ for j=1:3
         mkdir(heatmapsPath);
     end
     % Save heatmap structure HMS
-    if option.heatmaps.saveHMmat == 1
-        mat_name = strcat(heatmapsPath,"/","Heatmap_Structure.mat");
-        save(mat_name,'HMS');
-    end
+    %if option.heatmaps.saveHMmat == 1
+    %    mat_name = strcat(heatmapsPath,"/","Heatmap_Structure.mat");
+    %    save(mat_name,'HMS');
+    %end
     
     % Save accumulator
     if option.heatmaps.saveAccumulator == 1
         mat_name = strcat(heatmapsPath,"/","Accumulator.mat");
         save(mat_name,'currentAccumulator');
     end
-    
+    %{
     % -- Create the figures -- %
     vis = 'on';
     if option.heatmaps.disp == 0
@@ -132,7 +133,7 @@ for j=1:3
         disp('Cropper');
         gui_cropRegion(currentAccumulator,HMS.MIP.Top,200);
     end
-    
+    %}
     % CONVOLUTION
     sigma = 0.5; %default 0.5
     gaussian = fspecial('gaussian', [17 17], sigma);
@@ -168,22 +169,26 @@ for j=1:3
     %%%%% UNTIL HERE!
     
     % -- Save shell heatmaps -- %
-    f = figure;
+    f = figure('visible', 'off');
     set(f,'color','none');
     f.PaperUnits = 'inches';
     f.PaperPosition = [0 0 6 6];
     
-    for i=1:size(mercatorProjections{j},3)
+        
+    for i=1:size(mercatorProjections{j},3)-1
         imagesc(mercatorProjections{j}(:,:,i),[0 maxi]); axis image; colorbar; axis off; colormap parula;
         saveas(f,strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".png"),'png');
         savefig(strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".fig"))
     end
-    
+    imagesc(mercatorProjections{j}(:,:,size(mercatorProjections{j},3)),[0 maxi]); axis image; colorbar; axis off; colormap parula;
+    saveas(f,strcat(heatmapsPath,"/Heatmap_total.png"),'png');
+    savefig(strcat(heatmapsPath,"/Heatmap_total.fig"))
 end
 
 
 %% create combined heatmaps
-
+%DISABLED FOR DEMO
+%{
 % PGCs + landmark
 % -- Determine maximum value in all heatmaps for easier comparison -- %
 heatmapsPath = strcat(p.resultsPath, "/heatmaps/PGC+landmark");
@@ -210,5 +215,5 @@ for i=1:size(mercatorProjections{2},3)
     imagesc(fuse);
     saveas(f,strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".png"),'png');
 end
-
+%}
 end

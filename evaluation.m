@@ -63,11 +63,11 @@ while result < numberOfResults
             % ask user what he wants to improve
              choice = questdlg(['Which segmentation would you like to improve for ' gatheredData.filename '?'], ...
         'Choose one option', ...
-        'Cells','Tissue','Cells');
+        'Landmark','Cells','Cells');
             
             if strcmp(choice, 'Cells')
                 modifiedData = gui_manualSegmentation(gatheredData,p,'cells');
-            elseif strcmp(choice, 'Tissue')
+            elseif strcmp(choice, 'Landmark')
                 modifiedData = gui_manualSegmentation(gatheredData,p,'tissue');
             else
                 error('This should never happen!');

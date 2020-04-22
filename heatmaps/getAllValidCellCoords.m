@@ -21,7 +21,7 @@ if ( strcmp(handledChannel, 'mCherry') )
         allCellCoords = horzcat(allCellCoords, gatheredData.registered.cellCoordinates);
         %unregistered heatmap:
         %if result ==1
-            %referenceCenter = gatheredData.processed.ellipsoid.center;
+           %referenceCenter = gatheredData.processed.ellipsoid.center;
         %end
         %ellipsoidCenter = gatheredData.processed.ellipsoid.center;
         %ellipsoidCenter = ellipsoidCenter- referenceCenter;
@@ -38,7 +38,7 @@ elseif (strcmp(handledChannel, 'DAPI') )
         allCellCoords = horzcat(allCellCoords, gatheredData.registered.nucleiCoordinates);
         %unregistered heatmap:
         %if result ==1
-            %referenceCenter = gatheredData.processed.ellipsoid.center;
+           % referenceCenter = gatheredData.processed.ellipsoid.center;
         %end
         %ellipsoidCenter = gatheredData.processed.ellipsoid.center;
         %ellipsoidCenter = ellipsoidCenter- referenceCenter;
@@ -55,7 +55,7 @@ elseif (strcmp(handledChannel, 'GFP') )
         allCellCoords = horzcat(allCellCoords, gatheredData.registered.landmarkCentCoords);
         %unregistered heatmap
         %if result ==1
-            %referenceCenter = gatheredData.processed.ellipsoid.center;
+           %referenceCenter = gatheredData.processed.ellipsoid.center;
         %end
         %ellipsoidCenter = gatheredData.processed.ellipsoid.center;
         %ellipsoidCenter = ellipsoidCenter- referenceCenter;
@@ -90,7 +90,7 @@ normOfCoordinates(:,normOfCoordinates > 1+tole) = [];
 %Get rounded cell centroid coordinates
 allCellCoordsGrid = round(...
     (allCellCoords + repmat([1;1;1], 1, size(allCellCoords,2)))...
-    * sizeAcc / 2 );
+    .* sizeAcc / 2 ); %changed * to .* to accomodate the changes of gridsize parameter
 
 allCellCoordsGrid(allCellCoordsGrid==0)=1;
 end
