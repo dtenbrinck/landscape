@@ -49,18 +49,7 @@ while result < numberOfResults
             movefile([p.resultsPath '/' fileNames{result,1}], [p.resultsPath '/accepted/' fileNames{result,1}]);
         case 'Improve'
             
-            % ask user what he wants to improve
-             choice = questdlg(['Which segmentation would you like to improve for ' gatheredData.filename '?'], ...
-        'Choose one option', ...
-        'Landmark','Cells','Cells');
-            
-            if strcmp(choice, 'Cells')
-                modifiedData = gui_manualSegmentation(gatheredData,p,'cells');
-            elseif strcmp(choice, 'Landmark')
-                modifiedData = gui_manualSegmentation(gatheredData,p,'tissue');
-            else
-                error('This should never happen!');
-            end
+            modifiedData = gui_manualSegmentation(gatheredData,p,'cells');
             
             if isempty(modifiedData)
               fprintf('\t -> Improvement aborted!\n');
@@ -90,7 +79,8 @@ if exist('aborted','var')
 else
   disp('All results in folder processed!');
 end
-%pause(1);
-close 2;
+
+figHandles = findobj('type', 'figure', '-not', 'name', 'Landscape');
+close(figHandles);
 
 end
