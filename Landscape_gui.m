@@ -120,9 +120,9 @@ f.Visible = 'on';
         
         try
             p = initializeScript('evaluate', root_dir);
-
+            old_resolution = p.resolution;
             p = adjustParameters(p, changes);
-        
+            p.resolution = old_resolution;
         
             evaluation_gui(p);
         catch
