@@ -64,7 +64,7 @@ elseif strcmp(scriptType,'heatmap')
     struct2cell(p)',struct2cell(p_heat)'];
   p = struct(merge{:});
   p.resultsPathAccepted = [p.resultsPath,'/accepted'];
-  save([p.resultsPath,'/accepted/ParameterHeatmap.mat'],'p_heat');
+  %save([p.resultsPath,'/accepted/ParameterHeatmap.mat'],'p_heat');
   
   if ~exist([p.resultsPath,'/heatmaps'],'dir')
     mkdir([p.resultsPath,'/heatmaps']);
