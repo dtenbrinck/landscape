@@ -108,8 +108,8 @@ f.Visible = 'on';
         
         
             processing_gui(p);
-        catch
-            %ignore errors
+        catch ME
+            disp(ME);
         end
         
         box_status.String = 'Ready';
@@ -125,8 +125,8 @@ f.Visible = 'on';
             p.resolution = old_resolution;
         
             evaluation_gui(p);
-        catch
-            %ignore errors
+        catch ME
+            disp(ME)
         end
         
         box_status.String = 'Ready';
@@ -141,8 +141,8 @@ f.Visible = 'on';
             p = adjustParameters(p, changes);
         
             generateHeatmaps(p);
-        catch
-            %ignore errors
+        catch ME
+            disp(ME)
         end
         
         box_status.String = 'Ready';
