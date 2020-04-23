@@ -1,6 +1,12 @@
 function generateHeatmaps(p)
 %% GET FILES TO PROCESS
 
+if isfile([p.resultsPath, '/AllAccumulators.mat'])
+    load([p.resultsPath, '/AllAccumulators.mat']);
+    handleHeatmaps(accumulators,shells,numberOfResults,p);
+    return
+end
+
 % Get filenames of MAT files in selected folder
 fileNames = getMATfilenames(p.resultsPathAccepted);
 fileNames(strcmp(fileNames,'ParameterProcessing.mat')) = [];
