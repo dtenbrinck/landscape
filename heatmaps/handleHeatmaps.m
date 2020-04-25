@@ -170,6 +170,7 @@ for j=1:3
     
     % -- Save shell heatmaps -- %
     f = figure('visible', 'off');
+    %f = figure(100);
     set(f,'color','none');
     f.PaperUnits = 'inches';
     f.PaperPosition = [0 0 6 6];
@@ -177,12 +178,16 @@ for j=1:3
         
     for i=1:size(mercatorProjections{j},3)-1
         imagesc(mercatorProjections{j}(:,:,i),[0 maxi]); axis image; colorbar; axis off; colormap parula; if j == 3; title([num2str(numberOfResults),' Embryos, ',num2str(size(currentShell{i},2)),' Cells']); end
+       pause(0.1)
         saveas(f,strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".png"),'png');
+       pause(0.1)
         savefig(strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".fig"))
     end
     imagesc(mercatorProjections{j}(:,:,size(mercatorProjections{j},3)),[0 maxi]); axis image; colorbar; axis off; colormap parula; if j==3; title([num2str(numberOfResults),' Embryos, ',num2str(size(currentShell{4},2)),' Cells']); end
+    pause(0.1)
     saveas(f,strcat(heatmapsPath,"/Heatmap_total.png"),'png');
     savefig(strcat(heatmapsPath,"/Heatmap_total.fig"))
+    close(f)
 end
 
 
