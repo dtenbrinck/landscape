@@ -49,7 +49,11 @@ while result < numberOfResults
             movefile([p.resultsPath '/' fileNames{result,1}], [p.resultsPath '/accepted/' fileNames{result,1}]);
         case 'Improve'
             
-            modifiedData = gui_manualSegmentation(gatheredData,p,'cells');
+            if strcmp(p.mappingtype, "Cells")
+                modifiedData = gui_manualSegmentation(gatheredData,p,'cells');
+            elseif strcmp(p.mappingtype, "Tissue")
+                modifiedData = gui_manualSegmentation(gatheredData,p,'tissue');
+            end
             
             if isempty(modifiedData)
               fprintf('\t -> Improvement aborted!\n');

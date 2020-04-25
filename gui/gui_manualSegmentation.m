@@ -146,7 +146,17 @@ if strcmp(type, 'cells')
     modifiedData.processed.cells = segmentation_3D;
     modifiedData.processed.cellCoordinates = centCoords;
 elseif strcmp(type, 'tissue')
-    modifiedData.processed.landmark = segmentation_3D; 
+    modifiedData.processed.cells = segmentation_3D; 
+    indices = find(modifiedData.processed.cells > 0);
+    [tmpy, tmpx, tmpz] = ind2sub(size(modifiedData.processed.cells), indices);
+
+    % initialize container for center coordinates
+     centCoords = zeros(3,numel(indices));
+    % set return variables
+    centCoords(1,:) = tmpx;
+    centCoords(2,:) = tmpy;
+    centCoords(3,:) = tmpz;
+    modifiedData.processed.cellCoordinates = centCoords;
 end 
 
 registeredData = registerData( modifiedData.processed, p.resolution, modifiedData.registered.transformation_full, modifiedData.processed.ellipsoid, p.samples_cube);
