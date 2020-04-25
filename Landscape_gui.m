@@ -1,5 +1,6 @@
 function Landscape_gui
 clear;
+close all;
 
 f = figure('Visible', 'off', 'Position', [200,400,900,500], 'MenuBar', 'None', 'NumberTitle', 'off');
 
