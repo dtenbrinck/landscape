@@ -197,12 +197,14 @@ for j=1:3
                 text(1.25,0.5,'Abundance', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'center');
                 saveas(f,strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".png"),'png');
                 savefig(strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".fig"))
+                writematrix(mercatorProjections{j}(:,:,i),strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".csv"));
             end
             imagesc(mercatorProjections{j}(:,:,size(mercatorProjections{j},3)),[0 maxi]); axis image; colorbar; axis off; colormap parula; title([num2str(numberOfResults),' Embryo(s), ',num2str(size(currentShell{4},2)),' Cell(s)']);
             pause(0.1)
             text(1.25,0.5,'Abundance', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'center');
             saveas(f,strcat(heatmapsPath,"/Heatmap_total.png"),'png');
             savefig(strcat(heatmapsPath,"/Heatmap_total.fig"))
+            writematrix(mercatorProjections{j}(:,:,i),strcat(heatmapsPath,"/Heatmap_total.csv"));
             
         case 3 %mCherry
             for i=1:size(mercatorProjections{j},3)-1
@@ -211,12 +213,14 @@ for j=1:3
                 text(1.25,0.5,'Abundance', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'center');
                 saveas(f,strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".png"),'png');
                 savefig(strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".fig"))
+                writematrix(mercatorProjections{j}(:,:,i),strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".csv"));
             end
             imagesc(mercatorProjections{j}(:,:,size(mercatorProjections{j},3)),[0 maxi]); axis image; colorbar; axis off; colormap parula; title([num2str(numberOfResults),' Embryo(s), ',num2str(size(currentShell{4},2)),' Cell(s)']);
             pause(0.1)
             text(1.25,0.5,'Abundance', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'center');
             saveas(f,strcat(heatmapsPath,"/Heatmap_total.png"),'png');
             savefig(strcat(heatmapsPath,"/Heatmap_total.fig"))
+            writematrix(mercatorProjections{j}(:,:,i),strcat(heatmapsPath,"/Heatmap_total.csv"));
     end
     close(f);
 end
