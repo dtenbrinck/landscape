@@ -73,7 +73,7 @@ addlistener(threshold_slider,'Value','PreSet',@(a,b) update_editField(b,threshol
 
 %figure(h);
 %ih = drawSegmentation(im, im2);
-text(size(mip,2) / 2, -30, 'Select center point for segmentation region! You can revert your last chance by hitting either "Delete" or "Backspace".', 'HorizontalAlignment','center', 'BackgroundColor',[.7 .9 .7]);
+text(size(mip,2) / 2, -30, 'Select center point for segmentation region by clicking and holding the mouse button! You can revert your last change by hitting either "Delete" or "Backspace".', 'HorizontalAlignment','center', 'BackgroundColor',[.7 .9 .7]);
 axesHandle  = get(imageHandle,'Parent');
 set(get(axesHandle,'children'),'HitTest','off')
 set(axesHandle,'ButtonDownFcn',{@start_manual_segmentation,axesHandle,mip,contour_handle})
