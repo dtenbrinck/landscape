@@ -27,7 +27,7 @@ options = optimoptions('fmincon','Display','off','Algorithm','sqp'); % 'StepTole
         = sphericalRegression3D_daniel(regData,[0;0;-1],[1;0;0],options,visualize);
 
 %check if orientation of GC is counter clockwise
-if pstar(3) > 0 %Drosophila
+%if pstar(3) > 0 %Drosophila
 if pstar(3) < 0 %Zebrafish    
     if vstar(1) < 0
     vstar = - vstar;
