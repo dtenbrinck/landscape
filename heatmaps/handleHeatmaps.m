@@ -172,8 +172,11 @@ for j=1:3
     f = figure('visible', 'off');
     %f = figure(100);
     set(f,'color','none');
+   
     f.PaperUnits = 'inches';
     f.PaperPosition = [0 0 6 6];
+    pause(0.1);
+     set(0, 'CurrentFigure', f)
     
     switch j
         case 1 %GFP
