@@ -57,7 +57,7 @@ p.mCherryseg.k = 3; %3
 p.mCherryseg.cellSize = 15; %50. in pixel %15 for Drosophila
 %p.mCherryseg.method = 'k-means'; % 'k-means', 'k-means_local', 'CP'
 % -- LANDMARK PROJECTION -- %
-p.samples_sphere = 128; %128 %PoP:256
+p.samples_sphere = 256; %128 %PoP:256
 
 %% ELLIPSOIDAL FITTING
 p.ellipsoidFitting.percentage = 100; % 10 percent for old dapi segmentation
