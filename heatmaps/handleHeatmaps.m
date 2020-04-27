@@ -170,6 +170,7 @@ for j=1:3
     
     % -- Save shell heatmaps -- %
     f = figure('visible', 'off');
+    a = axes(f);
     %f = figure(100);
     set(f,'color','none');
    
@@ -181,13 +182,13 @@ for j=1:3
     switch j
         case 1 %GFP
             for i=1:size(mercatorProjections{j},3)-1
-                imagesc(mercatorProjections{j}(:,:,i),[0 maxi]); axis image; colorbar; axis off; colormap parula; title([num2str(numberOfResults),' embryo(s)']);
+                imagesc(mercatorProjections{j}(:,:,i),'parent',a,[0 maxi]); axis image; colorbar; axis off; colormap parula; title([num2str(numberOfResults),' embryo(s)']);
                 pause(0.1)
                 text(1.25,0.5,'abundance', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'center');
                 saveas(f,strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".png"),'png');
                 savefig(strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".fig"))
             end
-            imagesc(mercatorProjections{j}(:,:,size(mercatorProjections{j},3)),[0 maxi]); axis image; colorbar; axis off; colormap parula; title([num2str(numberOfResults),' embryo(s)']);
+            imagesc(mercatorProjections{j}(:,:,size(mercatorProjections{j},3)),'parent',a,[0 maxi]); axis image; colorbar; axis off; colormap parula; title([num2str(numberOfResults),' embryo(s)']);
             pause(0.1)
             text(1.25,0.5,'abundance', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'center');
             saveas(f,strcat(heatmapsPath,"/Heatmap_total.png"),'png');
@@ -195,7 +196,7 @@ for j=1:3
     
         case 2 %DAPI
             for i=1:size(mercatorProjections{j},3)-1
-                imagesc(mercatorProjections{j}(:,:,i),[0 maxi]); axis image; colorbar; axis off; colormap parula; title([num2str(numberOfResults),' embryo(s), ',num2str(size(currentShell{i},2)),' cell(s)']);
+                imagesc(mercatorProjections{j}(:,:,i),'parent',a,[0 maxi]); axis image; colorbar; axis off; colormap parula; title([num2str(numberOfResults),' embryo(s), ',num2str(size(currentShell{i},2)),' cell(s)']);
                 pause(0.1)
                 text(1.25,0.5,'abundance', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'center');
                 saveas(f,strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".png"),'png');
@@ -206,7 +207,7 @@ for j=1:3
                     csvwrite(strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".csv"),mercatorProjections{j}(:,:,i));
                 end
             end
-            imagesc(mercatorProjections{j}(:,:,size(mercatorProjections{j},3)),[0 maxi]); axis image; colorbar; axis off; colormap parula; title([num2str(numberOfResults),' embryo(s), ',num2str(size(currentShell{4},2)),' cell(s)']);
+            imagesc(mercatorProjections{j}(:,:,size(mercatorProjections{j},3)),'parent',a,[0 maxi]); axis image; colorbar; axis off; colormap parula; title([num2str(numberOfResults),' embryo(s), ',num2str(size(currentShell{4},2)),' cell(s)']);
             pause(0.1)
             text(1.25,0.5,'abundance', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'center');
             saveas(f,strcat(heatmapsPath,"/Heatmap_total.png"),'png');
@@ -220,7 +221,7 @@ for j=1:3
             
         case 3 %mCherry
             for i=1:size(mercatorProjections{j},3)-1
-                imagesc(mercatorProjections{j}(:,:,i),[0 maxi]); axis image; colorbar; axis off; colormap parula; title([num2str(numberOfResults),' embryo(s), ',num2str(size(currentShell{i},2)),' cell(s)']);
+                imagesc(mercatorProjections{j}(:,:,i),'parent',a,[0 maxi]); axis image; colorbar; axis off; colormap parula; title([num2str(numberOfResults),' embryo(s), ',num2str(size(currentShell{i},2)),' cell(s)']);
                 pause(0.1)
                 text(1.25,0.5,'abundance', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'center');
                 saveas(f,strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".png"),'png');
@@ -231,7 +232,7 @@ for j=1:3
                     csvwrite(strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".csv"),mercatorProjections{j}(:,:,i));
                 end
             end
-            imagesc(mercatorProjections{j}(:,:,size(mercatorProjections{j},3)),[0 maxi]); axis image; colorbar; axis off; colormap parula; title([num2str(numberOfResults),' embryo(s), ',num2str(size(currentShell{4},2)),' cell(s)']);
+            imagesc(mercatorProjections{j}(:,:,size(mercatorProjections{j},3)),'parent',a,[0 maxi]); axis image; colorbar; axis off; colormap parula; title([num2str(numberOfResults),' embryo(s), ',num2str(size(currentShell{4},2)),' cell(s)']);
             pause(0.1)
             text(1.25,0.5,'abundance', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'center');
             saveas(f,strcat(heatmapsPath,"/Heatmap_total.png"),'png');
