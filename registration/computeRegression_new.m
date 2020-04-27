@@ -36,16 +36,6 @@ elseif pstar(3) > 0
     if vstar(1) > 0
     vstar = -vstar;
     end
-else
-    if pstar(1) < 0
-        if vstar(3) > 0
-        vstar = -vstar;
-        end
-    else 
-        if vstar(3) < 0
-        vstar = -vstar;
-        end    
-    end      
 end
     
     
