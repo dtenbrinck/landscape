@@ -2,7 +2,7 @@ function Landscape_gui
 clear;
 close all;
 
-f = figure('Visible', 'off', 'Position', [200,400,900,500], 'MenuBar', 'None', 'NumberTitle', 'off');
+gui_figure = figure('Visible', 'off', 'Position', [200,400,900,500], 'MenuBar', 'None', 'NumberTitle', 'off');
 
 %set the standard settings here
 global changes
@@ -86,12 +86,12 @@ box_status = uicontrol('Style', 'text', ...
 
 
 % Assign the a name to appear in the window title.
-f.Name = 'Landscape';
+gui_figure.Name = 'Landscape';
 
 % Move the window to the center of the screen.
-movegui(f,'center')
+movegui(gui_figure,'center')
 
-f.Visible = 'on';
+gui_figure.Visible = 'on';
 
 
 
