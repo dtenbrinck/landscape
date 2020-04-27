@@ -32,12 +32,11 @@ if pstar(3) < 0 %Zebrafish
     if vstar(1) < 0
     vstar = - vstar;
     end
-elseif pstar(3) < 0
+elseif pstar(3) > 0
     if vstar(1) > 0
     vstar = -vstar;
     end
 else
-    disp('pstar  of great circle is zero!')
     if pstar(1) < 0
         if vstar(3) > 0
         vstar = -vstar;
