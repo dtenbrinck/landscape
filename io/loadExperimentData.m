@@ -32,7 +32,8 @@ end
 
 % save filename
 % ATTENTION: This assumes a fixed naming convention!
-data.filename = experimentSets{1,1}{1}(1:end-11);
+index = strfind(experimentSets{1,1}{1},'_');
+data.filename = experimentSets{1,1}{1}(1:index-1);
 
 catch ME
 warning(['Some error occured while reading the TIFF file!', ...

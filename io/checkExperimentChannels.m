@@ -12,10 +12,15 @@ for i=1:size(fileNames,1)
     % get number of underscores in current file name
     nb_underscores = size(indices{i,1},2);
     
+    % if more than one underscore is present abort
+    if nb_underscores > 1
+        error("Inconsistent file naming scheme. Please name your file <experiment_number>_<channel>.tif");
+    end
+    
     % get the integer number between second-last and last underscore
     experimentNumbers(i) ...
         = str2double(...
-        fileNames{i}(indices{i,1}(nb_underscores-1)+1:indices{i,1}(nb_underscores)-1));
+        fileNames{i}(1:indices{i,1}(nb_underscores)-1));
 end
 
 % initialize cell array assuming each experiment has three data sets
