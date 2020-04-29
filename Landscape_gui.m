@@ -154,11 +154,11 @@ gui_figure.Visible = 'on';
     end
 
     function button_help_callback(source, eventdata)
-        if ispc %Windows
+        if ismac %Mac
             open('gui/manual.pdf');
         elseif isunix %Linux
             system('evince gui/manual.pdf');
-        elseif ismac %Mac
+        elseif ispc %Windows
             open('gui/manual.pdf');
         end
     end
