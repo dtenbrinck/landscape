@@ -5,8 +5,11 @@ function [  ] = handleHeatmaps( accumulators,shells,numberOfResults, p )
 %% MAIN CODE
 
 option = p.option;
-
-channels = ["Landmark", "Nuclei", "CellsOfInterest"];
+if strcmp(p.mappingtype, 'Cells')
+    channels = ["Landmark", "Nuclei", "CellsOfInterest"];
+elseif strcmp(p.mappingtype, 'Tissue')
+    channels = ["Landmark", "Nuclei", "TissueOfInterest"];
+end
 mercatorProjections = cell(1,3);
 
 if option.heatmaps.saveAccumulator == 1
@@ -221,7 +224,12 @@ for j=1:3
             
         case 3 %mCherry
             for i=1:size(mercatorProjections{j},3)-1
-                imagesc(mercatorProjections{j}(:,:,i),'parent',a,[0 maxi]); axis image; colorbar(a); axis off; colormap(a,parula); title(a,[num2str(numberOfResults),' embryo(s), ',num2str(size(currentShell{i},2)),' cell(s)']);
+                imagesc(mercatorProjections{j}(:,:,i),'parent',a,[0 maxi]); axis image; colorbar(a); axis off; colormap(a,parula);
+                if strcmp(p.mappingtype, 'Cells') 
+                    title(a,[num2str(numberOfResults),' embryo(s), ',num2str(size(currentShell{i},2)),' cell(s)']); 
+                else
+                    title(a,[num2str(numberOfResults),' embryo(s)']);
+                end
                 pause(0.1)
                 text(a,1.25,0.5,'abundance', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'center');
                 saveas(f,strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".png"),'png');
@@ -232,7 +240,12 @@ for j=1:3
                     csvwrite(strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".csv"),mercatorProjections{j}(:,:,i));
                 end
             end
-            imagesc(mercatorProjections{j}(:,:,size(mercatorProjections{j},3)),'parent',a,[0 maxi]); axis image; colorbar(a); axis off; colormap(a,parula); title(a,[num2str(numberOfResults),' embryo(s), ',num2str(size(currentShell{4},2)),' cell(s)']);
+            imagesc(mercatorProjections{j}(:,:,size(mercatorProjections{j},3)),'parent',a,[0 maxi]); axis image; colorbar(a); axis off; colormap(a,parula);
+            if strcmp(p.mappingtype, 'Cells') 
+                    title(a,[num2str(numberOfResults),' embryo(s), ',num2str(size(currentShell{4},2)),' cell(s)']);
+                else
+                    title(a,[num2str(numberOfResults),' embryo(s)']);
+                end
             pause(0.1)
             text(a,1.25,0.5,'abundance', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'center');
             saveas(f,strcat(heatmapsPath,"/Heatmap_total.png"),'png');
