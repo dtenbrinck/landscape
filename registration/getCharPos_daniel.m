@@ -29,11 +29,11 @@ function [pnew,vnew] = getCharPos_daniel(p,v,coordinates,type,weightingRatio)
 
 % -- Compute points on regressionline for Tstar -- %
 G = geodesicFun(p,v);
-T = linspace(0,2*pi,700);
+T = linspace(0,2*pi,2100);  %700 PoP:2100
 rL = G(T);
 values = zeros(1,numel(T)); % find positions on discrete geodesic circle with close landmark coordinates
 
-threshold = 0.1;
+threshold = 0.025; %0.1 PoP:0.025
 
 for t=1:numel(T)
    

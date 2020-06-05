@@ -1,4 +1,4 @@
-function [nuclei, centCoords] = segmentDAPI( data, p, resolution )
+function [nuclei, centCoords, embryoShape] = segmentDAPI( data, p, resolution )
 %SEGMENTDATA Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -88,6 +88,9 @@ brightRegions = bwareaopen(Xi, p.minNucleusSize, 26);
 
 brightPixel3d = brightRegions & locMax;
 
+% For Dros_18 Delete later
+%brightPixel3d(:,:,size(brightPixel3d,3))=0;
+
 indices = find(brightPixel3d > 0);
 [tmpy, tmpx, tmpz] = ind2sub(size(brightPixel3d), indices);
 
@@ -99,50 +102,8 @@ centCoords(2,:) = tmpy;
 centCoords(3,:) = tmpz;
 nuclei = Xi;
 
-%%%%%%% test visualizations around slice 20 %%%%%%%%%%%%
-% 
-% % the same cell should not be found in consecutive slices
-% % so the plotted pixel are not close together for slice 19 and 20
-% 
-% figure;
-% overlay2=imoverlay(brightPixel3d(:,:,19), brightPixel3d(:,:,20), 'r');
-% imagesc(overlay2)
-% 
-% % found center coordinates of slice 21
-% layer=centCoords(:,centCoords(3,:)==21);
-% figure;
-% subplot(1,2,1);
-% imagesc(data(:,:,20))
-% hold on
-% plot(layer(1,:),layer(2,:),'r*')
-% subplot(1,2,2);
-% imagesc(Xi(:,:,20))
-% hold on
-% plot(layer(1,:),layer(2,:),'r*')
-% 
-% % found center coordinates of slice 20
-% layer=centCoords(:,centCoords(3,:)==20);
-% figure;
-% subplot(1,2,1);
-% imagesc(data(:,:,20))
-% hold on
-% plot(layer(1,:),layer(2,:),'r*')
-% subplot(1,2,2);
-% imagesc(Xi(:,:,20))
-% hold on
-% plot(layer(1,:),layer(2,:),'r*')
-% 
-% % found center coordinates of slice 19
-% layer=centCoords(:,centCoords(3,:)== 19);
-% figure;
-% subplot(1,2,1);
-% imagesc(data(:,:,20))
-% hold on
-% plot(layer(1,:),layer(2,:),'r*')
-% subplot(1,2,2);
-% imagesc(Xi(:,:,20))
-% hold on
-% plot(layer(1,:),layer(2,:),'r*')
+% segment shape of embryo based on DAPI information
+embryoShape = imclose(computeMIP(nuclei),strel('disk',50));
 
 % % possible tuning options to improve the segmentation results:
 % % - connectivity parameter in bwareaopen and imregionalmax

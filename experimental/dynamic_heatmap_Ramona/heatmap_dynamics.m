@@ -2,7 +2,7 @@ function heatmap_dynamics()
 clear; clc; close all;
 
 % define root directory
-root_dir = fileparts(fileparts(pwd));
+root_dir = pwd;
 
 % add path for parameter setup
 addpath(root_dir);

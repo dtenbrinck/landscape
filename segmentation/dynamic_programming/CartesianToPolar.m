@@ -39,6 +39,9 @@ for i = 1:samplingRadius
 end
 
 %interpolate image
-imagePolar = interp2(X,Y,imageCartesian, x_coord, y_coord, method);
+imagePolar = interp2(X,Y,imageCartesian, x_coord, y_coord, method, 0);
+if (sum(isnan(imagePolar(:))) > 0)
+    stop = 1;
+end
 end
 

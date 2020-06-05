@@ -2,7 +2,7 @@
 clear; clc; close all;
 
 % define root directory
-root_dir = fileparts(fileparts(pwd));
+root_dir = pwd;
 
 % add path for parameter setup
 addpath([root_dir '/parameter_setup/']);
@@ -13,10 +13,9 @@ p = initializeScript('processing', root_dir);
 %% PREPARE RESULTS DIRECTORY
 checkDirectory(p.resultsPath);
 
-
 %% LOAD DATA
 
-% get filenames of TIF files in selected folder
+% get filenames of STK / TIF files in selected folder
 fileNames = getSTKfilenames(p.dataPath);
 
 % extract only valid experiments with three data sets
@@ -30,12 +29,21 @@ p.resolution(1:2) = p.resolution(1:2) / p.scale;
 
 %% MAIN LOOP
 
-fprintf(['Processing dataset: (0,' num2str(numberOfExperiments) ')']);
+fprintf('Processing dataset:'); 
     
 % process all existing data in parallel
-%     if p.debug_level <= 1 && p.visualization == 0
-%         parpool;
-%     end
+%delete(gcp('nocreate'));
+%if p.debug_level <= 1 && p.visualization == 0
+%       parpool;
+%end
+
+filename = [];
+radius = [];
+axes1 = [];
+axes2 = [];
+axes3 = [];
+radOrdered = [];
+
 for experiment=1:numberOfExperiments
     
     % show remotecurrent experiment number
@@ -51,22 +59,29 @@ for experiment=1:numberOfExperiments
         processedData = preprocessData(experimentData, p);
         
         % segment data
-        if p.debug_level >= 1; disp('Segmenting GFP channel...'); end
-        [processedData.landmark, processedData.landmarkCentCoords] = segmentGFP(processedData.GFP, p.GFPseg, p.resolution);   %old method
-        %processedData.landmark = segmentMutantGFP(processedData.GFP);   %new method
-        
-        if p.debug_level >= 1; disp('Segmenting mCherry channel...'); end
-        [processedData.cells, processedData.cellCoordinates] = blobSegmentCells(processedData.mCherry, p.mCherryseg);   %old method
-        %[processedData.cells, processedData.cellCoordinates] = segmentMutantmCherry(processedData.mCherry);  %new method
+        %if p.debug_level >= 1; disp('Segmenting GFP channel...'); end
+        %[processedData.landmark, processedData.landmarkCentCoords] =...
+        %    segmentGFP(processedData.GFP, p.GFPseg, p.resolution);
         
         if p.debug_level >= 1; disp('Segmenting DAPI channel...'); end
-        [processedData.nuclei, processedData.nucleiCoordinates] = segmentDAPI(processedData.Dapi, p.DAPIseg, p.resolution); %old method
-        %[processedData.nuclei, processedData.nucleiCoordinates] = segmentMutantDapi(processedData.Dapi); %new method
+        [processedData.nuclei, processedData.nucleiCoordinates, processedData.embryoShape] =...
+            segmentDAPI(processedData.Dapi, p.DAPIseg, p.resolution);
+        
+        %if p.debug_level >= 1; disp('Segmenting mCherry channel...'); end
+        %[processedData.cells, processedData.cellCoordinates] =...
+        %    blobSegmentCells(processedData.mCherry, p.mCherryseg, processedData.embryoShape);     
 
         % estimate embryo surface by fitting an ellipsoid
         if p.debug_level >= 1; disp('Estimating embryo surface...'); end
         ellipsoid = estimateEmbryoSurface(processedData.nucleiCoordinates, p.resolution, p.ellipsoidFitting);
         
+        filename = [filename; experimentData.filename];
+        radius = [radius; ellipsoid.radii'];
+        axes1 = [axes1; ellipsoid.axes(1,:)];
+        axes2 = [axes2; ellipsoid.axes(2,:)];
+        axes3 = [axes3; ellipsoid.axes(3,:)];
+        radOrdered = [radOrdered; ellipsoid.radiiOrderedForPlots'];
+        %{
         % compute transformation which normalizes the estimated ellipsoid to a unit sphere
         if p.debug_level >= 1; disp('Compute transformation from optimal ellipsoid...'); end
         transformationMatrix = computeTransformationMatrix(ellipsoid);
@@ -82,7 +97,7 @@ for experiment=1:numberOfExperiments
         [sphereCoordinates, landmarkCoordinates, landmarkOnSphere] = ...
             projectLandmarkOnSphere(processedData.landmark, p.resolution, ellipsoid, p.samples_sphere);
         
-         % project cells onto unit sphere 
+        % project cells onto unit sphere 
         if p.debug_level >= 3
         disp('Projecting cells onto embryo surface...');
         [sphereCoordinates2, cellsCoordinates, cellsOnSphere] = ...
@@ -105,10 +120,10 @@ for experiment=1:numberOfExperiments
             visualizeProjectedLandmark(registered_sphere', landmarkOnSphere);
             
             %visualize projection of mCherry channel on unit sphere
-             if p.debug_level >= 3
+            if p.debug_level >= 3
                 visualizeProjectedLandmark(sphereCoordinates, cellsOnSphere);
                 visualizeProjectedLandmark(registered_sphere', cellsOnSphere);
-             end 
+            end 
         end
        
 %       % DEBUG
@@ -122,13 +137,11 @@ for experiment=1:numberOfExperiments
         registeredData = registerData( processedData, p.resolution, transformation_registration, ellipsoid, p.samples_cube);
                 
         % create filename to save results
-
         results_filename = [p.resultsPath '/' experimentData.filename '_results.mat'];
         
         gatheredData = saveResults(experimentData, processedData, registeredData, ellipsoid, transformationMatrix, rotationMatrix, results_filename);
         
         % visualize results if needed
-        %p.visualization = 1
         if p.visualization == 1
             visualizeResults_new(gatheredData);
         end
@@ -140,7 +153,7 @@ for experiment=1:numberOfExperiments
         
         
         if p.debug_level >= 1; disp('Saved results successfully!'); end
-        
+        %}
     catch ERROR_MSG  %% ONLY EXECUTED WHEN ERRORS HAPPENING
         
         disp(ERROR_MSG)
@@ -156,6 +169,9 @@ for experiment=1:numberOfExperiments
     end
     
 end
+
+csvTable = table(filename, radius, axes1, axes2, axes3, radOrdered);
+writetable(csvTable, [p.resultsPath '/ellipsoidData.csv'])
 
 % Save parameters
 save([p.resultsPath '/accepted/ParameterProcessing.mat'],'p');

@@ -12,10 +12,15 @@ for i=1:size(fileNames,1)
     % get number of underscores in current file name
     nb_underscores = size(indices{i,1},2);
     
+    % if more than one underscore is present abort
+    if nb_underscores > 1
+        error("Inconsistent file naming scheme. Please name your file <experiment_number>_<channel>.tif");
+    end
+    
     % get the integer number between second-last and last underscore
     experimentNumbers(i) ...
         = str2double(...
-        fileNames{i}(indices{i,1}(nb_underscores-1)+1:indices{i,1}(nb_underscores)-1));
+        fileNames{i}(1:indices{i,1}(nb_underscores)-1));
 end
 
 % initialize cell array assuming each experiment has three data sets
@@ -40,17 +45,17 @@ for i = nb_experiments
     % ATTENTION: Having an experiment called "DAPI" will cause a bug  
     
     % get Dapi data set for current experiment
-    index = strfind(fileNames(indices),'Dapi');
+    index = strfind(fileNames(indices),'nuclei');
     rightind = find(~cellfun(@isempty,index));
     experimentSets{i,1} = fileNames(indices(rightind));
     
     % get GFP data set for current experiment
-    index = strfind(fileNames(indices),'GFP');
+    index = strfind(fileNames(indices),'landmark');
     rightind = find(~cellfun(@isempty,index));
     experimentSets{i,2} = fileNames(indices(rightind));
     
     % get mCherry data set for current experiment
-    index = strfind(fileNames(indices),'mCherry');
+    index = strfind(fileNames(indices),'coi');
     rightind = find(~cellfun(@isempty,index));
     experimentSets{i,3} = fileNames(indices(rightind));
 end
@@ -60,5 +65,9 @@ end
 % delete empty cells
 experimentSets = reshape(experimentSets(~cellfun('isempty',experimentSets)),[],3);
 
+% Warning message if no experiments could be found
+if isempty(experimentSets)
+    error('No valid experiment data could be found in chosen directory. Make sure you name the files containing strings like ''landmark'', ''nuclei'', or ''coi''.');
 end
 
+end

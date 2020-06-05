@@ -8,7 +8,7 @@ rng(0,'twister');
 idx = randperm( size(X,1), ceil(ellipsoidFittingParams.percentage/100*size(X,1)));
 X = X(idx,:);
 
-[ ellipsoidEstimation.center, ellipsoidEstimation.radii, ellipsoidEstimation.axes, max_iterations_reached] = ...
+[ ellipsoidEstimation.center, ellipsoidEstimation.radii, ellipsoidEstimation.axes] = ...
     getEllipsoidCharacteristicsEstimation( X, ellipsoidFittingParams );
 
 %% plot fitted ellipsoid
@@ -35,9 +35,6 @@ if (  ellipsoidFittingParams.visualization )
         num2str(ellipsoidEstimation.radii(2)), ' \mum, \newline', ...
         num2str(ellipsoidEstimation.radii(3)), ' \mum'], 'Interpreter', 'tex'); 
     legend('Location', 'southoutside');
-   end
-   if max_iterations_reached
-       result_path = [result_path '_max_iterations_'];
    end
    savefig(fig, result_path)
    close(fig)
