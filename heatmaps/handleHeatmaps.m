@@ -168,7 +168,8 @@ for j=1:3
             maxi = tmp_max;
         end
     end
-    disp(['Maximum cell density in channel ' channels(j) ' channel for this experiment is: ' num2str(maxi)]);
+    %for debugging only
+    %disp(['Maximum cell density in channel ' channels(j) ' channel for this experiment is: ' num2str(maxi)]);
     %%%%% UNTIL HERE!
     
     % -- Save shell heatmaps -- %
@@ -188,12 +189,20 @@ for j=1:3
                 imagesc(mercatorProjections{j}(:,:,i),'parent',a,[0 maxi]); axis image; colorbar(a); axis off; colormap(a,parula); title(a,[num2str(numberOfResults),' embryo(s)']);
                 pause(0.1)
                 text(a,1.25,0.5,'abundance', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'center');
+                text(a,-0.1,1,'\rightarrow Right', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'right');
+                text(a,-0.1,0,'Left \leftarrow', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'left');
+                text(a,0,-0.12,'Anterior \leftarrow', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'HorizontalAlignment', 'left');
+                text(a,1,-0.12,'\rightarrow Posterior', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'HorizontalAlignment', 'right');
                 saveas(f,strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".png"),'png');
                 savefig(strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".fig"))
             end
             imagesc(mercatorProjections{j}(:,:,size(mercatorProjections{j},3)),'parent',a,[0 maxi]); axis image; colorbar(a); axis off; colormap(a,parula); title(a,[num2str(numberOfResults),' embryo(s)']);
             pause(0.1)
             text(a,1.25,0.5,'abundance', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'center');
+            text(a,-0.1,1,'\rightarrow Right', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'right');
+            text(a,-0.1,0,'Left \leftarrow', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'left');
+            text(a,0,-0.12,'Anterior \leftarrow', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'HorizontalAlignment', 'left');
+            text(a,1,-0.12,'\rightarrow Posterior', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'HorizontalAlignment', 'right');
             saveas(f,strcat(heatmapsPath,"/Heatmap_total.png"),'png');
             savefig(strcat(heatmapsPath,"/Heatmap_total.fig"))
     
@@ -202,6 +211,10 @@ for j=1:3
                 imagesc(mercatorProjections{j}(:,:,i),'parent',a,[0 maxi]); axis image; colorbar(a); axis off; colormap(a,parula); title(a,[num2str(numberOfResults),' embryo(s), ',num2str(size(currentShell{i},2)),' cell(s)']);
                 pause(0.1)
                 text(a,1.25,0.5,'abundance', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'center');
+                text(a,-0.1,1,'\rightarrow Right', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'right');
+                text(a,-0.1,0,'Left \leftarrow', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'left');
+                text(a,0,-0.12,'Anterior \leftarrow', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'HorizontalAlignment', 'left');
+                text(a,1,-0.12,'\rightarrow Posterior', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'HorizontalAlignment', 'right');
                 saveas(f,strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".png"),'png');
                 savefig(strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".fig"))
                 if exist('writematrix','file') == 2
@@ -213,6 +226,10 @@ for j=1:3
             imagesc(mercatorProjections{j}(:,:,size(mercatorProjections{j},3)),'parent',a,[0 maxi]); axis image; colorbar(a); axis off; colormap(a,parula); title(a,[num2str(numberOfResults),' embryo(s), ',num2str(size(currentShell{4},2)),' cell(s)']);
             pause(0.1)
             text(a,1.25,0.5,'abundance', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'center');
+            text(a,-0.1,1,'\rightarrow Right', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'right');
+            text(a,-0.1,0,'Left \leftarrow', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'left');
+            text(a,0,-0.12,'Anterior \leftarrow', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'HorizontalAlignment', 'left');
+            text(a,1,-0.12,'\rightarrow Posterior', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'HorizontalAlignment', 'right');
             saveas(f,strcat(heatmapsPath,"/Heatmap_total.png"),'png');
             savefig(strcat(heatmapsPath,"/Heatmap_total.fig"))
             if exist('writematrix','file') == 2
@@ -232,6 +249,10 @@ for j=1:3
                 end
                 pause(0.1)
                 text(a,1.25,0.5,'abundance', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'center');
+                text(a,-0.1,1,'\rightarrow Right', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'right');
+                text(a,-0.1,0,'Left \leftarrow', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'left');
+                text(a,0,-0.12,'Anterior \leftarrow', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'HorizontalAlignment', 'left');
+                text(a,1,-0.12,'\rightarrow Posterior', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'HorizontalAlignment', 'right');
                 saveas(f,strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".png"),'png');
                 savefig(strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".fig"))
                  if exist('writematrix','file') == 2
@@ -248,6 +269,10 @@ for j=1:3
                 end
             pause(0.1)
             text(a,1.25,0.5,'abundance', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'center');
+            text(a,-0.1,1,'\rightarrow Right', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'right');
+            text(a,-0.1,0,'Left \leftarrow', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'left');
+            text(a,0,-0.12,'Anterior \leftarrow', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'HorizontalAlignment', 'left');
+            text(a,1,-0.12,'\rightarrow Posterior', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'HorizontalAlignment', 'right');
             saveas(f,strcat(heatmapsPath,"/Heatmap_total.png"),'png');
             savefig(strcat(heatmapsPath,"/Heatmap_total.fig"))
             if exist('writematrix','file') == 2
