@@ -26,7 +26,8 @@ set(figHandle,'Units','normalized','Position',[0.1 0.1 0.9 0.9]);
 
 % add a button for being finished
 finish_button = uicontrol('Style', 'pushbutton', 'String', 'Finish',...
-  'Position', [550 20 80 20],...
+  'Units', 'normalized',...
+  'Position', [0.48 0.016 0.035 0.025],...
   'Callback', {@close_segmentation_GUI,figHandle});
 
 dataRange = maxData-minData;
@@ -37,12 +38,22 @@ threshold_slider = uicontrol('Style', 'slider',...
   'Max',round(maxData - 1),...
   'Value',round((minData + maxData) / 6),...
   'SliderStep', [0.004 0.0402],...
-  'Position', [300 20 150 20],...
+  'Units', 'normalized',...
+  'Position', [0.34 0.016 0.09 0.025],...
   'Callback', {@threshold_image,mip,figHandle});
 
+text_contrast = annotation('textbox',  [0.548, 0.05 0.08 0.03],...
+    'String', 'Contrast adjustment');
+
+text_threshold = annotation('textbox',  [0.34, 0.05 0.09 0.03],...
+    'String', 'Segmentation threshold');
+
 threshold_editField=uicontrol('Style','edit',...
-          'Position', [470 20 40 20],...
+          'Units', 'normalized',...
+          'Position', [0.435 0.016 0.018 0.025],...
           'String',num2str(get(threshold_slider,'Value')));
+      
+
         
 %while finished == false
 imageHandle = imagesc(mip,[0, max(mip(:))/2]); colormap gray; axis image;
@@ -52,6 +63,8 @@ hold on
 set(contour_handle, 'LineWidth', 2);
 %set(gca,'YDir','reverse');
 hold off;
+set(gca,'xtick',[])
+set(gca,'ytick',[])
 
 
 set(figHandle,'KeyPressFcn',@(a,b) capture_keystroke(figHandle,contour_handle,b));
@@ -60,7 +73,7 @@ addlistener(threshold_slider,'Value','PreSet',@(a,b) update_editField(b,threshol
 
 %figure(h);
 %ih = drawSegmentation(im, im2);
-text(size(mip,2) / 2, -30, 'Select center point for segmentation region! You can revert your last chance by hitting either "Delete" or "Backspace".', 'HorizontalAlignment','center', 'BackgroundColor',[.7 .9 .7]);
+text(size(mip,2) / 2, -30, 'Select center point for segmentation region by clicking and holding the mouse button! You can revert your last change by hitting either "Delete" or "Backspace".', 'HorizontalAlignment','center', 'BackgroundColor',[.7 .9 .7]);
 axesHandle  = get(imageHandle,'Parent');
 set(get(axesHandle,'children'),'HitTest','off')
 set(axesHandle,'ButtonDownFcn',{@start_manual_segmentation,axesHandle,mip,contour_handle})
@@ -72,7 +85,8 @@ contrast_slider = uicontrol('Style', 'slider',...
   'Max',5,...
   'Value',4,...
   'SliderStep', [0.25, 0.25],...
-  'Position', [700 20 200 20],...
+  'Units', 'normalized',...
+  'Position',  [0.54, 0.016 0.10 0.025],...
   'Callback', {@adjust_contrast,axesHandle,imageHandle});
 
 uiwait(figHandle);
@@ -132,7 +146,17 @@ if strcmp(type, 'cells')
     modifiedData.processed.cells = segmentation_3D;
     modifiedData.processed.cellCoordinates = centCoords;
 elseif strcmp(type, 'tissue')
-    modifiedData.processed.landmark = segmentation_3D; 
+    modifiedData.processed.cells = segmentation_3D; 
+    indices = find(modifiedData.processed.cells > 0);
+    [tmpy, tmpx, tmpz] = ind2sub(size(modifiedData.processed.cells), indices);
+
+    % initialize container for center coordinates
+     centCoords = zeros(3,numel(indices));
+    % set return variables
+    centCoords(1,:) = tmpx;
+    centCoords(2,:) = tmpy;
+    centCoords(3,:) = tmpz;
+    modifiedData.processed.cellCoordinates = centCoords;
 end 
 
 registeredData = registerData( modifiedData.processed, p.resolution, modifiedData.registered.transformation_full, modifiedData.processed.ellipsoid, p.samples_cube);
@@ -146,6 +170,7 @@ modifiedData.registered.landmarkMIP = computeMIP(registeredData.landmark);
 modifiedData.registered.Dapi = registeredData.Dapi;
 modifiedData.registered.GFP = registeredData.GFP;
 modifiedData.registered.mCherry = registeredData.mCherry;
+modifiedData.registered.nucleiMIP = data.registered.nucleiMIP;
 
 close(box_handle);
 close(figHandle);

@@ -5,8 +5,11 @@ function [  ] = handleHeatmaps( accumulators,shells,numberOfResults, p )
 %% MAIN CODE
 
 option = p.option;
-
-channels = ["GFP", "DAPI", "mCherry"];
+if strcmp(p.mappingtype, 'Cells')
+    channels = ["Landmark", "Nuclei", "CellsOfInterest"];
+elseif strcmp(p.mappingtype, 'Tissue')
+    channels = ["Landmark", "Nuclei", "TissueOfInterest"];
+end
 mercatorProjections = cell(1,3);
 
 if option.heatmaps.saveAccumulator == 1
@@ -62,7 +65,8 @@ for j=1:3
     end
     
     % -- Compute heatmaps -- %
-    HMS = generateHeatmap(currentAccumulator,option.heatmaps.types);
+    %DISABLED FOR DEMO
+    %HMS = generateHeatmap(currentAccumulator,option.heatmaps.types);
     
     % -- fix paths in case we are generating for special channel --%
     heatmapsPath = strcat(p.resultsPath, "/heatmaps/", channels(j));
@@ -70,17 +74,17 @@ for j=1:3
         mkdir(heatmapsPath);
     end
     % Save heatmap structure HMS
-    if option.heatmaps.saveHMmat == 1
-        mat_name = strcat(heatmapsPath,"/","Heatmap_Structure.mat");
-        save(mat_name,'HMS');
-    end
+    %if option.heatmaps.saveHMmat == 1
+    %    mat_name = strcat(heatmapsPath,"/","Heatmap_Structure.mat");
+    %    save(mat_name,'HMS');
+    %end
     
     % Save accumulator
     if option.heatmaps.saveAccumulator == 1
         mat_name = strcat(heatmapsPath,"/","Accumulator.mat");
         save(mat_name,'currentAccumulator');
     end
-    
+    %{
     % -- Create the figures -- %
     vis = 'on';
     if option.heatmaps.disp == 0
@@ -132,7 +136,7 @@ for j=1:3
         disp('Cropper');
         gui_cropRegion(currentAccumulator,HMS.MIP.Top,200);
     end
-    
+    %}
     % CONVOLUTION
     sigma = 0.5; %default 0.5
     gaussian = fspecial('gaussian', [17 17], sigma);
@@ -164,26 +168,126 @@ for j=1:3
             maxi = tmp_max;
         end
     end
-    disp(['Maximum cell density in channel ' channels(j) ' channel for this experiment is: ' num2str(maxi)]);
+    %for debugging only
+    %disp(['Maximum cell density in channel ' channels(j) ' channel for this experiment is: ' num2str(maxi)]);
     %%%%% UNTIL HERE!
     
     % -- Save shell heatmaps -- %
-    f = figure;
+    f = figure('visible', 'off');
+    a = axes(f);
+    %f = figure(100);
     set(f,'color','none');
+   
     f.PaperUnits = 'inches';
     f.PaperPosition = [0 0 6 6];
+    pause(0.1);
+     set(0, 'CurrentFigure', f)
     
-    for i=1:size(mercatorProjections{j},3)
-        imagesc(mercatorProjections{j}(:,:,i),[0 maxi]); axis image; colorbar; axis off; colormap parula;
-        saveas(f,strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".png"),'png');
-        savefig(strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".fig"))
+    switch j
+        case 1 %GFP
+            for i=1:size(mercatorProjections{j},3)-1
+                imagesc(mercatorProjections{j}(:,:,i),'parent',a,[0 maxi]); axis image; colorbar(a); axis off; colormap(a,parula); title(a,[num2str(numberOfResults),' embryo(s)']);
+                pause(0.1)
+                text(a,1.25,0.5,'abundance', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'center');
+                text(a,-0.1,1,'\rightarrow Right', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'right');
+                text(a,-0.1,0,'Left \leftarrow', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'left');
+                text(a,0,-0.12,'Anterior \leftarrow', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'HorizontalAlignment', 'left');
+                text(a,1,-0.12,'\rightarrow Posterior', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'HorizontalAlignment', 'right');
+                saveas(f,strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".png"),'png');
+                savefig(strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".fig"))
+            end
+            imagesc(mercatorProjections{j}(:,:,size(mercatorProjections{j},3)),'parent',a,[0 maxi]); axis image; colorbar(a); axis off; colormap(a,parula); title(a,[num2str(numberOfResults),' embryo(s)']);
+            pause(0.1)
+            text(a,1.25,0.5,'abundance', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'center');
+            text(a,-0.1,1,'\rightarrow Right', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'right');
+            text(a,-0.1,0,'Left \leftarrow', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'left');
+            text(a,0,-0.12,'Anterior \leftarrow', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'HorizontalAlignment', 'left');
+            text(a,1,-0.12,'\rightarrow Posterior', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'HorizontalAlignment', 'right');
+            saveas(f,strcat(heatmapsPath,"/Heatmap_total.png"),'png');
+            savefig(strcat(heatmapsPath,"/Heatmap_total.fig"))
+    
+        case 2 %DAPI
+            for i=1:size(mercatorProjections{j},3)-1
+                imagesc(mercatorProjections{j}(:,:,i),'parent',a,[0 maxi]); axis image; colorbar(a); axis off; colormap(a,parula); title(a,[num2str(numberOfResults),' embryo(s), ',num2str(size(currentShell{i},2)),' cell(s)']);
+                pause(0.1)
+                text(a,1.25,0.5,'abundance', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'center');
+                text(a,-0.1,1,'\rightarrow Right', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'right');
+                text(a,-0.1,0,'Left \leftarrow', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'left');
+                text(a,0,-0.12,'Anterior \leftarrow', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'HorizontalAlignment', 'left');
+                text(a,1,-0.12,'\rightarrow Posterior', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'HorizontalAlignment', 'right');
+                saveas(f,strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".png"),'png');
+                savefig(strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".fig"))
+                if exist('writematrix','file') == 2
+                    writematrix(mercatorProjections{j}(:,:,i),strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".csv"));
+                else
+                    csvwrite(strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".csv"),mercatorProjections{j}(:,:,i));
+                end
+            end
+            imagesc(mercatorProjections{j}(:,:,size(mercatorProjections{j},3)),'parent',a,[0 maxi]); axis image; colorbar(a); axis off; colormap(a,parula); title(a,[num2str(numberOfResults),' embryo(s), ',num2str(size(currentShell{4},2)),' cell(s)']);
+            pause(0.1)
+            text(a,1.25,0.5,'abundance', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'center');
+            text(a,-0.1,1,'\rightarrow Right', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'right');
+            text(a,-0.1,0,'Left \leftarrow', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'left');
+            text(a,0,-0.12,'Anterior \leftarrow', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'HorizontalAlignment', 'left');
+            text(a,1,-0.12,'\rightarrow Posterior', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'HorizontalAlignment', 'right');
+            saveas(f,strcat(heatmapsPath,"/Heatmap_total.png"),'png');
+            savefig(strcat(heatmapsPath,"/Heatmap_total.fig"))
+            if exist('writematrix','file') == 2
+                    writematrix(mercatorProjections{j}(:,:,i),strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".csv"));
+            else
+                    csvwrite(strcat(heatmapsPath,"/Heatmap_total.csv", ".csv"),mercatorProjections{j}(:,:,i));
+            end
+            
+            
+        case 3 %mCherry
+            for i=1:size(mercatorProjections{j},3)-1
+                imagesc(mercatorProjections{j}(:,:,i),'parent',a,[0 maxi]); axis image; colorbar(a); axis off; colormap(a,parula);
+                if strcmp(p.mappingtype, 'Cells') 
+                    title(a,[num2str(numberOfResults),' embryo(s), ',num2str(size(currentShell{i},2)),' cell(s)']); 
+                else
+                    title(a,[num2str(numberOfResults),' embryo(s)']);
+                end
+                pause(0.1)
+                text(a,1.25,0.5,'abundance', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'center');
+                text(a,-0.1,1,'\rightarrow Right', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'right');
+                text(a,-0.1,0,'Left \leftarrow', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'left');
+                text(a,0,-0.12,'Anterior \leftarrow', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'HorizontalAlignment', 'left');
+                text(a,1,-0.12,'\rightarrow Posterior', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'HorizontalAlignment', 'right');
+                saveas(f,strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".png"),'png');
+                savefig(strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".fig"))
+                 if exist('writematrix','file') == 2
+                    writematrix(mercatorProjections{j}(:,:,i),strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".csv"));
+                else
+                    csvwrite(strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".csv"),mercatorProjections{j}(:,:,i));
+                end
+            end
+            imagesc(mercatorProjections{j}(:,:,size(mercatorProjections{j},3)),'parent',a,[0 maxi]); axis image; colorbar(a); axis off; colormap(a,parula);
+            if strcmp(p.mappingtype, 'Cells') 
+                    title(a,[num2str(numberOfResults),' embryo(s), ',num2str(size(currentShell{4},2)),' cell(s)']);
+                else
+                    title(a,[num2str(numberOfResults),' embryo(s)']);
+                end
+            pause(0.1)
+            text(a,1.25,0.5,'abundance', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'center');
+            text(a,-0.1,1,'\rightarrow Right', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'right');
+            text(a,-0.1,0,'Left \leftarrow', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'rotation', 90, 'HorizontalAlignment', 'left');
+            text(a,0,-0.12,'Anterior \leftarrow', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'HorizontalAlignment', 'left');
+            text(a,1,-0.12,'\rightarrow Posterior', 'Units', 'normalized', 'FontName', 'Arial', 'FontSize', 15, 'HorizontalAlignment', 'right');
+            saveas(f,strcat(heatmapsPath,"/Heatmap_total.png"),'png');
+            savefig(strcat(heatmapsPath,"/Heatmap_total.fig"))
+            if exist('writematrix','file') == 2
+                    writematrix(mercatorProjections{j}(:,:,i),strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".csv"));
+            else
+                    csvwrite(strcat(heatmapsPath,"/Heatmap_total.csv", ".csv"),mercatorProjections{j}(:,:,i));
+            end
     end
-    
+    close(f);
 end
 
 
 %% create combined heatmaps
-
+%DISABLED FOR DEMO
+%{
 % PGCs + landmark
 % -- Determine maximum value in all heatmaps for easier comparison -- %
 heatmapsPath = strcat(p.resultsPath, "/heatmaps/PGC+landmark");
@@ -210,5 +314,5 @@ for i=1:size(mercatorProjections{2},3)
     imagesc(fuse);
     saveas(f,strcat(heatmapsPath,"/shellHeatmap_", num2str(i), ".png"),'png');
 end
-
+%}
 end

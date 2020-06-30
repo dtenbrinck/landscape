@@ -31,19 +31,19 @@ if strcmp(scriptType,'processing') || strcmp(scriptType,'processing_dynamic')
   p = ParameterProcessing();
   
   % Select data path
-  p.dataPath = uigetdir(dataPath,'Please select a folder with the data!');
+  p.dataPath = uigetdir(dataPath,'Please select a folder with the data');
   btn = questdlg('Do you want to use an existing results folder or create a new one?','New folder?','Create new','Use existing','Create new');
   
   if strcmp(btn,'Create new')
-    p.resultsPath = uigetdir(resultsPath,'Please select a directory for the new folder!');
-    answ = inputdlg('Enter a name for the new folder!');
+    p.resultsPath = uigetdir(resultsPath,'Please select a directory for the new folder');
+    answ = inputdlg('Please enter a name for the new folder');
     p.resultsPath = [p.resultsPath,'/',answ{1}];
     mkdir(p.resultsPath);
   else
-    p.resultsPath = uigetdir(resultsPath,'Please select a folder for the results!');
+    p.resultsPath = uigetdir(resultsPath,'Please select a folder for the results');
   end
 elseif strcmp(scriptType,'evaluate')
-  resultsPath = uigetdir(resultsPath,'Please select a results folder to evaluate!');
+  resultsPath = uigetdir(resultsPath,'Please select a results folder to evaluate');
   checkDirectory(resultsPath);
   if exist([resultsPath,'/accepted/ParameterProcessing.mat'],'file') == 2
     load([resultsPath,'/accepted/ParameterProcessing.mat']);
@@ -52,7 +52,7 @@ elseif strcmp(scriptType,'evaluate')
   end
   p.resultsPath = resultsPath;
 elseif strcmp(scriptType,'heatmap')
-  resultsPath = uigetdir(resultsPath,'Please select a results folder to generate heatmap!');
+  resultsPath = uigetdir(resultsPath,'Please select a results folder to generate heatmap');
   if exist([resultsPath,'/accepted/ParameterProcessing.mat'],'file') == 2
     load([resultsPath,'/accepted/ParameterProcessing.mat']);
   else
@@ -64,7 +64,7 @@ elseif strcmp(scriptType,'heatmap')
     struct2cell(p)',struct2cell(p_heat)'];
   p = struct(merge{:});
   p.resultsPathAccepted = [p.resultsPath,'/accepted'];
-  save([p.resultsPath,'/accepted/ParameterHeatmap.mat'],'p_heat');
+  %save([p.resultsPath,'/accepted/ParameterHeatmap.mat'],'p_heat');
   
   if ~exist([p.resultsPath,'/heatmaps'],'dir')
     mkdir([p.resultsPath,'/heatmaps']);
@@ -73,7 +73,7 @@ elseif strcmp(scriptType,'heatmap')
 elseif strcmp(scriptType,'heatmapComparison')
   
   % get first directory
-  resultsPath1 = uigetdir(resultsPath,'Please select first results folder to generate heatmap!');
+  resultsPath1 = uigetdir(resultsPath,'Please select first results folder to generate heatmap');
   if exist([resultsPath1,'/accepted/ParameterProcessing.mat'],'file') == 2
     load([resultsPath1,'/accepted/ParameterProcessing.mat']);
     p1 = p;
@@ -93,7 +93,7 @@ elseif strcmp(scriptType,'heatmapComparison')
   %save([p1.resultsPath1,'/accepted/ParameterHeatmap.mat'],'p_heat');
   
   % get second directory
-  resultsPath2 = uigetdir(resultsPath,'Please select second results folder to generate heatmap!');
+  resultsPath2 = uigetdir(resultsPath,'Please select second results folder to generate heatmap');
   if exist([resultsPath2,'/accepted/ParameterProcessing.mat'],'file') == 2
     load([resultsPath2,'/accepted/ParameterProcessing.mat']);
     p2 = p;
@@ -111,12 +111,12 @@ elseif strcmp(scriptType,'heatmapComparison')
   % ask for results folder
   btn = questdlg('Do you want to use an existing results folder or create a new one?','New folder?','Create new','Use existing','Create new');
   if strcmp(btn,'Create new')
-    p3.resultsPath = uigetdir(resultsPath,'Please select a directory for the new folder!');
-    answ = inputdlg('Enter a name for the new folder!');
+    p3.resultsPath = uigetdir(resultsPath,'Please select a directory for the new folder');
+    answ = inputdlg('Please enter a name for the new folder');
     p3.resultsPath = [p3.resultsPath,'/',answ{1}];
     mkdir(p3.resultsPath);
   else
-    p3.resultsPath = uigetdir(resultsPath,'Please select a folder for the results!');
+    p3.resultsPath = uigetdir(resultsPath,'Please select a folder for the results');
   end
   
   % wrap variables for output

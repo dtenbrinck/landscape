@@ -40,6 +40,8 @@ gatheredData.processed.cellsMIP = computeMIP(processedData.cells);
 gatheredData.processed.cellCoordinates = processedData.cellCoordinates;
 if isfield(processedData, 'nuclei') % check for backward compatibilty
     gatheredData.processed.nucleiMIP = computeMIP(processedData.nuclei);
+elseif isfield(processedData, 'nucleiMIP')
+    gatheredData.processed.nucleiMIP = processedData.nucleiMIP;
 end
 
 % important registered data
@@ -67,6 +69,8 @@ if isfield(registeredData, 'nucleiCoordinates') % check for backward compatibilt
 end
 if isfield(registeredData, 'nuclei') % check for backward compatibilty
     gatheredData.registered.nucleiMIP = computeMIP(registeredData.nuclei);
+elseif isfield(registeredData, 'nucleiMIP')
+    gatheredData.registered.nucleiMIP = registeredData.nucleiMIP;
 end
 save(results_filename,'gatheredData');
 end

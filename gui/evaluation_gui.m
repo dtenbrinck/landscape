@@ -40,7 +40,7 @@ while result < numberOfResults
     % ask user to decide what to do with the results
     choice = questdlg(['What do you want to do with the results of dataset ' gatheredData.filename '?'], ...
         'Decision on results', ...
-        'Accept','Improve','Reject','Accept');
+        'Accept','Improve', 'Reject','Accept');
     
     % Handle response
     switch choice
@@ -48,13 +48,18 @@ while result < numberOfResults
             fprintf('\t -> Accepted!\n');
             movefile([p.resultsPath '/' fileNames{result,1}], [p.resultsPath '/accepted/' fileNames{result,1}]);
         case 'Improve'
-            modifiedData = gui_manualSegmentation(gatheredData,p);
+            
+            if strcmp(p.mappingtype, "Cells")
+                modifiedData = gui_manualSegmentation(gatheredData,p,'cells');
+            elseif strcmp(p.mappingtype, "Tissue")
+                modifiedData = gui_manualSegmentation(gatheredData,p,'tissue');
+            end
+            
             if isempty(modifiedData)
               fprintf('\t -> Improvement aborted!\n');
               result = result - 1; % adjust for another try
               continue;
             end
-            %save([p.resultsPath,'/',fileNames{result,1}], 'gatheredData');
             modifiedData.experiment.filename = modifiedData.filename;
             saveResults(modifiedData.experiment, modifiedData.processed, modifiedData.registered,...
                         modifiedData.processed.ellipsoid, modifiedData.registered.transformation_normalization, modifiedData.registered.transformation_rotation,...
@@ -78,5 +83,8 @@ if exist('aborted','var')
 else
   disp('All results in folder processed!');
 end
-close 2;
+
+figHandles = findobj('type', 'figure', '-not', 'name', 'Landscape');
+close(figHandles);
+
 end

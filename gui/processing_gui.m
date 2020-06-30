@@ -1,12 +1,12 @@
 function processing_gui(p)
 
+%% PREPARE RESULTS DIRECTORY
 checkDirectory(p.resultsPath);
-
 
 %% LOAD DATA
 
 % get filenames of STK / TIF files in selected folder
-fileNames = getSTKfilenames(p.dataPath);
+fileNames = getTIFfilenames(p.dataPath);
 
 % extract only valid experiments with three data sets
 allValidExperiments = checkExperimentChannels(fileNames);
@@ -26,8 +26,7 @@ delete(gcp('nocreate'));
 if p.debug_level <= 1 && p.visualization == 0
        parpool;
 end
-%par
-for experiment=1:numberOfExperiments
+parfor experiment=1:numberOfExperiments
     
     % show remotecurrent experiment number
     dispCounter(experiment, numberOfExperiments);
@@ -40,27 +39,30 @@ for experiment=1:numberOfExperiments
         % preprocess and rescale data
         if p.debug_level >= 1; disp('Preprocessing data...'); end
         %Zebrafish:
+        if strcmp(p.datatype, 'Zebrafish')
         processedData = preprocessData(experimentData, p);
         %Drosophila Heatmap (the following is needed if the datasets do not  have the same sizes.Maybe put this into function preprocessData?):
-        %processedData_originalsize = preprocessData(experimentData, p); 
         
         
+        elseif strcmp(p.datatype, 'Drosophila')
+        processedData_originalsize = preprocessData(experimentData, p); 
         %for Drosophila Heatmap, delete later
-        %processedData.filename = processedData_originalsize.filename;
-        %processedData.Dapi = zeros(675, 1350, size(processedData_originalsize.Dapi, 3)); 
-        %processedData.GFP = zeros(675, 1350, size(processedData_originalsize.Dapi, 3));
-        %processedData.mCherry = zeros(675, 1350, size(processedData_originalsize.Dapi, 3));
-        %for i = 1:size(processedData.Dapi, 3)  
-           %processedData.Dapi(1:size(processedData_originalsize.Dapi,1),1:size(processedData_originalsize.Dapi,2),i) = processedData_originalsize.Dapi(:,:,i);
-        %end
+        processedData.filename = processedData_originalsize.filename;
+        processedData.Dapi = zeros(675, 1350, size(processedData_originalsize.Dapi, 3)); 
+        processedData.GFP = zeros(675, 1350, size(processedData_originalsize.Dapi, 3));
+        processedData.mCherry = zeros(675, 1350, size(processedData_originalsize.Dapi, 3));
+        for i = 1:size(processedData.Dapi, 3)  
+           processedData.Dapi(1:size(processedData_originalsize.Dapi,1),1:size(processedData_originalsize.Dapi,2),i) = processedData_originalsize.Dapi(:,:,i);
+        end
         
-        %for i = 1:size(processedData.Dapi, 3)  
-           %processedData.GFP(1:size(processedData_originalsize.Dapi,1),1:size(processedData_originalsize.Dapi,2),i) = processedData_originalsize.GFP(:,:,i);
-        %end
+        for i = 1:size(processedData.Dapi, 3)  
+           processedData.GFP(1:size(processedData_originalsize.Dapi,1),1:size(processedData_originalsize.Dapi,2),i) = processedData_originalsize.GFP(:,:,i);
+        end
         
-        %for i = 1:size(processedData.Dapi, 3)  
-           %processedData.mCherry(1:size(processedData_originalsize.Dapi,1),1:size(processedData_originalsize.Dapi,2),i) = processedData_originalsize.mCherry(:,:,i);
-        %end
+        for i = 1:size(processedData.Dapi, 3)  
+           processedData.mCherry(1:size(processedData_originalsize.Dapi,1),1:size(processedData_originalsize.Dapi,2),i) = processedData_originalsize.mCherry(:,:,i);
+        end
+        end
         
         % segment data
         if p.debug_level >= 1; disp('Segmenting GFP channel...'); end

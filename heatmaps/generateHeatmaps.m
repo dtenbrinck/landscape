@@ -1,6 +1,12 @@
 function generateHeatmaps(p)
 %% GET FILES TO PROCESS
 
+if isfile([p.resultsPath, '/AllAccumulators.mat'])
+    load([p.resultsPath, '/AllAccumulators.mat']);
+    handleHeatmaps(accumulators,shells,numberOfResults,p);
+    return
+end
+
 % Get filenames of MAT files in selected folder
 fileNames = getMATfilenames(p.resultsPathAccepted);
 fileNames(strcmp(fileNames,'ParameterProcessing.mat')) = [];
@@ -19,7 +25,7 @@ if numberOfResults == 0
     disp(resultsPathAccepted);
     return;
 else
-    disp([ num2str(numberOfResults) ' results found in folder for generating heat map.']);
+    disp([ num2str(numberOfResults) ' results found in folder for generating heatmap.']);
 end
 
 %% GET DATA SIZE FOR ACCUMULATOR
@@ -56,8 +62,8 @@ mCherry_accumulator = computeAccumulator(PGC_coords_grid, p.gridSize);
 [minRadius, maxRadius] = computeLandmarkShell(p, fileNames, numberOfResults);
 
 % TESTING for thicker shells
-%minRadius = minRadius - 0.0;
-%maxRadius = maxRadius + 0.0;
+minRadius = minRadius - 0.0;
+maxRadius = maxRadius + 0.0;
 
 if p.equalSizedShells == true
     %% NEW APPROACH: SHELLS WITH EQUAL SIZE
