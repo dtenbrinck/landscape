@@ -11,7 +11,7 @@ addpath([root_dir '/parameter_setup/']);
 p = initializeScript('heatmap', root_dir);
 
 % define ration of random data
-percOfAll = 0.5;
+percOfAll = 0.3;
 
 % define paths to heatmaps to be compared
 result_path = [p.resultsPath,'/'];

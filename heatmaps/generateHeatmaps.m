@@ -52,9 +52,9 @@ load([p.resultsPathAccepted,'/',fileNames{1,1}]);
 %hold off;
 
 % -- Compute the Accumulator from the cell coordinates -- %
-GFP_accumulator = computeAccumulator(landmark_coords_grid, p.gridSize);
-DAPI_accumulator = computeAccumulator(nuclei_coords_grid, p.gridSize);
-mCherry_accumulator = computeAccumulator(PGC_coords_grid, p.gridSize);
+GFP_accumulator = computeAccumulator(landmark_coords_grid, p);
+DAPI_accumulator = computeAccumulator(nuclei_coords_grid, p);
+mCherry_accumulator = computeAccumulator(PGC_coords_grid, p);
 
 %clear landmark_coords_grid, nuclei_coords_grid, PGC_coords_grid;
 

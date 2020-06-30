@@ -24,9 +24,6 @@ allValidExperiments = checkExperimentChannels(fileNames);
 % get number of experiments
 numberOfExperiments = size(allValidExperiments,1);
 
-% adjust resolution according to scale parameter
-p.resolution(1:2) = p.resolution(1:2) / p.scale;
-
 %% MAIN LOOP
 
 fprintf('Processing dataset:'); 
@@ -51,12 +48,12 @@ for experiment=1:numberOfExperiments
         if p.debug_level >= 1; disp('Preprocessing data...'); end
         %Zebrafish:
         if strcmp(p.datatype, 'Zebrafish')
-        processedData = preprocessData(experimentData, p);
+        [processedData, p] = preprocessData(experimentData, p);
         %Drosophila Heatmap (the following is needed if the datasets do not  have the same sizes.Maybe put this into function preprocessData?):
         
         
         elseif strcmp(p.datatype, 'Drosophila')
-        processedData_originalsize = preprocessData(experimentData, p); 
+        [processedData_originalsize, p] = preprocessData(experimentData, p); 
         %for Drosophila Heatmap, delete later
         processedData.filename = processedData_originalsize.filename;
         processedData.Dapi = zeros(675, 1350, size(processedData_originalsize.Dapi, 3)); 

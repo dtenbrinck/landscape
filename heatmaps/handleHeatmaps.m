@@ -45,7 +45,19 @@ for j=1:3
     
     % -- Convolve over the points -- %
     % TODO: Different settings per channel
-    %convAcc = convolveAccumulator(accumulator,option.cellradius,2*option.cellradius+1);
+    % convAcc = convolveAccumulator(accumulator,option.cellradius,2*option.cellradius+1); 
+    %
+    % better: Gauss filter
+    %cellDiameter = p.cellDiameter;
+    %cellDiameter = p.gridSize(1)/p.scaledDataSize(1) * cellDiameter; %problem: accumulator/heatmap is a square while data is not. TODO: adjust accumulator/heatmap size to data size
+    %sigma = cellDiameter/(2*sqrt(2*log(2))); 
+    %for i=1:size(currentAccumulator,3)
+         %currentAccumulator(:,:,i) = imgaussfilt(currentAccumulator(:,:,i), sigma); 
+         
+           %normalize for relative measures
+        %currentAccumulator(:,:,i) = currentAccumulator(:,:,i) ./ sum(currentAccumulator(:));
+    %end
+   
     
     % -- Compute mercator projections -- %
     mercatorProjections{j} = computeMercatorProjections(currentShell, option.shellHeatmapResolution);
@@ -137,15 +149,21 @@ for j=1:3
         gui_cropRegion(currentAccumulator,HMS.MIP.Top,200);
     end
     %}
-    % CONVOLUTION
-    sigma = 0.5; %default 0.5
-    gaussian = fspecial('gaussian', [17 17], sigma);
-    %gaussian = gaussian(9,:);
-    %gaussian = gaussian./(sum(gaussian(:)));
+       
+    %CONVOLUTION 
+    
+    try
+        cellDiameter = p.cellDiameter;
+        cellDiameter = p.option.shellHeatmapResolution(1)/p.scaledDataSize(1) * cellDiameter; %problem: accumulator/heatmap is a square while data is not. TODO: adjust accumulator/heatmap size to data size
+        sigma = cellDiameter/(2*sqrt(2*log(2)));
+    catch
+        sigma = 0.5; %default
+    end 
+    
     for i=1:size(mercatorProjections{j},3)
-         mercatorProjections{j}(:,:,i) = imfilter(mercatorProjections{j}(:,:,i),gaussian,'replicate');
+         mercatorProjections{j}(:,:,i) = imgaussfilt(mercatorProjections{j}(:,:,i), sigma); 
          
-         % normalize for relative measures
+         %normalize for relative measures
          mercatorProjections{j}(:,:,i) = mercatorProjections{j}(:,:,i) ./ sum(currentAccumulator(:));
     end
     

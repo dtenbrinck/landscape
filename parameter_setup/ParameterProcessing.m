@@ -9,7 +9,7 @@ p.datatype = 'Zebrafish'; %Zebrafish or Drosophila
 
 %% COMMON PARAMETER
 if strcmp(p.datatype, 'Zebrafish')
-    p.resolution = [1.29,1.29,7.2639]; %1.29,1.29,10 default settings for SD 0.32,0.32,5 for Drosophila
+    p.resolution = [1.29,1.29,10]; %1.29,1.29,10 default settings for SD 0.32,0.32,5 for Drosophila
 elseif strcmp(p.datatype, 'Drosophila')
     p.resolution = [0.32,0.32,5];
 end
@@ -17,6 +17,16 @@ end
 p.scale = 0.75;
 p.scaleAllDim = 0;
 
+% adjust resolution according to scale parameter
+p.resolution(1:2) = p.resolution(1:2) / p.scale;
+
+if strcmp(p.datatype, 'Zebrafish')
+    p.cellDiameter = 22; %22 in um
+elseif strcmp(p.datatype, 'Drosophila')
+    p.cellDiameter = 22; %TODO: What is Drosophila cell diameter?
+end
+% adjust cell diameter from um to pixels
+p.cellDiameter = p.cellDiameter/(p.resolution(1));
 
 % Debug variables
 p.debug_level = 1; %1

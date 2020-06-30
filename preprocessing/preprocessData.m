@@ -1,4 +1,4 @@
-function [ data ] = preprocessData( data, p )
+function [ data, p ] = preprocessData( data, p )
 % PREPROCESSDATA: This function preprocesses the data struct. 
 % It will remove the background, rescale the slices and normalize it.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -19,6 +19,8 @@ end
 % Normalize data
 data = normalizeData(data);
 
+% Save size of resized data for late
+p.scaledDataSize = [size(data.GFP,1),size(data.GFP,2),size(data.GFP,3)];
 
 end
 

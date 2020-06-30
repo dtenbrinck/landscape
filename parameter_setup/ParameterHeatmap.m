@@ -3,21 +3,10 @@ function p =  ParameterHeatmap()
 % This file contains all parameters needed for the heatmap script with
 % discriptions of each parameter. 
 
-datatype = 'Drosophila';
+datatype = 'Zebrafish';
+dynamicHeatmapsize = 'true'; % will consider the original data size
 
 %% COMMON PARAMETER
-
-% -- SIZE OF CELL IN THE GRID DOMAIN -- %
-%  !!! Not working because not elaborated enough !!! %
-% Size of the cells
-p.sizeCells = 20; %um
-% Size of the Pixel
-if strcmp(datatype, 'Zebrafish')
-    p.sizeOfPixel = 1.29; %um 1.29 Zebrafish
-elseif strcmp(datatype, 'Drosophila')
-    p.sizeOfPixel = 0.32;
-end
-p.sizeCellsPixel = round(p.sizeCells/p.sizeOfPixel);
 
 % -- PROCSESSING OF THE CELLS -- %
 % Tolerance for the cell to be outside of the sphere. Cells with norm
@@ -27,7 +16,9 @@ p.tole = 0.5;
 
 % Grid size of the accumulator: 
 % size(accumulator) = [gridSize,gridSize,gridSize];
-if strcmp(datatype, 'Zebrafish')
+if strcmp(dynamicHeatmapsize, 'true')
+    p.gridSize = [255;255;255]; % Enter the same value for each direction! The value will be the minimum pixel size for each direction. Size will adjust to original data size.
+elseif strcmp(datatype, 'Zebrafish')
     p.gridSize = [255;255;255]; %255
 elseif strcmp(datatype, 'Drosophila')
     p.gridSize = [510;255;255];
@@ -49,19 +40,6 @@ p.equalSizedShells = false;
 p.extractProfileLines = false;
 
 %% OPTIONS FOR THE HEATMAP HANDLER -- %
-% The cellradius in pixels in the sampled p.gridSize space.
-% So this needs to be changed to depending on gridSize.
-% The cell will be cellradius*2 pixels big. 
-% !!! NEED A BETTER APPROACH !!! %
-% Default: 5 with gridSize = 256
-if strcmp(datatype, 'Zebrafish')
-    p.option.cellradius = 7;  %for mCherry, Zebrafish:7  Dros:3
-elseif strcmp(datatype, 'Drosophila')
-    p.option.cellradius = 3;
-end
-% cell radius for nuclei cells in DAPI channel
-% Default: 2 with gridSize = 256
-%p.option.dapiCellradius = 1;
 
 % - Slider options - %
 % Will show the Slider 
@@ -80,6 +58,8 @@ p.option.shellThickness = 0.12;%0.0608;
 p.option.shellShiftWidth = 0.01;
 
 % Resolution for the shell heatmap in pixels
+if strcmp(dynamicHeatmapsize, 'true')
+    p.option.shellHeatmapResolution = [90, 90]; % Enter the same value for each direction! The value will be the minimum pixel size for each direction. Size will adjust to original data size.
 if strcmp(datatype, 'Zebrafish')
     p.option.shellHeatmapResolution = [90, 90]; %(old:256,256 default) Zebrafish: 90,90, Dros 90,180
 elseif strcmp(datatype, 'Drosophila')
