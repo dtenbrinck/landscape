@@ -26,11 +26,11 @@ options = optimoptions('fmincon','Display','off','Algorithm','sqp'); % 'StepTole
 [pstar,vstar] ...
         = sphericalRegression3D_daniel(regData,[0;0;-1],[1;0;0],options,visualize);
 
-%check if orientation of GC is counter clockwise
-%if pstar(3) > 0 %Drosophila
-if pstar(3) < 0 %Zebrafish    
-    if vstar(1) < 0
-    vstar = - vstar;
+ % Check if orientation of Great Circle is counter clockwise and change direction if needed 
+if pstar(3) < 0 % >0 Drosophila TODO: why? use parameter to change this
+    if vstar(1) < 0 
+        vstar = -vstar;
+
     end
 elseif pstar(3) > 0
     if vstar(1) > 0
