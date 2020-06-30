@@ -19,6 +19,14 @@ p.scaleAllDim = 0;
 % adjust resolution according to scale parameter
 p.resolution(1:2) = p.resolution(1:2) / p.scale;
 
+if strcmp(p.datatype, 'Zebrafish')
+    p.cellDiameter = 22; %22 in um
+elseif strcmp(p.datatype, 'Drosophila')
+    p.cellDiameter = 22; %TODO: What is Drosophila cell diameter?
+end
+% adjust cell diameter from um to pixels
+p.cellDiameter = p.cellDiameter/(p.resolution(1));
+
 % Debug variables
 p.debug_level = 1; %1
 p.visualization = 0; %0
@@ -68,13 +76,13 @@ p.ellipsoidFitting.descentMethod = 'cg'; % 'grad'
 
 if strcmp(p.datatype, 'Zebrafish')
     p.ellipsoidFitting.regularisationParams.mu0 = 10^-7; %10^8 for old dapi segmentation %now 10^-7 %Drosoph: 10^-4 
-    p.ellipsoidFitting.regularisationParams.mu1 = 10^-4; %2*10â?»4 old % 0.002 for old dapi segmentation  %now1*10^-4 Drosoph: 0.008
+    p.ellipsoidFitting.regularisationParams.mu1 = 10^-4; %2*10ï¿½?ï¿½4 old % 0.002 for old dapi segmentation  %now1*10^-4 Drosoph: 0.008
     p.ellipsoidFitting.regularisationParams.mu2 = 1; %1 
     p.ellipsoidFitting.regularisationParams.gamma = 1;
     p.ellipsoidFitting.pcaType = 'Zebrafish';
 elseif strcmp(p.datatype, 'Drosophila')
     p.ellipsoidFitting.regularisationParams.mu0 = 10^-4; %10^8 for old dapi segmentation %now 10^-7 %Drosoph: 10^-4 
-    p.ellipsoidFitting.regularisationParams.mu1 = 0.008; %2*10â?»4 old % 0.002 for old dapi segmentation  %now1*10^-4 Drosoph: 0.008
+    p.ellipsoidFitting.regularisationParams.mu1 = 0.008; %2*10ï¿½?ï¿½4 old % 0.002 for old dapi segmentation  %now1*10^-4 Drosoph: 0.008
     p.ellipsoidFitting.regularisationParams.mu2 = 1; %1 
     p.ellipsoidFitting.regularisationParams.gamma = 1;
     p.ellipsoidFitting.pcaType = 'Drosophila';
@@ -101,23 +109,16 @@ elseif strcmp(p.datatype, 'Drosophila')
 end
 
 
-
 %---------------------------------------------------------------------------
 
 
-%% COMMON PARAMETER
+%% PARAMETERS HEATMAP SCRIPT
+% This section contains all parameters needed for the heatmap script with
+% discriptions of each parameter. 
 
-% -- SIZE OF CELL IN THE GRID DOMAIN -- %
-%  !!! Not working because not elaborated enough !!! %
-% Size of the cells
-p.sizeCells = 20; %um
-% Size of the Pixel
-if strcmp(p.datatype, 'Zebrafish')
-    p.sizeOfPixel = 1.29; %um 1.29 Zebrafish
-elseif strcmp(p.datatype, 'Drosophila')
-    p.sizeOfPixel = 0.32;
-end
-p.sizeCellsPixel = round(p.sizeCells/p.sizeOfPixel);
+p.dynamicHeatmapsize = 'true'; % will consider the original data size
+
+%% COMMON PARAMETER
 
 % -- PROCSESSING OF THE CELLS -- %
 % Tolerance for the cell to be outside of the sphere. Cells with norm
@@ -126,12 +127,14 @@ p.sizeCellsPixel = round(p.sizeCells/p.sizeOfPixel);
 p.tole = 0.5;
 
 % Grid size of the accumulator: 
-if strcmp(p.datatype, 'Zebrafish')
+% size(accumulator) = [gridSize,gridSize,gridSize];
+if strcmp(p.dynamicHeatmapsize, 'true')
+    p.gridSize = [255;255;255]; % Enter the same value for each direction! The value will be the minimum pixel size for each direction. Size will adjust to original data size.
+elseif strcmp(datatype, 'Zebrafish')
     p.gridSize = [255;255;255]; %255
-elseif strcmp(p.datatype, 'Drosophila')
+elseif strcmp(datatype, 'Drosophila')
     p.gridSize = [510;255;255];
-end
-% Select a given number of random filnames
+end% Select a given number of random filnames
 p.random = 0;
 
 % Select number of random filenames and process them
@@ -217,6 +220,4 @@ p.option.heatmaps.scaled = 'both';
 % the value indicates the percentage of of found cells in this area considering the total number of results
 p.referenceLandmark.percentage = 0.5; 
 
-
-p.dynamicHeatmapsize = 'true';
 end

@@ -1,4 +1,4 @@
-function [  ] = handleHeatmaps( accumulators,shells,numberOfResults, p )
+function [  ] = handleHeatmaps( accumulators,shells, origSize_px, numberOfResults, p )
 % This function will handle the heatmaps. It will compute and show
 % different heatmaps depending on the given options in 'option'.
 
@@ -154,9 +154,10 @@ for j=1:3
     
     try
         cellDiameter = p.cellDiameter;
-        cellDiameter = p.option.shellHeatmapResolution(1)/p.scaledDataSize(1) * cellDiameter; %problem: accumulator/heatmap is a square while data is not. TODO: adjust accumulator/heatmap size to data size
+        cellDiameter = p.option.shellHeatmapResolution(1)/origSize_px(1) * cellDiameter; %problem: accumulator/heatmap is a square while data is not. TODO: adjust accumulator/heatmap size to data size
         sigma = cellDiameter/(2*sqrt(2*log(2)));
     catch
+        disp('Cell diameter not found because you are using old data. Using standard settings. ')
         sigma = 0.5; %default
     end 
     

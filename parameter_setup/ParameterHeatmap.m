@@ -4,7 +4,7 @@ function p =  ParameterHeatmap()
 % discriptions of each parameter. 
 
 datatype = 'Zebrafish';
-dynamicHeatmapsize = 'true'; % will consider the original data size
+p.dynamicHeatmapsize = 'true'; % will consider the original data size
 
 %% COMMON PARAMETER
 
@@ -16,7 +16,7 @@ p.tole = 0.5;
 
 % Grid size of the accumulator: 
 % size(accumulator) = [gridSize,gridSize,gridSize];
-if strcmp(dynamicHeatmapsize, 'true')
+if strcmp(p.dynamicHeatmapsize, 'true')
     p.gridSize = [255;255;255]; % Enter the same value for each direction! The value will be the minimum pixel size for each direction. Size will adjust to original data size.
 elseif strcmp(datatype, 'Zebrafish')
     p.gridSize = [255;255;255]; %255

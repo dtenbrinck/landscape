@@ -19,7 +19,7 @@ end
 % Normalize data
 data = normalizeData(data);
 
-% Save size of resized data for late
+% Save size of resized data for later
 p.scaledDataSize = [size(data.GFP,1),size(data.GFP,2),size(data.GFP,3)];
 
 end

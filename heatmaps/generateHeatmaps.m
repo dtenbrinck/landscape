@@ -32,9 +32,29 @@ end
 
 % Load first data set
 load([p.resultsPathAccepted,'/',fileNames{1,1}]);
+% Original data size (in px and um)
+ origSize_px = gatheredData.processed.size;
+ origSize_um = origSize_px .* p.resolution;
+ 
+% adjust grid size and resolution of Mercator projection for dynamic Heatmap size 
+try 
+    dynamicHeatmapsize = p.dynamicHeatmapsize;
+catch 
+    dynamicHeatmapsize = 'false'; % in old versions this parameter did not exist
+end
 
-% Original data size (in mu)
-% origSize = gatheredData.processed.originalSize;
+if strcmp(dynamicHeatmapsize, 'true')
+     M = min(origSize_um); % find the shortest side of the image
+     for i = 1:3 
+        ratio = origSize_um(i)/M; % calculate ratios of the others sides to the shortest side
+        p.gridSize(i) = round(ratio*p.gridSize(i)); % adjust gridSize of accumulator according to ratio
+     end
+     M = min(origSize_um(1:2)); % find the shortest side of the image (excluding z direction for mercator projection)
+     for i = 1:2 
+        ratio = origSize_um(i)/M; % calculate ratios of the others sides to the shortest side
+        p.option.shellHeatmapResolution(i) = round(ratio*p.option.shellHeatmapResolution(i)); % adjust resolution of Mercator Projection according to ratio
+     end    
+end
 
 %%% TODO: refactor code in this file to make pipeline more generic!
 
@@ -252,7 +272,7 @@ accumulators.mCherry = mCherry_accumulator;
 % end
 
 %% HANDLE HEATMAPS ( Computation, drawing and saving )
-handleHeatmaps(accumulators,shells,numberOfResults,p);
+handleHeatmaps(accumulators,shells, origSize_px,numberOfResults, p);
 
 %% USER OUTPUT
 disp('All results in folder processed!');
