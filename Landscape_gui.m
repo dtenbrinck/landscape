@@ -4,35 +4,41 @@ close all;
 
 gui_figure = figure('Visible', 'off', 'Position', [200,400,900,500], 'MenuBar', 'None', 'NumberTitle', 'off');
 
-%set the standard settings here
-global changes
-changes.datatype = 'Zebrafish';
-changes.resolution = [1.29,1.29,10];
-changes.mCherryseg.cellSize = 50;
-
-changes.ellipsoidFitting.regularisationParams.mu0 = 10^-7;
-changes.ellipsoidFitting.regularisationParams.mu1 = 10^-4;
-changes.ellipsoidFitting.regularisationParams.mu2 = 1;
-changes.ellipsoidFitting.pcaType = 'Zebrafish';
-changes.reg.characteristicWeight = 0;
-changes.reg.reference_point = [-1;0;0];
-changes.reg.reference_vector = [0;0;-1];
-changes.samples_cube = [256,256,256];
-
-changes.gridSize = [255;255;255];
-changes.option.cellradius = 7;
-changes.option.shellHeatmapResolution = [90,90];
-changes.option.heatmaps.disp = 0;
-
-changes.mappingtype = 'Cells';
-changes.rmgb.mCherryDiskSize = 11;
-
 
 root_dir = pwd;
+% add necessary folders
+addpath([root_dir '/auxiliary/']);
+addpath([root_dir '/fitting/']);
+addpath([root_dir '/gui/']);
+addpath([root_dir '/heatmaps/']);
+addpath([root_dir '/io/']);
+addpath([root_dir '/preprocessing/']);
+addpath([root_dir '/registration/']);
+addpath(genpath([root_dir '/segmentation/']));
+addpath([root_dir '/visualization/']);
+
 addpath([root_dir '/parameter_setup/']);
 addpath([root_dir '/gui/']);
 
+%set up standard parameters
+global p
+p = ParameterTotal();
 
+% set default search path for data
+if exist('/media/piradmin/4TB/data/Landscape/Static','dir') == 7
+  dataPath = '/media/piradmin/4TB/data/Landscape/Static';
+else % in case the above folders don't exist take the current directory
+  dataPath = [root_dir '/data'];
+end
+% set default search path for results
+if exist('/media/piradmin/4TB/data/Landscape/Static','dir') == 7
+  resultsPath = '/media/piradmin/4TB/data/Landscape/Static/results';
+else % in case the above folders don't exist take the current directory
+  resultsPath = [root_dir '/results'];
+end
+
+
+%%Buttons and UI Elements
 button_settings = uicontrol('Style', 'pushbutton', ...
     'String', 'Settings', ...
     'FontName', 'Arial', ...
@@ -94,18 +100,22 @@ movegui(gui_figure,'center')
 gui_figure.Visible = 'on';
 
 
-
-   %functions for the buttons
+%%Functions for buttons
     function button_processing_callback(source, eventdata)
         box_status.String = 'Registering...';
         
         try
-            p = initializeScript('processing', root_dir);
-        
-            p = adjustParameters(p, changes);
-            p = rmfield(p, 'gridSize');
-            p = rmfield(p, 'option');
-            p = rmfield(p, 'sizeOfPixel');
+            p.dataPath = uigetdir(dataPath,'Please select a folder with the data');
+            btn = questdlg('Do you want to use an existing results folder or create a new one?','New folder?','Create new','Use existing','Create new');
+  
+            if strcmp(btn,'Create new')
+                p.resultsPath = uigetdir(resultsPath,'Please select a directory for the new folder');
+                answ = inputdlg('Please enter a name for the new folder');
+                p.resultsPath = [p.resultsPath,'/',answ{1}];
+                mkdir(p.resultsPath);
+            else
+                p.resultsPath = uigetdir(resultsPath,'Please select a folder for the results');
+            end
         
         
             processing_gui(p);
@@ -120,10 +130,8 @@ gui_figure.Visible = 'on';
         box_status.String = 'Evaluating...';
         
         try
-            p = initializeScript('evaluate', root_dir);
-            old_resolution = p.resolution;
-            p = adjustParameters(p, changes);
-            p.resolution = old_resolution;
+            p.resultsPath = uigetdir(resultsPath,'Please select a results folder to evaluate');
+            checkDirectory(p.resultsPath);
         
             evaluation_gui(p);
         catch ME
@@ -137,9 +145,11 @@ gui_figure.Visible = 'on';
         box_status.String = 'Visualizing...';
         
         try
-            p = initializeScript('heatmap', root_dir);
-        
-            p = adjustParameters(p, changes);
+            p.resultsPath = uigetdir(resultsPath,'Please select a results folder to generate heatmap');
+            p.resultsPathAccepted = [p.resultsPath,'/accepted'];
+            if ~exist([p.resultsPath,'/heatmaps'],'dir')
+                mkdir([p.resultsPath,'/heatmaps']);
+            end
         
             generateHeatmaps(p);
         catch ME

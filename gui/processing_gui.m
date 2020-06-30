@@ -14,9 +14,6 @@ allValidExperiments = checkExperimentChannels(fileNames);
 % get number of experiments
 numberOfExperiments = size(allValidExperiments,1);
 
-% adjust resolution according to scale parameter
-p.resolution(1:2) = p.resolution(1:2) / p.scale;
-
 %% MAIN LOOP
 
 fprintf('Processing dataset:'); 
