@@ -21,12 +21,12 @@ fprintf('Processing dataset:');
 % process all existing data in parallel
 
 if p.debug_level <= 1 && p.visualization == 0 && p.parallelpool ==1
-    M = Inf;
+    maximumNumberOfWorkers = Inf;
 else
-    M = 0;
+    maximumNumberOfWorkers = 0;
 end
 
-parfor (experiment=1:numberOfExperiments,M)
+parfor (experiment=1:numberOfExperiments,maximumNumberOfWorkers)
     
     % show remotecurrent experiment number
     dispCounter(experiment, numberOfExperiments);
