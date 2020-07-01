@@ -30,6 +30,7 @@ p.cellDiameter = p.cellDiameter/(p.resolution(1));
 % Debug variables
 p.debug_level = 1; %1
 p.visualization = 0; %0
+p.parallelpool = 1; %1
 p.proofOfPrinciple = 0; %0 
 
 %% PREPROCESSING

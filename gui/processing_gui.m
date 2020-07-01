@@ -19,12 +19,14 @@ numberOfExperiments = size(allValidExperiments,1);
 fprintf('Processing dataset:'); 
     
 % process all existing data in parallel
-delete(gcp('nocreate'));
-if p.debug_level <= 1 && p.visualization == 0
-       parpool;
+
+if p.debug_level <= 1 && p.visualization == 0 && p.parallelpool ==1
+    M = Inf;
+else
+    M = 0;
 end
-%par
-for experiment=1:numberOfExperiments
+
+parfor (experiment=1:numberOfExperiments,M)
     
     % show remotecurrent experiment number
     dispCounter(experiment, numberOfExperiments);
