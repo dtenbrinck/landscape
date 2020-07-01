@@ -38,7 +38,7 @@ for experiment=1:numberOfExperiments
         if p.debug_level >= 1; disp('Preprocessing data...'); end
         %Zebrafish:
         if strcmp(p.datatype, 'Zebrafish')
-        [processedData, p] = preprocessData(experimentData, p);
+        processedData = preprocessData(experimentData, p);
         
         %Drosophila Heatmap (the following is needed if the datasets do not  have the same sizes.Maybe put this into function preprocessData?):
         elseif strcmp(p.datatype, 'Drosophila')
