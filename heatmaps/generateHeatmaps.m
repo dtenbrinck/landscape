@@ -53,7 +53,9 @@ if strcmp(dynamicHeatmapsize, 'true')
      for i = 1:2 
         ratio = origSize_um(i)/M; % calculate ratios of the others sides to the shortest side
         p.option.shellHeatmapResolution(i) = round(ratio*p.option.shellHeatmapResolution(i)); % adjust resolution of Mercator Projection according to ratio
-     end    
+     end
+else
+     p.option.shellHeatmapResolution([1 2]) =  p.option.shellHeatmapResolution([2 1]);  
 end
 
 %%% TODO: refactor code in this file to make pipeline more generic!

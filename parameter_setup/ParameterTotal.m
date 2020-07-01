@@ -175,9 +175,9 @@ p.option.shellShiftWidth = 0.01;
 if strcmp(p.dynamicHeatmapsize, 'true')
     p.option.shellHeatmapResolution = [90, 90]; % Enter the same value for each direction! The value will be the minimum pixel size for each direction. Size will adjust to original data size.
 if strcmp(p.datatype, 'Zebrafish')
-    p.option.shellHeatmapResolution = [90, 90]; %(old:256,256 default) Zebrafish: 90,90, Dros 90,180
+    p.option.shellHeatmapResolution = [90, 90]; %(old:256,256 default) Zebrafish: 90,90, Dros 180,90
 elseif strcmp(p.datatype, 'Drosophila')
-    p.option.shellHeatmapResolution = [90,180];
+    p.option.shellHeatmapResolution = [180,90];
 end
 % Types of heatmaps. Currently available 'MIP', 'SUM'.
 % Can handle multiple input.
@@ -207,9 +207,5 @@ p.option.heatmaps.disp = 0;
 
 % Scale the heatmaps. Input can be: 'true','false','both'
 p.option.heatmaps.scaled = 'both';
-
-% use an averaged amount of found landmark cells to be considered in the dynamic heatmaps
-% the value indicates the percentage of of found cells in this area considering the total number of results
-p.referenceLandmark.percentage = 0.5; 
-
+ 
 end
