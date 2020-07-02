@@ -160,7 +160,8 @@ gui_figure.Visible = 'on';
     end
 
     function button_settings_callback(source, eventdata)
-        settings_gui();
+        f = figure('Visible', 'on', 'Position', [400,400,500,500], 'MenuBar', 'None', 'NumberTitle', 'off', 'Name', 'Settings');
+        settings_gui(f);
     end
 
     function button_help_callback(source, eventdata)
