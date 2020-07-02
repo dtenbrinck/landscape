@@ -8,24 +8,25 @@ p.datatype = 'Zebrafish'; %Zebrafish or Drosophila
 
 %% COMMON PARAMETER
 if strcmp(p.datatype, 'Zebrafish')
-    p.resolution = [1.29,1.29,10]; %1.29,1.29,10 default settings for SD 0.32,0.32,5 for Drosophila
+    p.unscaled_resolution = [1.29,1.29,10]; %1.29,1.29,10 default settings for SD 0.32,0.32,5 for Drosophila
 elseif strcmp(p.datatype, 'Drosophila')
-    p.resolution = [0.32,0.32,5];
+    p.unscaled_resolution = [0.32,0.32,5];
 end
 
 p.scale = 0.75;
 p.scaleAllDim = 0;
 
 % adjust resolution according to scale parameter
+p.resolution = p.unscaled_resolution;
 p.resolution(1:2) = p.resolution(1:2) / p.scale;
 
 if strcmp(p.datatype, 'Zebrafish')
-    p.cellDiameter = 22; %22 in um
+    p.cellDiameter_um = 22; %22 in um
 elseif strcmp(p.datatype, 'Drosophila')
-    p.cellDiameter = 22; %TODO: What is Drosophila cell diameter?
+    p.cellDiameter_um = 22; %TODO: What is Drosophila cell diameter?
 end
 % adjust cell diameter from um to pixels
-p.cellDiameter = p.cellDiameter/(p.resolution(1));
+p.cellDiameter = p.cellDiameter_um/(p.resolution(1));
 
 % Debug variables
 p.debug_level = 1; %1
@@ -77,13 +78,13 @@ p.ellipsoidFitting.descentMethod = 'cg'; % 'grad'
 
 if strcmp(p.datatype, 'Zebrafish')
     p.ellipsoidFitting.regularisationParams.mu0 = 10^-7; %10^8 for old dapi segmentation %now 10^-7 %Drosoph: 10^-4 
-    p.ellipsoidFitting.regularisationParams.mu1 = 10^-4; %2*10�?�4 old % 0.002 for old dapi segmentation  %now1*10^-4 Drosoph: 0.008
+    p.ellipsoidFitting.regularisationParams.mu1 = 10^-4; %2*10???4 old % 0.002 for old dapi segmentation  %now1*10^-4 Drosoph: 0.008
     p.ellipsoidFitting.regularisationParams.mu2 = 1; %1 
     p.ellipsoidFitting.regularisationParams.gamma = 1;
     p.ellipsoidFitting.pcaType = 'Zebrafish';
 elseif strcmp(p.datatype, 'Drosophila')
     p.ellipsoidFitting.regularisationParams.mu0 = 10^-4; %10^8 for old dapi segmentation %now 10^-7 %Drosoph: 10^-4 
-    p.ellipsoidFitting.regularisationParams.mu1 = 0.008; %2*10�?�4 old % 0.002 for old dapi segmentation  %now1*10^-4 Drosoph: 0.008
+    p.ellipsoidFitting.regularisationParams.mu1 = 0.008; %2*10???4 old % 0.002 for old dapi segmentation  %now1*10^-4 Drosoph: 0.008
     p.ellipsoidFitting.regularisationParams.mu2 = 1; %1 
     p.ellipsoidFitting.regularisationParams.gamma = 1;
     p.ellipsoidFitting.pcaType = 'Drosophila';
@@ -117,7 +118,7 @@ end
 % This section contains all parameters needed for the heatmap script with
 % discriptions of each parameter. 
 
-p.dynamicHeatmapsize = 'true'; % will consider the original data size
+p.dynamicHeatmapsize = true; % will consider the original data size
 
 %% COMMON PARAMETER
 
@@ -129,11 +130,10 @@ p.tole = 0.5;
 
 % Grid size of the accumulator: 
 % size(accumulator) = [gridSize,gridSize,gridSize];
-if strcmp(p.dynamicHeatmapsize, 'true')
-    p.gridSize = [255;255;255]; % Enter the same value for each direction! The value will be the minimum pixel size for each direction. Size will adjust to original data size.
-elseif strcmp(datatype, 'Zebrafish')
+p.gridSizeBaseValue = 255; %The value will be the minimum pixel size for each direction. Size will adjust to original data size.
+if strcmp(p.datatype, 'Zebrafish')
     p.gridSize = [255;255;255]; %255
-elseif strcmp(datatype, 'Drosophila')
+elseif strcmp(p.datatype, 'Drosophila')
     p.gridSize = [510;255;255];
 end
 
@@ -172,8 +172,7 @@ p.option.shellThickness = 0.12;%0.0608;
 p.option.shellShiftWidth = 0.01;
 
 % Resolution for the shell heatmap in pixels
-if strcmp(p.dynamicHeatmapsize, 'true')
-    p.option.shellHeatmapResolution = [90, 90]; % Enter the same value for each direction! The value will be the minimum pixel size for each direction. Size will adjust to original data size.
+p.option.shellHeatmapResolutionBaseValue = 90; % The value will be the minimum pixel size for each direction. Size will adjust to original data size.
 if strcmp(p.datatype, 'Zebrafish')
     p.option.shellHeatmapResolution = [90, 90]; %(old:256,256 default) Zebrafish: 90,90, Dros 180,90
 elseif strcmp(p.datatype, 'Drosophila')
