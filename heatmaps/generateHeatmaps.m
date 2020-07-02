@@ -47,12 +47,12 @@ if strcmp(dynamicHeatmapsize, 'true')
      M = min(origSize_um); % find the shortest side of the image
      for i = 1:3 
         ratio = origSize_um(i)/M; % calculate ratios of the others sides to the shortest side
-        p.gridSize(i) = round(ratio*p.gridSize(i)); % adjust gridSize of accumulator according to ratio
+        p.gridSize(i) = round(ratio*p.gridSizeBaseValue); % adjust gridSize of accumulator according to ratio
      end
      M = min(origSize_um(1:2)); % find the shortest side of the image (excluding z direction for mercator projection)
      for i = 1:2 
         ratio = origSize_um(i)/M; % calculate ratios of the others sides to the shortest side
-        p.option.shellHeatmapResolution(i) = round(ratio*p.option.shellHeatmapResolution(i)); % adjust resolution of Mercator Projection according to ratio
+        p.option.shellHeatmapResolution(i) = round(ratio*p.option.shellHeatmapResolutionBaseValue); % adjust resolution of Mercator Projection according to ratio
      end
 else
      p.option.shellHeatmapResolution([1 2]) =  p.option.shellHeatmapResolution([2 1]);  
