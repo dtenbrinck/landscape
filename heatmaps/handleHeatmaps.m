@@ -156,6 +156,10 @@ for j=1:3
         cellDiameter = p.cellDiameter;
         cellDiameter = p.option.shellHeatmapResolution(1)/origSize_px(1) * cellDiameter; %problem: accumulator/heatmap is a square while data is not. TODO: adjust accumulator/heatmap size to data size
         sigma = cellDiameter/(2*sqrt(2*log(2)));
+        if sigma == Inf
+            disp('Cell diameter not found because you are only using accumulator files. Using standard settings. ')
+            sigma = 0.5;
+        end    
     catch
         disp('Cell diameter not found because you are using old data. Using standard settings. ')
         sigma = 0.5; %default

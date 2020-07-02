@@ -3,7 +3,7 @@ function generateHeatmaps(p)
 
 if isfile([p.resultsPath, '/AllAccumulators.mat'])
     load([p.resultsPath, '/AllAccumulators.mat']);
-    handleHeatmaps(accumulators,shells,numberOfResults,p);
+    handleHeatmaps(accumulators,shells,[0, 0, 0], numberOfResults,p);
     return
 end
 
