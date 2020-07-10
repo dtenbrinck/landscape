@@ -38,6 +38,13 @@ p.random = 0;
 % Select number of random filenames and process them
 p.numberOfRandom = 100;
 
+% This option allows to draw random cells for generating heatmaps when set to 1. 
+p.drawRandomCells = 0;
+
+% This specified percentage of cells will be drawn randomly during creation of
+% heatmaps if the option drawRandomCells is activated.
+p.percentageRandomCells = 10;
+
 % Choose if generated shell heatmaps should have equal size
 % If set to "false" this will fall back to the default mode in which we
 % compute a landmark shell heatmap and two shell heatmaps for all data
