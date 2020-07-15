@@ -78,7 +78,7 @@ parfor (experiment=1:numberOfExperiments,maximumNumberOfWorkers)
             blobSegmentCells(processedData.mCherry, p.mCherryseg, processedData.embryoShape); 
         else
         [processedData.cells, processedData.cellCoordinates] =...
-            segmentGFP(processedData.mCherry, p.GFPseg, p.resolution);
+            segmentGFP(processedData.mCherry, p.TISSUEseg, p.resolution);
         end
 
         % estimate embryo surface by fitting an ellipsoid
