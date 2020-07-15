@@ -58,6 +58,15 @@ p.GFPseg.downsampling_factor = 0.2;
 p.GFPseg.minNumberVoxels = 2000;
 % threshold level (percentage) to cut off blurry effects for EPI data
 p.GFPseg.threshold = 0.75; % SD: 0, EPI: 0.98 e.g.
+% -- TISSUE SEGMENTATION -- %
+p.TISSUEseg.k = 4; %4 
+p.TISSUEseg.size_opening = 5; %5Manual
+p.TISSUEseg.size_closing = 30;
+p.TISSUEseg.method = 'k-means'; % 'k-means', 'CP'
+p.TISSUEseg.downsampling_factor = 0.2;
+p.TISSUEseg.minNumberVoxels = 2000;
+% threshold level (percentage) to cut off blurry effects for EPI data
+p.TISSUEseg.threshold = 0.75; % SD: 0, EPI: 0.98 e.g.
 % -- mCherry SEGMENTATION -- %
 % binarization step before actual (blob) segmentation is variable,
 % default: 'kittler'
