@@ -51,15 +51,15 @@ box_resolution = uicontrol('Style', 'text', ...
     'FontName', 'Arial', ...
     'FontSize', 15);
 editbox_resolution_x = uicontrol('Style', 'edit', ...
-    'String', p.unscaled_resolution(1), ...
+    'String', p.original_resolution(1), ...
     'Position', [175,230,50,30], ...
     'Callback', @saving_callback);
 editbox_resolution_y = uicontrol('Style', 'edit', ...
-    'String', p.unscaled_resolution(2), ...
+    'String', p.original_resolution(2), ...
     'Position', [225,230,50,30], ...
     'Callback', @saving_callback);
 editbox_resolution_z = uicontrol('Style', 'edit', ...
-    'String', p.unscaled_resolution(3), ...
+    'String', p.original_resolution(3), ...
     'Position', [275,230,50,30], ...
     'Callback', @saving_callback);
 
@@ -94,8 +94,8 @@ button_advanced_settings = uicontrol('Style', 'pushbutton', ...
         editbox_resolution_y.String = 1.29;
         editbox_resolution_z.String = 10;
         
-        p.unscaled_resolution = [1.29,1.29,10];
-        p.resolution = p.unscaled_resolution;
+        p.original_resolution = [1.29,1.29,10];
+        p.resolution = p.original_resolution;
         p.resolution(1:2) = p.resolution(1:2) / p.scale;
         p.datatype = 'Zebrafish';
         
@@ -104,6 +104,7 @@ button_advanced_settings = uicontrol('Style', 'pushbutton', ...
         p.ellipsoidFitting.regularisationParams.mu2 = 1;
         p.ellipsoidFitting.pcaType = 'Zebrafish';
         p.reg.characteristicWeight = 0;
+        p.reg.angle = 0;
         p.reg.reference_point = [-1;0;0];
         p.reg.reference_vector = [0;0;-1];
         p.samples_cube = [256,256,256];
@@ -121,8 +122,8 @@ button_advanced_settings = uicontrol('Style', 'pushbutton', ...
         editbox_resolution_y.String = 0.32;
         editbox_resolution_z.String = 5;
         
-        p.unscaled_resolution = [0.32,0.32,5];
-        p.resolution = p.unscaled_resolution;
+        p.original_resolution = [0.32,0.32,5];
+        p.resolution = p.original_resolution;
         p.resolution(1:2) = p.resolution(1:2) / p.scale;
         p.datatype = 'Drosophila';
         
@@ -131,6 +132,7 @@ button_advanced_settings = uicontrol('Style', 'pushbutton', ...
         p.ellipsoidFitting.regularisationParams.mu2 = 1;
         p.ellipsoidFitting.pcaType = 'Drosophila';
         p.reg.characteristicWeight = 0.5;
+        p.reg.angle = 71.8051;
         p.reg.reference_point = [-0.3122;0;-0.95];
         p.reg.reference_vector = [0.95;0;-0.3122];
         p.samples_cube = [512,256,256];
@@ -144,19 +146,17 @@ button_advanced_settings = uicontrol('Style', 'pushbutton', ...
     function button_mappingtype_cells_callback(source, eventdata)
         button_mappingtype_cells.Value = 1;
         button_mappingtype_tissue.Value = 0;
-        %editbox_cellsize.Enable = 'on';
         
         p.mappingtype = 'Cells';
-        p.rmgb.mCherryDiskSize = 11;
+        p.rmbg.mCherryDiskSize = 11;
     end
 
     function button_mappingtype_tissue_callback(source, eventdata)
         button_mappingtype_cells.Value = 0;
         button_mappingtype_tissue.Value = 1;
-        %editbox_cellsize.Enable = 'off';
         
         p.mappingtype = 'Tissue';
-        p.rmgb.mCherryDiskSize = 50;
+        p.rmbg.mCherryDiskSize = 50;
     end
 
     function button_advanced_settings_callback(source, eventdata)
@@ -165,8 +165,8 @@ button_advanced_settings = uicontrol('Style', 'pushbutton', ...
 
 
     function saving_callback(source, eventdata)
-        p.unscaled_resolution = [str2double(editbox_resolution_x.String), str2double(editbox_resolution_y.String), str2double(editbox_resolution_z.String)];
-        p.resolution = p.unscaled_resolution;
+        p.original_resolution = [str2double(editbox_resolution_x.String), str2double(editbox_resolution_y.String), str2double(editbox_resolution_z.String)];
+        p.resolution = p.original_resolution;
         p.resolution(1:2) = p.resolution(1:2) / p.scale;
         
         p.cellDiameter_um = str2double(editbox_celldiameter.String);

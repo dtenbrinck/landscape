@@ -20,7 +20,7 @@ fprintf('Processing dataset:');
     
 % process all existing data in parallel
 
-if p.debug_level <= 1 && p.visualization == 0 && p.parallelpool ==1
+if p.debug_level <= 1 && p.visualization == 0 && p.reg.visualization == 0 && p.ellipsoidFitting.visualization == 0 && p.parallelpool ==1
     maximumNumberOfWorkers = Inf;
 else
     maximumNumberOfWorkers = 0;
@@ -113,7 +113,7 @@ parfor (experiment=1:numberOfExperiments,maximumNumberOfWorkers)
             registerLandmark(landmarkCoordinates, p.reg);
         
         %%%%%%%%%%% VALIDITY CHECK FOR DEBUGGING
-        if p.debug_level >= 2
+        if p.reg.visualization
             % transform projected landmark with estimated rotation
             registered_sphere = ...
                 transformCoordinates(sphereCoordinates, [0 0 0]', rotationMatrix, [0 0 0]');
