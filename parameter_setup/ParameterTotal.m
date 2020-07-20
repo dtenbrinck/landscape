@@ -8,16 +8,16 @@ p.datatype = 'Zebrafish'; %Zebrafish or Drosophila
 
 %% COMMON PARAMETER
 if strcmp(p.datatype, 'Zebrafish')
-    p.unscaled_resolution = [1.29,1.29,10]; %1.29,1.29,10 default settings for SD 0.32,0.32,5 for Drosophila
+    p.original_resolution = [1.29,1.29,10]; %1.29,1.29,10 default settings for SD 0.32,0.32,5 for Drosophila
 elseif strcmp(p.datatype, 'Drosophila')
-    p.unscaled_resolution = [0.32,0.32,5];
+    p.original_resolution = [0.32,0.32,5];
 end
 
 p.scale = 0.75;
 p.scaleAllDim = 0;
 
 % adjust resolution according to scale parameter
-p.resolution = p.unscaled_resolution;
+p.resolution = p.original_resolution;
 p.resolution(1:2) = p.resolution(1:2) / p.scale;
 
 if strcmp(p.datatype, 'Zebrafish')
@@ -104,20 +104,25 @@ p.reg.landmarkCharacteristic = 'middle';
 
 if strcmp(p.datatype, 'Zebrafish')
     p.reg.characteristicWeight = 0; % 0 = head, 1 = tail
-    zwert =0; %value for z (front = -1 to back = 1. Default is left = 0) for the reference point, only works for points on the left half of the unit ball. -0.95 for Dros
+    p.reg.angle = 0; %angle of reference point starting from the left of the sphere
 elseif strcmp(p.datatype, 'Drosophila')
     p.reg.characteristicWeight = 0.5; % 0 = head, 1 = tail
-    zwert =-0.95; %-0.95
+    p.reg.angle = 71.8051;
 end
 
-p.reg.reference_point = [-sqrt(1-zwert^2); 0; zwert]; 
+p.reg.reference_point = [-cos(deg2rad(p.reg.angle));0; -sin(deg2rad(p.reg.angle))];
+
+p.reg.flipped = false;
 p.reg.reference_vector = [-p.reg.reference_point(3);0;p.reg.reference_point(1)];
+p.reg.reference_vector = (1-2*p.reg.flipped) * p.reg.reference_vector;
 % - register data - %
 if strcmp(p.datatype, 'Zebrafish')
     p.samples_cube = [256,256,256]; %[256,256,256]
 elseif strcmp(p.datatype, 'Drosophila')
     p.samples_cube = [512,256,256]; %[512,256,256]
 end
+
+p.reg.visualization = false;
 
 
 %---------------------------------------------------------------------------
@@ -209,6 +214,9 @@ p.option.heatmaps.saveHMmat = 1;
 % Save the accumulator matrix. This is the pure 3D matrix which stores the
 % number of cells at a voxel position
 p.option.heatmaps.saveAccumulator = 1;
+
+%Save the heatmap as a csv file
+p.option.heatmaps.saveCSV = 1;
 
 % Show the heatmaps figures. Doesn't need to be activated for the saving.
 p.option.heatmaps.disp = 0;
