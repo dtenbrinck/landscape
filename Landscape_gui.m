@@ -1,6 +1,6 @@
 function Landscape_gui
 clear;
-close all;
+%close all;
 
 gui_figure = figure('Visible', 'off', 'Position', [200,400,900,500], 'MenuBar', 'None', 'NumberTitle', 'off');
 
@@ -161,6 +161,7 @@ gui_figure.Visible = 'on';
 
     function button_settings_callback(source, eventdata)
         f = figure('Visible', 'on', 'Position', [400,400,500,500], 'MenuBar', 'None', 'NumberTitle', 'off', 'Name', 'Settings');
+        movegui(f, 'center');
         settings_gui(f);
     end
 
