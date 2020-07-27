@@ -177,6 +177,8 @@ p.option.slider = 0;  %in progress
 p.option.cropper = 0;
 
 % -- Options for the heatmap generation -- %
+%Enable or disable convolution
+p.option.convolution = true;
 
 % Thickness of shells for mercator projection
 p.option.shellThickness = 0.12;%0.0608;
