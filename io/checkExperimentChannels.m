@@ -55,7 +55,7 @@ for i = nb_experiments
     experimentSets{i,2} = fileNames(indices(rightind));
     
     % get mCherry data set for current experiment
-    index = strfind(fileNames(indices),'coi');
+    index = strfind(fileNames(indices),'probe');
     rightind = find(~cellfun(@isempty,index));
     experimentSets{i,3} = fileNames(indices(rightind));
 end
@@ -67,7 +67,7 @@ experimentSets = reshape(experimentSets(~cellfun('isempty',experimentSets)),[],3
 
 % Warning message if no experiments could be found
 if isempty(experimentSets)
-    error('No valid experiment data could be found in chosen directory. Make sure you name the files containing strings like ''landmark'', ''nuclei'', or ''coi''.');
+    error('No valid experiment data could be found in chosen directory. Make sure you name the files containing strings like ''landmark'', ''nuclei'', or ''probe''.');
 end
 
 end
