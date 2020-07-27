@@ -12,7 +12,7 @@ subplot(3,3,1); imagesc((gatheredData.experiment.DapiMIP)); axis image; set(gca,
 subplot(3,3,2); imagesc((gatheredData.experiment.GFPMIP)); axis image; set(gca, 'xtick',[],'ytick',[]);
     text(0.5, 1.1,'Landmark', 'Units', 'normalized', 'FontSize', 15, 'FontName', 'Arial', 'HorizontalAlignment', 'center');
 subplot(3,3,3); imagesc((gatheredData.experiment.mCherryMIP)); axis image; set(gca, 'xtick',[],'ytick',[]);
-    text(0.5, 1.1,'Cells/Tissue of Interest', 'Units', 'normalized', 'FontSize', 15, 'FontName', 'Arial', 'HorizontalAlignment', 'center');
+    text(0.5, 1.1,'Probe', 'Units', 'normalized', 'FontSize', 15, 'FontName', 'Arial', 'HorizontalAlignment', 'center');
 
 % visualize segmentation results in preprocessed data
 subplot(3,3,4); imagesc((gatheredData.processed.DapiMIP)); axis image; set(gca, 'xtick',[],'ytick',[]);
