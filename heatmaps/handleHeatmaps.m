@@ -5,11 +5,7 @@ function [  ] = handleHeatmaps( accumulators,shells, origSize_px, numberOfResult
 %% MAIN CODE
 
 option = p.option;
-if strcmp(p.mappingtype, 'Cells')
-    channels = ["Landmark", "Nuclei", "CellsOfInterest"];
-elseif strcmp(p.mappingtype, 'Tissue')
-    channels = ["Landmark", "Nuclei", "TissueOfInterest"];
-end
+channels = ["Landmark", "Nuclei", "Probe"];
 mercatorProjections = cell(1,3);
 
 if option.heatmaps.saveAccumulator == 1
@@ -152,24 +148,26 @@ for j=1:3
        
     %CONVOLUTION 
     
-    try
-        cellDiameter = p.cellDiameter;
-        cellDiameter = p.option.shellHeatmapResolution(1)/origSize_px(1) * cellDiameter; %problem: accumulator/heatmap is a square while data is not. TODO: adjust accumulator/heatmap size to data size
-        sigma = cellDiameter/(2*sqrt(2*log(2)));
-        if sigma == Inf
-            disp('Cell diameter not found because you are only using accumulator files. Using standard settings. ')
-            sigma = 0.5;
-        end    
-    catch
-        disp('Cell diameter not found because you are using old data. Using standard settings. ')
-        sigma = 0.5; %default
-    end 
-    
-    for i=1:size(mercatorProjections{j},3)
-         mercatorProjections{j}(:,:,i) = imgaussfilt(mercatorProjections{j}(:,:,i), sigma); 
-         
-         %normalize for relative measures
-         mercatorProjections{j}(:,:,i) = mercatorProjections{j}(:,:,i) ./ sum(currentAccumulator(:));
+    if p.option.convolution
+        try
+            cellDiameter = p.cellDiameter;
+            cellDiameter = p.option.shellHeatmapResolution(1)/origSize_px(1) * cellDiameter; %problem: accumulator/heatmap is a square while data is not. TODO: adjust accumulator/heatmap size to data size
+            sigma = cellDiameter/(2*sqrt(2*log(2)));
+            if sigma == Inf
+                disp('Cell diameter not found because you are only using accumulator files. Using standard settings. ')
+                sigma = 0.5;
+            end    
+        catch
+            disp('Cell diameter not found because you are using old data. Using standard settings. ')
+            sigma = 0.5; %default
+        end 
+
+        for i=1:size(mercatorProjections{j},3)
+             mercatorProjections{j}(:,:,i) = imgaussfilt(mercatorProjections{j}(:,:,i), sigma); 
+
+             %normalize for relative measures
+             mercatorProjections{j}(:,:,i) = mercatorProjections{j}(:,:,i) ./ sum(currentAccumulator(:));
+        end
     end
     
     % -- Determine maximum value in all heatmaps for easier comparison -- %
