@@ -84,7 +84,10 @@ button_back = uicontrol('Style', 'pushbutton', ...
         p.reg.reference_point = [-cos(deg2rad(p.reg.angle));0; -sin(deg2rad(p.reg.angle))];
         p.reg.flipped = checkbox_flipped.Value;
         p.reg.reference_vector = (1-2*p.reg.flipped)*[-p.reg.reference_point(3);0;p.reg.reference_point(1)];
-        p.samples_cube = [str2double(editbox_samples_cube_x.String);str2double(editbox_samples_cube_y.String);str2double(editbox_samples_cube_z.String)];
+        p.samples_cube = [round(str2double(editbox_samples_cube_x.String));round(str2double(editbox_samples_cube_y.String));round(str2double(editbox_samples_cube_z.String))];
+        editbox_samples_cube_x.String = p.samples_cube(1);
+        editbox_samples_cube_y.String = p.samples_cube(2);
+        editbox_samples_cube_z.String = p.samples_cube(3);
     end
 end
 

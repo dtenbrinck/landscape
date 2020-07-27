@@ -98,7 +98,8 @@ button_back = uicontrol('Style', 'pushbutton', ...
         p.ellipsoidFitting.regularisationParams.mu1 = str2double(editbox_mu1.String);
         p.ellipsoidFitting.regularisationParams.mu2 = str2double(editbox_mu2.String);
         p.ellipsoidFitting.regularisationParams.gamma = str2double(editbox_gamma.String);
-        p.samples_sphere = str2double(editbox_samples.String);
+        p.samples_sphere = round(str2double(editbox_samples.String));
+        editbox_samples.String = p.samples_sphere;
     end
 end
 

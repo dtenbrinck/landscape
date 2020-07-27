@@ -124,6 +124,10 @@ button_back = uicontrol('Style', 'pushbutton', ...
     function saving_callback_parallelpool(source, eventdata)
         p.parallelpool = checkbox_parallel.Value;
         if p.parallelpool
+            checkbox_visualization_ellipsoid.Value = false;
+            checkbox_visualization_registration.Value = false;
+            checkbox_visualization_result.Value = false;
+            
             checkbox_visualization_ellipsoid.Enable = 'off';
             checkbox_visualization_registration.Enable = 'off';
             checkbox_visualization_result.Enable = 'off';

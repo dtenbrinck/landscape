@@ -69,9 +69,12 @@ button_back = uicontrol('Style', 'pushbutton', ...
 
     function saving_callback(source, eventdata)
         p.scale = str2double(editbox_scale.String);
-        p.rmbg.dapiDiskSize = str2double(editbox_disk_dapi.String);
-        p.rmbg.GFPDiskSize = str2double(editbox_disk_gfp.String);
-        p.rmbg.mCherryDiskSize = str2double(editbox_disk_mcherry.String);
+        p.rmbg.dapiDiskSize = round(str2double(editbox_disk_dapi.String));
+        editbox_disk_dapi.String = p.rmbg.dapiDiskSize;
+        p.rmbg.GFPDiskSize = round(str2double(editbox_disk_gfp.String));
+        editbox_disk_gfp.String = p.rmbg.GFPDiskSize;
+        p.rmbg.mCherryDiskSize = round(str2double(editbox_disk_mcherry.String));
+        editbox_disk_mcherry.String = p.rmbg.mCherryDiskSize;
     end
 end
 

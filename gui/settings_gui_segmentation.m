@@ -164,17 +164,28 @@ button_back = uicontrol('Style', 'pushbutton', ...
     end
 
     function saving_callback(source, eventdata)
-        p.DAPIseg.k = str2double(editbox_k1.String);
-        p.GFPseg.k = str2double(editbox_k2.String);
-        p.mCherryseg.k = str2double(editbox_k3.String);
-        p.TISSUEseg.k = str2double(editbox_k4.String);
-        p.DAPIseg.minNucleusSize = str2double(editbox_min_nucleus.String);
-        p.GFPseg.minNumberVoxels = str2double(editbox_min_voxels_gfp.String);
-        p.GFPseg.size_opening = str2double(editbox_filter_opening_gfp.String);
-        p.GFPseg.size_closing = str2double(editbox_filter_closing_gfp.String);
-        p.TISSUEseg.minNumberVoxels = str2double(editbox_min_voxels_tissue.String);
-        p.TISSUEseg.size_opening = str2double(editbox_filter_opening_tissue.String);
-        p.TISSUEseg.size_closing = str2double(editbox_filter_closing_tissue.String);
+        p.DAPIseg.k = round(str2double(editbox_k1.String));
+        editbox_k1.String = p.DAPIseg.k;
+        p.GFPseg.k = round(str2double(editbox_k2.String));
+        editbox_k2.String = p.GFPseg.k;
+        p.mCherryseg.k = round(str2double(editbox_k3.String));
+        editbox_k3.String = p.mCherryseg.k;
+        p.TISSUEseg.k = round(str2double(editbox_k4.String));
+        editbox_k4.String = p.TISSUEseg.k;
+        p.DAPIseg.minNucleusSize = round(str2double(editbox_min_nucleus.String));
+        editbox_min_nucleus.String = p.DAPIseg.minNucleusSize;
+        p.GFPseg.minNumberVoxels = round(str2double(editbox_min_voxels_gfp.String));
+        editbox_min_voxels_gfp.String = p.GFPseg.minNumberVoxels;
+        p.GFPseg.size_opening = round(str2double(editbox_filter_opening_gfp.String));
+        editbox_filter_opening_gfp.String = p.GFPseg.size_opening;
+        p.GFPseg.size_closing = round(str2double(editbox_filter_closing_gfp.String));
+        editbox_filter_closing_gfp.String = p.GFPseg.size_closing;
+        p.TISSUEseg.minNumberVoxels = round(str2double(editbox_min_voxels_tissue.String));
+        editbox_min_voxels_tissue.String = p.TISSUEseg.minNumberVoxels;
+        p.TISSUEseg.size_opening = round(str2double(editbox_filter_opening_tissue.String));
+        editbox_filter_opening_tissue.String = p.TISSUEseg.size_opening;
+        p.TISSUEseg.size_closing = round(str2double(editbox_filter_closing_tissue.String));
+        editbox_filter_closing_tissue.String = p.TISSUEseg.size_closing;
     end
 
     function s = intern_function_bool_to_on_off(x)
