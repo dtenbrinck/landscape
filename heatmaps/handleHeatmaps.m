@@ -5,6 +5,12 @@ function [  ] = handleHeatmaps( accumulators,shells, origSize_px, numberOfResult
 %% MAIN CODE
 
 option = p.option;
+
+% check if random cell option exists
+if exist('p.drawRandomCells', 'var') ~= 1
+    p.drawRandomCells = 0;
+end
+
 channels = ["Landmark", "Nuclei", "Probe"];
 mercatorProjections = cell(1,3);
 
@@ -112,10 +118,10 @@ for j=1:3
     %end
     
     % Save accumulator
-    if option.heatmaps.saveAccumulator == 1
-        mat_name = strcat(heatmapsPath,"/","Accumulator.mat");
-        save(mat_name,'currentAccumulator');
-    end
+    %if option.heatmaps.saveAccumulator == 1
+    %    mat_name = strcat(heatmapsPath,"/","Accumulator.mat");
+    %    save(mat_name,'currentAccumulator');
+    %end
     %{
     % -- Create the figures -- %
     vis = 'on';
