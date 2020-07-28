@@ -28,15 +28,39 @@ for j=1:3
     
     % extract information for current channel
     switch j
-        case 1  
-            currentAccumulator = accumulators.GFP;
+        case 1
+            numberOfEntities = sum(accumulators.GFP(:));
             currentShell = shells.GFP;
         case 2
-            currentAccumulator = accumulators.DAPI;
+            numberOfEntities = sum(accumulators.DAPI(:));
             currentShell = shells.DAPI;
         case 3
-            currentAccumulator = accumulators.mCherry;
+            numberOfEntities = sum(accumulators.mCherry(:));
             currentShell = shells.mCherry;
+    end
+    
+    % if activated we draw random cells for each shell
+    if p.drawRandomCells == 1
+        numberOfEntities = round(numberOfEntities * p.percentageRandomCells/100);
+        
+        % iterate over all shells
+        for i=1:size(currentShell,2)
+            
+            % extract coordinates for shell
+             coordinates = currentShell{i};
+             
+             % determine number of points
+             numberOfPoints = size(coordinates,2);
+             
+             % determine new number of points based on parameter
+             newNumberOfPoints = round(numberOfPoints * p.percentageRandomCells/100);
+             
+             % generate random subset 
+             randomIndexSet = randsample(numberOfPoints, newNumberOfPoints);
+             
+             % draw randomly and overwrite old shell container
+             currentShell{i} = coordinates(:,randomIndexSet);
+        end
     end
     
     % -- Convolve over the points -- %
@@ -165,9 +189,10 @@ for j=1:3
         for i=1:size(mercatorProjections{j},3)
              mercatorProjections{j}(:,:,i) = imgaussfilt(mercatorProjections{j}(:,:,i), sigma); 
 
-             %normalize for relative measures
-             mercatorProjections{j}(:,:,i) = mercatorProjections{j}(:,:,i) ./ sum(currentAccumulator(:));
+           % normalize for relative measures
+            mercatorProjections{j}(:,:,i) = mercatorProjections{j}(:,:,i) ./ numberOfEntities;
         end
+
     end
     
     % -- Determine maximum value in all heatmaps for easier comparison -- %

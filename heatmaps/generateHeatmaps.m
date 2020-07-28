@@ -22,7 +22,7 @@ numberOfResults = numel(fileNames);
 % Check if any results have been found
 if numberOfResults == 0
     disp('All results already processed or path to results folder wrong?');
-    disp(resultsPathAccepted);
+    disp(p.resultsPathAccepted);
     return;
 else
     disp([ num2str(numberOfResults) ' results found in folder for generating heatmap.']);
