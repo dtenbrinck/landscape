@@ -7,16 +7,9 @@ end
 
 modifiedData = data;
 
-% TODO: check if exists!
-if strcmp(type, 'cells')
-    mip = computeMIP(single(data.processed.mCherry));
-    segmentation = data.processed.cellsMIP;
-elseif strcmp(type, 'tissue')
-    mip = computeMIP(single(data.processed.GFP));
-    segmentation = data.processed.landmarkMIP;
-else
-    error('This should never happen!');
-end
+mip = computeMIP(single(data.processed.mCherry));
+segmentation = data.processed.cellsMIP;
+
 
 minData = min(mip(:));
 maxData = max(mip(:));
@@ -119,16 +112,15 @@ box_handle = msgbox('New segmentation is being registered. Please wait a few sec
 
 segmentation_2D = getappdata(figHandle,'segmentation');
 
+modifiedData.processed.cellsMIP = segmentation_2D;
 if strcmp(type, 'cells')
-    modifiedData.processed.cellsMIP = segmentation_2D;
-    segmentation_3D = extend2dTo3dSegmentation(segmentation_2D,modifiedData.processed.mCherry);
+    
+    segmentation_3D = extend2dTo3dSegmentation(segmentation_2D,modifiedData.processed.mCherry);  
     
 elseif strcmp(type, 'tissue')
-    modifiedData.processed.landmarkMIP = segmentation_2D;
-    %segmentation_3D = extend2dTo3dSegmentation(segmentation_2D,modifiedData.processed.GFP);
     
-    MIP = computeMIP(modifiedData.processed.GFP);
-    segmentation_3D = repmat(segmentation_2D,1,1,size(modifiedData.processed.GFP,3)) & (modifiedData.processed.GFP > 0.9*repmat(MIP,1,1,size(modifiedData.processed.GFP,3)));
+    MIP = computeMIP(modifiedData.processed.mCherry);                                                          
+    segmentation_3D = repmat(segmentation_2D,1,1,size(modifiedData.processed.mCherry,3)) & (modifiedData.processed.mCherry > 0.9*repmat(MIP,1,1,size(modifiedData.processed.mCherry,3)));      
     segmentation_3D = imopen(segmentation_3D,strel('disk',1));
     segmentation_3D = imclose(segmentation_3D,strel('disk',10));
     
@@ -146,11 +138,11 @@ if strcmp(type, 'cells')
     modifiedData.processed.cells = segmentation_3D;
     modifiedData.processed.cellCoordinates = centCoords;
 elseif strcmp(type, 'tissue')
-    modifiedData.processed.landmark = segmentation_3D; 
+    modifiedData.processed.cells = segmentation_3D;                                           
     
-    modifiedData.processed.landmarkMIP = computeMIP(segmentation_3D); 
+    modifiedData.processed.cellsMIP = computeMIP(segmentation_3D);                            
     
-    %indices = find(modifiedData.processed.landmark > 0);
+    %indices = find(modifiedData.processed.landmark > 0);                                      
     %[tmpy, tmpx, tmpz] = ind2sub(size(modifiedData.processed.landmark), indices);
 
     % initialize container for center coordinates
@@ -394,4 +386,3 @@ if strcmp(event.Key,'delete') || strcmp(event.Key,'backspace')
 end
 
 end
-
