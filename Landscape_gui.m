@@ -76,13 +76,6 @@ button_heatmap = uicontrol('Style', 'pushbutton', ...
     'BackgroundColor', [0.6,0.7,1], ...
     'Callback', {@button_heatmap_callback});
 
-button_help = uicontrol('Style', 'pushbutton', ...
-    'String', 'Manual', ...
-    'FontName', 'Arial', ...
-    'FontSize', 15, ...
-    'Position', [750, 25,100,50], ...
-    'Callback', @button_help_callback);
-
 
 box_status = uicontrol('Style', 'text', ...
     'String', 'Ready', ...
@@ -163,16 +156,6 @@ gui_figure.Visible = 'on';
         f = figure('Visible', 'on', 'Position', [400,400,500,500], 'MenuBar', 'None', 'NumberTitle', 'off', 'Name', 'Settings');
         movegui(f, 'center');
         settings_gui(f);
-    end
-
-    function button_help_callback(source, eventdata)
-        if ismac %Mac
-            open('gui/manual.pdf');
-        elseif isunix %Linux
-            system('evince gui/manual.pdf');
-        elseif ispc %Windows
-            open('gui/manual.pdf');
-        end
     end
 
 end
