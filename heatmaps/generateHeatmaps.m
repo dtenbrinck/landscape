@@ -40,10 +40,10 @@ load([p.resultsPathAccepted,'/',fileNames{1,1}]);
 try 
     dynamicHeatmapsize = p.dynamicHeatmapsize;
 catch 
-    dynamicHeatmapsize = 'false'; % in old versions this parameter did not exist
+    dynamicHeatmapsize = false; % in old versions this parameter did not exist
 end
 
-if strcmp(dynamicHeatmapsize, 'true')
+if dynamicHeatmapsize
      M = min(origSize_um); % find the shortest side of the image
      for i = 1:3 
         ratio = origSize_um(i)/M; % calculate ratios of the others sides to the shortest side
