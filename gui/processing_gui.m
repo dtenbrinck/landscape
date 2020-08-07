@@ -142,7 +142,7 @@ parfor (experiment=1:numberOfExperiments,maximumNumberOfWorkers)
         % create filename to save results
         results_filename = [p.resultsPath '/' experimentData.filename '_results.mat'];
    
-        gatheredData = saveResults(experimentData, processedData, registeredData, ellipsoid, transformationMatrix, rotationMatrix, results_filename);
+        gatheredData = saveResults(experimentData, processedData, registeredData, ellipsoid, transformationMatrix, rotationMatrix, results_filename, p);
         
         % visualize results if needed
         if p.visualization == 1
