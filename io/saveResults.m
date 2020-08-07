@@ -1,4 +1,4 @@
-function gatheredData = saveResults( experimentData, processedData, registeredData, ellipsoid, transformationMatrix, rotationMatrix, results_filename )
+function gatheredData = saveResults( experimentData, processedData, registeredData, ellipsoid, transformationMatrix, rotationMatrix, results_filename, p )
 %SAVERESULTS Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -7,6 +7,8 @@ function gatheredData = saveResults( experimentData, processedData, registeredDa
 gatheredData = struct;
 gatheredData.filename = experimentData.filename;
 
+% parameter file
+gatheredData.parameters = p;
 
 % important original data
 gatheredData.experiment.size = size(processedData.Dapi);
