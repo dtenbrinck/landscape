@@ -30,6 +30,12 @@ while result < numberOfResults
     % load result data
     load([p.resultsPath,'/',fileNames{result,1}])
     
+     if isfield(gatheredData, 'parameters') %try to find saved parameters (old data did not save parameters in result file)
+        p = gatheredData.parameters;
+    else
+        fprintf('Parameters could not be loaded from result file because you are using old data. Parameters are now loaded from Landscape GUI Settings. Make sure you set the correct parameters.');
+    end
+    
     % visualize results
 %     visualizeResults(experimentData, processedData, registeredData);
     visualizeResults_evaluation(h,gatheredData);
@@ -63,7 +69,7 @@ while result < numberOfResults
             modifiedData.experiment.filename = modifiedData.filename;
             saveResults(modifiedData.experiment, modifiedData.processed, modifiedData.registered,...
                         modifiedData.processed.ellipsoid, modifiedData.registered.transformation_normalization, modifiedData.registered.transformation_rotation,...
-                        [p.resultsPath,'/',fileNames{result,1}] );
+                        [p.resultsPath,'/',fileNames{result,1}], p );
             result = result - 1; % adjust for another try
             fprintf('\t -> Improved!\n');
         case 'Reject'
