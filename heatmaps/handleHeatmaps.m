@@ -194,13 +194,15 @@ for j=1:3
 
         for i=1:size(mercatorProjections{j},3)
              mercatorProjections{j}(:,:,i) = imgaussfilt(mercatorProjections{j}(:,:,i), sigma); 
-
-           % normalize for relative measures
-            mercatorProjections{j}(:,:,i) = mercatorProjections{j}(:,:,i) ./ numberOfEntities;
         end
 
     end
-    
+
+    for i=1:size(mercatorProjections{j},3)
+           % normalize for relative measures
+            mercatorProjections{j}(:,:,i) = mercatorProjections{j}(:,:,i) ./ numberOfEntities;
+    end
+
     % -- Determine maximum value in all heatmaps for easier comparison -- %
     % HERE YOU CAN SET THE MAXIMUM VALUE MANUALLY BASED ON THE MAXIMUM
     % NUMBER OF CELLS IN ALL SHELLS (COMPARISON WITH OTHER EXPERIMENTS)

@@ -119,10 +119,11 @@ if strcmp(type, 'cells')
     
 elseif strcmp(type, 'tissue')
     
-    MIP = computeMIP(modifiedData.processed.mCherry);                                                          
-    segmentation_3D = repmat(segmentation_2D,1,1,size(modifiedData.processed.mCherry,3)) & (modifiedData.processed.mCherry > 0.9*repmat(MIP,1,1,size(modifiedData.processed.mCherry,3)));      
-    segmentation_3D = imopen(segmentation_3D,strel('disk',1));
-    segmentation_3D = imclose(segmentation_3D,strel('disk',10));
+    %MIP = computeMIP(modifiedData.processed.mCherry);                                                          
+    segmentation_3D = extend2dTo3dSegmentation(segmentation_2D,modifiedData.processed.mCherry);  
+    %segmentation_3D = repmat(segmentation_2D,1,1,size(modifiedData.processed.mCherry,3)) & (modifiedData.processed.mCherry > 0.9*repmat(MIP,1,1,size(modifiedData.processed.mCherry,3)));      
+    %segmentation_3D = imopen(segmentation_3D,strel('disk',1));
+    %segmentation_3D = imclose(segmentation_3D,strel('disk',10));
     
 end    
 
