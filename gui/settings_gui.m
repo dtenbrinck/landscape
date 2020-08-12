@@ -129,7 +129,7 @@ button_advanced_settings = uicontrol('Style', 'pushbutton', ...
         p.sizeOfPixel = 0.32;
         p.gridSize = [510;255;255];
         p.option.cellradius = 3;
-        p.option.shellHeatmapResolution = [90,180];
+        p.option.shellHeatmapResolution = [180,90];
     end
 
     function button_mappingtype_cells_callback(source, eventdata)
