@@ -176,8 +176,9 @@ for j=1:3
     end
     %}
        
-    %CONVOLUTION 
+    %CONVOLUTION on mCherry channel
     
+    if j == 3
     if p.option.convolution
         try
             cellDiameter = p.cellDiameter;
@@ -191,12 +192,13 @@ for j=1:3
             disp('Cell diameter not found because you are using old data. Using standard settings. ')
             sigma = 0.5; %default
         end 
-
+         
         for i=1:size(mercatorProjections{j},3)
              mercatorProjections{j}(:,:,i) = imgaussfilt(mercatorProjections{j}(:,:,i), sigma); 
         end
-
     end
+    end
+    
 
     for i=1:size(mercatorProjections{j},3)
            % normalize for relative measures
