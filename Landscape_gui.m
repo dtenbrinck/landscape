@@ -1,5 +1,5 @@
 function Landscape_gui
-clear;
+clear all;
 %close all;
 
 gui_figure = figure('Visible', 'off', 'Position', [200,400,900,500], 'MenuBar', 'None', 'NumberTitle', 'off');
