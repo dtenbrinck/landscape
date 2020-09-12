@@ -1,5 +1,12 @@
 function processing_gui(p)
-
+%processing_gui processes the selected data with given parameters p
+    %This function allows the user to select a data path and then prepares
+    %the data for analysis in 4 steps:
+    %1. preprocessing
+    %2. segmentation
+    %3. normalization
+    %4. rotation
+    
 %% PREPARE RESULTS DIRECTORY
 checkDirectory(p.resultsPath);
 
@@ -18,9 +25,8 @@ numberOfExperiments = size(allValidExperiments,1);
 
 fprintf('Processing dataset:'); 
     
-% process all existing data in parallel
-
-if p.debug_level <= 1 && p.visualization == 0 && p.reg.visualization == 0 && p.ellipsoidFitting.visualization == 0 && p.parallelpool ==1
+% process all existing data in parallel unless specified otherwise
+if p.parallelpool == 1
     maximumNumberOfWorkers = Inf;
 else
     maximumNumberOfWorkers = 0;
@@ -36,34 +42,15 @@ parfor (experiment=1:numberOfExperiments,maximumNumberOfWorkers)
         if p.debug_level >= 1; disp('Loading data...'); end
         experimentData = loadExperimentData(allValidExperiments(experiment,:), p.dataPath);
         
+
+        %1. PREPROCESSING        
         % preprocess and rescale data
         if p.debug_level >= 1; disp('Preprocessing data...'); end
-        %Zebrafish:
-        if strcmp(p.datatype, 'Zebrafish')
         processedData = preprocessData(experimentData, p);
         
-        %Drosophila Heatmap (the following is needed if the datasets do not  have the same sizes.Maybe put this into function preprocessData?):
-        elseif strcmp(p.datatype, 'Drosophila')
-        processedData_originalsize = preprocessData(experimentData, p); 
-        %for Drosophila Heatmap, delete later
-        processedData.filename = processedData_originalsize.filename;
-        processedData.Dapi = zeros(675, 1350, size(processedData_originalsize.Dapi, 3)); 
-        processedData.GFP = zeros(675, 1350, size(processedData_originalsize.Dapi, 3));
-        processedData.mCherry = zeros(675, 1350, size(processedData_originalsize.Dapi, 3));
-        for i = 1:size(processedData.Dapi, 3)  
-           processedData.Dapi(1:size(processedData_originalsize.Dapi,1),1:size(processedData_originalsize.Dapi,2),i) = processedData_originalsize.Dapi(:,:,i);
-        end
         
-        for i = 1:size(processedData.Dapi, 3)  
-           processedData.GFP(1:size(processedData_originalsize.Dapi,1),1:size(processedData_originalsize.Dapi,2),i) = processedData_originalsize.GFP(:,:,i);
-        end
-        
-        for i = 1:size(processedData.Dapi, 3)  
-           processedData.mCherry(1:size(processedData_originalsize.Dapi,1),1:size(processedData_originalsize.Dapi,2),i) = processedData_originalsize.mCherry(:,:,i);
-        end
-        end
-        
-        % segment data
+        %2. SEGMENTATION
+        % segment data in all three channels
         if p.debug_level >= 1; disp('Segmenting GFP channel...'); end
         [processedData.landmark, processedData.landmarkCentCoords] =...
             segmentGFP(processedData.GFP, p.GFPseg, p.resolution);
@@ -72,8 +59,9 @@ parfor (experiment=1:numberOfExperiments,maximumNumberOfWorkers)
         [processedData.nuclei, processedData.nucleiCoordinates, processedData.embryoShape] =...
             segmentDAPI(processedData.Dapi, p.DAPIseg, p.resolution);
         
+        %segment mCherry channel depending on selected mappingtype
         if p.debug_level >= 1; disp('Segmenting mCherry channel...'); end
-        if strcmp(p.mappingtype, 'Cells') %segment mCherry channel depending on selected mappingtype
+        if strcmp(p.mappingtype, 'Cells')
         [processedData.cells, processedData.cellCoordinates] =...
             blobSegmentCells(processedData.mCherry, p.mCherryseg, processedData.embryoShape); 
         else
@@ -81,18 +69,20 @@ parfor (experiment=1:numberOfExperiments,maximumNumberOfWorkers)
             segmentGFP(processedData.mCherry, p.TISSUEseg, p.resolution);
         end
 
+        
+        %3. NORMALIZATION
         % estimate embryo surface by fitting an ellipsoid
         if p.debug_level >= 1; disp('Estimating embryo surface...'); end
         ellipsoid = estimateEmbryoSurface(processedData.nucleiCoordinates, p.resolution, p.ellipsoidFitting);
         
         % compute transformation which normalizes the estimated ellipsoid to a unit sphere
         if p.debug_level >= 1; disp('Compute transformation from optimal ellipsoid...'); end
-        transformationMatrix = computeTransformationMatrix(ellipsoid);
+        normalizationMatrix = computeTransformationMatrix(ellipsoid);
         
         %%%%%%%%%%% VALIDITY CHECK FOR DEBUGGING
         if p.debug_level >= 2
             disp('Transform data for validity check...');
-            [ transformedData, transformedResolution ] = transformDataToSphere( processedData, p.resolution, transformationMatrix, ellipsoid, p.samples_cube );
+            [ ~, ~ ] = transformDataToSphere( processedData, p.resolution, normalizationMatrix, ellipsoid, p.samples_cube );
         end
         
         % project landmark onto unit sphere
@@ -100,19 +90,14 @@ parfor (experiment=1:numberOfExperiments,maximumNumberOfWorkers)
         [sphereCoordinates, landmarkCoordinates, landmarkOnSphere] = ...
             projectLandmarkOnSphere(processedData.landmark, p.resolution, ellipsoid, p.samples_sphere);
         
-        % project cells onto unit sphere 
-        if p.debug_level >= 3
-        disp('Projecting cells onto embryo surface...');
-        [sphereCoordinates2, cellsCoordinates, cellsOnSphere] = ...
-            projectLandmarkOnSphere(processedData.cells, p.resolution, ellipsoid, p.samples_sphere);
-        end
         
+        %4. ROTATION
         % estimate optimal rotation to register data to reference point with reference orientation
         if p.debug_level >= 1; disp('Estimating transformation from projected landmark...'); end        
         rotationMatrix = ...
             registerLandmark(landmarkCoordinates, p.reg);
         
-        %%%%%%%%%%% VALIDITY CHECK FOR DEBUGGING
+        % visualize the rotation of the projected landmark
         if p.reg.visualization
             % transform projected landmark with estimated rotation
             registered_sphere = ...
@@ -121,28 +106,19 @@ parfor (experiment=1:numberOfExperiments,maximumNumberOfWorkers)
             % visualize projection on unit sphere
             visualizeProjectedLandmark(sphereCoordinates, landmarkOnSphere);
             visualizeProjectedLandmark(registered_sphere', landmarkOnSphere);
-            
-            %visualize projection of mCherry channel on unit sphere
-            if p.debug_level >= 3
-                visualizeProjectedLandmark(sphereCoordinates, cellsOnSphere);
-                visualizeProjectedLandmark(registered_sphere', cellsOnSphere);
-            end 
         end
-       
-%       % DEBUG
-%       transformedCoordinates = rotationMatrix * landmarkCoordinates';
+        
         
         % compute registration transformation from original data space
-        transformation_registration = transformationMatrix * rotationMatrix';
+        transformation_registration = normalizationMatrix * rotationMatrix';
         
         % register data
         if p.debug_level >= 1; disp('Registering data...'); end
         registeredData = registerData( processedData, p.resolution, transformation_registration, ellipsoid, p.samples_cube);
                 
-        % create filename to save results
+        % create filename and save results
         results_filename = [p.resultsPath '/' experimentData.filename '_results.mat'];
-   
-        gatheredData = saveResults(experimentData, processedData, registeredData, ellipsoid, transformationMatrix, rotationMatrix, results_filename, p);
+        gatheredData = saveResults(experimentData, processedData, registeredData, ellipsoid, normalizationMatrix, rotationMatrix, results_filename, p);
         
         % visualize results if needed
         if p.visualization == 1
@@ -153,13 +129,9 @@ parfor (experiment=1:numberOfExperiments,maximumNumberOfWorkers)
         if p.proofOfPrinciple >= 1
             results_filename = [p.resultsPath '/' experimentData.filename];
             
-            rotationMatrix = transformationMatrix./repmat(ellipsoid.radii,[1,3]);
-            proofOfPrinciple(results_filename, registeredData, experimentData, processedData, p.resolution, inv(rotationMatrix)*transformationMatrix, ellipsoid.center, p.samples_cube);
+            rotationMatrix = normalizationMatrix./repmat(ellipsoid.radii,[1,3]);
+            proofOfPrinciple(results_filename, registeredData, experimentData, processedData, p.resolution, inv(rotationMatrix)*normalizationMatrix, ellipsoid.center, p.samples_cube);
         end
-        %-------------------------------------------------------------------------------------------------------
-        %ADDITIONAL VISUALIZATION
-        %slideShow(gatheredData.processed.GFPMIP, [])
-        %-------------------------------------------------------------------------------------------------------
         
         
         if p.debug_level >= 1; disp('Saved results successfully!'); end
