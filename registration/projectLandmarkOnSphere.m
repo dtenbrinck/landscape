@@ -1,19 +1,29 @@
 function [ sphereCoordinates, landmarkCoordinates, landmarkOnSphere ] = projectLandmarkOnSphere(landmark,resolution,ellipsoid,samples)
-%PROJECTIONONSPHERE:  This function will project the segmentation of the
-%landmark onto the sphere and the cells into the unit ball
+%PROJECTLANDMARKONSPHERE:  This function will project the segmentation of the
+%landmark onto the unit sphere surface
 %% Input:
-%   output:    	struct that contains all the segmentation data
-%   samples:    sampling of the space
-%   resolution: resolution of the original space
+%  landmark:    	dim1xdim2xdim3-matrix containing the 3d landmark
+%                   segmentation based on voxel labeling
+%  resolution:      1x3 vector containing the scaled resolution in [x,y,z]-direction
+%  ellipsoid:       struct containing the information about the ellipsoid
+%                   ellipsoid.center: 3x1 vector
+%                   ellipsoid.radii: 3x1 vector
+%                   ellipsoid.axes: 3x3 matrix
+%  samples:         integer that defines the resolution of the unit sphere
+%                   surface and the size of sphereCoordinates
 %% Output:
-%   output:     same struct as before but contains two new values:
-%               .regData:       These are the coordinates of the
-%                segmentation on the sphere.
-%               .centCoords:    These are the coordinates of the cells.
+%  sphereCoordinates:       samples^2 x 3 - matrix containing the
+%                           3d-coordinates that represent the unit sphere
+%                           surface
+%  landmarkCoordinates:     nx3-matrix containing the 3d coordinates of the
+%                           projected landmark
+%  landmarkOnSphere:        2*samples x samples/2 - matrix containing the
+%                           2d segmentation of the projected landmark
+%                           based on voxel labeling 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Main Code:
 
-% % Sampling sphere
+% Sampling sphere
 [alpha, beta] = meshgrid(linspace(pi,2*pi,samples/2), linspace(0,2*pi,2*samples));
 Xs = sin(alpha) .* sin(beta);
 Ys = cos(beta);
@@ -28,23 +38,17 @@ mind = [0 0 0]; maxd = size(landmark) .* resolution;
     linspace( mind(1), maxd(1), size(landmark,1) ),...
     linspace( mind(3), maxd(3), size(landmark,3) ) );
 
-
-% Projection: %
-%fprintf('Projection onto the unit sphere...');
-
 landmarkOnSphere = zeros(size(alpha));
 ellipsoid_tmp = ellipsoid;
 
 % Transform unit sphere...
 
-for tolerance = 0:0.01:2 %old:0.8:0.01:1.6
+for tolerance = 0:0.01:2 %old:0.8:0.01:1.6 %TODO: Was there a reason for the old values except for being faster?
     
     ellipsoid_tmp.radii = ellipsoid.radii * tolerance;
     
     transformationMatrix = computeTransformationMatrix(ellipsoid_tmp);
     
-    %[Xs_t,Ys_t,Zs_t] ...
-       %= transformUnitSphere3D(Xs,Ys,Zs,transformation_matrix,ellipsoid.center);
     transformedCoordinates = ...
         transformCoordinates(sphereCoordinates, [0; 0; 0], transformationMatrix, ellipsoid.center);
     
@@ -60,23 +64,8 @@ for tolerance = 0:0.01:2 %old:0.8:0.01:1.6
     landmarkOnSphere = max(landmarkOnSphere, tmp);
 end
 
-% visualize projection on unit sphere
-%visualizeProjectedLandmark(sphereCoordinates, landmarkOnSphere);
-
 % compute coordinates of landmark on sphere
 landmark_indices = find(landmarkOnSphere == 1);
 landmarkCoordinates = [sphereCoordinates(landmark_indices,1), sphereCoordinates(landmark_indices,2), sphereCoordinates(landmark_indices,3)];
 
-% Computing the coordinates of the segmentation
-%regData = [(round(Xs(landmarkOnSphere == 1 & Zs <= 0)*10^10)/10^10)';...
-%    (round(Ys(landmarkOnSphere == 1 & Zs <= 0)*10^10)/10^10)';...
-%    (round(Zs(landmarkOnSphere == 1 & Zs <= 0)*10^10)/10^10)'];
-
-% Delete all multiple points
-%regData = unique(output.regData','rows')';
-
-%fprintf('Done!\n');
-
-
 end
-
