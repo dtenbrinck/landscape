@@ -28,7 +28,8 @@ pstar = pstar/norm(pstar);
 vstar = vstar/norm(vstar);
 
 % Rotationmatrix: Rotate the great circle s.t. pstar is on reference_point
-% and vstar points into the same direction as reference_vector
+% and vstar points into the same direction as reference_vector??
+%TODO: What is the difference between Rp and Ra? Add correct commentary. 
 [Rp,~,~,~,vAngle]...
     = rotateGreatCircle(pstar,vstar,reference_point,reference_vector);
 
