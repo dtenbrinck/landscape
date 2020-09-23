@@ -1,4 +1,4 @@
-function [pstar, vstar] = sphericalRegression3D_daniel(data, p0, v0, options, visualize)
+function [pstar, vstar] = sphericalRegression3D_daniel(data, p0, v0, options)
 %SPHERICALREGRESSION3D   This function computes a spherical regression on
 %the 3D unit sphere.
 %% INPUT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -12,8 +12,6 @@ function [pstar, vstar] = sphericalRegression3D_daniel(data, p0, v0, options, vi
 %   options:    The fmincon options. Default:
 %               options = optimoptions('fmincon','Display','iter','Algorithm','sqp').
 %               For more information visit the documentation of fmincon.
-%   visualize:  visualize = 'true', visualizes the resulting regression
-%               line. Default: 'false'.
 %% OUTPUT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % pstar:        3D optimal starting point of the regression.
@@ -33,9 +31,6 @@ end
 if nargin < 4
     options = optimoptions('fmincon','Display','off','Algorithm','sqp');
 end
-if nargin < 5
-    visualize = 'true';
-end
 
 %% MAIN CODE %%
 %T = 0:0.01:2*pi;
@@ -54,6 +49,7 @@ pvT = [p0;v0];
 [pvT2, fval, exitflag, output] = fmincon(F,pvT,[],[],[],[],[],[],nonlcon,options);
 pstar = pvT2(1:3);
 vstar = pvT2(4:6);
+
 %Tstar = pvT2(7:end)';
 
 % visualization for debugging
@@ -74,4 +70,3 @@ vstar = pvT2(4:6);
 %Tstar = sort(Tstar);
 
 end
-
