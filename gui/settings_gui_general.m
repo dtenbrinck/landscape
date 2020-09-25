@@ -1,7 +1,16 @@
 function settings_gui_general(f)
+% SETTINGS_GUI_GENERAL the general settings
 
+% Clear the window
 clf(f);
+
+% Access the parameter variable used in the main gui
 global p;
+
+%--------------------------------------------------------------------------
+% Create all buttons and UI elements from top to bottom
+%--------------------------------------------------------------------------
+% Text that shows the current category of settings
 box_title = uicontrol('Style', 'text', ...
     'String', 'General', ...
     'HorizontalAlignment', 'center', ...
@@ -9,7 +18,7 @@ box_title = uicontrol('Style', 'text', ...
     'FontSize', 20, ...
     'Position', [100, 460, 300, 30]);
 
-
+% Buttons to select the level of debugging (1-3)
 box_debugging = uicontrol('Style', 'text', ...
     'String', 'Debug Level:', ...
     'HorizontalAlignment', 'left', ...
@@ -39,6 +48,7 @@ button_debugging_2 = uicontrol('Style', 'radiobutton', ...
     'Value', p.debug_level==2, ...
     'Callback', @saving_callback_debugging);
 
+% Box to select if parallel pooling should be enabled
 box_parallel = uicontrol('Style', 'text', ...
     'String', 'Parallel Processing:', ...
     'HorizontalAlignment', 'left', ...
@@ -50,6 +60,8 @@ checkbox_parallel = uicontrol('Style', 'checkbox', ...
     'Position', [250,375,30,20], ...
     'Callback', @saving_callback_parallelpool);
 
+% Boxes to select which kind of visualization should be done during the
+% registration step. Parallel pooling must be disabled for visualization
 box_visualization = uicontrol('Style', 'text', ...
     'String', 'Display During Registration: ', ...
     'HorizontalAlignment', 'left', ...
@@ -81,6 +93,7 @@ checkbox_visualization_result = uicontrol('Style', 'checkbox', ...
     'Enable', intern_function_bool_to_on_off(~p.parallelpool), ...
     'Callback', @saving_callback);
 
+% Button that leads to the previous window
 button_back = uicontrol('Style', 'pushbutton', ...
     'FontName', 'Arial', ...
     'FontSize', 15, ...
@@ -88,20 +101,22 @@ button_back = uicontrol('Style', 'pushbutton', ...
     'Position', [150, 30, 200, 50], ...
     'Callback', @button_back_callback);
 
-%--------------------------------------------
-%BUTTON FUNCTIONS
-%--------------------------------------------
+%--------------------------------------------------------------------------
+%Functions
+%--------------------------------------------------------------------------
     function button_back_callback(source, eventdata)
         settings_gui_advanced(f);
     end
 
+    % Function that saves all changes in specific parameters
     function saving_callback(source, eventdata)
         p.parallelpool = checkbox_parallel.Value;
         p.visualization = checkbox_visualization_result.Value;
         p.ellipsoidFitting.visualization = checkbox_visualization_ellipsoid.Value;
         p.reg.visualization = checkbox_visualization_registration.Value;
     end
-
+    
+    % Function that saves changes in the debugging level
     function saving_callback_debugging(source, eventdata)
         if source==button_debugging_0
             button_debugging_0.Value = 1;
@@ -121,6 +136,8 @@ button_back = uicontrol('Style', 'pushbutton', ...
         end
     end
 
+    % Function that saves changes in parallel pooling and enables/disables
+    % visualization accordingly
     function saving_callback_parallelpool(source, eventdata)
         p.parallelpool = checkbox_parallel.Value;
         if p.parallelpool

@@ -1,15 +1,23 @@
 function settings_gui(f)
+% SETTINGS_GUI the settings window for landscape
+
+% Access the parameter variable used in the main gui
 global p
 
+% Clear the figure
 clf(f);
-%--------------------------------------------------------------------------------
 
+%--------------------------------------------------------------------------
+% Create all buttons and UI elements from top to bottom
+%--------------------------------------------------------------------------
+% Button that saves the current settings to a file
 button_save = uicontrol('Style', 'pushbutton', ...
     'String', 'Save Settings', ...
     'FontName', 'Arial', ...
     'FontSize', 10, ...
     'Position', [150, 470, 100, 30], ...
     'Callback', @button_save_callback);
+% Button that loads settings from a file
 button_load = uicontrol('Style', 'pushbutton', ...
     'String', 'Load Settings', ...
     'FontName', 'Arial', ...
@@ -18,7 +26,10 @@ button_load = uicontrol('Style', 'pushbutton', ...
     'Callback', @button_load_callback);
 
 
-box_analysis_type = uicontrol('Style', 'text', ...
+% Buttons to choose the type of input data
+% This automatically sets all settings to the corresponding standard
+% settings
+box_data_type = uicontrol('Style', 'text', ...
     'String', 'Type of Input Data', ...
     'Position', [150, 415, 200, 30], ...
     'HorizontalAlignment', 'center', ...
@@ -37,7 +48,7 @@ button_type_drosophila = uicontrol('Style', 'togglebutton', ...
     'Value', isequal(p.datatype, 'Drosophila'), ...
     'Callback', @button_type_drosophila_callback);
 
-
+% Buttons to choose the mapping type for the data
 box_mapping_type = uicontrol('Style', 'text', ...
     'String', 'Type of Probe', ...
     'HorizontalAlignment', 'center', ...
@@ -57,7 +68,7 @@ button_mappingtype_tissue = uicontrol('Style', 'togglebutton', ...
     'Value', isequal(p.mappingtype, 'Tissue'), ...
     'Callback', @button_mappingtype_tissue_callback);
 
-
+% Editboxes to set the resolution of the input data
 box_resolution = uicontrol('Style', 'text', ...
     'String', ['Image Resolution (X,Y,Z) [' char(181) 'm]'], ...
     'HorizontalAlignment', 'center', ...
@@ -78,7 +89,7 @@ editbox_resolution_z = uicontrol('Style', 'edit', ...
     'Callback', @saving_callback);
 
 
-
+% Button that opens the advanced settings
 button_advanced_settings = uicontrol('Style', 'pushbutton', ...
     'FontName', 'Arial', ...
     'FontSize', 15, ...
@@ -87,9 +98,10 @@ button_advanced_settings = uicontrol('Style', 'pushbutton', ...
     'Callback', @button_advanced_settings_callback);
 
 
-%------------------------------------------------------------------------------
-%Button Functions
-%------------------------------------------------------------------------------
+%--------------------------------------------------------------------------
+%Functions
+%--------------------------------------------------------------------------
+    % Function that sets all settings to the standard zebrafish settings
     function button_type_zebrafish_callback(source, eventdata)
         button_type_zebrafish.Value = 1;
         button_type_drosophila.Value = 0;
@@ -118,6 +130,7 @@ button_advanced_settings = uicontrol('Style', 'pushbutton', ...
         p.option.shellHeatmapResolution = [90,90];
     end
 
+    % Function that sets all settings to the standard drosophila settings
     function button_type_drosophila_callback(source, eventdata)
         button_type_zebrafish.Value = 0;
         button_type_drosophila.Value = 1;
@@ -146,6 +159,7 @@ button_advanced_settings = uicontrol('Style', 'pushbutton', ...
         p.option.shellHeatmapResolution = [180,90];
     end
 
+    % Function that sets all relevant settings for cell mapping
     function button_mappingtype_cells_callback(source, eventdata)
         button_mappingtype_cells.Value = 1;
         button_mappingtype_tissue.Value = 0;
@@ -154,7 +168,8 @@ button_advanced_settings = uicontrol('Style', 'pushbutton', ...
         p.rmbg.mCherryDiskSize = 11;
         p.option.convolution = true;
     end
-
+    
+    % Function that sets all relevant settings for tissue mapping
     function button_mappingtype_tissue_callback(source, eventdata)
         button_mappingtype_cells.Value = 0;
         button_mappingtype_tissue.Value = 1;
@@ -164,11 +179,12 @@ button_advanced_settings = uicontrol('Style', 'pushbutton', ...
         p.option.convolution = false;
     end
 
+    % Function that opens the advanced settings in this window
     function button_advanced_settings_callback(source, eventdata)
         settings_gui_advanced(f);
     end
 
-
+    % Function that saves all changes in the settings
     function saving_callback(source, eventdata)
         p.original_resolution = [str2double(editbox_resolution_x.String), str2double(editbox_resolution_y.String), str2double(editbox_resolution_z.String)];
         p.resolution = p.original_resolution;
@@ -176,15 +192,33 @@ button_advanced_settings = uicontrol('Style', 'pushbutton', ...
         
     end
 
+    % Function that saves the current settings to a file chosen by the user
     function button_save_callback(source, eventdata)
-        parameter_file_path = uigetdir('Please select folder for your parameter file');
-        parameter_file_name = inputdlg('Please enter a name for your parameter file');
-        save([parameter_file_path '\' parameter_file_name{1} '.mat'], 'p');
+        try
+            parameter_file_path = uigetdir('Please select folder for your parameter file');
+            % If the path selection was canceled, stop the saving process
+            if parameter_file_path == 0; return; end
+            parameter_file_name = inputdlg('Please enter a name for your parameter file');
+            % If the file naming was canceled, stop the saving process
+            if isempty(parameter_file_name); return; end
+            save([parameter_file_path '\' parameter_file_name{1} '.mat'], 'p');
+        catch
+            disp('Saving parameters was not successful')
+        end
     end
 
+    % Function that loads the settings from a file chosen by the user
     function button_load_callback(source, eventdata)
-        [parameter_file_name, parameter_file_path] = uigetfile;
-        load([parameter_file_path '/' parameter_file_name]);
+        try
+            [parameter_file_name, parameter_file_path] = uigetfile;
+            % If the file selection was canceled, stop the loading process
+            if parameter_file_name == 0; return; end
+            load([parameter_file_path '/' parameter_file_name]);
+        catch
+            disp('Loading parameters was not successful')
+            return
+        end
+        % Update all UI elements for the new settings
         button_type_zebrafish.Value = isequal(p.datatype, 'Zebrafish');
         button_type_drosophila.Value = isequal(p.datatype, 'Drosophila');
         button_mappingtype_cells.Value = isequal(p.mappingtype, 'Cells');
