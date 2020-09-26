@@ -78,7 +78,7 @@ function [ center, radii, axis ] ...
 
 % idx = randperm( size(X,1), ceil(0.1*size(X,1)));
 % X = X(idx,:); 
-[W, X, pca_transformation] = prepareCoordinateMatrixAndOrientationMatrix(X, fittingParams.pcaType);
+[W, X, pca_transformation] = prepareCoordinateMatrixAndOrientationMatrix(X, fittingParams.pcaCentered);
 [v_initial] = initializeEllipsoidParams(X);
 Wtransposed = W';
 
@@ -112,12 +112,12 @@ function [radii, center] = getEllipsoidParams(v)
     center = - v(4:6) ./ v(1:3);
 end
 
-function [W, X, pca_transformation] = prepareCoordinateMatrixAndOrientationMatrix(X, pcaType)
+function [W, X, pca_transformation] = prepareCoordinateMatrixAndOrientationMatrix(X, pcaCentered)
     if size( X, 2 ) ~= 3
         error( 'Input data must have three columns!' );
     else
         %species = 'Zebrafish'; %Zebrafish or Drosophila
-        if strcmp(pcaType, 'Zebrafish')
+        if ~pcaCentered
         [pca_transformation, X_transformedWithPCA] = pca(X, 'Centered',false); 
         % pca_transformation = column-wise coeff. of principal components 
         % X_transformedWithPCA = transformed coordinates of observations X
@@ -128,7 +128,7 @@ function [W, X, pca_transformation] = prepareCoordinateMatrixAndOrientationMatri
         % X = X_transformedWithPCA * pca_transformation';
         % pca_transformation is a orthogonal matrix
         X = X_transformedWithPCA;
-        elseif strcmp(pcaType, 'Drosophila')
+        else
         pca_transformation = pca(X); %column-wise coeff. of principal components 
         X = X * pca_transformation;
         end

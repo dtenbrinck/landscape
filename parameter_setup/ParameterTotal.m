@@ -90,14 +90,15 @@ if strcmp(p.datatype, 'Zebrafish')
     p.ellipsoidFitting.regularisationParams.mu1 = 10^-4; %2*10???4 old % 0.002 for old dapi segmentation  %now1*10^-4 Drosoph: 0.008
     p.ellipsoidFitting.regularisationParams.mu2 = 1; %1 
     p.ellipsoidFitting.regularisationParams.gamma = 1;
-    p.ellipsoidFitting.pcaType = 'Zebrafish';
+    p.ellipsoidFitting.pcaCentered = false;
 elseif strcmp(p.datatype, 'Drosophila')
     p.ellipsoidFitting.regularisationParams.mu0 = 10^-4; %10^8 for old dapi segmentation %now 10^-7 %Drosoph: 10^-4 
     p.ellipsoidFitting.regularisationParams.mu1 = 0.008; %2*10???4 old % 0.002 for old dapi segmentation  %now1*10^-4 Drosoph: 0.008
     p.ellipsoidFitting.regularisationParams.mu2 = 1; %1 
     p.ellipsoidFitting.regularisationParams.gamma = 1;
-    p.ellipsoidFitting.pcaType = 'Drosophila';
+    p.ellipsoidFitting.pcaCentered = true;
 end
+
 %% REGISTRATION
 % -- REGISTRATION OF LANDMARK -- %
 p.reg.landmarkCharacteristic = 'middle';
