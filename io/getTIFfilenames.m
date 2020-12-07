@@ -1,5 +1,8 @@
 function fileNames = getTIFfilenames( pathName )
+%% Output:
+%  filenames:      nx1 cell containing the filenames 
 
+%% Code
 % get all tif files in selected folder
 tifFiles = strcat(pathName,'/*.tif');
 listOfFiles = dir(tifFiles);
