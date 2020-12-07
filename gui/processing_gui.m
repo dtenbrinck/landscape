@@ -51,16 +51,16 @@ parfor (experiment=1:numberOfExperiments,maximumNumberOfWorkers)
         
         %2. SEGMENTATION
         % segment data in all three channels
-        if p.debug_level >= 1; disp('Segmenting GFP channel...'); end
+        if p.debug_level >= 1; disp('Segmenting landmark channel...'); end
         [processedData.landmark, processedData.landmarkCentCoords] =...
             segmentGFP(processedData.GFP, p.GFPseg, p.resolution);
         
-        if p.debug_level >= 1; disp('Segmenting DAPI channel...'); end
+        if p.debug_level >= 1; disp('Segmenting nuclei channel...'); end
         [processedData.nuclei, processedData.nucleiCoordinates, processedData.embryoShape] =...
             segmentDAPI(processedData.Dapi, p.DAPIseg, p.resolution);
         
         %segment mCherry channel depending on selected mappingtype
-        if p.debug_level >= 1; disp('Segmenting mCherry channel...'); end
+        if p.debug_level >= 1; disp('Segmenting probe channel...'); end
         if strcmp(p.mappingtype, 'Cells')
         [processedData.cells, processedData.cellCoordinates] =...
             blobSegmentCells(processedData.mCherry, p.mCherryseg, processedData.embryoShape); 
