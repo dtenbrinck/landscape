@@ -1,4 +1,8 @@
 function fileNames = getSTKfilenames( pathName )
+%% Output:
+%  filenames:      nx1 cell containing the filenames 
+
+%% Code
 
 % get all stk files in selected folder
 files = strcat(pathName,'/*.stk');
