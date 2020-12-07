@@ -1,6 +1,21 @@
 function experimentSets = checkExperimentChannels( fileNames )
-%CHECKEXPERIMENTCHANNELS Summary of this function goes here
-%   Detailed explanation goes here
+%CHECKEXPERIMENTCHANNELS:  This function will rearrange the cell with the filenames
+%                          s.t. each row corresponds to a complete experiment set
+%                          that consists of three files (nuclei,
+%                          landmark and probe channel). 
+%                          The files have to be named after the scheme
+%                          <experiment_number>_<channel>.tif.
+%                          If a data set is missing one of the channels it
+%                          will be ignored.
+%% Input:
+%  filenames:    	nx1 cell containing the filenames 
+%% Output:
+%  experimentSets:       (n/3)x3 cell containing the rearranged filenames
+%                        each row contains the three filenames for the nuclei (1st column),
+%                        landmark (2nd column) and probe (3rd column) channel that form a
+%                        complete experiment set.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Code
 
 % search for underscores in filenames
 indices = strfind(fileNames,'_');
@@ -67,7 +82,8 @@ experimentSets = reshape(experimentSets(~cellfun('isempty',experimentSets)),[],3
 
 % Warning message if no experiments could be found
 if isempty(experimentSets)
-    error('No valid experiment data could be found in chosen directory. Make sure you name the files containing strings like ''landmark'', ''nuclei'', or ''probe''.');
+    error('No valid experiment data could be found in chosen directory. Make sure you name your files <experiment_number>_<channel>.tif');
 end
 
 end
+
