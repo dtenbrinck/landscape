@@ -1,12 +1,9 @@
 function experimentSets = checkExperimentChannels( fileNames )
 %CHECKEXPERIMENTCHANNELS:  This function will rearrange the cell with the filenames
-%                          s.t. each row corresponds to a complete experiment set
-%                          that consists of three files (nuclei,
-%                          landmark and probe channel). 
-%                          The files have to be named after the scheme
-%                          <experiment_number>_<channel>.tif.
-%                          If a data set is missing one of the channels it
-%                          will be ignored.
+%s.t. each row corresponds to a complete experiment set that consists of three files 
+%(nuclei, landmark and probe channel). 
+%The files have to be named after the scheme <experiment_number>_<channel>.tif.
+%If an experiment set is missing one of the channels it will be ignored.
 %% Input:
 %  filenames:    	nx1 cell containing the filenames 
 %% Output:
@@ -86,4 +83,3 @@ if isempty(experimentSets)
 end
 
 end
-
