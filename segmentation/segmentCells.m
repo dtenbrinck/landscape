@@ -1,6 +1,9 @@
 function [cells, centCoords] = segmentCells( data, p, resolution )
-%SEGMENTDATA Summary of this function goes here
-%   Detailed explanation goes here
+%SEGMENTDATA function for segmenting the probe channel
+%   This function uses the in p selected clustering algorithm to segment
+%   the data in the probe channel into signal and background. The default
+%   method is k-means.
+%   This function has been replaced by blobSegmentCells.
 
 % method = 'k-means';
 
@@ -94,10 +97,12 @@ for i = 1:cc.NumObjects
 end
 
 for j=1:length(cellObjects)
+    % extract current cell
     currentCell = zeros(size(data));
     currentCell(cellObjects{j}) = 1;
     currentCell = currentCell .* data;
     
+    % find strongest signal in current cell
     maxSlice = 2;
     maxValue = -1;
     for slice = 2:size(data,3)-1
@@ -107,6 +112,7 @@ for j=1:length(cellObjects)
         end
     end
     
+    % mark the cell in the slice with the strongest signal
     sliceMask = zeros(size(data));
     sliceMask(:,:,maxSlice) = 1;
     
