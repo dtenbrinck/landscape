@@ -2,7 +2,6 @@ function [ pstar, vstar ] = computeRegression_new(regData)
 % COMPUTEREGRESSION computes the regression and will output pstar and vstar of the data regression.
 %% Input:
 %   regData:        3xn matrix containing the coordinates on the sphere
-%   visualize:      Visualize the regression. 'true', 'false'
 %% Output:
 %   pstar:          p* of the regression. Sets the Point where the geodesic
 %                   starts.

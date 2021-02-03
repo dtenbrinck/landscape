@@ -19,10 +19,12 @@ for i = 1:cc.NumObjects
 end
 
 for j=1:length(cellObjects)
+    % extract current cell
     currentCell = zeros(size(data_3D));
     currentCell(cellObjects{j}) = 1;
     currentCell = currentCell .* single(data_3D);
     
+    % find strongest signal
     maxSlice = 2;
     maxValue = -1;
     for slice = 2:size(data_3D,3)-1
@@ -32,6 +34,7 @@ for j=1:length(cellObjects)
         end
     end
     
+    % mark cell in slice with the strongest signal
     sliceMask = zeros(size(data_3D));
     sliceMask(:,:,maxSlice) = 1;
     

@@ -1,8 +1,15 @@
 function [ transformation ] = computeTransformationMatrix( ellipsoid )
-%COMP Summary of this function goes here
-%   Detailed explanation goes here
+%COMPUTETRANSFORMATIONMATRIX: This function computes the transformation 
+%to transform the given ellipsoid to unit sphere
+%% Input:
+% ellipsoid:       struct containing the information about the ellipsoid
+%                  ellipsoid.radii: 3x1 vector
+%                  ellipsoid.axes: 3x3 matrix
+%% Output:
+% transformation: 3x3 matrix
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Code
 
-% compute transformation to transform ellisoid to unit sphere
 transformation = diag(ellipsoid.radii(:)) * ellipsoid.axes;
 
 end

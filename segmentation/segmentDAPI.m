@@ -1,6 +1,8 @@
 function [nuclei, centCoords, embryoShape] = segmentDAPI( data, p, resolution )
-%SEGMENTDATA Summary of this function goes here
-%   Detailed explanation goes here
+%SEGMENTDATA function for segmenting the nuclei channel
+%   This function uses the in p selected clustering algorithm to segment
+%   the data in the nuclei channel into signal and background. The default
+%   method is k-means.
 
 if strcmp(p.method, 'CP') % Chambolle-Pock with thresholding
   % get histogram
@@ -78,7 +80,6 @@ end
 smoothed = imgaussfilt3(data, 0.1);
 
 locMax = imregionalmax(smoothed, 26);
-% TODO reduce plateau areas to only one pixel?!
 
 % remove too small objects
 % neighbourhoodConnectivity = zeros(3,3,3);
@@ -87,9 +88,6 @@ locMax = imregionalmax(smoothed, 26);
 brightRegions = bwareaopen(Xi, p.minNucleusSize, 26);
 
 brightPixel3d = brightRegions & locMax;
-
-% For Dros_18 Delete later
-%brightPixel3d(:,:,size(brightPixel3d,3))=0;
 
 indices = find(brightPixel3d > 0);
 [tmpy, tmpx, tmpz] = ind2sub(size(brightPixel3d), indices);

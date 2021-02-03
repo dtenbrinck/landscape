@@ -1,5 +1,5 @@
 function [cells, centCoords] = blobSegmentCells( data, p, embryoShape )
-
+%BLOBSEGMENTCELLS function to segment data in the probe channel
 % Segmentation of the cells with blob segmentation
 
 % Check that user has the Image Processing Toolbox installed.
@@ -49,16 +49,10 @@ end
 % filter segmentation using mask for embryo
 binaryImage = binaryImage & repmat(embryoShape,1,1,size(binaryImage,3));
 
-% DEBUG
-%figure; imagesc(computeMIP(data)); hold on; contour(computeMIP(binaryImage),[0.5, 0.5], 'r'); hold off
-
 start_points = binaryImage;
 CC = bwconncomp(start_points);
 S = regionprops(CC,'centroid');
 centCoords = round(cat(1,S(:).Centroid));
-
-% DEBUG
-%figure(4); imagesc(computeMIP(data)); hold on; plot(centCoords(:,1), centCoords(:,2), 'r*'); hold off;
 
 % Filter centCoords via kd-tree (resolution dependent)
 
@@ -87,24 +81,11 @@ for i=1:CC.NumObjects
         max(1,centCoords(i,2)-bbLimit):min(size(data,1),centCoords(i,2)+bbLimit),...
         max(1,centCoords(i,1)-bbLimit):min(size(data,2),centCoords(i,1)+bbLimit))...
         | segmented_roi{i};
-    % DEBUG
-    %figure(1); imagesc(roi{i}); hold on; contour(segmented_roi{i}, [0.5, 0.5], 'r'); hold off;
-    %figure(2); imagesc(computeMIP(data)); hold on; plot(centCoords(:,1), centCoords(:,2), 'r*'); plot(centCoords(i,1), centCoords(i,2), 'g*'); hold off;
-    %pause(1);
 end
 
 
 cells = extend2dTo3dSegmentation(segmentation_2D, data);
 %binaryImage = segmentation3D;
-% DEBUG
-% figure;
-% for i=1:CC.NumObjects
-%     imagesc(roi{i});
-%     hold on;
-%     contour(segmented_roi{i}, [0.5, 0.5], 'r');
-%     hold off;
-%     pause(2);
-% end
 
 % Do a "hole fill" to get rid of any background pixels or "holes" inside the blobs.
 %binaryImage = imfill(binaryImage, 'holes');
